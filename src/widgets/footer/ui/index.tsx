@@ -17,7 +17,9 @@ const Footer = () => {
                   src={PRODUCT_INFO.logo}
                   alt={PRODUCT_INFO.name}
                   title={PRODUCT_INFO.name}
-                  className="h-8"
+                  width={32}
+                  height={32}
+                  className="h-8 w-auto"
                 />
               </a>
               <h2 className="text-xl font-semibold">{PRODUCT_INFO.name}</h2>

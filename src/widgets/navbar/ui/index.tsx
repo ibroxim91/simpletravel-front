@@ -36,12 +36,12 @@ const Navbar = () => {
             <LocationOnIcon
               sx={{ color: 'white', width: '28px', height: '28px' }}
             />
-            <p>{t('Укажите город')}</p>
+            <p className="text-sm">{t('Укажите город')}</p>
             <ChevronRightIcon
               sx={{
                 color: 'white',
-                width: '28px',
-                height: '28px',
+                width: '24px',
+                height: '24px',
               }}
             />
           </div>
@@ -60,11 +60,11 @@ const Navbar = () => {
               <p className="text-sm">{t('Tourex@gmail.com')}</p>
             </div>
             <div className="w-[1px] h-[60%] bg-white" />
-            <div className="flex gap-2 text-white">
+            <div className="flex gap-2 text-white items-center">
               <LocalPhoneIcon
                 sx={{ color: 'white', width: '24px', height: '24px' }}
               />
-              <p>90 222 29 22</p>
+              <p className="text-sm">90 222 29 22</p>
             </div>
           </div>
         </div>
