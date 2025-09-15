@@ -1,5 +1,5 @@
-import { LanguageRoutes } from '../config/i18n/types';
 import { getLocale } from 'next-intl/server';
+import { LanguageRoutes } from '../config/i18n/types';
 
 /**
  * Format price. With label.
@@ -10,9 +10,9 @@ import { getLocale } from 'next-intl/server';
 const formatPrice = async (amount: number | string, withLabel?: boolean) => {
   const locale = (await getLocale()) as LanguageRoutes;
   const label = withLabel
-    ? locale == LanguageRoutes.RU
+    ? locale === LanguageRoutes.RU
       ? ' сум'
-      : locale == LanguageRoutes.KI
+      : locale === LanguageRoutes.KI
         ? ' сўм'
         : ' so‘m'
     : '';
@@ -22,7 +22,7 @@ const formatPrice = async (amount: number | string, withLabel?: boolean) => {
 
   const formattedDollars = dollars.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 
-  if (String(amount).length == 0) {
+  if (String(amount).length === 0) {
     return formattedDollars + '.' + cents + label;
   } else {
     return formattedDollars + label;

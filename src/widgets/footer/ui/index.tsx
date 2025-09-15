@@ -1,7 +1,8 @@
 import { PRODUCT_INFO } from '@/shared/constants/data';
-import { InstagramIcon, YoutubeIcon } from 'lucide-react';
-import { sections } from '../lib/data';
 import { ModeToggle } from '@/shared/ui/theme-toggle';
+import { InstagramIcon, YoutubeIcon } from 'lucide-react';
+import Image from 'next/image';
+import { sections } from '../lib/data';
 
 const Footer = () => {
   return (
@@ -12,7 +13,7 @@ const Footer = () => {
             {/* Logo */}
             <div className="flex items-center gap-2 lg:justify-start">
               <a href="https://shadcnblocks.com">
-                <img
+                <Image
                   src={PRODUCT_INFO.logo}
                   alt={PRODUCT_INFO.name}
                   title={PRODUCT_INFO.name}

@@ -1,17 +1,16 @@
 'use client';
 
-import * as React from 'react';
-import { GlobeIcon } from 'lucide-react';
+import { LanguageRoutes } from '@/shared/config/i18n/types';
+import { Button } from '@/shared/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu';
-import { Button } from '@/shared/ui/button';
-import { languages } from '../lib/data';
+import { GlobeIcon } from 'lucide-react';
 import { useParams, usePathname, useRouter } from 'next/navigation';
-import { LanguageRoutes } from '@/shared/config/i18n/types';
+import { languages } from '../lib/data';
 
 export function ChangeLang() {
   const { locale } = useParams();
@@ -30,7 +29,7 @@ export function ChangeLang() {
       <DropdownMenuTrigger asChild>
         <Button variant="outline">
           <GlobeIcon />
-          <span>{languages.find((e) => e.key == locale)?.name}</span>
+          <span>{languages.find((e) => e.key === locale)?.name}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

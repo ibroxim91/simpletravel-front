@@ -126,3 +126,17 @@
     @apply container px-4 mx-auto;
   }
 }
+
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('/fonts/SFProDisplay-Regular.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('/fonts/SFProDisplay-Bold.otf') format('opentype');
+}
+
+body {
+  font-family: 'SF Pro Display', sans-serif;
+}

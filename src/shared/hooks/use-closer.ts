@@ -33,7 +33,7 @@ const useCloser = (
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('scroll', handleScroll);
     };
-  }, [ref, closeFunction]);
+  }, [ref, closeFunction, scrollClose]);
 };
 
 export default useCloser;

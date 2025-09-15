@@ -1,17 +1,17 @@
-import type { Metadata } from 'next';
-import '../globals.css';
 import { golosText } from '@/shared/config/fonts';
+import { routing } from '@/shared/config/i18n/routing';
+import QueryProvider from '@/shared/config/react-query/QueryProvider';
 import { ThemeProvider } from '@/shared/config/theme-provider';
 import { PRODUCT_INFO } from '@/shared/constants/data';
-import { hasLocale, Locale, NextIntlClientProvider } from 'next-intl';
-import { routing } from '@/shared/config/i18n/routing';
-import { notFound } from 'next/navigation';
 import Footer from '@/widgets/footer/ui';
 import Navbar from '@/widgets/navbar/ui';
-import { ReactNode } from 'react';
+import type { Metadata } from 'next';
+import { hasLocale, Locale, NextIntlClientProvider } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
-import QueryProvider from '@/shared/config/react-query/QueryProvider';
+import { notFound } from 'next/navigation';
 import Script from 'next/script';
+import { ReactNode } from 'react';
+import '../globals.css';
 
 export const metadata: Metadata = {
   title: PRODUCT_INFO.name,
