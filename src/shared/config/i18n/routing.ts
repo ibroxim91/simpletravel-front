@@ -3,7 +3,7 @@ import { LanguageRoutes } from './types';
 
 export const routing = defineRouting({
   // A list of all locales that are supported
-  locales: [LanguageRoutes.UZ, LanguageRoutes.RU, LanguageRoutes.KI],
+  locales: [LanguageRoutes.UZ, LanguageRoutes.RU, LanguageRoutes.EN],
 
   // Used when no locale matches
   defaultLocale: LanguageRoutes.UZ,

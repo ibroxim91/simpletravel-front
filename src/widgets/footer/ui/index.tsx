@@ -1,86 +1,152 @@
-import { PRODUCT_INFO } from '@/shared/constants/data';
-import { ModeToggle } from '@/shared/ui/theme-toggle';
-import { InstagramIcon, YoutubeIcon } from 'lucide-react';
+'use client';
+
+import Logo from '@/assets/LogoWhite.png';
+import { Link } from '@/shared/config/i18n/navigation';
+import FacebookOutlinedIcon from '@mui/icons-material/FacebookOutlined';
+import InstagramIcon from '@mui/icons-material/Instagram';
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import XIcon from '@mui/icons-material/X';
+import IconButton from '@mui/material/IconButton';
 import Image from 'next/image';
-import { sections } from '../lib/data';
 
 const Footer = () => {
   return (
-    <section className="py-32">
+    <section className="py-8 bg-[#031753] rounded-t-4xl">
       <div className="custom-container">
-        <div className="flex w-full flex-col items-center justify-between gap-10 text-center lg:flex-row lg:items-start lg:text-left">
-          <div className="flex w-full flex-col items-center justify-between gap-6 lg:items-start">
-            {/* Logo */}
-            <div className="flex items-center gap-2 lg:justify-start">
-              <a href="https://shadcnblocks.com">
-                <Image
-                  src={PRODUCT_INFO.logo}
-                  alt={PRODUCT_INFO.name}
-                  title={PRODUCT_INFO.name}
-                  width={32}
-                  height={32}
-                  className="h-8 w-auto"
+        <div className="flex items-center">
+          <div className="w-full h-12 flex items-center gap-8">
+            <Image
+              src={Logo}
+              alt="Logo"
+              width={120}
+              height={40}
+              priority
+              className="h-full w-auto size-12"
+            />
+          </div>
+          <div className="flex gap-4 max-lg:hidden">
+            <Link href={'#'}>
+              <IconButton sx={{ border: '1px solid var(--ring)' }}>
+                <LinkedInIcon
+                  sx={{ color: 'white', width: '28px', height: '28px' }}
                 />
-              </a>
-              <h2 className="text-xl font-semibold">{PRODUCT_INFO.name}</h2>
+              </IconButton>
+            </Link>
+            <Link href={'#'}>
+              <IconButton sx={{ border: '1px solid var(--ring)' }}>
+                <XIcon sx={{ color: 'white', width: '28px', height: '28px' }} />
+              </IconButton>
+            </Link>
+            <Link href={'#'}>
+              <IconButton sx={{ border: '1px solid var(--ring)' }}>
+                <InstagramIcon
+                  sx={{ color: 'white', width: '28px', height: '28px' }}
+                />
+              </IconButton>
+            </Link>
+            <Link href={'#'}>
+              <IconButton sx={{ border: '1px solid var(--ring)' }}>
+                <FacebookOutlinedIcon
+                  sx={{ color: 'white', width: '28px', height: '28px' }}
+                />
+              </IconButton>
+            </Link>
+          </div>
+        </div>
+        <div className="w-full h-[1px] bg-ring mt-10" />
+        <div className="grid grid-cols-4 font-medium max-lg:grid-cols-3 max-md:grid-cols-2 max-sm:grid-cols-1 max-lg:gap-10 mt-10">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1">
+              <p className="text-ring text-sm">Служба поддержки</p>
+              <p className="text-white font-semibold">+998 71 000 00 00</p>
             </div>
-            <p className="text-sm text-muted-foreground">
-              A collection of 100+ responsive HTML templates for your startup
-              business or side project.
-            </p>
-            <ul className="flex items-center space-x-6 text-muted-foreground">
-              <li className="font-medium hover:text-primary">
-                <a href="#">
-                  <InstagramIcon className="size-6" />
-                </a>
-              </li>
-              <li className="font-medium hover:text-primary">
-                <a href="#">
-                  <YoutubeIcon className="size-6" />
-                </a>
-              </li>
-              <li className="font-medium hover:text-primary">
-                <a href="#">
-                  <InstagramIcon className="size-6" />
-                </a>
-              </li>
-              <li className="font-medium hover:text-primary">
-                <a href="#">
-                  <InstagramIcon className="size-6" />
-                </a>
-              </li>
-            </ul>
-            <ModeToggle />
+            <div className="flex flex-col gap-1">
+              <p className="text-ring text-sm">Общие вопросы</p>
+              <p className="text-white font-semibold">office@Simple travel</p>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="text-ring text-sm">Адрес</p>
+              <p className="text-white font-semibold">
+                Тошкент шахри, Юнусобод тумани
+              </p>
+            </div>
           </div>
-          <div className="grid w-full grid-cols-3 gap-6 lg:gap-20">
-            {sections.map((section, sectionIdx) => (
-              <div key={sectionIdx}>
-                <h3 className="mb-6 font-bold">{section.title}</h3>
-                <ul className="space-y-4 text-sm text-muted-foreground">
-                  {section.links.map((link, linkIdx) => (
-                    <li
-                      key={linkIdx}
-                      className="font-medium hover:text-primary"
-                    >
-                      <a href={link.href}>{link.name}</a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1">
+              <p className="text-white font-semibold">Страница</p>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="text-ring text-sm">Главная</p>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="text-ring text-sm">Подобрать тур</p>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="text-ring text-sm">Блоги</p>
+            </div>
+          </div>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1">
+              <p className="text-white font-semibold">О сервисе</p>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="text-ring text-sm">О нас</p>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="text-ring text-sm">Услуги</p>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="text-ring text-sm">Публичная оферта</p>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="text-ring text-sm">Оферта для юрлиц</p>
+            </div>
+          </div>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1">
+              <p className="text-white font-semibold">Помощь</p>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="text-ring text-sm">Инструкция пользователя</p>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="text-ring text-sm">Политика конфиденциальности</p>
+            </div>
           </div>
         </div>
-        <div className="mt-8 flex flex-col justify-between gap-4 border-t pt-8 text-center text-sm font-medium text-muted-foreground lg:flex-row lg:items-center lg:text-left">
-          <p>
-            © {new Date().getFullYear()} {PRODUCT_INFO.creator}. All rights
-            reserved.
-          </p>
-          <ul className="flex justify-center gap-4 lg:justify-start">
-            <li className="hover:text-primary">
-              <a href={PRODUCT_INFO.terms_of_use}>Terms and Conditions</a>
-            </li>
-          </ul>
+        <div className="w-full h-[1px] bg-ring mt-10" />
+        <div className="flex gap-4 min-lg:hidden mt-10">
+          <Link href={'#'}>
+            <IconButton sx={{ border: '1px solid var(--ring)' }}>
+              <LinkedInIcon
+                sx={{ color: 'white', width: '28px', height: '28px' }}
+              />
+            </IconButton>
+          </Link>
+          <Link href={'#'}>
+            <IconButton sx={{ border: '1px solid var(--ring)' }}>
+              <XIcon sx={{ color: 'white', width: '28px', height: '28px' }} />
+            </IconButton>
+          </Link>
+          <Link href={'#'}>
+            <IconButton sx={{ border: '1px solid var(--ring)' }}>
+              <InstagramIcon
+                sx={{ color: 'white', width: '28px', height: '28px' }}
+              />
+            </IconButton>
+          </Link>
+          <Link href={'#'}>
+            <IconButton sx={{ border: '1px solid var(--ring)' }}>
+              <FacebookOutlinedIcon
+                sx={{ color: 'white', width: '28px', height: '28px' }}
+              />
+            </IconButton>
+          </Link>
         </div>
+        <p className="mt-10 text-white font-medium">
+          «simpletravel» Подробные сведения, политика конфиденциальности и
+          пользовательское соглашение размещены в разделе «Документы и файлы».
+        </p>
       </div>
     </section>
   );

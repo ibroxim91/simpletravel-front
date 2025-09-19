@@ -1,6 +1,6 @@
+import { LanguageRoutes } from '@/shared/config/i18n/types';
 import { Book, Sunset, Trees, Zap } from 'lucide-react';
 import { MenuItem } from './model';
-import { LanguageRoutes } from '@/shared/config/i18n/types';
 
 const menu: MenuItem[] = [
   { title: 'Home', url: '#' },
@@ -81,8 +81,8 @@ const languages: { name: string; key: LanguageRoutes }[] = [
     key: LanguageRoutes.UZ,
   },
   {
-    name: 'Ўзбекча',
-    key: LanguageRoutes.KI,
+    name: 'Inglizcha',
+    key: LanguageRoutes.EN,
   },
   {
     name: 'Русский',
@@ -90,4 +90,4 @@ const languages: { name: string; key: LanguageRoutes }[] = [
   },
 ];
 
-export { menu, languages };
+export { languages, menu };

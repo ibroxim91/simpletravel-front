@@ -2,22 +2,27 @@
 
 import Logo from '@/assets/navLogo.png';
 import { Link, usePathname } from '@/shared/config/i18n/navigation';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import EmailIcon from '@mui/icons-material/Email';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
+import MenuIcon from '@mui/icons-material/Menu';
 import PersonIcon from '@mui/icons-material/Person';
-import PublicIcon from '@mui/icons-material/Public';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import clsx from 'clsx';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
+import { useState } from 'react';
+import { ChangeLang } from './ChangeLang';
+import CitySelect from './CitySelect';
+import CitySelectMobile from './CitySelectMobile';
+import MobileNavbar from './MobileNavbar';
 
 const Navbar = () => {
   const t = useTranslations();
   const pathname = usePathname();
+
+  const [openMobie, setOpenMobile] = useState(false);
 
   const links = [
     { href: '/', label: 'Главная' },
@@ -29,49 +34,38 @@ const Navbar = () => {
   ];
 
   return (
-    <section className="sticky w-full top-0">
-      <div className="bg-[#031753] p-2">
-        <div className="flex custom-container px-0 justify-between">
-          <div className="px-0 flex gap-2 text-white items-center">
-            <LocationOnIcon
-              sx={{ color: 'white', width: '28px', height: '28px' }}
-            />
-            <p className="text-sm">{t('Укажите город')}</p>
-            <ChevronRightIcon
-              sx={{
-                color: 'white',
-                width: '24px',
-                height: '24px',
-              }}
-            />
-          </div>
-          <div className="flex gap-4 items-center">
-            <div className="flex gap-2 text-white items-center">
-              <PublicIcon
-                sx={{ color: 'white', width: '24px', height: '24px' }}
-              />
-              <p className="text-sm">{t('Русский')}</p>
-            </div>
-            <div className="w-[1px] h-[60%] bg-white" />
-            <div className="flex gap-2 text-white items-center">
+    <section className="sticky w-full top-0 z-20">
+      <div className="bg-[#031753] p-2 relative">
+        <div className="flex custom-container justify-between items-center">
+          <CitySelect />
+          <CitySelectMobile />
+          <div className="flex gap-4 items-center font-medium">
+            <ChangeLang />
+            <div className="w-[1px] h-[60%] bg-white max-lg:hidden" />
+            <Link
+              href={'mailto:Tourex@gmail.com'}
+              className="flex gap-2 text-white items-center max-lg:hidden"
+            >
               <EmailIcon
                 sx={{ color: 'white', width: '24px', height: '24px' }}
               />
               <p className="text-sm">{t('Tourex@gmail.com')}</p>
-            </div>
-            <div className="w-[1px] h-[60%] bg-white" />
-            <div className="flex gap-2 text-white items-center">
+            </Link>
+            <div className="w-[1px] h-[60%] bg-white max-lg:hidden" />
+            <Link
+              href={'tel:+998902222922'}
+              className="flex gap-2 text-white items-center max-lg:hidden"
+            >
               <LocalPhoneIcon
                 sx={{ color: 'white', width: '24px', height: '24px' }}
               />
               <p className="text-sm">90 222 29 22</p>
-            </div>
+            </Link>
           </div>
         </div>
       </div>
-
-      <div className="bg-[#FFFFFF] w-full shadow-md rounded-b-xl p-2">
-        <div className="flex justify-between custom-container px-0 w-full">
+      <div className="bg-[#FFFFFF] w-full shadow-sm rounded-b-2xl p-2">
+        <div className="flex justify-between custom-container w-full">
           <div className="w-full h-16 flex items-center gap-8">
             <Image
               src={Logo}
@@ -81,7 +75,7 @@ const Navbar = () => {
               priority
               className="h-auto w-auto"
             />
-            <div className="flex gap-4 items-center justify-center h-full">
+            <div className="flex gap-4 items-center justify-center h-full max-lg:hidden">
               {links.map(({ href, label }) => (
                 <div
                   key={label}
@@ -92,17 +86,12 @@ const Navbar = () => {
                       : 'text-black hover:text-blue-600',
                   )}
                 >
-                  <Link href={href}>{label}</Link>
+                  <Link href={href}>{t(label)}</Link>
                 </div>
               ))}
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            {/* <Link href={'#'} className="border border-ring rounded-full p-2">
-              <FavoriteIcon
-                sx={{ color: 'black', width: '24px', height: '24px' }}
-              />
-            </Link> */}
+          <div className="flex items-center gap-4 max-lg:hidden">
             <IconButton
               aria-label="favourite"
               sx={{
@@ -131,7 +120,18 @@ const Navbar = () => {
               </Button>
             </Link>
           </div>
+          <div className="flex items-center gap-4 lg:hidden">
+            <IconButton
+              onClick={() => setOpenMobile(true)}
+              sx={{ border: '1px solid gray' }}
+            >
+              <MenuIcon
+                sx={{ color: 'black', width: '20px', height: '20px' }}
+              />
+            </IconButton>
+          </div>
         </div>
+        <MobileNavbar open={openMobie} setOpen={setOpenMobile} />
       </div>
     </section>
   );

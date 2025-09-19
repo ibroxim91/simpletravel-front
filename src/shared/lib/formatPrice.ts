@@ -12,7 +12,7 @@ const formatPrice = async (amount: number | string, withLabel?: boolean) => {
   const label = withLabel
     ? locale === LanguageRoutes.RU
       ? ' сум'
-      : locale === LanguageRoutes.KI
+      : locale === LanguageRoutes.EN
         ? ' сўм'
         : ' so‘m'
     : '';

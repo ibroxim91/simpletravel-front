@@ -39,7 +39,9 @@ export default async function RootLayout({ children, params }: Props) {
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={`${golosText.variable} antialiased`}>
+      <body
+        className={`${golosText.variable} antialiased min-h-screen flex flex-col`}
+      >
         <NextIntlClientProvider locale={locale}>
           <ThemeProvider
             attribute={'class'}
@@ -49,7 +51,7 @@ export default async function RootLayout({ children, params }: Props) {
           >
             <QueryProvider>
               <Navbar />
-              {children}
+              <main className="flex-1">{children}</main>
               <Footer />
             </QueryProvider>
           </ThemeProvider>

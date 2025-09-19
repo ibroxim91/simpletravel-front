@@ -127,16 +127,43 @@
   }
 }
 
-@font-face {
+/* @font-face {
   font-family: 'SF Pro Display';
-  src: url('/fonts/SFProDisplay-Regular.otf') format('opentype');
-}
+  src: url('/fonts/Gilroy-ExtraBold.otf') format('opentype');
+} */
 
 @font-face {
   font-family: 'SF Pro Display';
-  src: url('/fonts/SFProDisplay-Bold.otf') format('opentype');
+  src:
+    url('/fonts/SF-Pro-Display-Regular.woff2') format('woff2'),
+    url('/fonts/SF-Pro-Display-Regular.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
 }
 
 body {
-  font-family: 'SF Pro Display', sans-serif;
+  font-family:
+    'SF Pro Display',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Helvetica Neue',
+    Arial,
+    sans-serif;
+  font-weight: 600;
+  background: #edeef1;
+}
+
+.mask-half {
+  -webkit-mask-image: radial-gradient(
+    circle at left,
+    black 50%,
+    transparent 51%
+  );
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: cover;
+  mask-image: radial-gradient(circle at left, black 50%, transparent 51%);
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: cover;
 }
