@@ -2,21 +2,18 @@
 
 import Logo from '@/assets/navLogo.png';
 import { Link, usePathname } from '@/shared/config/i18n/navigation';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import EmailIcon from '@mui/icons-material/Email';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
-import MenuIcon from '@mui/icons-material/Menu';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 import PersonIcon from '@mui/icons-material/Person';
+import PublicIcon from '@mui/icons-material/Public';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
-import clsx from 'clsx';
 import { useTranslations } from 'next-intl';
+import Button from '@mui/material/Button';
 import Image from 'next/image';
-import { useState } from 'react';
-import { ChangeLang } from './ChangeLang';
-import CitySelect from './CitySelect';
-import CitySelectMobile from './CitySelectMobile';
-import MobileNavbar from './MobileNavbar';
 
 const Navbar = () => {
   const t = useTranslations();
@@ -34,18 +31,31 @@ const Navbar = () => {
   ];
 
   return (
-    <section className="sticky w-full top-0 z-20">
-      <div className="bg-[#031753] p-2 relative">
-        <div className="flex custom-container justify-between items-center">
-          <CitySelect />
-          <CitySelectMobile />
-          <div className="flex gap-4 items-center font-medium">
-            <ChangeLang />
-            <div className="w-[1px] h-[60%] bg-white max-lg:hidden" />
-            <Link
-              href={'mailto:Tourex@gmail.com'}
-              className="flex gap-2 text-white items-center max-lg:hidden"
-            >
+    <section className="sticky w-full top-0">
+      <div className="bg-[#031753] p-2">
+        <div className="flex custom-container px-0 justify-between">
+          <div className="px-0 flex gap-2 text-white items-center">
+            <LocationOnIcon
+              sx={{ color: 'white', width: '28px', height: '28px' }}
+            />
+            <p className="text-sm">{t('Укажите город')}</p>
+            <ChevronRightIcon
+              sx={{
+                color: 'white',
+                width: '24px',
+                height: '24px',
+              }}
+            />
+          </div>
+          <div className="flex gap-4 items-center">
+            <div className="flex gap-2 text-white items-center">
+              <PublicIcon
+                sx={{ color: 'white', width: '24px', height: '24px' }}
+              />
+              <p className="text-sm">{t('Русский')}</p>
+            </div>
+            <div className="w-[1px] h-[60%] bg-white" />
+            <div className="flex gap-2 text-white items-center">
               <EmailIcon
                 sx={{ color: 'white', width: '24px', height: '24px' }}
               />

@@ -167,3 +167,37 @@ body {
   mask-position: center;
   mask-size: cover;
 }
+
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE va eski Edge uchun */
+  scrollbar-width: none;     /* Firefox uchun */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari va Opera uchun */
+}
+
+/* Firefox uchun */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll {
+  animation: scroll 20s linear infinite;
+}
