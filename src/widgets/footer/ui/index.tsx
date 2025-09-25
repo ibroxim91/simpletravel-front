@@ -11,7 +11,7 @@ import Image from 'next/image';
 
 const Footer = () => {
   return (
-    <section className="py-8 bg-[#031753] rounded-t-4xl">
+    <section className="py-8 bg-[#031753] rounded-t-4xl max-lg:mb-16">
       <div className="custom-container">
         <div className="flex items-center">
           <div className="w-full h-12 flex items-center gap-8">

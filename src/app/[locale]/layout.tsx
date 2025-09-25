@@ -3,7 +3,7 @@ import { routing } from '@/shared/config/i18n/routing';
 import QueryProvider from '@/shared/config/react-query/QueryProvider';
 import { ThemeProvider } from '@/shared/config/theme-provider';
 import { PRODUCT_INFO } from '@/shared/constants/data';
-import Footer from '@/widgets/footer/ui';
+import ConditionalFooter from '@/widgets/footer/ui/ConditionalFooter';
 import Navbar from '@/widgets/navbar/ui';
 import type { Metadata } from 'next';
 import { hasLocale, Locale, NextIntlClientProvider } from 'next-intl';
@@ -30,6 +30,7 @@ export function generateStaticParams() {
 
 export default async function RootLayout({ children, params }: Props) {
   const { locale } = await params;
+
   if (!hasLocale(routing.locales, locale)) {
     notFound();
   }
@@ -40,7 +41,7 @@ export default async function RootLayout({ children, params }: Props) {
   return (
     <html lang={locale} suppressHydrationWarning>
       <body
-        className={`${golosText.variable} antialiased min-h-screen flex flex-col`}
+        className={`${golosText.variable} antialiased min-h-screen flex flex-col relative`}
       >
         <NextIntlClientProvider locale={locale}>
           <ThemeProvider
@@ -52,7 +53,7 @@ export default async function RootLayout({ children, params }: Props) {
             <QueryProvider>
               <Navbar />
               <main className="flex-1">{children}</main>
-              <Footer />
+              <ConditionalFooter />
             </QueryProvider>
           </ThemeProvider>
         </NextIntlClientProvider>

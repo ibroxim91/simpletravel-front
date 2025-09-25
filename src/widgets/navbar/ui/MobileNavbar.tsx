@@ -26,7 +26,6 @@ const MobileNavbar = ({ setOpen, open }: Props) => {
 
   const links = [
     { href: '/', label: 'Главная' },
-    { href: '/tours', label: 'Подобрать тур' },
     { href: '/about', label: 'О нас' },
     { href: '/blogs', label: 'Блоги' },
     { href: '/faq', label: 'Ответы на вопросы' },
@@ -37,7 +36,7 @@ const MobileNavbar = ({ setOpen, open }: Props) => {
       anchor="right"
       open={open}
       onClose={() => setOpen(false)}
-      sx={{ position: 'sticky', top: '0px', zIndex: '20', bgcolor: '#edeef1' }}
+      sx={{ position: 'sticky', top: '0px', zIndex: '50', bgcolor: '#edeef1' }}
     >
       <div className="w-screen" />
       <div className="bg-[#031753] p-2 relative">
@@ -79,8 +78,9 @@ const MobileNavbar = ({ setOpen, open }: Props) => {
           <Link
             href={href}
             key={label}
+            onClick={() => setOpen(false)}
             className={clsx(
-              'w-full py-4 px-4 rounded-2xl sticky -z-30',
+              'w-full py-4 px-4 rounded-2xl sticky z-30',
               pathname === href
                 ? 'bg-blue-500 text-white shadow-sm'
                 : 'bg-[#F8F8F8] text-black shadow-sm',

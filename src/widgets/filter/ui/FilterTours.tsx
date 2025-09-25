@@ -463,7 +463,7 @@ const FilterTours = () => {
         <div className="h-[25px]" />
         <Link
           href={'#'}
-          className="bg-blue-600 text-white h-[60px] flex items-center justify-center rounded-4xl text-center"
+          className="bg-blue-600 text-white h-[60px] flex items-center justify-center rounded-4xl text-center font-semibold"
         >
           <p>Искать туры</p>
         </Link>

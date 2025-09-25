@@ -389,7 +389,7 @@ const FilterToursMobile = () => {
             </div>
             <div className="grid grid-cols-1 mt-0 gap-2">
               <button
-                className="bg-blue-600 rounded-3xl p-3 text-white"
+                className="bg-blue-600 rounded-3xl p-3 text-white font-semibold"
                 onClick={() => {
                   setDataOpenMobile(false);
                   setFromDate(undefined);
@@ -516,7 +516,7 @@ const FilterToursMobile = () => {
           </div>
           <div className="mt-auto grid grid-cols-1 gap-2">
             <button
-              className="bg-blue-600 rounded-3xl p-3 text-white cursor-pointer"
+              className="bg-blue-600 rounded-3xl p-3 text-white cursor-pointer font-semibold"
               onClick={() => {
                 setSelectAge(adults + children);
                 setAgeOpen(false);
@@ -530,7 +530,7 @@ const FilterToursMobile = () => {
       <div className="flex flex-col gap-2">
         <Link
           href={'#'}
-          className="bg-blue-600 text-white h-[60px] flex items-center justify-center rounded-4xl text-center"
+          className="bg-blue-600 text-white h-[60px] flex items-center justify-center rounded-4xl text-center font-semibold"
         >
           <p>Искать туры</p>
         </Link>

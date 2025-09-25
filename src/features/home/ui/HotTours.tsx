@@ -155,7 +155,6 @@ const HotTours = () => {
                 key={idx}
                 className="flex flex-col w-auto basis-1/4 max-lg:basis-1/3 max-md:basis-[70%] shrink-0 font-medium"
               >
-                {/* Rasm chiqib kelishi */}
                 <motion.div
                   initial={{ opacity: 0, y: 40, scale: 0.95 }}
                   whileInView={{ opacity: 1, y: 0, scale: 1 }}
@@ -177,7 +176,7 @@ const HotTours = () => {
                     {e.popular && (
                       <Badge
                         variant="destructive"
-                        className="px-4 py-1 rounded-4xl font-semibold"
+                        className="px-4 py-1 text-sm rounded-4xl font-semibold"
                       >
                         Горящие туры
                       </Badge>
@@ -185,7 +184,7 @@ const HotTours = () => {
                     {e.visa && (
                       <Badge
                         variant="default"
-                        className="bg-[#031753] px-4 py-1 rounded-4xl font-semibold"
+                        className="bg-[#031753] text-sm px-4 py-1 rounded-4xl font-semibold"
                       >
                         Без визы
                       </Badge>
@@ -209,7 +208,7 @@ const HotTours = () => {
                   <p className="text-xl font-semibold text-[#031753]">
                     {e.name}
                   </p>
-                  <p className="text-sm text-blue-950">{e.desc}</p>
+                  <p className="text-md text-blue-950">{e.desc}</p>
                   <p className="mt-2 text-blue-600 font-semibold">{e.price}</p>
                 </motion.div>
               </CarouselItem>
@@ -242,7 +241,7 @@ const HotTours = () => {
           </div>
         </div>
 
-        <Carousel className="w-full mt-4 cursor-pointer" setApi={setApi}>
+        <Carousel className="w-full mt-4 cursor-pointer" setApi={setHot}>
           <CarouselContent>
             {data.map((e, idx) => (
               <CarouselItem
@@ -330,7 +329,7 @@ const HotTours = () => {
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.2 }}
-                  className="text-4xl text-[#031753] font-semibold w-96"
+                  className="text-3xl text-[#031753] font-semibold w-96"
                 >
                   С Simple Travel ваши поездки ещё проще
                 </motion.p>
@@ -338,7 +337,7 @@ const HotTours = () => {
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.4 }}
-                  className="text-lg text-[#031753]"
+                  className="text-mmd text-[#031753]"
                 >
                   Поддержка 24/7, страховка и дополнительные возможности
                 </motion.p>

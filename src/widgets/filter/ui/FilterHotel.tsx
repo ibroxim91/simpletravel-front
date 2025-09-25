@@ -355,7 +355,7 @@ const FilterHotel = () => {
         <div className="h-[25px]" />
         <Link
           href={'#'}
-          className="bg-blue-600 text-white h-[60px] flex items-center justify-center rounded-4xl text-center"
+          className="bg-blue-600 text-white h-[60px] flex items-center font-semibold justify-center rounded-4xl text-center"
         >
           <p>Искать туры</p>
         </Link>

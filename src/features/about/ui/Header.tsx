@@ -48,7 +48,7 @@ const Header = () => {
           }}
         >
           <motion.p
-            className="text-4xl text-center max-md:text-2xl"
+            className="text-4xl text-center max-md:text-2xl font-semibold"
             variants={{
               hidden: { opacity: 0, y: 20 },
               visible: { opacity: 1, y: 0 },

@@ -51,6 +51,10 @@ const SendPartner = () => {
     defaultValues: {
       name: '',
       phone: '',
+      address: ' ',
+      email: '',
+      license: undefined,
+      website: '',
     },
   });
 
@@ -118,7 +122,7 @@ const SendPartner = () => {
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <p className="text-3xl w-[80%] max-lg:w-full text-[#031753]">
+            <p className="text-3xl w-[80%] max-lg:w-full text-[#031753] font-semibold">
               Сотрудничаем с лидерами Узбекистана
             </p>
             <p className="text-[#636363] text-lg font-medium max-lg:w-full">
@@ -140,7 +144,10 @@ const SendPartner = () => {
                 </Button>
               </DialogTrigger>
 
-              <DialogContent showCloseButton={false} className="rounded-4xl">
+              <DialogContent
+                showCloseButton={false}
+                className="rounded-4xl !max-w-4xl"
+              >
                 <DialogHeader>
                   <DialogTitle
                     className={clsx(
@@ -203,17 +210,17 @@ const SendPartner = () => {
 
                     {success && (
                       <div className="text-center flex flex-col gap-4 px-4 justify-center">
-                        <p className="text-2xl mt-5 text-[#212122]">
+                        <p className="text-2xl mt-5 text-[#212122] font-semibold">
                           Заявка успешно отправлено
                         </p>
-                        <p className="text-[#646465] font-medium text-md">
+                        <p className="text-[#646465] font-medium text-lg">
                           Эксперт свяжется с вами в ближайшее время по номеру +
                           {form.getValues('phone')} позвонив на него
                         </p>
                         <div className="mt-4">
                           <Button
                             variant={'default'}
-                            className="rounded-3xl bg-[#1764FC] px-10 cursor-pointer py-4 h-fit w-fit"
+                            className="rounded-3xl bg-[#1764FC] px-10 font-semibold cursor-pointer py-4 h-fit w-fit"
                             onClick={() => {
                               form.reset();
                               setSuccess(false);
@@ -221,7 +228,7 @@ const SendPartner = () => {
                               setOpen(false);
                             }}
                           >
-                            <p>Хорошо</p>
+                            Хорошо
                           </Button>
                         </div>
                       </div>
@@ -234,7 +241,7 @@ const SendPartner = () => {
                         </p>
                         <Button
                           variant="destructive"
-                          className="rounded-3xl px-10 cursor-pointer py-4 h-fit w-fit"
+                          className="rounded-3xl px-10 cursor-pointer py-4 h-fit w-fit font-semibold"
                           onClick={() => {
                             form.reset();
                             setSuccess(false);
@@ -243,7 +250,7 @@ const SendPartner = () => {
                             setError(null);
                           }}
                         >
-                          <p>Попробовать снова</p>
+                          Попробовать снова
                         </Button>
                       </div>
                     )}
@@ -252,7 +259,7 @@ const SendPartner = () => {
                       <Form {...form}>
                         <form
                           onSubmit={form.handleSubmit(onSubmit)}
-                          className="space-y-8"
+                          className="space-y-4 w-full"
                         >
                           <FormField
                             control={form.control}
@@ -275,16 +282,115 @@ const SendPartner = () => {
                           />
                           <FormField
                             control={form.control}
-                            name="phone"
+                            name="address"
                             render={({ field }) => (
                               <FormItem>
                                 <Label className="text-xl font-semibold text-[#212122]">
-                                  Номер телефона
+                                  Адрес
                                 </Label>
                                 <FormControl>
                                   <Input
                                     {...field}
-                                    placeholder="Введите ваш номер телефона"
+                                    placeholder="Город, улица, дом"
+                                    className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <FormField
+                            control={form.control}
+                            name="license"
+                            render={({ field }) => (
+                              <FormItem>
+                                <Label className="text-xl font-semibold text-[#212122]">
+                                  Свидетельств/Лицензияо
+                                </Label>
+                                <FormControl>
+                                  <Input
+                                    onChange={(e) => {
+                                      const file = e.target.files?.[0];
+                                      field.onChange(file);
+                                    }}
+                                    onBlur={field.onBlur}
+                                    type="file"
+                                    className="hidden"
+                                    id="license-file"
+                                  />
+                                </FormControl>
+                                <label
+                                  htmlFor="license-file"
+                                  className="w-full bg-[#EDEEF180] border-2 border-dashed border-[#D3D3D3] flex flex-col items-center gap-2 justify-center py-4 rounded-2xl cursor-pointer hover:bg-[#EDEEF1]"
+                                >
+                                  <p className="font-semibold text-xl text-[#212122]">
+                                    Drag or select file
+                                  </p>
+                                  <p className="text-[#646465] text-sm">
+                                    Drop files here or click to browse
+                                  </p>
+                                  {field.value && (
+                                    <p className="text-[#212122] mt-2 font-medium">
+                                      Выбран файл: {field.value.name}
+                                    </p>
+                                  )}
+                                </label>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <div className="flex gap-4 w-full items-start">
+                            <FormField
+                              control={form.control}
+                              name="email"
+                              render={({ field }) => (
+                                <FormItem className="w-full">
+                                  <Label className="text-xl font-semibold text-[#212122]">
+                                    Электронная почта
+                                  </Label>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      placeholder="example@mail.com"
+                                      className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="phone"
+                              render={({ field }) => (
+                                <FormItem className="w-full">
+                                  <Label className="text-xl font-semibold text-[#212122]">
+                                    Номер телефона
+                                  </Label>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      placeholder="Введите ваш номер телефона"
+                                      className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                          <FormField
+                            control={form.control}
+                            name="website"
+                            render={({ field }) => (
+                              <FormItem className="w-full">
+                                <Label className="text-xl font-semibold text-[#212122]">
+                                  Instagram / Вебсайт
+                                </Label>
+                                <FormControl>
+                                  <Input
+                                    {...field}
+                                    placeholder="https://example.com"
                                     className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
                                   />
                                 </FormControl>
@@ -416,7 +522,7 @@ const SendPartner = () => {
             borderTopLeftRadius: 16,
             borderTopRightRadius: 16,
             width: '100vw',
-            height: '60vh',
+            height: '95vh',
             display: 'flex',
             flexDirection: 'column',
           },
@@ -512,7 +618,7 @@ const SendPartner = () => {
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-6 px-4"
+                className="space-y-4 w-full px-4 mb-4"
               >
                 <FormField
                   control={form.control}
@@ -533,12 +639,89 @@ const SendPartner = () => {
                     </FormItem>
                   )}
                 />
-
+                <FormField
+                  control={form.control}
+                  name="address"
+                  render={({ field }) => (
+                    <FormItem>
+                      <Label className="text-xl font-semibold text-[#212122]">
+                        Адрес
+                      </Label>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Город, улица, дом"
+                          className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="license"
+                  render={({ field }) => (
+                    <FormItem>
+                      <Label className="text-xl font-semibold text-[#212122]">
+                        Свидетельств/Лицензияо
+                      </Label>
+                      <FormControl>
+                        <Input
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            field.onChange(file);
+                          }}
+                          onBlur={field.onBlur}
+                          type="file"
+                          className="hidden"
+                          id="license-file"
+                        />
+                      </FormControl>
+                      <label
+                        htmlFor="license-file"
+                        className="w-full bg-[#EDEEF180] border-2 border-dashed border-[#D3D3D3] flex flex-col items-center gap-2 justify-center py-4 rounded-2xl cursor-pointer hover:bg-[#EDEEF1]"
+                      >
+                        <p className="font-semibold text-xl text-[#212122]">
+                          Drag or select file
+                        </p>
+                        <p className="text-[#646465] text-sm">
+                          Drop files here or click to browse
+                        </p>
+                        {field.value && (
+                          <p className="text-[#212122] mt-2 font-medium">
+                            Выбран файл: {field.value.name}
+                          </p>
+                        )}
+                      </label>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <Label className="text-xl font-semibold text-[#212122]">
+                        Электронная почта
+                      </Label>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="example@mail.com"
+                          className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   control={form.control}
                   name="phone"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="w-full">
                       <Label className="text-xl font-semibold text-[#212122]">
                         Номер телефона
                       </Label>
@@ -553,15 +736,33 @@ const SendPartner = () => {
                     </FormItem>
                   )}
                 />
-
-                <div className="flex flex-col gap-2 absolute bottom-0 left-0 right-0 px-4 pb-4">
+                <FormField
+                  control={form.control}
+                  name="website"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <Label className="text-xl font-semibold text-[#212122]">
+                        Instagram / Вебсайт
+                      </Label>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="https://example.com"
+                          className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="flex flex-col gap-4 items-center">
                   <Button
                     type="submit"
-                    className="w-full px-10 py-6 rounded-3xl text-lg font-medium cursor-pointer"
+                    className="px-10 py-8 rounded-4xl w-full text-lg font-medium cursor-pointer"
                   >
                     Отправить
                   </Button>
-                  <p className="text-center font-medium text-sm text-[#646465]">
+                  <p className="font-medium text-center text-md text-[#646465]">
                     Я даю согласие на обработку персональных данных
                   </p>
                 </div>

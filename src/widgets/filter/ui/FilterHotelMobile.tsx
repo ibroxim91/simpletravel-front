@@ -276,7 +276,7 @@ const FilterHotelMobile = () => {
             </div>
             <div className="grid grid-cols-1 mt-5 gap-2">
               <button
-                className="bg-blue-600 rounded-3xl p-3 text-white"
+                className="bg-blue-600 rounded-3xl p-3 text-white font-semibold"
                 onClick={() => {
                   setDataOpenMobile(false);
                   setFromDate(undefined);
@@ -355,16 +355,14 @@ const FilterHotelMobile = () => {
                 </Button>
                 <Button
                   variant={'ghost'}
-                  className="rounded-none border-r-2 h-full border-l-2 text-lg"
+                  className="rounded-none border-r-2 h-full border-l-2 text-lg font-semibold"
                 >
                   {adults}
                 </Button>
                 <Button
                   variant={'ghost'}
                   className="h-full rounded-tl-none rounded-bl-none rounded-br-lg rounded-tr-lg"
-                  onClick={() =>
-                    setAdults((prev) => (prev === 2 ? prev : prev + 1))
-                  }
+                  onClick={() => setAdults((prev) => prev + 1)}
                 >
                   <AddIcon className="text-blue-600" />
                 </Button>
@@ -387,7 +385,7 @@ const FilterHotelMobile = () => {
                 </Button>
                 <Button
                   variant={'ghost'}
-                  className="rounded-none border-r-2 h-full border-l-2 text-lg"
+                  className="rounded-none border-r-2 h-full border-l-2 text-lg font-semibold"
                 >
                   {children}
                 </Button>
@@ -403,7 +401,7 @@ const FilterHotelMobile = () => {
           </div>
           <div className="mt-auto grid grid-cols-1 gap-2">
             <button
-              className="bg-blue-600 rounded-3xl p-3 text-white cursor-pointer"
+              className="bg-blue-600 rounded-3xl p-3 text-white cursor-pointer font-semibold"
               onClick={() => {
                 setSelectAge(adults + children);
                 setAgeOpen(false);
@@ -417,7 +415,7 @@ const FilterHotelMobile = () => {
       <div className="flex flex-col gap-2">
         <Link
           href={'#'}
-          className="bg-blue-600 text-white h-[60px] flex items-center justify-center rounded-4xl text-center"
+          className="bg-blue-600 text-white h-[60px] flex items-center justify-center rounded-4xl text-center font-semibold"
         >
           <p>Искать туры</p>
         </Link>

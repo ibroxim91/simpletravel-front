@@ -70,7 +70,7 @@ const SearchTours = () => {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-white text-3xl font-semibold"
+              className="text-white text-4xl font-semibold"
             >
               Предложение дня: только сегодня!
             </motion.p>
@@ -78,7 +78,7 @@ const SearchTours = () => {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-gray-300 text-lg"
+              className="text-gray-300 text-xl"
             >
               Лучшие направления по самым выгодным ценам
             </motion.p>
@@ -89,7 +89,7 @@ const SearchTours = () => {
             >
               <Link
                 href={'#'}
-                className="bg-white mt-5 text-black flex gap-4 px-8 py-4 shadow-sm !rounded-4xl w-fit"
+                className="bg-white mt-5 font-semibold text-black flex gap-4 px-8 py-4 shadow-sm !rounded-4xl w-fit"
               >
                 <p>Смотреть цены</p>
                 <EastIcon />

@@ -14,7 +14,7 @@ const Sertificat = () => {
     <div className="custom-container mt-10">
       <div className="flex justify-between max-lg:flex-col gap-10">
         <motion.p
-          className="text-4xl w-[50%] text-[#031753] max-lg:w-full font-semibold"
+          className="text-4xl w-[50%] text-[#212122] max-lg:w-full font-semibold"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: false, amount: 0.3 }}
@@ -65,7 +65,7 @@ const Sertificat = () => {
                 />
               </motion.div>
               <motion.p
-                className="mt-4 text-xl text-[#212122]"
+                className="mt-4 text-xl text-[#212122] font-semibold"
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: false, amount: 0.1 }}

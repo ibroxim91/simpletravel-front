@@ -127,29 +127,35 @@
   }
 }
 
-/* @font-face {
-  font-family: 'SF Pro Display';
-  src: url('/fonts/Gilroy-ExtraBold.otf') format('opentype');
-} */
+@font-face {
+  font-family: 'Montserrat';
+  src: url('/fonts/Montserrat-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
 
 @font-face {
-  font-family: 'SF Pro Display';
-  src:
-    url('/fonts/SF-Pro-Display-Regular.woff2') format('woff2'),
-    url('/fonts/SF-Pro-Display-Regular.woff') format('woff');
-  font-weight: 500;
+  font-family: 'Montserrat';
+  src: url('/fonts/Montserrat-Bold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  src: url('/fonts/Montserrat-ExtraBold.ttf') format('truetype');
+  font-weight: 700;
   font-style: normal;
 }
 
 body {
   font-family:
-    'SF Pro Display',
+    'Montserrat',
     -apple-system,
     BlinkMacSystemFont,
     'Helvetica Neue',
     Arial,
     sans-serif;
-  font-weight: 600;
   background: #edeef1;
 }
 

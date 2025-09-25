@@ -26,12 +26,12 @@ const BannerCarousel = () => {
           {items.map((_, index) => (
             <CarouselItem
               key={index}
-              className="basis-full md:basis-[70%] shrink-0"
+              className="basis-full md:basis-[80%] shrink-0"
             >
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: false, amount: 0.3 }}
+                viewport={{ once: false, amount: 0.1 }}
                 transition={{ duration: 0.6, ease: 'easeOut' }}
                 className="h-[500px]"
               >
@@ -43,24 +43,23 @@ const BannerCarousel = () => {
                   <motion.div
                     initial={{ opacity: 0, x: -50 }}
                     whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.8, delay: 0.2 }}
-                    className="flex flex-col gap-6 w-90 z-20 absolute left-14 top-1/2 -translate-y-1/2"
+                    transition={{ duration: 0.8, delay: 0.1 }}
+                    className="flex flex-col gap-6 w-96 z-20 absolute left-14 top-1/2 -translate-y-1/2"
                   >
-                    <p className="text-4xl">Предложение дня: только сегодня!</p>
+                    <p className="text-4xl font-semibold">
+                      Предложение дня: только сегодня!
+                    </p>
                     <p className="text-[#212122] font-medium">
-                      Лучшие направления по самым выгодным ценамЛучшие
-                      направления по самым
+                      Лучшие направления по самым выгодным ценам
                     </p>
                     <Link
                       href="#"
-                      className="bg-white text-black flex gap-4 px-8 py-4 shadow-sm !rounded-4xl w-fit"
+                      className="bg-white text-black font-semibold flex gap-4 px-8 py-4 shadow-sm !rounded-4xl w-fit"
                     >
                       <p>Смотреть цены</p>
                       <EastIcon />
                     </Link>
                   </motion.div>
-
-                  {/* Rasm animatsiyasi */}
                   <motion.div
                     initial={{ opacity: 0, x: 50 }}
                     whileInView={{ opacity: 1, x: 0 }}
