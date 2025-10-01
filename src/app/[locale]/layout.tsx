@@ -3,6 +3,7 @@ import { routing } from '@/shared/config/i18n/routing';
 import QueryProvider from '@/shared/config/react-query/QueryProvider';
 import { ThemeProvider } from '@/shared/config/theme-provider';
 import { PRODUCT_INFO } from '@/shared/constants/data';
+import { Toaster } from '@/shared/ui/sonner';
 import ConditionalFooter from '@/widgets/footer/ui/ConditionalFooter';
 import Navbar from '@/widgets/navbar/ui';
 import type { Metadata } from 'next';
@@ -41,7 +42,7 @@ export default async function RootLayout({ children, params }: Props) {
   return (
     <html lang={locale} suppressHydrationWarning>
       <body
-        className={`${golosText.variable} antialiased min-h-screen flex flex-col relative`}
+        className={`${golosText.className} antialiased min-h-screen flex flex-col relative`}
       >
         <NextIntlClientProvider locale={locale}>
           <ThemeProvider
@@ -54,6 +55,7 @@ export default async function RootLayout({ children, params }: Props) {
               <Navbar />
               <main className="flex-1">{children}</main>
               <ConditionalFooter />
+              <Toaster richColors />
             </QueryProvider>
           </ThemeProvider>
         </NextIntlClientProvider>

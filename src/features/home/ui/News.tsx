@@ -50,8 +50,11 @@ const News = () => {
       <Carousel className="w-full mt-4">
         <CarouselContent>
           {data.map((e, idx) => (
-            <CarouselItem className="flex flex-col w-auto basis-1/3 max-lg:basis-1/2 max-md:basis-[80%] shrink-0">
-              <Link key={idx} href={`/blogs/${e.id}`} className="w-full">
+            <CarouselItem
+              key={idx}
+              className="flex flex-col w-auto basis-1/3 max-lg:basis-1/2 max-md:basis-[80%] shrink-0"
+            >
+              <Link href={`/blogs/${e.id}`} className="w-full">
                 <motion.div
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}

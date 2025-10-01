@@ -50,7 +50,7 @@ const BlogHeader = () => {
           Блоги
         </Link>
         <p className="text-[#646465] font-medium">
-          {items.find((e) => e.id == Number(active))?.name}
+          {items.find((e) => e.id === Number(active))?.name}
         </p>
       </Breadcrumbs>
       <div className="w-full h-[350px] mt-10 flex relative justify-between rounded-3xl bg-gradient-to-r to-[#42B5CD] from-[#1764FC]">

@@ -28,7 +28,7 @@ const Navbar = () => {
 
   const links = [
     { href: '/', label: 'Главная' },
-    { href: '/tours', label: 'Подобрать тур' },
+    { href: '/selectour', label: 'Подобрать тур' },
     { href: '/about', label: 'О нас' },
     { href: '/blogs', label: 'Блоги' },
     { href: '/faq', label: 'Ответы на вопросы' },
@@ -37,9 +37,9 @@ const Navbar = () => {
 
   const linksMobile = [
     { href: '/', label: 'Главная', icon: HomeIcon },
-    { href: '/tours', label: 'Подобрать тур', icon: SearchIcon },
+    { href: '/selectour', label: 'Подобрать тур', icon: SearchIcon },
     { href: '/saved', label: 'Избранное', icon: FavoriteIcon },
-    { href: '/profile', label: 'Профиль', icon: PersonIcon },
+    { href: '/profile?tabs=profile', label: 'Профиль', icon: PersonIcon },
   ];
 
   return (
@@ -90,7 +90,7 @@ const Navbar = () => {
                   <div
                     key={label}
                     className={clsx(
-                      'h-full flex items-center font-semibold',
+                      'h-full text-md flex items-center font-medium',
                       pathname === href
                         ? 'text-blue-600 border-b border-b-blue-600 underline-offset-4'
                         : 'text-black hover:text-blue-600',
@@ -119,7 +119,7 @@ const Navbar = () => {
                 </IconButton>
               </Link>
               <div className="w-[1px] h-[30%] bg-ring" />
-              <Link href={'/auth/register'}>
+              {/* <Link href={'/auth/register'}>
                 <Button
                   variant="contained"
                   size="large"
@@ -129,6 +129,18 @@ const Navbar = () => {
                     sx={{ color: 'white', width: '24px', height: '24px' }}
                   />
                   <p>{t('Войти')}</p>
+                </Button>
+              </Link> */}
+              <Link href={'/profile?tabs=profile'}>
+                <Button
+                  variant="contained"
+                  size="large"
+                  sx={{ borderRadius: '34px', gap: '8px' }}
+                >
+                  <PersonIcon
+                    sx={{ color: 'white', width: '24px', height: '24px' }}
+                  />
+                  <p>{t('Профиль')}</p>
                 </Button>
               </Link>
             </div>
@@ -146,7 +158,7 @@ const Navbar = () => {
           <MobileNavbar open={openMobie} setOpen={setOpenMobile} />
         </div>
       </section>
-      <div className="bg-white shadow-2xl border-1 rounded-t-2xl grid grid-cols-4 justify-center items-center py-3 w-full fixed bottom-0 z-30 lg:hidden">
+      <div className="bg-white shadow-2xl border-1 rounded-t-2xl grid grid-cols-4 justify-center items-center py-3 h-auto w-full fixed bottom-0 z-30 lg:hidden">
         {linksMobile.map((e) => (
           <Link
             href={e.href}
@@ -155,14 +167,14 @@ const Navbar = () => {
           >
             <e.icon
               sx={{
-                width: '36px',
-                height: '36px',
+                width: '34px',
+                height: '34px',
                 color: e.href === pathname ? '#084FE3' : '#646465',
               }}
             />
             <p
               className={clsx(
-                'max-md:text-[12px]',
+                'max-md:text-[12px] text-center max-[400px]:!text-[8px]',
                 e.href === pathname ? 'text-[#084FE3]' : 'text-[#646465]',
               )}
             >

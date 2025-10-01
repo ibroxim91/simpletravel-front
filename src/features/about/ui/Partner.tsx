@@ -1,8 +1,5 @@
 'use client';
 
-import Partners_1 from '@/assets/partners_1.png';
-import Partners_2 from '@/assets/partners_2.png';
-import Partners_3 from '@/assets/partners_3.png';
 import { Button } from '@/shared/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
 import { easeOut, motion } from 'framer-motion';
@@ -11,7 +8,6 @@ import { CardData } from '../lib/data';
 import SendPartner from './SendPartner';
 
 const Partner = () => {
-  const partners = [Partners_1, Partners_2, Partners_3];
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {

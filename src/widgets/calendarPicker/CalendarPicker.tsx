@@ -11,11 +11,7 @@ interface CalendarPickerProps {
   setFromDate: (date: Date | undefined) => void;
 }
 
-const CalendarPicker = ({
-  fromDate,
-  toDate,
-  setFromDate,
-}: CalendarPickerProps) => {
+const CalendarPicker = ({ fromDate, setFromDate }: CalendarPickerProps) => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(fromDate);
 
   const handleSelect = (date: Date | undefined) => {

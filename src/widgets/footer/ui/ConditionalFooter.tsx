@@ -4,12 +4,9 @@ import { usePathname } from '@/shared/config/i18n/navigation';
 import Footer from '@/widgets/footer/ui';
 
 const authRoutes = [
-  '/auth',
+  '/auth/edit-password',
+  '/auth/forget-password',
   '/auth/register',
-  '/login',
-  '/signup',
-  '/forgot-password',
-  '/reset-password',
 ];
 
 export default function ConditionalFooter() {

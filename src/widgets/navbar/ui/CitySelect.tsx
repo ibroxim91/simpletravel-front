@@ -36,7 +36,7 @@ const CitySelect = () => {
         className="flex items-center cursor-pointer gap-2"
       >
         <LocationOnIcon sx={{ color: 'white', width: 28, height: 28 }} />
-        <p className="text-sm text-white font-medium">{t('Укажите город')}</p>
+        <p className="text-md text-white font-medium">{t('Укажите город')}</p>
         <ChevronRightIcon sx={{ color: 'white', width: 24, height: 24 }} />
       </div>
 

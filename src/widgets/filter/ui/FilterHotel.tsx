@@ -11,16 +11,13 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import DoneIcon from '@mui/icons-material/Done';
 import RemoveIcon from '@mui/icons-material/Remove';
 import SearchIcon from '@mui/icons-material/Search';
-import { useTranslations } from 'next-intl';
 
 import { useState } from 'react';
 import { DateRange } from 'react-day-picker';
 
 const FilterHotel = () => {
-  const t = useTranslations();
   const [openCity, setOpenCity] = useState(false);
   const [ageOpen, setAgeOpen] = useState(false);
-  const [where, setWhere] = useState(false);
   const [dataOpen, setDataOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
@@ -41,7 +38,8 @@ const FilterHotel = () => {
       <div className="relative gap-2 h-full ">
         <div
           onClick={() => {
-            setOpenCity(!openCity), setSearch('');
+            setOpenCity(!openCity);
+            setSearch('');
           }}
           className="cursor-pointer flex flex-col gap-2"
         >
@@ -213,7 +211,8 @@ const FilterHotel = () => {
               <button
                 className="bg-blue-500/40 rounded-3xl p-3 text-blue-600 cursor-pointer"
                 onClick={() => {
-                  setDataOpen(false), setFromDate(undefined);
+                  setDataOpen(false);
+                  setFromDate(undefined);
                   setToDate(undefined);
                 }}
               >
@@ -242,7 +241,7 @@ const FilterHotel = () => {
       <div className="relative gap-2 h-full ">
         <div
           onClick={() => {
-            setAgeOpen(!where);
+            setAgeOpen(!ageOpen);
           }}
           className="cursor-pointer flex flex-col gap-2"
         >

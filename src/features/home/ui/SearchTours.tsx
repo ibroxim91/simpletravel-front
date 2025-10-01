@@ -7,7 +7,6 @@ import EastIcon from '@mui/icons-material/East';
 import HotelIcon from '@mui/icons-material/Hotel';
 import LuggageIcon from '@mui/icons-material/Luggage';
 import { motion } from 'framer-motion';
-import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useState } from 'react';
 import TabsHotel from './TabsHotel';
@@ -17,7 +16,6 @@ import TabsTours from './TabsTours';
 
 const SearchTours = () => {
   const [active, setActive] = useState<'tours' | 'hotel'>('tours');
-  const t = useTranslations();
 
   return (
     <div className="min-h-[500px] custom-container">

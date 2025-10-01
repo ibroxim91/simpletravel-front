@@ -269,9 +269,9 @@ const FilterToursMobile = () => {
           anchor="bottom"
           open={dataOpenMobile}
           onClose={() => {
-            setDataOpenMobile(false),
-              setFromDate(undefined),
-              setToDate(undefined);
+            setDataOpenMobile(false);
+            setFromDate(undefined);
+            setToDate(undefined);
           }}
           PaperProps={{
             sx: {
@@ -329,7 +329,7 @@ const FilterToursMobile = () => {
             </div>
             <div className="grid grid-cols-1 mt-4">
               <Calendar
-                className="w-full"
+                className="w-full max-w-2xl mx-auto"
                 mode="range"
                 selected={range}
                 onSelect={(val) => {
@@ -337,8 +337,7 @@ const FilterToursMobile = () => {
                   setFromDate(val?.from);
                   setToDate(val?.to);
                 }}
-                showOutsideDays={false}
-                numberOfMonths={1}
+                disabled={{ before: new Date() }}
               />
               {/* <Calendar
                     mode="single"

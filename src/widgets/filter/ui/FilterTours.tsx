@@ -13,13 +13,11 @@ import DoneIcon from '@mui/icons-material/Done';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import RemoveIcon from '@mui/icons-material/Remove';
 import SearchIcon from '@mui/icons-material/Search';
-import { useTranslations } from 'next-intl';
 
 import { useState } from 'react';
 import { DateRange } from 'react-day-picker';
 
 const FilterTours = () => {
-  const t = useTranslations();
   const [openCity, setOpenCity] = useState(false);
   const [ageOpen, setAgeOpen] = useState(false);
   const [where, setWhere] = useState(false);
@@ -50,7 +48,8 @@ const FilterTours = () => {
       <div className="relative gap-2 h-full ">
         <div
           onClick={() => {
-            setOpenCity(!openCity), setSearch('');
+            setOpenCity(!openCity);
+            setSearch('');
           }}
           className="cursor-pointer flex flex-col gap-2"
         >
@@ -139,7 +138,8 @@ const FilterTours = () => {
       <div className="relative gap-2 h-full ">
         <div
           onClick={() => {
-            setWhere(!where), setSearchWhere('');
+            setWhere(!where);
+            setSearchWhere('');
           }}
           className="cursor-pointer flex flex-col gap-2"
         >
@@ -321,7 +321,8 @@ const FilterTours = () => {
               <button
                 className="bg-blue-500/40 rounded-3xl p-3 text-blue-600 cursor-pointer"
                 onClick={() => {
-                  setDataOpen(false), setFromDate(undefined);
+                  setDataOpen(false);
+                  setFromDate(undefined);
                   setToDate(undefined);
                 }}
               >

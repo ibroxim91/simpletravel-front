@@ -88,20 +88,19 @@ const SendPartner = () => {
 
   const MotionDiv = isMobile ? 'div' : motion.div;
 
-  async function onSubmit(values: z.infer<typeof senPartners>) {
+  async function onSubmit() {
     setLoading(true);
     setSuccess(false);
     setError(null);
     try {
-      await new Promise((resolve, reject) => {
+      await new Promise((resolve) => {
         setTimeout(() => {
-          // reject('server error');
           resolve('ok');
         }, 2000);
       });
       setLoading(false);
       setSuccess(true);
-    } catch (err) {
+    } catch {
       setLoading(false);
       setError('Произошла ошибка при отправке. Попробуйте ещё раз.');
     }
@@ -183,9 +182,9 @@ const SendPartner = () => {
                           <Button
                             variant={'outline'}
                             onClick={() => {
-                              setSuccess(false),
-                                setLoading(false),
-                                form.reset();
+                              setSuccess(false);
+                              setLoading(false);
+                              form.reset();
                             }}
                             className="rounded-full p-6 h-12 w-12"
                           >

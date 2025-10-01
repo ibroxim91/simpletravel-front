@@ -25,7 +25,6 @@ const FilterHotelMobile = () => {
   const [selectAge, setSelectAge] = useState<number>(0);
   const [search, setSearch] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
-  const [searchWhere, setSearchWhere] = useState('');
   const [fromDate, setFromDate] = useState<Date | undefined>();
   const [toDate, setToDate] = useState<Date | undefined>();
   const [selectData, setSelectData] = useState<string>();
@@ -156,9 +155,9 @@ const FilterHotelMobile = () => {
           anchor="bottom"
           open={dataOpenMobile}
           onClose={() => {
-            setDataOpenMobile(false),
-              setFromDate(undefined),
-              setToDate(undefined);
+            setDataOpenMobile(false);
+            setFromDate(undefined);
+            setToDate(undefined);
           }}
           PaperProps={{
             sx: {
@@ -262,7 +261,7 @@ const FilterHotelMobile = () => {
                     />
                   )} */}
               <Calendar
-                className="w-full"
+                className="w-full max-w-2xl mx-auto"
                 mode="range"
                 selected={range}
                 onSelect={(val) => {
@@ -271,6 +270,7 @@ const FilterHotelMobile = () => {
                   setToDate(val?.to);
                 }}
                 showOutsideDays={false}
+                disabled={{ before: new Date() }}
                 numberOfMonths={1}
               />
             </div>

@@ -14,7 +14,7 @@ import {
 import ArrowDropUpOutlinedIcon from '@mui/icons-material/ArrowDropUpOutlined';
 import PublicIcon from '@mui/icons-material/Public';
 import { useTranslations } from 'next-intl';
-import Image from 'next/image';
+import Image, { StaticImageData } from 'next/image';
 import { useParams, usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -25,7 +25,11 @@ export function ChangeLang() {
   const t = useTranslations();
   const [open, setOpen] = useState(false);
 
-  const languages: { code: LanguageRoutes; label: string; flag: any }[] = [
+  const languages: {
+    code: LanguageRoutes;
+    label: string;
+    flag: StaticImageData;
+  }[] = [
     { code: LanguageRoutes.UZ, label: t('Oʻzbekcha'), flag: UZ },
     { code: LanguageRoutes.RU, label: t('Русский'), flag: RU },
     { code: LanguageRoutes.EN, label: t('English'), flag: EN },
@@ -54,7 +58,7 @@ export function ChangeLang() {
       >
         <SelectTrigger className="w-auto p-0 border-none bg-transparent cursor-pointer shadow-none focus:ring-0 focus:outline-none gap-2">
           <PublicIcon sx={{ color: 'white', width: '24px', height: '24px' }} />
-          <p className="text-sm text-white font-medium">
+          <p className="text-md text-white font-medium">
             {languages.find((l) => l.code === locale)?.label}
           </p>
         </SelectTrigger>
