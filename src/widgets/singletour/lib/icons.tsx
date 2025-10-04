@@ -5,6 +5,7 @@ import { JSX } from 'react';
 
 type TtourAdditionalInfo = {
   name: string;
+  iconName: string;
   icon: JSX.Element;
 };
 
@@ -12,30 +13,37 @@ const tourAdditionalInfo: TtourAdditionalInfo[] = [
   {
     name: 'Wi-Fi в общественных местах (бесплатно)',
     icon: <Wifi width={32} height={32} />,
+    iconName: 'wifi',
   },
   {
     name: 'Не дальше 50 км от аэропорта',
     icon: <Plane />,
+    iconName: 'plane-departure',
   },
   {
     name: 'Детский клуб',
     icon: <Laugh />,
+    iconName: 'face-smile',
   },
   {
     name: 'Песчаный пляж',
     icon: <Umbrella />,
+    iconName: 'umbrella',
   },
   {
     name: 'Анимация',
     icon: <PartyPopper />,
+    iconName: 'party-horn',
   },
   {
     name: 'SPA-центр',
     icon: <SpaIcon />,
+    iconName: 'spa',
   },
   {
     name: 'Открытый бассейн',
     icon: <PoolIcon />,
+    iconName: 'person-swimming',
   },
 ];
 

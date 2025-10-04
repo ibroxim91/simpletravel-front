@@ -37,20 +37,21 @@ import Drawer from '@mui/material/Drawer';
 import { Map, Placemark, YMaps } from '@pbe/react-yandex-maps';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
 
-const senPartners = z.object({
-  name: z.string().min(2, {
-    message: "Eng kamida 2ta harf bo'lishi kerak",
-  }),
-  phone: z.string().min(5, {
-    message: 'Telefon raqam xato',
-  }),
-});
-
 export default function Contacts() {
+  const t = useTranslations();
+  const senPartners = z.object({
+    name: z.string().min(2, {
+      message: "Eng kamida 2ta harf bo'lishi kerak",
+    }),
+    phone: z.string().min(5, {
+      message: 'Telefon raqam xato',
+    }),
+  });
   const [open, setOpen] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -122,13 +123,15 @@ export default function Contacts() {
           }}
         >
           <Link href="/" className="font-medium text-[#646465]">
-            Главная страница
+            {t('Главная')}
           </Link>
-          <p className="text-[#646465] font-medium">Контакты</p>
+          <p className="text-[#646465] font-medium">{t('Контакты')}</p>
         </Breadcrumbs>
       </motion.div>
 
-      <h1 className="font-bold text-[#031753] text-[32px] my-5">Контакты</h1>
+      <h1 className="font-bold text-[#031753] text-[32px] my-5">
+        {t('Контакты')}
+      </h1>
 
       <div className="grid grid-cols-2 gap-6 justify-between max-lg:grid-cols-1">
         <div className="h-full">
@@ -139,7 +142,7 @@ export default function Contacts() {
           >
             <div className="p-[20px] bg-[#ffffff] rounded-[16px]">
               <p className="font-semibold text-[#121212] text-2xl mb-4">
-                Ответим на все вопросы
+                {t('Ответим на все вопросы')}
               </p>
               <Form {...form}>
                 <form className="space-y-4 w-full">
@@ -149,12 +152,12 @@ export default function Contacts() {
                     render={({ field }) => (
                       <FormItem>
                         <Label className="text-xl font-semibold text-[#212122]">
-                          Имя
+                          {t('Имя')}
                         </Label>
                         <FormControl>
                           <Input
                             {...field}
-                            placeholder="Введите Имя"
+                            placeholder={t('Введите Имя')}
                             className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
                           />
                         </FormControl>
@@ -168,12 +171,12 @@ export default function Contacts() {
                     render={({ field }) => (
                       <FormItem>
                         <Label className="text-xl font-semibold text-[#212122]">
-                          Номер телефона
+                          {t('Номер телефона')}
                         </Label>
                         <FormControl>
                           <Input
                             {...field}
-                            placeholder="Введите ваш номер телефона"
+                            placeholder={t('Введите ваш номер телефона')}
                             className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
                           />
                         </FormControl>
@@ -186,16 +189,16 @@ export default function Contacts() {
                       onClick={form.handleSubmit(onSubmit)}
                       className="px-10 py-7 max-lg:hidden bg-[#1764FC] hover:bg-[#1764FC] max-lg:w-full rounded-4xl text-lg font-medium cursor-pointer"
                     >
-                      Отправить
+                      {t('Отправить')}
                     </Button>
                     <Button
                       onClick={form.handleSubmit(onSubmitMobile)}
                       className="px-10 py-7 lg:hidden bg-[#1764FC] hover:bg-[#1764FC] max-lg:w-full rounded-4xl text-lg font-medium cursor-pointer"
                     >
-                      Отправить
+                      {t('Отправить')}
                     </Button>
                     <p className="font-medium text-md text-[#646465]">
-                      Я даю согласие на обработку персональных данных
+                      {t('Я даю согласие на обработку персональных данных')}
                     </p>
                   </div>
                 </form>
@@ -208,21 +211,21 @@ export default function Contacts() {
             transition={{ duration: 0.8 }}
             className="bg-[#084FE3] p-[20px] rounded-3xl text-white mt-[15px]"
           >
-            <h1 className="font-bold text-[32px] my-5">Контакты</h1>
+            <h1 className="font-bold text-[32px] my-5">{t('Контакты')}</h1>
 
             <div className="flex items-center justify-between my-5 gap-4">
               <div className="flex items-center gap-2">
                 <LocationOnIcon />
-                Адрес:
+                {t('Адрес')}:
               </div>
 
-              <p>Алмазарский р-н, Камарнисо, 13</p>
+              <p>{t('Алмазарский р-н, Камарнисо, 13')}</p>
             </div>
             <hr className="border-[#FFFFFF29]" />
             <div className="flex items-center justify-between my-5">
               <div className="flex items-center gap-2 ">
                 <CallEndIcon />
-                Телефон:
+                {t('Телефон')}:
               </div>
               <p>5990</p>
             </div>
@@ -292,7 +295,7 @@ export default function Contacts() {
                 success && 'justify-center',
               )}
             >
-              {loading && <p className="text-3xl">Отправка...</p>}
+              {loading && <p className="text-3xl">{t('Отправка')}...</p>}
 
               {success && (
                 <Button
@@ -314,7 +317,7 @@ export default function Contacts() {
 
               {!loading && !success && !error && (
                 <>
-                  <p className="text-3xl">Стать партнёром</p>
+                  <p className="text-3xl">{t('Стать партнёром')}</p>
                   <DialogClose asChild>
                     <Button
                       variant={'outline'}
@@ -347,11 +350,11 @@ export default function Contacts() {
               {success && (
                 <div className="text-center flex flex-col gap-4 px-4 justify-center">
                   <p className="text-2xl mt-5 text-[#212122] font-semibold">
-                    Заявка успешно отправлено
+                    {t('Заявка успешно отправлено')}
                   </p>
                   <p className="text-[#646465] font-medium text-lg">
-                    Эксперт свяжется с вами в ближайшее время по номеру +
-                    {form.getValues('phone')} позвонив на него
+                    {t('Эксперт свяжется с вами в ближайшее время по номеру')} +
+                    {form.getValues('phone')} {t('позвонив на него')}
                   </p>
                   <div className="mt-4">
                     <Button
@@ -364,7 +367,7 @@ export default function Contacts() {
                         setOpen(false);
                       }}
                     >
-                      Хорошо
+                      {t('Хорошо')}
                     </Button>
                   </div>
                 </div>
@@ -386,7 +389,7 @@ export default function Contacts() {
                       setError(null);
                     }}
                   >
-                    Попробовать снова
+                    {t('Попробовать снова')}
                   </Button>
                 </div>
               )}
@@ -424,7 +427,7 @@ export default function Contacts() {
       >
         {!success && !error && !loading && (
           <div className="flex justify-between items-center p-4">
-            <p className="text-2xl font-semibold">Стать партнёром</p>
+            <p className="text-2xl font-semibold">{t('Стать партнёром')}</p>
             <Button
               variant="outline"
               onClick={() => {
@@ -461,11 +464,11 @@ export default function Contacts() {
                 <DoneIcon sx={{ width: '38px', height: '38px' }} />
               </Button>
               <p className="text-2xl mt-5 text-[#212122]">
-                Заявка успешно отправлено
+                {t('Заявка успешно отправлено')}
               </p>
               <p className="text-[#646465] font-medium text-md">
-                Эксперт свяжется с вами в ближайшее время по номеру{' '}
-                {form.getValues('phone')} позвонив на него
+                {t('Эксперт свяжется с вами в ближайшее время по номеру')}{' '}
+                {form.getValues('phone')} {t('позвонив на него')}
               </p>
               <Button
                 variant={'default'}
@@ -477,7 +480,7 @@ export default function Contacts() {
                   setOpenDrawer(false);
                 }}
               >
-                Хорошо
+                {t('Хорошо')}
               </Button>
             </div>
           )}
@@ -490,7 +493,7 @@ export default function Contacts() {
                 <CloseIcon sx={{ width: 32, height: 32 }} />
               </Button>
               <p className="text-2xl mt-5 text-[#212122]">
-                Произошла ошибка при отправке
+                {t('Произошла ошибка при отправке')}
               </p>
               <p className="text-xl font-semibold text-[#212122]">{error}</p>
               <Button
@@ -504,7 +507,7 @@ export default function Contacts() {
                   setOpenDrawer(false);
                 }}
               >
-                Попробовать снова
+                {t('Попробовать снова')}
               </Button>
             </div>
           )}

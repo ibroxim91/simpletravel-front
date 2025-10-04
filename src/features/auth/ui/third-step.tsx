@@ -14,6 +14,7 @@ import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Check } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
@@ -33,6 +34,7 @@ const formSchema = z
   });
 
 const ThirdStep = () => {
+  const t = useTranslations();
   const route = useRouter();
   const { setOpenModalMobile, setOpenModal } = useWelcomeStore();
   const [license, setLicense] = useState<boolean>(false);
@@ -52,10 +54,9 @@ const ThirdStep = () => {
 
   return (
     <div className="w-[50%] bg-white rounded-3xl h-fit py-5 px-10 absolute bottom-0 top-52 max-md:px-2 max-sm:top-16 max-lg:w-[90%] left-1/2 -translate-x-1/2">
-      <p className="text-xl font-semibold">Регистрация аккаунта</p>
+      <p className="text-xl font-semibold">{t('Регистрация аккаунта')}</p>
       <p className="mt-2 text-md w-full break-words text-[#646465]">
-        Создайте свой личный кабинет, чтобы управлять бронированиями, сохранять
-        избранное и пользоваться всеми возможностями Simple Travel
+        {t('Создайте свой личный кабинет, чтобы управлять бронированиями')}
       </p>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
@@ -65,11 +66,11 @@ const ThirdStep = () => {
             render={({ field }) => (
               <FormItem>
                 <Label className="text-lg font-semibold">
-                  Придумайте пароль
+                  {t('Придумайте пароль')}
                 </Label>
                 <FormControl>
                   <Input
-                    placeholder="Введите пароль (минимум 8 символов)"
+                    placeholder={t('Введите пароль (минимум 8 символов)')}
                     {...field}
                     className="h-[60px] rounded-xl focus:!ring-0 !text-md"
                   />
@@ -85,11 +86,11 @@ const ThirdStep = () => {
             render={({ field }) => (
               <FormItem>
                 <Label className="text-lg font-semibold">
-                  Подтвердите пароль
+                  {t('Подтвердите пароль')}
                 </Label>
                 <FormControl>
                   <Input
-                    placeholder="Повторите пароль"
+                    placeholder={t('Повторите пароль')}
                     {...field}
                     className="h-[60px] rounded-xl focus:!ring-0 !text-md"
                   />
@@ -109,8 +110,9 @@ const ThirdStep = () => {
               onClick={() => setLicense((prev) => !prev)}
               className="cursor-pointer text-[#646465]"
             >
-              Я согласен с условиями использования и политикой
-              конфиденциальности
+              {t(
+                'Я согласен с условиями использования и политикой конфиденциальности',
+              )}
             </Label>
           </div>
           <Button
@@ -118,7 +120,7 @@ const ThirdStep = () => {
             disabled={!license}
             className="w-full px-4 py-8 rounded-full bg-[#1764FC] hover:bg-[#1764FC0] cursor-pointer"
           >
-            Зарегистрироваться
+            {t('Зарегистрироваться')}
           </Button>
         </form>
       </Form>

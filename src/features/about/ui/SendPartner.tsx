@@ -31,6 +31,7 @@ import DoneIcon from '@mui/icons-material/Done';
 import Drawer from '@mui/material/Drawer';
 import clsx from 'clsx';
 import { easeOut, motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -38,6 +39,7 @@ import z from 'zod';
 import senPartners from '../lib/form';
 
 const SendPartner = () => {
+  const t = useTranslations();
   const partners = [Partners_1, Partners_2, Partners_3];
   const [open, setOpen] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
@@ -122,11 +124,10 @@ const SendPartner = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             <p className="text-3xl w-[80%] max-lg:w-full text-[#031753] font-semibold">
-              Сотрудничаем с лидерами Узбекистана
+              {t('Сотрудничаем с лидерами Узбекистана')}
             </p>
             <p className="text-[#636363] text-lg font-medium max-lg:w-full">
-              Мы успешно работаем с крупнейшими компаниями Узбекистана,
-              предлагая им надёжные решения и долгосрочное партнёрство.
+              {t('Мы успешно работаем с крупнейшими компаниями Узбекистана')}
             </p>
             <Dialog
               open={open}
@@ -139,7 +140,7 @@ const SendPartner = () => {
             >
               <DialogTrigger asChild>
                 <Button className="w-fit cursor-pointer mt-2 rounded-3xl py-6 px-6 text-md max-lg:hidden">
-                  Стать партнёром
+                  {t('Стать партнёром')}
                 </Button>
               </DialogTrigger>
 
@@ -155,7 +156,7 @@ const SendPartner = () => {
                       success && 'justify-center',
                     )}
                   >
-                    {loading && <p className="text-3xl">Отправка...</p>}
+                    {loading && <p className="text-3xl">{t('Отправка')}</p>}
 
                     {success && (
                       <Button
@@ -177,7 +178,7 @@ const SendPartner = () => {
 
                     {!loading && !success && !error && (
                       <>
-                        <p className="text-3xl">Стать партнёром</p>
+                        <p className="text-3xl">{t('Стать партнёром')}</p>
                         <DialogClose asChild>
                           <Button
                             variant={'outline'}
@@ -210,11 +211,13 @@ const SendPartner = () => {
                     {success && (
                       <div className="text-center flex flex-col gap-4 px-4 justify-center">
                         <p className="text-2xl mt-5 text-[#212122] font-semibold">
-                          Заявка успешно отправлено
+                          {t('Заявка успешно отправлено')}
                         </p>
                         <p className="text-[#646465] font-medium text-lg">
-                          Эксперт свяжется с вами в ближайшее время по номеру +
-                          {form.getValues('phone')} позвонив на него
+                          {t(
+                            'Эксперт свяжется с вами в ближайшее время по номеру',
+                          )}{' '}
+                          +{form.getValues('phone')} {t('позвонив на него')}
                         </p>
                         <div className="mt-4">
                           <Button
@@ -227,7 +230,7 @@ const SendPartner = () => {
                               setOpen(false);
                             }}
                           >
-                            Хорошо
+                            {t('Хорошо')}
                           </Button>
                         </div>
                       </div>
@@ -249,7 +252,7 @@ const SendPartner = () => {
                             setError(null);
                           }}
                         >
-                          Попробовать снова
+                          {t('Попробовать снова')}
                         </Button>
                       </div>
                     )}
@@ -266,12 +269,14 @@ const SendPartner = () => {
                             render={({ field }) => (
                               <FormItem>
                                 <Label className="text-xl font-semibold text-[#212122]">
-                                  Название компании
+                                  {t('Название компании')}
                                 </Label>
                                 <FormControl>
                                   <Input
                                     {...field}
-                                    placeholder="Введите название вашей компании"
+                                    placeholder={t(
+                                      'Введите название вашей компании',
+                                    )}
                                     className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
                                   />
                                 </FormControl>
@@ -285,12 +290,12 @@ const SendPartner = () => {
                             render={({ field }) => (
                               <FormItem>
                                 <Label className="text-xl font-semibold text-[#212122]">
-                                  Адрес
+                                  {t('Адрес')}
                                 </Label>
                                 <FormControl>
                                   <Input
                                     {...field}
-                                    placeholder="Город, улица, дом"
+                                    placeholder={t('Город, улица, дом')}
                                     className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
                                   />
                                 </FormControl>
@@ -304,7 +309,7 @@ const SendPartner = () => {
                             render={({ field }) => (
                               <FormItem>
                                 <Label className="text-xl font-semibold text-[#212122]">
-                                  Свидетельств/Лицензияо
+                                  {t('Свидетельств/Лицензияо')}
                                 </Label>
                                 <FormControl>
                                   <Input
@@ -323,14 +328,14 @@ const SendPartner = () => {
                                   className="w-full bg-[#EDEEF180] border-2 border-dashed border-[#D3D3D3] flex flex-col items-center gap-2 justify-center py-4 rounded-2xl cursor-pointer hover:bg-[#EDEEF1]"
                                 >
                                   <p className="font-semibold text-xl text-[#212122]">
-                                    Drag or select file
+                                    {t('Drag or select file')}
                                   </p>
                                   <p className="text-[#646465] text-sm">
-                                    Drop files here or click to browse
+                                    {t('Drop files here or click to browse')}
                                   </p>
                                   {field.value && (
                                     <p className="text-[#212122] mt-2 font-medium">
-                                      Выбран файл: {field.value.name}
+                                      {t('Выбран файл')}: {field.value.name}
                                     </p>
                                   )}
                                 </label>
@@ -345,7 +350,7 @@ const SendPartner = () => {
                               render={({ field }) => (
                                 <FormItem className="w-full">
                                   <Label className="text-xl font-semibold text-[#212122]">
-                                    Электронная почта
+                                    {t('Электронная почта')}
                                   </Label>
                                   <FormControl>
                                     <Input
@@ -364,12 +369,14 @@ const SendPartner = () => {
                               render={({ field }) => (
                                 <FormItem className="w-full">
                                   <Label className="text-xl font-semibold text-[#212122]">
-                                    Номер телефона
+                                    {t('Номер телефона')}
                                   </Label>
                                   <FormControl>
                                     <Input
                                       {...field}
-                                      placeholder="Введите ваш номер телефона"
+                                      placeholder={t(
+                                        'Введите ваш номер телефона',
+                                      )}
                                       className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
                                     />
                                   </FormControl>
@@ -384,7 +391,7 @@ const SendPartner = () => {
                             render={({ field }) => (
                               <FormItem className="w-full">
                                 <Label className="text-xl font-semibold text-[#212122]">
-                                  Instagram / Вебсайт
+                                  {t('Instagram / Вебсайт')}
                                 </Label>
                                 <FormControl>
                                   <Input
@@ -402,10 +409,12 @@ const SendPartner = () => {
                               type="submit"
                               className="px-10 py-8 rounded-4xl text-lg font-medium cursor-pointer"
                             >
-                              Отправить
+                              {t('Отправить')}
                             </Button>
                             <p className="font-medium text-md text-[#646465]">
-                              Я даю согласие на обработку персональных данных
+                              {t(
+                                'Я даю согласие на обработку персональных данных',
+                              )}
                             </p>
                           </div>
                         </form>
@@ -496,7 +505,7 @@ const SendPartner = () => {
             className="w-full cursor-pointer mt-10 rounded-3xl py-6 px-6 text-md lg:hidden"
             onClick={() => setOpenDrawer(true)}
           >
-            Стать партнёром
+            {t('Стать партнёром')}
           </Button>
         </CardContent>
       </MotionDiv>
@@ -529,7 +538,7 @@ const SendPartner = () => {
       >
         {!success && !error && !loading && (
           <div className="flex justify-between items-center p-4">
-            <p className="text-2xl font-semibold">Стать партнёром</p>
+            <p className="text-2xl font-semibold">{t('Стать партнёром')}</p>
             <Button
               variant="outline"
               onClick={() => {
@@ -566,11 +575,11 @@ const SendPartner = () => {
                 <DoneIcon sx={{ width: '38px', height: '38px' }} />
               </Button>
               <p className="text-2xl mt-5 text-[#212122]">
-                Заявка успешно отправлено
+                {t('Заявка успешно отправлено')}
               </p>
               <p className="text-[#646465] font-medium text-md">
-                Эксперт свяжется с вами в ближайшее время по номеру{' '}
-                {form.getValues('phone')} позвонив на него
+                {t('Эксперт свяжется с вами в ближайшее время по номеру')}{' '}
+                {form.getValues('phone')} {t('позвонив на него')}
               </p>
               <Button
                 variant={'default'}
@@ -582,7 +591,7 @@ const SendPartner = () => {
                   setOpenDrawer(false);
                 }}
               >
-                Хорошо
+                {t('Хорошо')}
               </Button>
             </div>
           )}
@@ -595,7 +604,7 @@ const SendPartner = () => {
                 <CloseIcon sx={{ width: 32, height: 32 }} />
               </Button>
               <p className="text-2xl mt-5 text-[#212122]">
-                Произошла ошибка при отправке
+                {t('Произошла ошибка при отправке')}
               </p>
               <p className="text-xl font-semibold text-[#212122]">{error}</p>
               <Button
@@ -609,7 +618,7 @@ const SendPartner = () => {
                   setOpenDrawer(false);
                 }}
               >
-                Попробовать снова
+                {t('Попробовать снова')}
               </Button>
             </div>
           )}
@@ -625,12 +634,12 @@ const SendPartner = () => {
                   render={({ field }) => (
                     <FormItem>
                       <Label className="text-xl font-semibold text-[#212122]">
-                        Название компании
+                        {t('Название компании')}
                       </Label>
                       <FormControl>
                         <Input
                           {...field}
-                          placeholder="Введите название вашей компании"
+                          placeholder={t('Введите название вашей компании')}
                           className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
                         />
                       </FormControl>
@@ -644,12 +653,12 @@ const SendPartner = () => {
                   render={({ field }) => (
                     <FormItem>
                       <Label className="text-xl font-semibold text-[#212122]">
-                        Адрес
+                        {t('Адрес')}
                       </Label>
                       <FormControl>
                         <Input
                           {...field}
-                          placeholder="Город, улица, дом"
+                          placeholder={t('Город, улица, дом')}
                           className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
                         />
                       </FormControl>
@@ -663,7 +672,7 @@ const SendPartner = () => {
                   render={({ field }) => (
                     <FormItem>
                       <Label className="text-xl font-semibold text-[#212122]">
-                        Свидетельств/Лицензияо
+                        {t('Свидетельств/Лицензияо')}
                       </Label>
                       <FormControl>
                         <Input
@@ -682,14 +691,14 @@ const SendPartner = () => {
                         className="w-full bg-[#EDEEF180] border-2 border-dashed border-[#D3D3D3] flex flex-col items-center gap-2 justify-center py-4 rounded-2xl cursor-pointer hover:bg-[#EDEEF1]"
                       >
                         <p className="font-semibold text-xl text-[#212122]">
-                          Drag or select file
+                          {t('Drag or select file')}
                         </p>
                         <p className="text-[#646465] text-sm">
-                          Drop files here or click to browse
+                          {t('Drop files here or click to browse')}
                         </p>
                         {field.value && (
                           <p className="text-[#212122] mt-2 font-medium">
-                            Выбран файл: {field.value.name}
+                            {t('Выбран файл')}: {field.value.name}
                           </p>
                         )}
                       </label>
@@ -703,7 +712,7 @@ const SendPartner = () => {
                   render={({ field }) => (
                     <FormItem className="w-full">
                       <Label className="text-xl font-semibold text-[#212122]">
-                        Электронная почта
+                        {t('Электронная почта')}
                       </Label>
                       <FormControl>
                         <Input
@@ -722,7 +731,7 @@ const SendPartner = () => {
                   render={({ field }) => (
                     <FormItem className="w-full">
                       <Label className="text-xl font-semibold text-[#212122]">
-                        Номер телефона
+                        {t('Номер телефона')}
                       </Label>
                       <FormControl>
                         <Input
@@ -741,7 +750,7 @@ const SendPartner = () => {
                   render={({ field }) => (
                     <FormItem className="w-full">
                       <Label className="text-xl font-semibold text-[#212122]">
-                        Instagram / Вебсайт
+                        {t('Instagram / Вебсайт')}
                       </Label>
                       <FormControl>
                         <Input
@@ -759,10 +768,10 @@ const SendPartner = () => {
                     type="submit"
                     className="px-10 py-8 rounded-4xl w-full text-lg font-medium cursor-pointer"
                   >
-                    Отправить
+                    {t('Отправить')}
                   </Button>
                   <p className="font-medium text-center text-md text-[#646465]">
-                    Я даю согласие на обработку персональных данных
+                    {t('Я даю согласие на обработку персональных данных')}
                   </p>
                 </div>
               </form>

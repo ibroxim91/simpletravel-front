@@ -15,6 +15,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import DoneIcon from '@mui/icons-material/Done';
 import Drawer from '@mui/material/Drawer';
 import clsx from 'clsx';
+import { useTranslations } from 'next-intl';
 import { Dispatch, SetStateAction } from 'react';
 
 interface Props {
@@ -42,6 +43,7 @@ export default function PaidModal({
   setOpenDrawer,
   open,
 }: Props) {
+  const t = useTranslations();
   const router = useRouter();
   return (
     <>
@@ -66,7 +68,7 @@ export default function PaidModal({
                   success && 'justify-center',
                 )}
               >
-                {loading && <p className="text-3xl">Отправка...</p>}
+                {loading && <p className="text-3xl">{t('Отправка')}...</p>}
 
                 {success && (
                   <Button
@@ -88,7 +90,7 @@ export default function PaidModal({
 
                 {!loading && !success && !error && (
                   <>
-                    <p className="text-3xl">Стать партнёром</p>
+                    <p className="text-3xl">{t('Оплата')}</p>
                     <DialogClose asChild>
                       <Button
                         variant={'outline'}
@@ -120,11 +122,11 @@ export default function PaidModal({
                 {success && (
                   <div className="text-center flex flex-col gap-4 px-4 justify-center">
                     <p className="text-2xl mt-5 text-[#212122] font-semibold">
-                      Оплата прошла успешно!
+                      {t('Оплата прошла успешно!')}
                     </p>
                     <p className="text-[#646465] font-medium text-lg">
-                      Эксперт свяжется с вами в ближайшее время по номеру +998
-                      93 222 29 22, позвонив на него
+                      {t('Эксперт свяжется с вами в ближайшее время по номеру')}{' '}
+                      +998 93 222 29 22, {t('позвонив на него')}
                     </p>
                     <div className="flex mt-4 justify-center gap-4">
                       <Button
@@ -137,7 +139,7 @@ export default function PaidModal({
                           router.push('/');
                         }}
                       >
-                        На главную
+                        {t('На главную')}
                       </Button>
                       <Button
                         variant={'default'}
@@ -149,7 +151,7 @@ export default function PaidModal({
                           router.push('/profile?tabs=reservations');
                         }}
                       >
-                        Мои брони
+                        {t('Мои брони')}
                       </Button>
                     </div>
                   </div>
@@ -170,7 +172,7 @@ export default function PaidModal({
                         setError(null);
                       }}
                     >
-                      Попробовать снова
+                      {t('Попробовать снова')}
                     </Button>
                   </div>
                 )}
@@ -208,7 +210,7 @@ export default function PaidModal({
       >
         {!success && !error && !loading && (
           <div className="flex justify-between items-center p-4">
-            <p className="text-2xl font-semibold">Стать партнёром</p>
+            <p className="text-2xl font-semibold">{t('Оплата')}</p>
             <Button
               variant="outline"
               onClick={() => {
@@ -244,11 +246,11 @@ export default function PaidModal({
                 <DoneIcon sx={{ width: '38px', height: '38px' }} />
               </Button>
               <p className="text-2xl mt-5 text-[#212122]">
-                Заявка успешно отправлено
+                {t('Заявка успешно отправлено')}
               </p>
               <p className="text-[#646465] font-medium text-md">
-                Эксперт свяжется с вами в ближайшее время по номеру позвонив на
-                него
+                {t('Эксперт свяжется с вами в ближайшее время по номеру')} +998
+                88 007 78 03 {t('позвонив на него')}
               </p>
               <div className="grid grid-cols-2 w-full mt-4 gap-4 absolute bottom-2 px-5">
                 <Button
@@ -261,7 +263,7 @@ export default function PaidModal({
                     router.push('/');
                   }}
                 >
-                  На главную
+                  {t('На главную')}
                 </Button>
                 <Button
                   variant={'default'}
@@ -273,7 +275,7 @@ export default function PaidModal({
                     router.push('/profile?tabs=reservations');
                   }}
                 >
-                  Мои брони
+                  {t('Мои брони')}
                 </Button>
               </div>
             </div>
@@ -287,7 +289,7 @@ export default function PaidModal({
                 <CloseIcon sx={{ width: 32, height: 32 }} />
               </Button>
               <p className="text-2xl mt-5 text-[#212122]">
-                Произошла ошибка при отправке
+                {t('Произошла ошибка при отправке')}
               </p>
               <p className="text-xl font-semibold text-[#212122]">{error}</p>
               <Button
@@ -300,7 +302,7 @@ export default function PaidModal({
                   setOpenDrawer(false);
                 }}
               >
-                Попробовать снова
+                {t('Попробовать снова')}
               </Button>
             </div>
           )}

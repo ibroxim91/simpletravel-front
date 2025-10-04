@@ -2,6 +2,7 @@
 import SertificatImg from '@/assets/sertificat.png';
 import { Carousel, CarouselContent, CarouselItem } from '@/shared/ui/carousel';
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 
 const fadeUpVariants = {
@@ -10,6 +11,7 @@ const fadeUpVariants = {
 };
 
 const Sertificat = () => {
+  const t = useTranslations();
   return (
     <div className="custom-container mt-10">
       <div className="flex justify-between max-lg:flex-col gap-10">
@@ -24,7 +26,7 @@ const Sertificat = () => {
             visible: { opacity: 1, x: 0 },
           }}
         >
-          Надёжность, подтверждённая документами
+          {t('Надёжность, подтверждённая документами')}
         </motion.p>
 
         <motion.p
@@ -38,9 +40,7 @@ const Sertificat = () => {
             visible: { opacity: 1, x: 0 },
           }}
         >
-          Каждое наше направление сопровождается официальными лицензиями и
-          сертификатами. Это означает, что вы можете быть уверены в безопасности
-          и легальности каждого путешествия с нами
+          {t('Каждое наше направление сопровождается официальными лицензиями')}
         </motion.p>
       </div>
       <Carousel className="w-full mt-20 cursor-pointer">
@@ -71,7 +71,7 @@ const Sertificat = () => {
                 viewport={{ once: false, amount: 0.1 }}
                 transition={{ duration: 0.6, delay: index * 0.1 + 0.1 }}
               >
-                Соответствие международным стандартам
+                {t('Соответствие международным стандартам')}
               </motion.p>
             </CarouselItem>
           ))}

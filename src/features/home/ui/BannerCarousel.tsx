@@ -13,11 +13,13 @@ import {
 import EastIcon from '@mui/icons-material/East';
 import Card from '@mui/material/Card';
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 
 const BannerCarousel = () => {
   const items = Array.from({ length: 4 });
   const colors = ['#EDF5C7', '#F5DCC7'];
+  const t = useTranslations();
 
   return (
     <div className="mt-10 max-lg:hidden custom-container">
@@ -47,16 +49,16 @@ const BannerCarousel = () => {
                     className="flex flex-col gap-6 w-96 z-20 absolute left-14 top-1/2 -translate-y-1/2"
                   >
                     <p className="text-4xl font-semibold">
-                      Предложение дня: только сегодня!
+                      {t('Предложение дня: только сегодня!')}
                     </p>
                     <p className="text-[#212122] font-medium">
-                      Лучшие направления по самым выгодным ценам
+                      {t('Лучшие направления по самым выгодным ценам')}
                     </p>
                     <Link
-                      href="#"
+                      href="/selectour"
                       className="bg-white text-black font-semibold flex gap-4 px-8 py-4 shadow-sm !rounded-4xl w-fit"
                     >
-                      <p>Смотреть цены</p>
+                      <p>{t('Смотреть цены')}</p>
                       <EastIcon />
                     </Link>
                   </motion.div>
@@ -72,6 +74,8 @@ const BannerCarousel = () => {
                       width={304}
                       height={312}
                       quality={100}
+                      priority
+                      fetchPriority="high"
                       className="object-cover w-full h-full"
                     />
                   </motion.div>

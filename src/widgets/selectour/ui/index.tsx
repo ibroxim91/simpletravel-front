@@ -1,62 +1,101 @@
 'use client';
 
-import Kuba from '@/assets/Kuba.jpg';
-import OAE from '@/assets/OAE.jpg';
-import ShriLanka from '@/assets/ShriLanka.jpg';
-import Tailand from '@/assets/Tailand.jpg';
-import Turk from '@/assets/Turk.jpg';
-import { Link } from '@/shared/config/i18n/navigation';
+import loaderAnimation from '@/assets/lottie/Travel Tour.json';
+import { Link, useRouter } from '@/shared/config/i18n/navigation';
+import formatDate from '@/shared/lib/formatDate';
 import { Button } from '@/shared/ui/button';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+} from '@/shared/ui/pagination';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/shared/ui/select';
+import { useFilterToursStore } from '@/widgets/filter/lib/store';
 import FilterTours from '@/widgets/filter/ui/FilterTours';
 import FilterToursMobile from '@/widgets/filter/ui/FilterToursMobile';
+import { Player } from '@lottiefiles/react-lottie-player';
 import CloseIcon from '@mui/icons-material/Close';
 import EastIcon from '@mui/icons-material/East';
 import FilterListIcon from '@mui/icons-material/FilterList';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Drawer from '@mui/material/Drawer';
+import { useQuery } from '@tanstack/react-query';
+import clsx from 'clsx';
 import { motion } from 'framer-motion';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import { useEffect, useState } from 'react';
-import Checkbox from './CheckBox';
+import Ticket_Api from '../lib/api';
+import CheckboxFilter from './CheckBox';
 import FilterSection from './FilterSection';
 import TourItem from './TourItem';
 
 export default function Selectour() {
-  const [priceRange, setPriceRange] = useState<number[]>([100, 300]);
+  const t = useTranslations();
+  const [priceRange, setPriceRange] = useState<number[]>([2500000, 100000000]);
+  const [expensive, setExpensive] = useState<boolean>(false);
+  const [cheaper, setCheaper] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [visa, setVisa] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const { from, date, passenger, where, toDate, selectData } =
+    useFilterToursStore();
+
   const [openFilter, setFilter] = useState(false);
-  const tourItem = [
-    {
-      img: Kuba,
-      id: 1,
-      rating: 3,
-      like: true,
-    },
-    {
-      img: OAE,
-      id: 2,
-      rating: 2,
-      like: false,
-    },
-    {
-      img: ShriLanka,
-      id: 3,
-      rating: 4,
-      like: false,
-    },
-    {
-      id: 4,
-      img: Tailand,
-      rating: 5,
-      like: true,
-    },
-    {
-      img: Turk,
-      id: 5,
-      rating: 1,
-      like: false,
-    },
-  ];
+  const { data: ticket } = useQuery({
+    queryKey: [
+      'ticket_all',
+      from,
+      where,
+      date,
+      cheaper,
+      expensive,
+      selectData,
+      toDate,
+      passenger,
+      currentPage,
+      priceRange,
+      visa,
+    ],
+    queryFn: () =>
+      Ticket_Api.GetAllTickets({
+        params: {
+          page: currentPage,
+          page_size: 8,
+          departure: from,
+          destination: where,
+          cheapest: cheaper,
+          most_expensive: expensive,
+          min_departure_date: date ? formatDate.format(date, 'YYYY-MM-DD') : '',
+          max_departure_date: toDate
+            ? formatDate.format(toDate, 'YYYY-MM-DD')
+            : '',
+          passenger_count: passenger,
+          min_price: priceRange[0],
+          visa_required:
+            visa === 'visa'
+              ? true
+              : visa === 'no_visa'
+                ? false
+                : visa === null && '',
+          max_price: priceRange[1],
+        },
+      }),
+  });
 
   useEffect(() => {
     const handleScroll = () => {};
@@ -64,9 +103,18 @@ export default function Selectour() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    router.push(`selectour?page=${currentPage}`);
+  }, [currentPage, router]);
+
+  useEffect(() => {
+    if (searchParams.get('page')) {
+      setCurrentPage(Number(searchParams.get('page')));
+    }
+  }, [searchParams]);
+
   return (
     <div className="custom-container mt-5 bg-[#edeef1] min-h-screen pb-20">
-      {/* Breadcrumb */}
       <Breadcrumbs
         aria-label="breadcrumb"
         separator={<EastIcon fontSize="small" className="text-[#646465]" />}
@@ -77,9 +125,9 @@ export default function Selectour() {
         }}
       >
         <Link href="/" className="font-medium text-[#646465]">
-          Главная страница
+          {t('Главная')}
         </Link>
-        <p className="text-[#646465] font-medium">Подобрать тур</p>
+        <p className="text-[#646465] font-medium">{t('Подобрать тур')}</p>
       </Breadcrumbs>
 
       <motion.div
@@ -105,8 +153,6 @@ export default function Selectour() {
         <FilterToursMobile />
       </motion.div>
 
-      {/* Searchbar here */}
-
       <div className="mt-10 flex gap-10 max-lg:flex-col">
         <motion.div
           initial={{ opacity: 0, x: -40 }}
@@ -118,14 +164,14 @@ export default function Selectour() {
           }}
           className="w-[50%] p-5 rounded-2xl bg-white h-max max-lg:hidden"
         >
-          <h2 className="text-lg font-semibold">Фильтры</h2>
+          <h2 className="text-lg font-semibold">{t('Фильтры')}</h2>
           <hr className="my-3 border-[#DFDFDF]" />
 
-          <FilterSection title="Стоимость">
+          <FilterSection title={t('Стоимость')}>
             <Slider
               range
-              min={100}
-              max={10000}
+              min={2500000}
+              max={100000000}
               value={priceRange}
               onChange={(v) => setPriceRange(v as number[])}
             />
@@ -149,71 +195,86 @@ export default function Selectour() {
             </div>
           </FilterSection>
 
-          <FilterSection title="Название отеля">
+          <FilterSection title={t('Название отеля')}>
             <input
               type="text"
-              placeholder="Название отеля"
+              placeholder={t('Название отеля')}
               className="w-full border rounded-xl px-3 py-2 outline-none"
             />
           </FilterSection>
 
-          <FilterSection title="Условия въезда">
-            <Checkbox label="Без визы" defaultChecked />
-            <Checkbox label="С визой" />
+          <FilterSection title={t('Условия въезда')}>
+            <CheckboxFilter
+              value="no_visa"
+              label={t('Без визы')}
+              selectedValue={visa}
+              setChecked={setVisa}
+              exclusive
+            />
+            <CheckboxFilter
+              value="visa"
+              label={t('С визой')}
+              selectedValue={visa}
+              setChecked={setVisa}
+              exclusive
+            />
           </FilterSection>
 
-          <FilterSection title="Продолжительность тура">
-            <Checkbox label="7 ночей / 8 дней" defaultChecked />
-            <Checkbox label="10 ночей / 11 дней" />
-            <Checkbox label="14 ночей / 15 дней" />
+          <FilterSection title={t('Продолжительность тура')}>
+            <CheckboxFilter value="1" label="7 ночей / 8 дней" defaultChecked />
+            <CheckboxFilter value="2" label="10 ночей / 11 дней" />
+            <CheckboxFilter value="3" label="14 ночей / 15 дней" />
           </FilterSection>
 
-          <FilterSection title="Регионы и курорты">
-            <Checkbox label="Все регионы" />
-            <Checkbox label="Курорты" />
-            <Checkbox label="Марса Алам" />
+          <FilterSection title={t('Регионы и курорты')}>
+            <CheckboxFilter value="1" label="Все регионы" />
+            <CheckboxFilter value="2" label="Курорты" />
+            <CheckboxFilter value="3" label="Марса Алам" />
           </FilterSection>
 
-          <FilterSection title="Категория отеля">
-            <Checkbox label="5 звезд" />
-            <Checkbox label="4 звезды" />
-            <Checkbox label="3 звезды" />
+          <FilterSection title={t('Категория отеля')}>
+            <CheckboxFilter value="5" label={t('5 звезды')} />
+            <CheckboxFilter value="4" label={t('4 звезды')} />
+            <CheckboxFilter value="3" label={t('3 звезды')} />
           </FilterSection>
 
-          <FilterSection title="Питание">
-            <Checkbox label="Все включено" />
-            <Checkbox label="Завтрак" />
-            <Checkbox label="Полупансион" />
+          <FilterSection title={t('Питание')}>
+            <CheckboxFilter value="1" label={t('Все включено')} />
+            <CheckboxFilter value="1" label={t('Завтрак')} />
+            <CheckboxFilter value="1" label={t('Полупансион')} />
           </FilterSection>
 
-          <FilterSection title="Пляж">
-            <Checkbox label="Пляжный" />
-            <Checkbox label="Песчано-галечный пляж" />
-            <Checkbox label="Собственный пляж" />
+          <FilterSection title={t('Пляж')}>
+            <CheckboxFilter value="1" label={t('Пляжный')} />
+            <CheckboxFilter value="1" label={t('Песчано-галечный пляж')} />
+            <CheckboxFilter value="1" label={t('Собственный пляж')} />
           </FilterSection>
 
-          <FilterSection title="Тип отеля">
-            <Checkbox label="Отель" />
-            <Checkbox label="Курорт" />
-            <Checkbox label="Пансионат" />
+          <FilterSection title={t('Тип отеля')}>
+            <CheckboxFilter value="1" label={t('Отель')} />
+            <CheckboxFilter value="1" label={t('Курорт')} />
+            <CheckboxFilter value="1" label={t('Пансионат')} />
           </FilterSection>
 
-          <FilterSection title="Водные развлечения">
-            <Checkbox label="Открытый бассейн" />
-            <Checkbox label="Открытый бассейн с подогревом" />
-            <Checkbox label="Крытый бассейн" />
+          <FilterSection title={t('Водные развлечения')}>
+            <CheckboxFilter value="1" label={t('Открытый бассейн')} />
+            <CheckboxFilter
+              value="1"
+              label={t('Открытый бассейн с подогревом')}
+            />
+            <CheckboxFilter value="1" label={t('Крытый бассейн')} />
           </FilterSection>
 
-          <FilterSection title="Для детей">
-            <Checkbox label="Детское меню" />
-            <Checkbox label="Детская площадка" />
-            <Checkbox label="Детский сад" />
+          <FilterSection title={t('Для детей')}>
+            <CheckboxFilter value="1" label={t('Детское меню')} />
+            <CheckboxFilter value="1" label={t('Детская площадка')} />
+            <CheckboxFilter value="1" label={t('Детский сад')} />
           </FilterSection>
 
-          <FilterSection title="Дополнительно">
-            <Checkbox label="Wi-Fi" />
-            <Checkbox label="Парковка" />
-            <Checkbox label="Трансфер" />
+          <FilterSection title={t('Дополнительно')}>
+            <CheckboxFilter value="1" label={t('Wi-Fi')} />
+            <CheckboxFilter value="1" label={t('Парковка')} />
+            <CheckboxFilter value="1" label={t('Трансфер')} />
           </FilterSection>
         </motion.div>
 
@@ -231,7 +292,7 @@ export default function Selectour() {
             className="bg-white shadow-sm flex items-center justify-between px-4 py-4 rounded-xl"
             onClick={() => setFilter(true)}
           >
-            <p className="font-semibold text-lg">Филтры</p>
+            <p className="font-semibold text-lg">{t('Филтры')}</p>
             <FilterListIcon />
           </div>
           <Drawer
@@ -250,7 +311,7 @@ export default function Selectour() {
             }}
           >
             <div className="mb-5 flex items-center justify-between sticky">
-              <h2 className="text-lg font-semibold">Фильтры</h2>
+              <h2 className="text-lg font-semibold">{t('Фильтры')}</h2>
               <Button
                 variant={'outline'}
                 className="rounded-full h-[40px] w-[40px] cursor-pointer"
@@ -260,7 +321,7 @@ export default function Selectour() {
               </Button>
             </div>
 
-            <FilterSection title="Стоимость">
+            <FilterSection title={t('Стоимость')}>
               <Slider
                 range
                 min={100}
@@ -288,71 +349,78 @@ export default function Selectour() {
               </div>
             </FilterSection>
 
-            <FilterSection title="Название отеля">
+            <FilterSection title={t('Название отеля')}>
               <input
                 type="text"
-                placeholder="Название отеля"
+                placeholder={t('Название отеля')}
                 className="w-full border rounded-xl px-3 py-2 outline-none"
               />
             </FilterSection>
 
-            <FilterSection title="Условия въезда">
-              <Checkbox label="Без визы" defaultChecked />
-              <Checkbox label="С визой" />
+            <FilterSection title={t('Условия въезда')}>
+              <CheckboxFilter value="1" label={t('Без визы')} defaultChecked />
+              <CheckboxFilter value="1" label={t('С визой')} />
             </FilterSection>
 
-            <FilterSection title="Продолжительность тура">
-              <Checkbox label="7 ночей / 8 дней" defaultChecked />
-              <Checkbox label="10 ночей / 11 дней" />
-              <Checkbox label="14 ночей / 15 дней" />
+            <FilterSection title={t('Продолжительность тура')}>
+              <CheckboxFilter
+                value="1"
+                label="7 ночей / 8 дней"
+                defaultChecked
+              />
+              <CheckboxFilter value="1" label="10 ночей / 11 дней" />
+              <CheckboxFilter value="1" label="14 ночей / 15 дней" />
             </FilterSection>
 
-            <FilterSection title="Регионы и курорты">
-              <Checkbox label="Все регионы" />
-              <Checkbox label="Курорты" />
-              <Checkbox label="Марса Алам" />
+            <FilterSection title={t('Регионы и курорты')}>
+              <CheckboxFilter value="1" label="Все регионы" />
+              <CheckboxFilter value="1" label="Курорты" />
+              <CheckboxFilter value="1" label="Марса Алам" />
             </FilterSection>
 
-            <FilterSection title="Категория отеля">
-              <Checkbox label="5 звезд" />
-              <Checkbox label="4 звезды" />
-              <Checkbox label="3 звезды" />
+            <FilterSection title={t('Категория отеля')}>
+              <CheckboxFilter value="1" label={t('5 звезды')} />
+              <CheckboxFilter value="1" label={t('4 звезды')} />
+              <CheckboxFilter value="1" label={t('3 звезды')} />
             </FilterSection>
 
-            <FilterSection title="Питание">
-              <Checkbox label="Все включено" />
-              <Checkbox label="Завтрак" />
-              <Checkbox label="Полупансион" />
+            <FilterSection title={t('Питание')}>
+              <CheckboxFilter value="1" label={t('Все включено')} />
+              <CheckboxFilter value="1" label={t('Завтрак')} />
+              <CheckboxFilter value="1" label={t('Полупансион')} />
             </FilterSection>
 
-            <FilterSection title="Пляж">
-              <Checkbox label="Пляжный" />
-              <Checkbox label="Песчано-галечный пляж" />
-              <Checkbox label="Собственный пляж" />
+            <FilterSection title={t('Пляж')}>
+              <CheckboxFilter value="1" label={t('Пляжный')} />
+              <CheckboxFilter value="1" label={t('Песчано-галечный пляж')} />
+              <CheckboxFilter value="1" label={t('Собственный пляж')} />
             </FilterSection>
 
-            <FilterSection title="Тип отеля">
-              <Checkbox label="Отель" />
-              <Checkbox label="Курорт" />
-              <Checkbox label="Пансионат" />
+            <FilterSection title={t('Тип отеля')}>
+              <CheckboxFilter value="1" label={t('Отель')} />
+              <CheckboxFilter value="1" label={t('Курорт')} />
+              <CheckboxFilter value="1" label={t('Пансионат')} />
             </FilterSection>
 
-            <FilterSection title="Водные развлечения">
-              <Checkbox label="Открытый бассейн" />
-              <Checkbox label="Открытый бассейн с подогревом" />
-              <Checkbox label="Крытый бассейн" />
+            <FilterSection title={t('Водные развлечения')}>
+              <CheckboxFilter value="1" label={t('Открытый бассейн')} />
+              <CheckboxFilter
+                value="1"
+                label={t('Открытый бассейн с подогревом')}
+              />
+              <CheckboxFilter value="1" label={t('Крытый бассейн')} />
             </FilterSection>
 
-            <FilterSection title="Для детей">
-              <Checkbox label="Детское меню" />
-              <Checkbox label="Детская площадка" />
-              <Checkbox label="Детский сад" />
+            <FilterSection title={t('Для детей')}>
+              <CheckboxFilter value="1" label={t('Детское меню')} />
+              <CheckboxFilter value="1" label={t('Детская площадка')} />
+              <CheckboxFilter value="1" label={t('Детский сад')} />
             </FilterSection>
 
-            <FilterSection title="Дополнительно">
-              <Checkbox label="Wi-Fi" />
-              <Checkbox label="Парковка" />
-              <Checkbox label="Трансфер" />
+            <FilterSection title={t('Дополнительно')}>
+              <CheckboxFilter value="1" label={t('Wi-Fi')} />
+              <CheckboxFilter value="1" label={t('Парковка')} />
+              <CheckboxFilter value="1" label={t('Трансфер')} />
             </FilterSection>
             <div className="sticky bottom-0 w-full left-0">
               <button
@@ -361,59 +429,168 @@ export default function Selectour() {
                   setFilter(false);
                 }}
               >
-                Применять
+                {t('Применять')}
               </button>
             </div>
           </Drawer>
         </motion.div>
 
-        {/* Cards place (for tours) */}
-        <div className="w-[100%]">
-          <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{
-              duration: 0.5,
-              delay: 0.3,
-              ease: 'easeOut',
-            }}
-          >
-            <div className="w-full flex justify-between items-center max-lg:flex-col max-lg:items-start max-lg:gap-5">
-              <h1 className="font-bold text-2xl text-start">
-                Туры в Египет: найдено 116 предложений
-              </h1>
+        <div className="w-[100%] flex flex-col justify-between">
+          <div>
+            <motion.div
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{
+                duration: 0.5,
+                delay: 0.3,
+                ease: 'easeOut',
+              }}
+            >
+              <div className="w-full flex justify-between items-center max-lg:flex-col max-lg:items-start max-lg:gap-5">
+                <h1 className="font-bold text-2xl text-start">
+                  {where ? ` ${where}${t('ga tegishli')}` : t('Umumiy')}{' '}
+                  {ticket ? (
+                    <>
+                      {ticket.data.total_items} {t('ta tur topildi')}
+                    </>
+                  ) : (
+                    ''
+                  )}
+                </h1>
 
-              <div className="flex items-center justify-between p-[12px] max-lg:w-full rounded-xl border border-[#DFDFDF] gap-4 bg-[#FFFFFF]">
-                <input
-                  type="text"
-                  placeholder="По возрастанию цены"
-                  className="text-[#909091] outline-none border-none w-full"
-                />
-                <button>
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                      d="M12.293 5.33334C12.7123 5.33334 12.9453 5.81831 12.6834 6.14569L8.39041 11.512C8.19025 11.7622 7.80971 11.7622 7.60955 11.512L3.31652 6.14569C3.05462 5.81831 3.28771 5.33334 3.70696 5.33334L12.293 5.33334Z"
-                      fill="#212122"
-                    />
-                  </svg>
-                </button>
+                <Select
+                  onValueChange={(value) => {
+                    if (value === 'cheaper') {
+                      setCheaper(true);
+                      setExpensive(false);
+                    } else if (value === 'expensive') {
+                      setCheaper(false);
+                      setExpensive(true);
+                    } else if (value === 'all') {
+                      setCheaper(false);
+                      setExpensive(false);
+                    }
+                  }}
+                >
+                  <SelectTrigger className="w-[180px] !h-[40px] flex items-center justify-between max-lg:w-full rounded-lg border border-[#DFDFDF] gap-4 bg-[#FFFFFF]">
+                    <SelectValue placeholder={t('По возрастанию цены')} />
+                    <KeyboardArrowDownIcon />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t('Все')}</SelectItem>
+                    <SelectItem value="cheaper">{t('Подешевле')}</SelectItem>
+                    <SelectItem value="expensive">{t('Подороже')}</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
 
-          <div className="mt-5">
-            {tourItem.map((item) => (
-              <TourItem key={item.id} data={item} />
-            ))}
+            <div className="mt-5">
+              {ticket && ticket.data.results.tickets.length > 0 ? (
+                ticket?.data.results.tickets.map((item) => (
+                  <TourItem key={item.id} data={item} />
+                ))
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, x: 30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{
+                    duration: 0.8,
+                    delay: 0.1,
+                    ease: 'easeOut',
+                  }}
+                  viewport={{ once: false, amount: 0.1 }}
+                  className="flex flex-col justify-center items-center mt-10"
+                >
+                  <Player
+                    autoplay
+                    loop
+                    src={loaderAnimation}
+                    style={{ height: '240px', width: '240px' }}
+                  />
+                  <p className="text-2xl font-semibold">{t('Не найдено')}</p>
+                </motion.div>
+              )}
+            </div>
           </div>
+          {ticket && ticket.data.total_pages > 1 && (
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{
+                duration: 0.8,
+                delay: 0.1,
+                ease: 'easeOut',
+              }}
+              viewport={{ once: false, amount: 0.1 }}
+              className="flex justify-end items-end w-full mt-10"
+            >
+              <Pagination className="flex justify-end">
+                <PaginationContent>
+                  <Button
+                    onClick={() => setCurrentPage((prev) => prev - 1)}
+                    disabled={currentPage === 1}
+                    className="bg-[#ECF2FF] rounded-full w-10 hover:bg-[#ECF2FF] h-10 shadow-sm flex justify-center items-center cursor-pointer"
+                  >
+                    <ChevronLeft color="#084FE3" />
+                  </Button>
+
+                  {Array.from({ length: ticket.data.total_pages }).map(
+                    (_, i) => {
+                      const page = i + 1;
+
+                      if (
+                        page === 1 ||
+                        page === ticket.data.total_pages ||
+                        (page >= currentPage - 1 && page <= currentPage + 1)
+                      ) {
+                        return (
+                          <PaginationItem key={page}>
+                            <PaginationLink
+                              onClick={(e) => {
+                                e.preventDefault();
+                                setCurrentPage(page);
+                              }}
+                              href={`/selectour?page=${page}`}
+                              className={clsx(
+                                'rounded-full w-10 h-10 flex items-center justify-center shadow-sm',
+                                currentPage === page
+                                  ? 'bg-[#084FE3] text-white'
+                                  : 'bg-[#ECF2FF] text-[#084FE3]',
+                              )}
+                            >
+                              {page}
+                            </PaginationLink>
+                          </PaginationItem>
+                        );
+                      }
+
+                      if (
+                        page === currentPage - 2 ||
+                        page === currentPage + 2
+                      ) {
+                        return (
+                          <PaginationItem key={`ellipsis-${page}`}>
+                            <PaginationEllipsis />
+                          </PaginationItem>
+                        );
+                      }
+
+                      return null;
+                    },
+                  )}
+
+                  <Button
+                    onClick={() => setCurrentPage((prev) => prev + 1)}
+                    disabled={currentPage === ticket.data.total_pages}
+                    className="bg-[#ECF2FF] rounded-full w-10 hover:bg-[#ECF2FF] h-10 shadow-sm flex justify-center items-center cursor-pointer"
+                  >
+                    <ChevronRight color="#084FE3" />
+                  </Button>
+                </PaginationContent>
+              </Pagination>
+            </motion.div>
+          )}
         </div>
       </div>
     </div>

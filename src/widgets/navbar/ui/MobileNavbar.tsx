@@ -21,9 +21,8 @@ interface Props {
 }
 
 const MobileNavbar = ({ setOpen, open }: Props) => {
-  const t = useTranslations();
   const pathname = usePathname();
-
+  const t = useTranslations();
   const links = [
     { href: '/', label: 'Главная' },
     { href: '/about', label: 'О нас' },
@@ -51,14 +50,16 @@ const MobileNavbar = ({ setOpen, open }: Props) => {
       <div className="bg-[#FFFFFF] w-full shadow-sm rounded-b-2xl p-2">
         <div className="flex justify-between custom-container px-0 w-full">
           <div className="w-full h-16 flex items-center gap-8">
-            <Image
-              src={Logo}
-              alt="Logo"
-              width={120}
-              height={40}
-              priority
-              className="h-auto w-auto"
-            />
+            <Link href={'/'}>
+              <Image
+                src={Logo}
+                alt="Logo"
+                width={120}
+                height={40}
+                priority
+                className="h-auto w-auto"
+              />
+            </Link>
           </div>
           <div className="flex items-center gap-4">
             <IconButton
@@ -73,7 +74,7 @@ const MobileNavbar = ({ setOpen, open }: Props) => {
         </div>
       </div>
       <div className="flex gap-2 items-start mt-4 custom-container justify-start h-full flex-col">
-        <p className="text-xl font-semibold">Меню</p>
+        <p className="text-xl font-semibold">{t('Меню')}</p>
         {links.map(({ href, label }) => (
           <Link
             href={href}
@@ -86,7 +87,7 @@ const MobileNavbar = ({ setOpen, open }: Props) => {
                 : 'bg-[#F8F8F8] text-black shadow-sm',
             )}
           >
-            {label}
+            {t(label)}
           </Link>
         ))}
         <Link
@@ -94,7 +95,7 @@ const MobileNavbar = ({ setOpen, open }: Props) => {
           className="flex gap-2 text-black items-center"
         >
           <EmailIcon sx={{ color: '#084FE3', width: '26px', height: '26px' }} />
-          <p className="text-sm">{t('Tourex@gmail.com')}</p>
+          <p className="text-sm">Tourex@gmail.com</p>
         </Link>
         <Link
           href={'tel:+998902222922'}

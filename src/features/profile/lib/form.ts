@@ -15,7 +15,7 @@ export const editUserPhone = z.object({
 });
 
 export const editUserEmail = z.object({
-  emial: z.string().min(1, { message: "E-mailni to'gri kiriting" }),
+  emial: z.string().min(1, { message: 'Majburiy maydon' }),
 });
 
 export const ParticipantProfileSchema = z.object({

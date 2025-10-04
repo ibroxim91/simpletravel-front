@@ -1,18 +1,21 @@
+import { BASE_URL } from '@/shared/config/api/URLs';
 import { Link } from '@/shared/config/i18n/navigation';
+import { LanguageRoutes } from '@/shared/config/i18n/types';
+import formatDate from '@/shared/lib/formatDate';
+import { formatPrice } from '@/shared/lib/formatPrice';
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
 import Rating from '@mui/material/Rating';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
-import { MapPinCheckInside, Plane } from 'lucide-react';
-import Image, { StaticImageData } from 'next/image';
+import { CalendarDays, MapPinCheckInside, Plane, User } from 'lucide-react';
+import Image from 'next/image';
+import { useParams } from 'next/navigation';
+import { TickectAllResults } from '../lib/types';
 
-export default function TourItem({
-  data,
-}: {
-  data: { id: number; img: StaticImageData; rating: number; like: boolean };
-}) {
+export default function TourItem({ data }: { data: TickectAllResults }) {
+  const { locale } = useParams();
   return (
     <Link href={`/selectour/${data.id}`}>
       <motion.div
@@ -29,16 +32,18 @@ export default function TourItem({
         <Button
           className={clsx(
             'absolute cursor-pointer z-10 border-2 w-10 h-10 rounded-full right-4 top-5',
-            data.like
+            data.is_liked
               ? 'bg-[#FFE4E5] border-[#E0313733] hover:bg-[#FFE4E5]'
               : 'bg-[#FFFF] border-[#DFDFDF] hover:bg-[#FFFF]',
           )}
         >
-          <FavoriteRoundedIcon sx={{ color: data.like ? '#E03137' : '#000' }} />
+          <FavoriteRoundedIcon
+            sx={{ color: data.is_liked ? '#E03137' : '#000' }}
+          />
         </Button>
         <div className="h-full aspect-square rounded-3xl w-[40%] relative max-lg:w-full">
           <Image
-            src={data.img}
+            src={BASE_URL + data.ticket_images.image}
             alt="tour"
             className="w-full h-full object-cover rounded-3xl"
             width={500}
@@ -46,18 +51,15 @@ export default function TourItem({
             quality={100}
           />
           <div className="flex flex-col absolute top-2 left-4 gap-2 z-20">
-            <Badge
-              variant="destructive"
-              className="px-4 py-1 text-sm rounded-4xl font-semibold"
-            >
-              Горящие туры
-            </Badge>
-            <Badge
-              variant="default"
-              className="bg-[#031753] text-sm px-4 py-1 rounded-4xl font-semibold"
-            >
-              Без визы
-            </Badge>
+            {data.badge.map((e) => (
+              <Badge
+                key={e.id}
+                variant="default"
+                className={`bg-${e.color}-500 text-sm px-4 py-1 rounded-4xl font-semibold`}
+              >
+                {e.name}
+              </Badge>
+            ))}
           </div>
         </div>
 
@@ -70,10 +72,11 @@ export default function TourItem({
                 sx={{ color: '#F08125' }}
                 value={data.rating}
                 readOnly
+                precision={0.1}
               />
             </div>
             <h1 className="text-2xl text-[#031753] font-semibold">
-              Memories Varadero
+              {data.title}
             </h1>
             <div className="flex items-center">
               <MapPinCheckInside
@@ -81,28 +84,34 @@ export default function TourItem({
                 color="white"
                 className="size-8"
               />
-              <p className="text-[#031753]">ОАЭ, Шарджа</p>
+              <p className="text-[#031753]">{data.destination}</p>
             </div>
           </div>
 
           <ul className="px-6 text-[#646465] text-md list-disc items-center mt-5">
-            <li>Открытый бассейн</li>
-            <li>Первая линия пляжа</li>
-            <li>Анимация</li>
+            {data.ticket_amenities.slice(0, 3).map((e) => (
+              <li key={e.name}>{e.name}</li>
+            ))}
           </ul>
 
           <div className="flex items-center gap-4 max-xl:flex-col mt-5 max-xl:items-start">
             <button className="bg-[#1764FC] text-white text-sm rounded-full px-4 py-4 cursor-pointer max-xl:w-full">
-              12 450 000 сум
+              {formatPrice(data.price, locale as LanguageRoutes, true)}
             </button>
             <div className="flex gap-8 items-center  text-[#646465] text-sm">
               <div className="flex gap-3 text-[12px] items-center">
                 <Plane fill="#084FE3" color="#084FE3" className="size-5" />
-                <p>12 Сен.</p>
+                <p>{formatDate.format(data.departure_date, 'DD MMM')}</p>
               </div>
-              <ul className="flex items-center text-[12px] gap-8 list-disc text-center">
-                <li>2 Вызрослых</li>
-                <li>8 Ночей</li>
+              <ul className="flex items-center text-[12px] gap-8 text-center">
+                <li className="flex items-center gap-2">
+                  <User color="#1764FC" className="size-5" />
+                  {data.passenger_count}
+                </li>
+                <li className="flex items-center gap-2">
+                  <CalendarDays color="#1764FC" className="size-5" />
+                  {data.duration_days}
+                </li>
               </ul>
             </div>
           </div>

@@ -23,6 +23,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import Drawer from '@mui/material/Drawer';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import clsx from 'clsx';
+import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
 import { welcomeForm } from '../lib/form';
@@ -30,7 +31,7 @@ import { useWelcomeStore } from '../lib/hook';
 
 const Welcome = () => {
   const { openModal: open, setOpenModal: setOpen } = useWelcomeStore();
-
+  const t = useTranslations();
   const form = useForm<z.infer<typeof welcomeForm>>({
     resolver: zodResolver(welcomeForm),
     defaultValues: {
@@ -52,12 +53,12 @@ const Welcome = () => {
           render={({ field }) => (
             <FormItem>
               <Label className="text-xl font-semibold text-[#212122]">
-                Имя
+                {t('Имя')}
               </Label>
               <FormControl>
                 <Input
                   {...field}
-                  placeholder="Введите имя"
+                  placeholder={t('Введите имя')}
                   className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
                 />
               </FormControl>
@@ -71,12 +72,12 @@ const Welcome = () => {
           render={({ field }) => (
             <FormItem>
               <Label className="text-xl font-semibold text-[#212122]">
-                Фамилия
+                {t('Фамилия')}
               </Label>
               <FormControl>
                 <Input
                   {...field}
-                  placeholder="Введите фамилию"
+                  placeholder={t('Введите фамилию')}
                   className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black max-lg:w-full"
                 />
               </FormControl>
@@ -88,7 +89,7 @@ const Welcome = () => {
           type="submit"
           className="px-14 py-8 rounded-4xl text-lg font-medium cursor-pointer bg-[#1764FC] hover:bg-[#1764FC] max-lg:w-full max-lg:mt-10"
         >
-          Сохранить
+          {t('Сохранить')}
         </Button>
       </form>
     </Form>
@@ -98,15 +99,20 @@ const Welcome = () => {
     <>
       {!isMobile ? (
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogContent className="rounded-4xl !max-w-3xl">
+          <DialogContent
+            className="rounded-4xl !max-w-3xl"
+            showCloseButton={false}
+          >
             <DialogHeader>
               <DialogTitle
                 className={clsx('flex justify-between w-full items-center')}
               >
                 <div className="flex flex-col gap-4">
-                  <p className="text-2xl">Давайте познакомимся!</p>
+                  <p className="text-2xl">{t('Давайте познакомимся!')}</p>
                   <p className="w-[80%] text-[#646465] font-medium">
-                    Чтобы завершить регистрацию, пожалуйста, укажите ваше имя
+                    {t(
+                      'Чтобы завершить регистрацию, пожалуйста, укажите ваше имя',
+                    )}
                   </p>
                 </div>
                 <DialogClose asChild>
@@ -144,9 +150,11 @@ const Welcome = () => {
         >
           <div className="flex justify-between">
             <div className="flex flex-col gap-2">
-              <p className="text-3xl font-semibold">Давайте познакомимся!</p>
+              <p className="text-3xl font-semibold">
+                {t('Давайте познакомимся!')}
+              </p>
               <p className="w-[80%] text-[#646465] font-medium">
-                Чтобы завершить регистрацию, пожалуйста, укажите ваше имя
+                {t('Чтобы завершить регистрацию, пожалуйста, укажите ваше имя')}
               </p>
             </div>
             <Button

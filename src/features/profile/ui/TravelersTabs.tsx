@@ -26,6 +26,7 @@ import clsx from 'clsx';
 import { format } from 'date-fns';
 import { AnimatePresence, motion } from 'framer-motion';
 import { TrashIcon, UserIcon } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -34,6 +35,7 @@ import { dataTraveler } from '../lib/data';
 import { ParticipantProfileSchema } from '../lib/form';
 
 function TravelersTabs() {
+  const t = useTranslations();
   const [add, setAdded] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [open, setOpen] = useState(false);
@@ -80,14 +82,14 @@ function TravelersTabs() {
               <form onSubmit={form.handleSubmit(onSubmit)}>
                 <div className="bg-white p-5 rounded-2xl relative space-y-6">
                   <div className="flex items-center justify-between max-lg:flex-col max-lg:items-start max-lg:gap-4">
-                    <h1 className="font-bold text-xl">Участник</h1>
+                    <h1 className="font-bold text-xl">{t('Участник')}</h1>
                   </div>
                   <FormField
                     control={form.control}
                     name={`gender`}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Пол</FormLabel>
+                        <FormLabel>{t('Пол')}</FormLabel>
                         <FormControl>
                           <div className="flex items-center gap-8 mt-2 max-sm:flex-col max-sm:items-start">
                             <label className="flex items-center gap-2 cursor-pointer">
@@ -98,7 +100,7 @@ function TravelersTabs() {
                                 onChange={field.onChange}
                                 className="w-6 h-6 accent-[#084FE3]"
                               />
-                              Мужчина
+                              {t('Мужчина')}
                             </label>
                             <label className="flex items-center gap-2 cursor-pointer">
                               <Input
@@ -108,7 +110,7 @@ function TravelersTabs() {
                                 onChange={field.onChange}
                                 className="w-6 h-6 accent-[#084FE3]"
                               />
-                              Женщина
+                              {t('Женщина')}
                             </label>
                           </div>
                         </FormControl>
@@ -122,12 +124,14 @@ function TravelersTabs() {
                       name={`firstName`}
                       render={({ field }) => (
                         <FormItem>
-                          <Label className="text-lg font-semibold">Имя</Label>
+                          <Label className="text-lg font-semibold">
+                            {t('Имя')}
+                          </Label>
                           <FormControl>
                             <Input
                               {...field}
                               type="text"
-                              placeholder="Введите имя"
+                              placeholder={t('Введите имя')}
                               className="px-5 h-14 rounded-lg"
                             />
                           </FormControl>
@@ -141,13 +145,13 @@ function TravelersTabs() {
                       render={({ field }) => (
                         <FormItem>
                           <Label className="text-lg font-semibold">
-                            Фамилия
+                            {t('Фамилия')}
                           </Label>
                           <FormControl>
                             <Input
                               {...field}
                               type="text"
-                              placeholder="Введите фамилию"
+                              placeholder={t('Введите фамилию')}
                               className="p-5 rounded-lg h-14"
                             />
                           </FormControl>
@@ -162,7 +166,9 @@ function TravelersTabs() {
                       name={`date`}
                       render={({ field }) => (
                         <FormItem>
-                          <Label className="text-lg">Время возвращения</Label>
+                          <Label className="text-lg">
+                            {t('Время возвращения')}
+                          </Label>
                           <FormControl>
                             <div>
                               <div className="max-lg:hidden">
@@ -184,7 +190,7 @@ function TravelersTabs() {
                                       />
                                       {field.value
                                         ? format(field.value, 'dd.MM.yyyy')
-                                        : 'Когда'}
+                                        : t('Когда')}
                                     </button>
                                   </PopoverTrigger>
                                   <PopoverContent
@@ -223,7 +229,7 @@ function TravelersTabs() {
                                   />
                                   {field.value
                                     ? format(field.value, 'dd.MM.yyyy')
-                                    : 'Когда'}
+                                    : t('Когда')}
                                 </button>
                                 <Drawer
                                   anchor="bottom"
@@ -243,7 +249,7 @@ function TravelersTabs() {
                                   <div className="flex flex-col gap-4 w-full font-medium">
                                     <div className="flex items-center justify-between">
                                       <p className="text-lg font-semibold">
-                                        Дата отправления
+                                        {t('Дата отправления')}
                                       </p>
                                       <Button
                                         variant={'outline'}
@@ -284,13 +290,13 @@ function TravelersTabs() {
                       render={({ field }) => (
                         <FormItem>
                           <Label className="text-lg font-semibold">
-                            Телефон номер
+                            {t('Телефон номер')}
                           </Label>
                           <FormControl>
                             <Input
                               {...field}
                               type="text"
-                              placeholder="Введите номер"
+                              placeholder={t('Введите номер')}
                               className="p-5 rounded-lg h-14"
                             />
                           </FormControl>
@@ -305,7 +311,7 @@ function TravelersTabs() {
                     render={({ field }) => (
                       <FormItem>
                         <Label className="text-xl font-semibold text-[#212122]">
-                          Фото/скан паспорта
+                          {t('Фото/скан паспорта')}
                         </Label>
                         <FormControl>
                           <Input
@@ -324,14 +330,14 @@ function TravelersTabs() {
                           className="w-full bg-[#EDEEF180] border-2 border-dashed border-[#D3D3D3] flex flex-col items-center gap-2 justify-center py-4 rounded-2xl cursor-pointer hover:bg-[#EDEEF1]"
                         >
                           <p className="font-semibold text-xl text-[#212122]">
-                            Drag or select file
+                            {t('Drag or select file')}
                           </p>
                           <p className="text-[#646465] text-sm text-center">
-                            Drop files here or click to{' '}
+                            {t('Drop files here or click to')}{' '}
                             <span className="underline text-[#084FE3]">
-                              browse
+                              {t('browse')}
                             </span>{' '}
-                            through your machine.
+                            {t('through your machine')}
                           </p>
                         </label>
                         <FormMessage />
@@ -376,7 +382,7 @@ function TravelersTabs() {
                           className="p-2 flex gap-4 rounded-full bg-red-500 text-white max-sm:w-full max-sm:justify-center"
                         >
                           <TrashIcon />
-                          <p className="sm:hidden">Удалить</p>
+                          <p className="sm:hidden">{t('Удалить')}</p>
                         </button>
                         <button
                           type="button"
@@ -387,7 +393,7 @@ function TravelersTabs() {
                           }}
                         >
                           <UserIcon />
-                          Посмотреть
+                          {t('Посмотреть')}
                         </button>
                       </div>
                     </div>
@@ -400,14 +406,14 @@ function TravelersTabs() {
                     onClick={() => setAdded(false)}
                     className="bg-[#FFFFFF] border shadow-nonde border-[#DFDFDF] text-[#031753] hover:bg-[#FFFFFF] px-14 py-3 max-lg:px-0 rounded-full cursor-pointer"
                   >
-                    Отмена
+                    {t('Отмена')}
                   </button>
                   <button
                     type="submit"
                     onClick={form.handleSubmit(onSubmit)}
                     className="bg-[#1764FC] border shadow-nonde text-white border-[#DFDFDF] hover:bg-[#1764FC] px-14 py-3 max-lg:px-0 rounded-full cursor-pointer"
                   >
-                    Сохранить
+                    {t('Сохранить')}
                   </button>
                 </div>
               </form>
@@ -442,7 +448,7 @@ function TravelersTabs() {
             <div>
               <div className="flex w-full justify-between">
                 <p className="text-xl font-semibold text-[#212122]">
-                  Мои попутчики
+                  {t('Мои попутчики')}
                 </p>
                 <Button
                   variant={'outline'}
@@ -451,7 +457,7 @@ function TravelersTabs() {
                 >
                   <AddIcon sx={{ width: 24, height: 24, color: '#031753' }} />
                   <p className="text-[#031753] text-md max-lg:hidden">
-                    Добавить попутчика
+                    {t('Добавить попутчика')}
                   </p>
                 </Button>
               </div>
@@ -462,11 +468,10 @@ function TravelersTabs() {
                 <div className="w-full h-[400px] flex flex-col gap-2 justify-center items-center">
                   <Image src={Badge} alt="badge" width={100} height={100} />
                   <p className="text-2xl font-semibold text-[#212122] mt-2">
-                    Пока нет попутчиков
+                    {t('Пока нет попутчиков')}
                   </p>
                   <p className="w-[40%] text-center text-[#646465] max-lg:w-full">
-                    Добавьте своего первого попутчика, чтобы вместе планировать
-                    поездки и делиться впечатлениями.
+                    {t('Добавьте своего первого попутчика')}
                   </p>
                 </div>
               ) : (
@@ -488,7 +493,7 @@ function TravelersTabs() {
                             {e.firstName} {e.lastName}
                           </p>
                           <p className="text-md text-[#646465] font-medium">
-                            {e.gender === 'male' ? 'Мужчина' : 'Женщина'}
+                            {e.gender === 'male' ? t('Мужчина') : t('Женщина')}
                           </p>
                         </div>
                       </div>
@@ -508,7 +513,9 @@ function TravelersTabs() {
                           <EditIcon
                             sx={{ width: 24, height: 24, color: '#031753' }}
                           />
-                          <p className="text-[#031753] text-md">Изменить</p>
+                          <p className="text-[#031753] text-md">
+                            {t('Изменение')}
+                          </p>
                         </Button>
                       </div>
                     </div>

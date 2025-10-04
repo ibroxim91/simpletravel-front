@@ -1,18 +1,20 @@
 'use client';
 
 import BannerCircle from '@/assets/divCircle.png';
-import Kuba from '@/assets/Kuba.jpg';
-import OAE from '@/assets/OAE.jpg';
 import Shore from '@/assets/shore.png';
 import ShoreCrop from '@/assets/ShoreCrop.png';
-import ShriLanka from '@/assets/ShriLanka.jpg';
-import Tailand from '@/assets/Tailand.jpg';
-import Turk from '@/assets/Turk.jpg';
+import { BASE_URL } from '@/shared/config/api/URLs';
 import { Link } from '@/shared/config/i18n/navigation';
+import { LanguageRoutes } from '@/shared/config/i18n/types';
+import { formatPrice } from '@/shared/lib/formatPrice';
+import Ticket_Api from '@/widgets/selectour/lib/api';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
+import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
+import { useParams } from 'next/navigation';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 60 },
@@ -23,149 +25,285 @@ const fadeUp = {
   }),
 };
 
+const SkeletonCard = ({ className }: { className: string }) => (
+  <div className={`${className} rounded-3xl bg-gray-200 animate-pulse`}>
+    <div className="absolute bottom-10 left-4 space-y-2">
+      <div className="w-40 h-6 bg-gray-300 rounded" />
+      <div className="w-32 h-4 bg-gray-300 rounded" />
+    </div>
+  </div>
+);
+
 const Populardestinations = () => {
+  const { locale } = useParams();
+  const t = useTranslations();
+  const { data: ticket, isLoading } = useQuery({
+    queryKey: ['ticket_popular'],
+    queryFn: () =>
+      Ticket_Api.GetAllTickets({
+        params: {
+          page: 1,
+          page_size: 6,
+        },
+      }),
+    select(data) {
+      return data.data.results.tickets;
+    },
+  });
+
   return (
     <div className="custom-container mt-10 max-lg:hidden">
       <div className="flex justify-between items-center">
-        <p className="text-2xl font-semibold">Популярные направления</p>
-        <Link href={'#'} className="cursor-pointer text-blue-600 font-semibold">
-          Больше акций
+        <p className="text-2xl font-semibold">{t('Популярные направления')}</p>
+        <Link
+          href="/selectour"
+          className="cursor-pointer text-blue-600 font-semibold"
+        >
+          {t('Больше акций')}
         </Link>
       </div>
-      <motion.div
-        className="flex mt-4 gap-5 h-[700px] font-medium"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: false, amount: 0.2 }}
-      >
-        <motion.div
-          variants={fadeUp}
-          custom={0}
-          className="w-[30%] rounded-3xl h-[700px] relative group overflow-hidden"
-        >
-          <Link href={'#'}>
-            <Image
-              src={Turk}
-              alt="turk"
-              className="rounded-3xl h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-            />
-            <div className="absolute inset-0 bg-black/15 group-hover:bg-black/50 transition-colors duration-500 rounded-3xl" />
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-              <RemoveRedEyeOutlinedIcon
-                className="text-white"
-                sx={{ width: '60px', height: '60px' }}
-              />
-            </div>
-            <div className="absolute bottom-10 left-4 transition-all duration-500 group-hover:translate-y-[-4px] group-hover:scale-105">
-              <p className="text-white text-2xl font-semibold">Турция</p>
-              <p className="text-white text-sm">От $700 / 2 чел</p>
-            </div>
-          </Link>
-        </motion.div>
-        <div className="grid grid-rows-2 w-full gap-4">
-          <div className="w-full flex h-full rounded-3xl gap-4">
-            <motion.div
-              variants={fadeUp}
-              custom={1}
-              className="w-[30%] rounded-3xl relative group overflow-hidden"
-            >
-              <Link href={'#'}>
-                <Image
-                  src={OAE}
-                  alt="oae"
-                  className="rounded-3xl h-full object-cover w-full transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black/15 group-hover:bg-black/50 transition-colors duration-500 rounded-3xl" />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                  <RemoveRedEyeOutlinedIcon
-                    className="text-white"
-                    sx={{ width: '60px', height: '60px' }}
-                  />
-                </div>
-                <div className="absolute bottom-10 left-4">
-                  <p className="text-white text-2xl font-semibold">ОАЭ</p>
-                  <p className="text-white text-sm">От $1000 / 1 чел</p>
-                </div>
-              </Link>
-            </motion.div>
-            <motion.div
-              variants={fadeUp}
-              custom={2}
-              className="w-[70%] rounded-3xl relative group overflow-hidden"
-            >
-              <Link href={'#'}>
-                <Image
-                  src={Tailand}
-                  alt="Tailand"
-                  className="rounded-3xl h-full object-cover w-full transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black/15 group-hover:bg-black/50 transition-colors duration-500 rounded-3xl" />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                  <RemoveRedEyeOutlinedIcon
-                    className="text-white"
-                    sx={{ width: '60px', height: '60px' }}
-                  />
-                </div>
-                <div className="absolute bottom-10 left-4">
-                  <p className="text-white text-2xl font-semibold">Таиланд</p>
-                  <p className="text-white text-sm">От $800 / 1 чел</p>
-                </div>
-              </Link>
-            </motion.div>
-          </div>
 
-          <div className="w-full flex h-full rounded-3xl gap-4">
-            <motion.div
-              variants={fadeUp}
-              custom={3}
-              className="w-[70%] rounded-3xl relative group overflow-hidden"
-            >
-              <Link href={'#'}>
-                <Image
-                  src={ShriLanka}
-                  alt="ShriLanka"
-                  className="rounded-3xl h-full object-cover w-full transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black/15 group-hover:bg-black/50 transition-colors duration-500 rounded-3xl" />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                  <RemoveRedEyeOutlinedIcon
-                    className="text-white"
-                    sx={{ width: '60px', height: '60px' }}
-                  />
-                </div>
-                <div className="absolute bottom-10 left-4">
-                  <p className="text-white text-2xl font-semibold">Шри-Ланка</p>
-                  <p className="text-white text-sm">От $1050 / 2 чел</p>
-                </div>
-              </Link>
-            </motion.div>
-            <motion.div
-              variants={fadeUp}
-              custom={4}
-              className="w-[30%] rounded-3xl relative group overflow-hidden"
-            >
-              <Link href={'#'}>
-                <Image
-                  src={Kuba}
-                  alt="Kuba"
-                  className="rounded-3xl h-full object-cover w-full transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black/15 group-hover:bg-black/50 transition-colors duration-500 rounded-3xl" />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                  <RemoveRedEyeOutlinedIcon
-                    className="text-white"
-                    sx={{ width: '60px', height: '60px' }}
-                  />
-                </div>
-                <div className="absolute bottom-10 left-4">
-                  <p className="text-white text-2xl font-semibold">Куба</p>
-                  <p className="text-white text-sm">От $1200 / 2 чел</p>
-                </div>
-              </Link>
-            </motion.div>
+      {isLoading ? (
+        <div className="flex mt-4 gap-5 h-[700px] font-medium">
+          <SkeletonCard className="w-[30%] h-[700px] relative" />
+          <div className="grid grid-rows-2 w-full gap-4">
+            <div className="w-full flex h-full gap-4">
+              <SkeletonCard className="w-[30%] relative" />
+              <SkeletonCard className="w-[70%] relative" />
+            </div>
+            <div className="w-full flex h-full gap-4">
+              <SkeletonCard className="w-[70%] relative" />
+              <SkeletonCard className="w-[30%] relative" />
+            </div>
           </div>
         </div>
-      </motion.div>
+      ) : (
+        <motion.div
+          className="flex mt-4 gap-5 h-[700px] font-medium"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.2 }}
+        >
+          <motion.div
+            variants={fadeUp}
+            custom={0}
+            className="w-[30%] rounded-3xl h-[700px] relative group overflow-hidden"
+          >
+            {ticket && ticket[0] && (
+              <Link
+                href={`/selectour/${ticket[0].id}`}
+                className="block relative w-full h-full"
+              >
+                <Image
+                  src={BASE_URL + ticket[0].ticket_images.image}
+                  alt={ticket[0].title}
+                  fill
+                  sizes="(max-width: 1920px) 100vw, 33vw"
+                  quality={100}
+                  className="rounded-3xl object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+
+                <div className="absolute inset-0 bg-black/15 group-hover:bg-black/50 transition-colors duration-500 rounded-3xl" />
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                  <RemoveRedEyeOutlinedIcon
+                    className="text-white"
+                    sx={{ width: '60px', height: '60px' }}
+                  />
+                </div>
+                <div className="absolute bottom-10 left-4 transition-all duration-500 group-hover:translate-y-[-4px] group-hover:scale-105">
+                  <p className="text-white text-2xl font-semibold">
+                    {ticket[0].title}
+                  </p>
+                  <p className="text-white text-sm">
+                    {formatPrice(
+                      ticket[0].price,
+                      locale as LanguageRoutes,
+                      true,
+                    )}{' '}
+                    / {ticket[0].passenger_count} {t('чел')}
+                  </p>
+                </div>
+              </Link>
+            )}
+          </motion.div>
+
+          <div className="grid grid-rows-2 w-full gap-4">
+            <div className="w-full flex h-full rounded-3xl gap-4">
+              <motion.div
+                variants={fadeUp}
+                custom={1}
+                className="w-[30%] rounded-3xl relative group overflow-hidden"
+              >
+                {ticket && ticket[1] && (
+                  <Link
+                    href={`/selectour/${ticket[1].id}`}
+                    className="block relative w-full h-full"
+                  >
+                    <Image
+                      src={BASE_URL + ticket[1].ticket_images.image}
+                      alt={ticket[1].title}
+                      fill
+                      sizes="(max-width: 1920px) 100vw, 33vw"
+                      quality={100}
+                      className="rounded-3xl object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-black/15 group-hover:bg-black/50 transition-colors duration-500 rounded-3xl" />
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                      <RemoveRedEyeOutlinedIcon
+                        className="text-white"
+                        sx={{ width: '60px', height: '60px' }}
+                      />
+                    </div>
+                    <div className="absolute bottom-10 left-4">
+                      <p className="text-white text-2xl font-semibold">
+                        {ticket[1].title}
+                      </p>
+                      <p className="text-white text-sm">
+                        {formatPrice(
+                          ticket[1].price,
+                          locale as LanguageRoutes,
+                          true,
+                        )}{' '}
+                        / {ticket[1].passenger_count} {t('чел')}
+                      </p>
+                    </div>
+                  </Link>
+                )}
+              </motion.div>
+
+              <motion.div
+                variants={fadeUp}
+                custom={2}
+                className="w-[70%] rounded-3xl relative group overflow-hidden"
+              >
+                {ticket && ticket[2] && (
+                  <Link
+                    href={`/selectour/${ticket[2].id}`}
+                    className="block relative w-full h-full"
+                  >
+                    <Image
+                      src={BASE_URL + ticket[2].ticket_images.image}
+                      alt={ticket[2].title}
+                      fill
+                      sizes="(max-width: 1920px) 100vw, 33vw"
+                      quality={100}
+                      className="rounded-3xl object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-black/15 group-hover:bg-black/50 transition-colors duration-500 rounded-3xl" />
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                      <RemoveRedEyeOutlinedIcon
+                        className="text-white"
+                        sx={{ width: '60px', height: '60px' }}
+                      />
+                    </div>
+                    <div className="absolute bottom-10 left-4">
+                      <p className="text-white text-2xl font-semibold">
+                        {ticket[2].title}
+                      </p>
+                      <p className="text-white text-sm">
+                        {formatPrice(
+                          ticket[2].price,
+                          locale as LanguageRoutes,
+                          true,
+                        )}{' '}
+                        / {ticket[2].passenger_count} {t('чел')}
+                      </p>
+                    </div>
+                  </Link>
+                )}
+              </motion.div>
+            </div>
+            <div className="w-full flex h-full rounded-3xl gap-4">
+              <motion.div
+                variants={fadeUp}
+                custom={3}
+                className="w-[70%] rounded-3xl relative group overflow-hidden"
+              >
+                {ticket && ticket[3] && (
+                  <Link
+                    href={`/selectour/${ticket[3].id}`}
+                    className="block relative w-full h-full"
+                  >
+                    <Image
+                      src={BASE_URL + ticket[3].ticket_images.image}
+                      alt={ticket[3].title}
+                      fill
+                      sizes="(max-width: 1920px) 100vw, 33vw"
+                      quality={100}
+                      className="rounded-3xl object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-black/15 group-hover:bg-black/50 transition-colors duration-500 rounded-3xl" />
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                      <RemoveRedEyeOutlinedIcon
+                        className="text-white"
+                        sx={{ width: '60px', height: '60px' }}
+                      />
+                    </div>
+                    <div className="absolute bottom-10 left-4">
+                      <p className="text-white text-2xl font-semibold">
+                        {ticket[3].title}
+                      </p>
+                      <p className="text-white text-sm">
+                        {formatPrice(
+                          ticket[3].price,
+                          locale as LanguageRoutes,
+                          true,
+                        )}{' '}
+                        / {ticket[3].passenger_count} {t('чел')}
+                      </p>
+                    </div>
+                  </Link>
+                )}
+              </motion.div>
+
+              <motion.div
+                variants={fadeUp}
+                custom={4}
+                className="w-[30%] rounded-3xl relative group overflow-hidden"
+              >
+                {ticket && ticket[4] && (
+                  <Link
+                    href={`/selectour/${ticket[4].id}`}
+                    className="block relative w-full h-full"
+                  >
+                    <Image
+                      src={BASE_URL + ticket[4].ticket_images.image}
+                      alt={ticket[4].title}
+                      fill
+                      sizes="(max-width: 1920px) 100vw, 33vw"
+                      quality={100}
+                      className="rounded-3xl object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-black/15 group-hover:bg-black/50 transition-colors duration-500 rounded-3xl" />
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                      <RemoveRedEyeOutlinedIcon
+                        className="text-white"
+                        sx={{ width: '60px', height: '60px' }}
+                      />
+                    </div>
+                    <div className="absolute bottom-10 left-4">
+                      <p className="text-white text-2xl font-semibold">
+                        {ticket[4].title}
+                      </p>
+                      <p className="text-white text-sm">
+                        {formatPrice(
+                          ticket[4].price,
+                          locale as LanguageRoutes,
+                          true,
+                        )}{' '}
+                        / {ticket[4].passenger_count} {t('чел')}
+                      </p>
+                    </div>
+                  </Link>
+                )}
+              </motion.div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+      {/* Grid end */}
+
+      {/* Banner section */}
       <div className="w-full h-[400px] mt-20 relative flex rounded-4xl font-medium">
         <div className="h-[400px] w-full overflow-hidden relative rounded-4xl">
           <motion.div
@@ -183,7 +321,7 @@ const Populardestinations = () => {
                 transition={{ duration: 0.8, delay: 0.2 }}
                 className="text-3xl text-[#031753] font-semibold w-96"
               >
-                Солнце, пляж, отпуск - всё включено
+                {t('Солнце, пляж, отпуск - всё включено')}
               </motion.p>
               <motion.p
                 initial={{ opacity: 0, y: 30 }}
@@ -191,8 +329,7 @@ const Populardestinations = () => {
                 transition={{ duration: 0.8, delay: 0.4 }}
                 className="text-xl text-[#031753] w-[80%]"
               >
-                Подбор туров у воды по сниженным ценам. Количество мест
-                ограничено.
+                {t('Подбор туров у воды по сниженным ценам')}
               </motion.p>
 
               <motion.div
@@ -205,10 +342,12 @@ const Populardestinations = () => {
                   whileTap={{ scale: 0.95 }}
                 >
                   <Link
-                    href={'#'}
+                    href="/selectour  "
                     className="bg-[#ECF2FF] w-fit py-4 px-10 rounded-4xl flex gap-4 shadow-md"
                   >
-                    <p className="text-blue-600 font-semibold">Забронировать</p>
+                    <p className="text-blue-600 font-semibold">
+                      {t('Забронировать')}
+                    </p>
                     <ArrowRightAltIcon className="text-blue-600" />
                   </Link>
                 </motion.div>

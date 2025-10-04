@@ -17,18 +17,18 @@ export const CardData: CardItem[] = [
     icon: DoneAllIcon,
     color: '#084FE3',
     title: 'Максимальная гибкость',
-    text: 'Вы выбираете — мы адаптируем...',
+    text: 'Вы выбираете — мы адаптируем',
   },
   {
     icon: StarIcon,
     color: '#F08125',
     title: 'Уникальные впечатления',
-    text: 'От альпийских вершин...',
+    text: 'От альпийских вершин',
   },
   {
     icon: FavoriteIcon,
     color: '#E03137',
     title: 'Полный комфорт',
-    text: 'Мы берём на себя...',
+    text: 'Мы берём на себя',
   },
 ];

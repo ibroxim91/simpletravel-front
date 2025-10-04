@@ -1,8 +1,8 @@
 'use client';
 
-import * as React from 'react';
 import * as LabelPrimitive from '@radix-ui/react-label';
 import { Slot } from '@radix-ui/react-slot';
+import * as React from 'react';
 import {
   Controller,
   FormProvider,
@@ -15,6 +15,7 @@ import {
 
 import { cn } from '@/shared/lib/utils';
 import { Label } from '@/shared/ui/label';
+import { useTranslations } from 'next-intl';
 
 const Form = FormProvider;
 
@@ -138,6 +139,7 @@ function FormDescription({ className, ...props }: React.ComponentProps<'p'>) {
 
 function FormMessage({ className, ...props }: React.ComponentProps<'p'>) {
   const { error, formMessageId } = useFormField();
+  const t = useTranslations();
   const body = error ? String(error?.message ?? '') : props.children;
 
   if (!body) {
@@ -151,18 +153,18 @@ function FormMessage({ className, ...props }: React.ComponentProps<'p'>) {
       className={cn('text-destructive text-sm', className)}
       {...props}
     >
-      {body}
+      {t(body as string)}
     </p>
   );
 }
 
 export {
-  useFormField,
   Form,
-  FormItem,
-  FormLabel,
   FormControl,
   FormDescription,
-  FormMessage,
   FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  useFormField,
 };

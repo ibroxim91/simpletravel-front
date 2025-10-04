@@ -1,7 +1,6 @@
 'use client';
 
 import Banner from '@/assets/Auth_Banner.png';
-import { useWelcomeStore } from '@/features/profile/lib/hook';
 import { Link, useRouter } from '@/shared/config/i18n/navigation';
 import { Button } from '@/shared/ui/button';
 import {
@@ -14,6 +13,7 @@ import {
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
@@ -36,8 +36,8 @@ const formSchema = z
   });
 
 const AuthEditPassword = () => {
+  const t = useTranslations();
   const route = useRouter();
-  const { setOpenModalMobile, setOpenModal } = useWelcomeStore();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -49,8 +49,6 @@ const AuthEditPassword = () => {
 
   function onSubmit() {
     route.push('/profile');
-    setOpenModalMobile(true);
-    setOpenModal(true);
   }
   return (
     <div className="custom-container mt-2 relative h-[700px]">
@@ -64,9 +62,9 @@ const AuthEditPassword = () => {
         className="object-center w-full h-[300px] max-lg:h-[100px] rounded-3xl"
       />
       <div className="w-[50%] bg-white rounded-3xl h-fit py-5 px-10 absolute bottom-0 top-48 max-md:px-2 max-lg:top-14 max-lg:w-[90%] left-1/2 -translate-x-1/2">
-        <p className="text-xl font-semibold">Изменить пароль</p>
+        <p className="text-xl font-semibold">{t('Изменить пароль')}</p>
         <p className="mt-2 text-md w-full break-words text-[#646465]">
-          Измените пароль, чтобы обеспечить безопасность вашего аккаунта
+          {t('Измените пароль, чтобы обеспечить безопасность вашего аккаунта')}
         </p>
         <Form {...form}>
           <form
@@ -79,11 +77,11 @@ const AuthEditPassword = () => {
               render={({ field }) => (
                 <FormItem>
                   <Label className="text-lg font-semibold">
-                    Текущий пароль
+                    {t('Текущий пароль')}
                   </Label>
                   <FormControl>
                     <Input
-                      placeholder="Введите старый пароль"
+                      placeholder={t('Введите старый пароль')}
                       {...field}
                       className="h-[60px] rounded-xl focus:!ring-0 !text-md"
                     />
@@ -98,10 +96,12 @@ const AuthEditPassword = () => {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <Label className="text-lg font-semibold">Новый пароль</Label>
+                  <Label className="text-lg font-semibold">
+                    {t('Новый пароль')}
+                  </Label>
                   <FormControl>
                     <Input
-                      placeholder="Введите пароль (минимум 8 символов)"
+                      placeholder={t('Введите пароль (минимум 8 символов)')}
                       {...field}
                       className="h-[60px] rounded-xl focus:!ring-0 !text-md"
                     />
@@ -116,11 +116,11 @@ const AuthEditPassword = () => {
               render={({ field }) => (
                 <FormItem>
                   <Label className="text-lg font-semibold">
-                    Подтвердите пароль
+                    {t('Подтвердите пароль')}
                   </Label>
                   <FormControl>
                     <Input
-                      placeholder="Повторите пароль"
+                      placeholder={t('Повторите пароль')}
                       {...field}
                       className="h-[60px] rounded-xl focus:!ring-0 !text-md"
                     />
@@ -133,13 +133,13 @@ const AuthEditPassword = () => {
               href={'/auth/forget-password'}
               className="text-[#084FE3] font-medium"
             >
-              Забыл пароль
+              {t('Забыл пароль')}
             </Link>
             <Button
               type="submit"
               className="w-full px-4 py-8 rounded-full mt-3 bg-[#1764FC] hover:bg-[#1764FC0] cursor-pointer"
             >
-              Сохранить новый пароль
+              {t('Сохранить новый пароль')}
             </Button>
           </form>
         </Form>

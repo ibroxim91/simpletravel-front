@@ -9,9 +9,11 @@ import { Carousel, CarouselContent, CarouselItem } from '@/shared/ui/carousel';
 import EastIcon from '@mui/icons-material/East';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 
 const Header = () => {
+  const t = useTranslations();
   const slides = [Banner_1, Banner_3, Banner_4, Banner_2];
 
   return (
@@ -26,9 +28,9 @@ const Header = () => {
         }}
       >
         <Link href="/" className="font-medium text-[#646465]">
-          Главная страница
+          {t('Главная')}
         </Link>
-        <p className="text-[#646465] font-medium">О нас</p>
+        <p className="text-[#646465] font-medium">{t('О нас')}</p>
       </Breadcrumbs>
       <div className="flex flex-col justify-center items-center">
         <motion.div
@@ -54,7 +56,7 @@ const Header = () => {
               visible: { opacity: 1, y: 0 },
             }}
           >
-            Откройте для себя новые горизонты
+            {t('Откройте для себя новые горизонты')}
           </motion.p>
 
           <motion.div
@@ -71,7 +73,7 @@ const Header = () => {
                 visible: { opacity: 1, y: 0 },
               }}
             >
-              Ваш идеальный отпуск начинается здесь и сейчас.
+              {t('Ваш идеальный отпуск начинается здесь и сейчас')}
             </motion.p>
             <motion.p
               className="text-center text-xl w-[70%] leading-relaxed max-md:text-lg max-md:w-full text-[#646465] mx-auto"
@@ -80,9 +82,7 @@ const Header = () => {
                 visible: { opacity: 1, y: 0 },
               }}
             >
-              Солнечные рассветы, вечера у моря и приключения, которые
-              становятся воспоминаниями на всю жизнь. Мы создаем условия, где
-              каждая деталь продумана для вашего комфорта и счастья
+              {t('Солнечные рассветы, вечера у моря и приключения')}
             </motion.p>
           </motion.div>
         </motion.div>

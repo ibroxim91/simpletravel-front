@@ -1,27 +1,72 @@
 'use client';
 
 import { Input } from '@/shared/ui/input';
+import { useFilterToursStore } from '@/widgets/filter/lib/store';
+import Ticket_Api from '@/widgets/selectour/lib/api';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import DoneIcon from '@mui/icons-material/Done';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import SearchIcon from '@mui/icons-material/Search';
 import Drawer from '@mui/material/Drawer';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
-import { useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 
 const CitySelectMobile = () => {
-  const t = useTranslations();
   const [openCity, setOpenCity] = useState(false);
+  const t = useTranslations();
   const [search, setSearch] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const { where, setStoreWhere } = useFilterToursStore();
+  const [citiesWhere, setCitiesWhere] = useState<string[]>([]);
+  const router = useRouter();
 
-  const cities = ['Самарканд', 'Бухара', 'Наваи', 'Бишкек', 'Казан', 'Астана'];
+  const { data: ticket } = useQuery({
+    queryKey: ['ticket_all'],
+    queryFn: () =>
+      Ticket_Api.GetAllTickets({
+        params: {
+          page: 1,
+          page_size: 8,
+        },
+      }),
+  });
+  useEffect(() => {
+    if (ticket) {
+      const uniqueCities = Array.from(
+        new Set(
+          ticket.data.results.tickets.slice(0, 8).map((e) => e.destination),
+        ),
+      );
+      setCitiesWhere(uniqueCities);
+    }
+  }, [ticket]);
 
   const filteredCities =
     search.trim() === ''
-      ? cities
-      : cities.filter((c) => c.toLowerCase().includes(search.toLowerCase()));
+      ? citiesWhere
+      : citiesWhere.filter((c) =>
+          c.toLowerCase().includes(search.toLowerCase()),
+        );
+
+  useEffect(() => {
+    if (where) {
+      setSelectedCity(where);
+    }
+  }, [where]);
+
+  useEffect(() => {
+    if (search.trim()) {
+      const handler = setTimeout(() => {
+        setStoreWhere(search);
+        router.push('/selectour');
+        setOpenCity(false);
+      }, 1000);
+      return () => clearTimeout(handler);
+    }
+  }, [search, setStoreWhere, router]);
 
   return (
     <div
@@ -36,7 +81,9 @@ const CitySelectMobile = () => {
         className="flex items-center cursor-pointer gap-2 font-medium"
       >
         <LocationOnIcon sx={{ color: 'white', width: 28, height: 28 }} />
-        <p className="text-sm text-white">{t('Укажите город')}</p>
+        <p className="text-sm text-white">
+          {selectedCity || t('Укажите город')}
+        </p>
         <ChevronRightIcon sx={{ color: 'white', width: 24, height: 24 }} />
       </div>
       <Drawer
@@ -60,7 +107,7 @@ const CitySelectMobile = () => {
           </div>
           <div className="relative">
             <Input
-              placeholder="Укажите город"
+              placeholder={t('Укажите город')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-10 text-black"
@@ -85,6 +132,8 @@ const CitySelectMobile = () => {
                   className="p-2 hover:bg-gray-200 text-black items-center cursor-pointer flex justify-between"
                   onClick={() => {
                     setSelectedCity(cityName);
+                    setStoreWhere(cityName);
+                    router.push('/selectour');
                     setOpenCity(false);
                   }}
                 >
@@ -95,7 +144,7 @@ const CitySelectMobile = () => {
                 </div>
               ))
             ) : (
-              <div className="p-2 text-black">Hech narsa topilmadi</div>
+              <div className="p-2 text-black">{t('Не найдено')}</div>
             )}
           </div>
         </div>

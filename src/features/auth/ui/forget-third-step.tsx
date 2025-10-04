@@ -1,6 +1,5 @@
 'use client';
 
-import { useWelcomeStore } from '@/features/profile/lib/hook';
 import { useRouter } from '@/shared/config/i18n/navigation';
 import { Button } from '@/shared/ui/button';
 import {
@@ -13,6 +12,7 @@ import {
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
 
@@ -31,8 +31,8 @@ const formSchema = z
   });
 
 const ForgetThirdStep = () => {
+  const t = useTranslations();
   const route = useRouter();
-  const { setOpenModalMobile, setOpenModal } = useWelcomeStore();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -43,15 +43,13 @@ const ForgetThirdStep = () => {
 
   function onSubmit() {
     route.push('/profile');
-    setOpenModalMobile(true);
-    setOpenModal(true);
   }
 
   return (
     <div className="w-[50%] bg-white rounded-3xl h-fit py-5 px-10 absolute bottom-0 top-52 max-md:px-2 max-sm:top-16 max-lg:w-[90%] left-1/2 -translate-x-1/2">
-      <p className="text-xl font-semibold">Изменить пароль</p>
+      <p className="text-xl font-semibold">{t('Изменить пароль')}</p>
       <p className="mt-2 text-md w-full break-words text-[#646465]">
-        Измените пароль, чтобы обеспечить безопасность вашего аккаунта
+        {t('Измените пароль, чтобы обеспечить безопасность вашего аккаунта')}
       </p>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
@@ -60,10 +58,12 @@ const ForgetThirdStep = () => {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <Label className="text-lg font-semibold">Новый пароль</Label>
+                <Label className="text-lg font-semibold">
+                  {t('Новый пароль')}
+                </Label>
                 <FormControl>
                   <Input
-                    placeholder="Введите пароль (минимум 8 символов)"
+                    placeholder={t('Введите пароль (минимум 8 символов)')}
                     {...field}
                     className="h-[60px] rounded-xl focus:!ring-0 !text-md"
                   />
@@ -79,11 +79,11 @@ const ForgetThirdStep = () => {
             render={({ field }) => (
               <FormItem>
                 <Label className="text-lg font-semibold">
-                  Подтвердите пароль
+                  {t('Подтвердите пароль')}
                 </Label>
                 <FormControl>
                   <Input
-                    placeholder="Повторите пароль"
+                    placeholder={t('Повторите пароль')}
                     {...field}
                     className="h-[60px] rounded-xl focus:!ring-0 !text-md"
                   />
@@ -96,7 +96,7 @@ const ForgetThirdStep = () => {
             type="submit"
             className="w-full px-4 py-8 rounded-full bg-[#1764FC] hover:bg-[#1764FC0] cursor-pointer"
           >
-            Сохранить новый пароль
+            {t('Сохранить новый пароль')}
           </Button>
         </form>
       </Form>

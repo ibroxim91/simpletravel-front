@@ -11,7 +11,15 @@ const slideIn = {
   }),
 };
 
-export default function TourItem() {
+interface Props {
+  data: {
+    image: string;
+    title: string;
+    desc: string;
+  };
+}
+
+export default function TourItem({ data }: Props) {
   return (
     <>
       <motion.div
@@ -22,15 +30,19 @@ export default function TourItem() {
         className="cursor-pointer max-lg:hidden"
       >
         <div className="w-full aspect-square relative rounded-2xl">
-          <Image src={Tour1.src} fill alt={Tour1.src} />
+          <Image
+            src={data.image}
+            quality={100}
+            width={700}
+            height={700}
+            alt={data.title}
+            results={100}
+            className="w-full h-full rounded-2xl object-cover"
+          />
         </div>
         <div className="mt-[10px]">
-          <h1 className="text-[20px] font-bold text-[#031753]">
-            Проживание в отеле
-          </h1>
-          <p className="text-sm font-semibold text-[#031753]">
-            Количество ночей
-          </p>
+          <h1 className="text-[20px] font-bold text-[#031753]">{data.title}</h1>
+          <p className="text-sm font-semibold text-[#031753]">{data.desc}</p>
         </div>
       </motion.div>
 

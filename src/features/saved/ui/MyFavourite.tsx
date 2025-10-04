@@ -1,6 +1,9 @@
 'use client';
 
+import { BASE_URL } from '@/shared/config/api/URLs';
 import { Link } from '@/shared/config/i18n/navigation';
+import { LanguageRoutes } from '@/shared/config/i18n/types';
+import { formatPrice } from '@/shared/lib/formatPrice';
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import {
@@ -9,6 +12,8 @@ import {
   CarouselContent,
   CarouselItem,
 } from '@/shared/ui/carousel';
+import { Skeleton } from '@/shared/ui/skeleton';
+import Ticket_Api from '@/widgets/selectour/lib/api';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import EastIcon from '@mui/icons-material/East';
@@ -18,11 +23,13 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Rating from '@mui/material/Rating';
+import { useQuery } from '@tanstack/react-query';
 import { motion, Variants } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { dataFavourite, dataHotTours } from '../lib/data';
+import { dataFavourite } from '../lib/data';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -45,10 +52,24 @@ const itemVariants: Variants = {
 };
 
 const MyFavourite = () => {
+  const { locale } = useParams();
+  const t = useTranslations();
   const router = useRouter();
   const [hot, setHot] = useState<CarouselApi>();
   const [hotScrollNext, setHotScrollNext] = useState(false);
   const [hotScrollPrev, setHotScrollPrev] = useState(false);
+
+  const { data: hotTicket, isLoading: hotLoading } = useQuery({
+    queryKey: ['ticket_hot'],
+    queryFn: () =>
+      Ticket_Api.GetAllTickets({
+        params: {
+          page: 1,
+          page_size: 8,
+          rating: 3.5,
+        },
+      }),
+  });
 
   useEffect(() => {
     if (!hot) return;
@@ -91,14 +112,16 @@ const MyFavourite = () => {
         sx={{ '& .MuiBreadcrumbs-separator': { mx: 2 } }}
       >
         <Link href="/" className="font-medium text-[#646465]">
-          Главная страница
+          {t('Главная')}
         </Link>
-        <p className="text-[#646465] font-medium">Избранное</p>
+        <p className="text-[#646465] font-medium">{t('Избранное')}</p>
       </Breadcrumbs>
 
       {dataFavourite.length > 0 ? (
-        <div className="mt-5">
-          <p className="text-3xl font-semibold text-[#031753]">Избранное</p>
+        <div className="mt-10">
+          <p className="text-3xl font-semibold text-[#031753]">
+            {t('Избранное')}
+          </p>
 
           <div className="flex flex-col gap-6 mt-5">
             {rows.map((row, rowIdx) => (
@@ -203,7 +226,7 @@ const MyFavourite = () => {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: false, amount: 0.1 }}
-          className="mt-5"
+          className="mt-10"
         >
           <motion.p
             variants={itemVariants}
@@ -212,7 +235,7 @@ const MyFavourite = () => {
             viewport={{ once: false, amount: 0.1 }}
             className="text-3xl font-semibold text-[#031753]"
           >
-            Тут ничего нет...
+            {t('Тут ничего нет')}...
           </motion.p>
           <motion.p
             initial="hidden"
@@ -221,7 +244,7 @@ const MyFavourite = () => {
             variants={itemVariants}
             className="text-3xl font-semibold text-[#084FE3]"
           >
-            Выберите понравивщися тур
+            {t('Выберите понравивщися тур')}
           </motion.p>
 
           {/* uchta info kartochka */}
@@ -243,7 +266,7 @@ const MyFavourite = () => {
                 sx={{ width: '60px', height: '60px', color: '#084FE3' }}
               />
               <p className="text-[#212122] font-semibold text-lg">
-                Найдите понравивщися тур на сайте simple travel
+                {t('Найдите понравивщися тур на сайте simple travel')}
               </p>
             </motion.div>
 
@@ -258,7 +281,7 @@ const MyFavourite = () => {
                 sx={{ width: '60px', height: '60px', color: '#084FE3' }}
               />
               <p className="text-[#212122] font-semibold text-lg">
-                Добавьте тур в избранное, нажав кнопку сохранить
+                {t('Добавьте тур в избранное, нажав кнопку сохранить')}
               </p>
             </motion.div>
 
@@ -273,7 +296,7 @@ const MyFavourite = () => {
                 sx={{ width: '60px', height: '60px', color: '#084FE3' }}
               />
               <p className="text-[#212122] font-semibold text-lg">
-                Зайди в свой профиль и оформите тур
+                {t('Зайди в свой профиль и оформите тур')}
               </p>
             </motion.div>
           </motion.div>
@@ -281,10 +304,10 @@ const MyFavourite = () => {
           <div className="custom-container mt-20">
             <div className="flex justify-between items-center">
               <Link
-                href={'#'}
+                href="/selectour"
                 className="text-3xl text-[#031753] font-semibold"
               >
-                Горящие туры
+                {t('Горящие туры')}
               </Link>
               <div className="flex gap-4">
                 <Button
@@ -308,71 +331,89 @@ const MyFavourite = () => {
 
             <Carousel className="w-full mt-4 cursor-pointer" setApi={setHot}>
               <CarouselContent>
-                {dataHotTours.map((e, idx) => (
-                  <CarouselItem
-                    key={idx}
-                    className="flex flex-col w-auto basis-1/4 max-lg:basis-1/3 max-md:basis-[70%] shrink-0 font-medium"
-                  >
-                    <motion.div
-                      initial={{ opacity: 0, y: 40, scale: 0.95 }}
-                      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                      viewport={{ once: false, amount: 0.1 }}
-                      transition={{
-                        duration: 0.6,
-                        delay: idx * 0.15,
-                        ease: 'easeOut',
-                      }}
-                      className="w-full aspect-square relative group overflow-hidden rounded-3xl shadow-lg"
-                    >
-                      <Image
-                        src={e.img}
-                        alt={e.name}
-                        fill
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                      />
-                      <div className="flex flex-col absolute top-2 left-4 gap-2 z-20">
-                        {e.popular && (
-                          <Badge
-                            variant="destructive"
-                            className="px-4 py-1 rounded-4xl font-semibold"
+                {hotLoading
+                  ? Array.from({ length: 4 }).map((_, idx) => (
+                      <CarouselItem
+                        key={idx}
+                        className="flex flex-col w-auto basis-1/4 max-lg:basis-1/3 max-md:basis-[70%] shrink-0"
+                      >
+                        <div className="w-full aspect-square relative overflow-hidden rounded-3xl shadow-lg">
+                          <Skeleton className="w-full h-full" />
+                        </div>
+                        <div className="mt-4 space-y-2">
+                          <Skeleton className="h-4 w-24" />
+                          <Skeleton className="h-4 w-32" />
+                          <Skeleton className="h-4 w-20" />
+                        </div>
+                      </CarouselItem>
+                    ))
+                  : hotTicket?.data.results.tickets.map((e, idx) => (
+                      <CarouselItem
+                        key={idx}
+                        className="flex flex-col w-auto basis-1/4 max-lg:basis-1/3 max-md:basis-[70%] shrink-0 font-medium"
+                      >
+                        <Link href={`/selectour/${e.id}`}>
+                          <motion.div
+                            initial={{ opacity: 0, y: 40, scale: 0.95 }}
+                            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                            viewport={{ once: false, amount: 0.1 }}
+                            transition={{
+                              duration: 0.6,
+                              delay: idx * 0.15,
+                              ease: 'easeOut',
+                            }}
+                            className="w-full aspect-square relative group overflow-hidden rounded-3xl shadow-lg"
                           >
-                            Горящие туры
-                          </Badge>
-                        )}
-                        {e.visa && (
-                          <Badge
-                            variant="default"
-                            className="bg-[#031753] px-4 py-1 rounded-4xl font-semibold"
+                            <Image
+                              src={BASE_URL + e.ticket_images.image}
+                              alt={e.title}
+                              fill
+                              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                            />
+                            <div className="flex flex-col absolute top-2 left-4 gap-2 z-20">
+                              {e.badge.map((e) => (
+                                <Badge
+                                  key={e.id}
+                                  variant="default"
+                                  className={`bg-${e.color}-500 text-sm px-4 py-1 rounded-4xl font-semibold`}
+                                >
+                                  {e.name}
+                                </Badge>
+                              ))}
+                            </div>
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10" />
+                          </motion.div>
+                          <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: false, amount: 0.1 }}
+                            transition={{ duration: 0.6, delay: idx * 0.2 }}
+                            className="mt-4"
                           >
-                            Без визы
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10" />
-                    </motion.div>
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: false, amount: 0.1 }}
-                      transition={{ duration: 0.6, delay: idx * 0.2 }}
-                      className="mt-4"
-                    >
-                      <Rating
-                        name="read-only"
-                        size="small"
-                        value={e.rating}
-                        readOnly
-                      />
-                      <p className="text-xl font-semibold text-[#031753]">
-                        {e.name}
-                      </p>
-                      <p className="text-sm text-blue-950">{e.desc}</p>
-                      <p className="mt-2 text-blue-600 font-semibold">
-                        {e.price}
-                      </p>
-                    </motion.div>
-                  </CarouselItem>
-                ))}
+                            <Rating
+                              name="read-only"
+                              size="small"
+                              value={e.rating}
+                              readOnly
+                              precision={0.1}
+                            />
+                            <p className="text-xl font-semibold text-[#031753]">
+                              {e.title}
+                            </p>
+                            <p className="text-md text-blue-950">
+                              {e.destination}
+                            </p>
+                            <p className="mt-2 text-blue-600 font-semibold">
+                              {formatPrice(
+                                e.price,
+                                locale as LanguageRoutes,
+                                true,
+                              )}
+                            </p>
+                          </motion.div>
+                        </Link>
+                      </CarouselItem>
+                    ))}
               </CarouselContent>
             </Carousel>
           </div>

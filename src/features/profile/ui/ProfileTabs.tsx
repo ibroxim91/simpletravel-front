@@ -22,6 +22,7 @@ import EastIcon from '@mui/icons-material/East';
 import EditIcon from '@mui/icons-material/Edit';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -32,6 +33,7 @@ import SettingTabs from './SettingTabs';
 import TravelersTabs from './TravelersTabs';
 
 const ProfileTabs = () => {
+  const t = useTranslations();
   const [activeTab, setActiveTab] = useState('profile');
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -119,13 +121,13 @@ const ProfileTabs = () => {
         }}
       >
         <Link href="/" className="font-medium text-[#646465]">
-          Главная страница
+          {t('Главная')}
         </Link>
-        <p className="text-[#646465] font-medium">Профиль</p>
+        <p className="text-[#646465] font-medium">{t('Профиль')}</p>
       </Breadcrumbs>
 
       <div className="mt-10">
-        <p className="text-3xl text-[#031753] font-semibold">Профиль</p>
+        <p className="text-3xl text-[#031753] font-semibold">{t('Профиль')}</p>
         <motion.div
           key="cabinet"
           initial="hidden"
@@ -148,31 +150,31 @@ const ProfileTabs = () => {
                 value="profile"
                 className="!w-full !h-[50px] py-4 data-[state=active]:bg-[#EDEEF1] cursor-pointer text-lg !items-start !justify-start px-4 rounded-xl !shadow-none"
               >
-                Профиль
+                {t('Профиль')}
               </TabsTrigger>
               <TabsTrigger
                 value="reservations"
                 className="!w-full !h-[50px] py-4 data-[state=active]:bg-[#EDEEF1] cursor-pointer text-lg !items-start !justify-start px-4 rounded-xl !shadow-none"
               >
-                Мои бронирования
+                {t('Мои бронирования')}
               </TabsTrigger>
               <TabsTrigger
                 value="travelers"
                 className="!w-full !h-[50px] py-4 data-[state=active]:bg-[#EDEEF1] cursor-pointer text-lg !items-start !justify-start px-4 rounded-xl !shadow-none"
               >
-                Мои попутчики
+                {t('Мои попутчики')}
               </TabsTrigger>
               <TabsTrigger
                 value="settings"
                 className="!w-full !h-[50px] py-4 data-[state=active]:bg-[#EDEEF1] cursor-pointer text-lg !items-start !justify-start px-4 rounded-xl !shadow-none"
               >
-                Настройки
+                {t('Настройки')}
               </TabsTrigger>
               <TabsTrigger
                 value="support"
                 className="!w-full !h-[50px] py-4 data-[state=active]:bg-[#EDEEF1] cursor-pointer text-lg !items-start !justify-start px-4 rounded-xl !shadow-none"
               >
-                Служба поддержки
+                {t('Служба поддержки')}
               </TabsTrigger>
             </TabsList>
             <AnimatePresence mode="wait">
@@ -213,7 +215,7 @@ const ProfileTabs = () => {
                                 >
                                   <CloseIcon fill="#031753" />
                                   <p className="text-md max-lg:hidden">
-                                    Bekor qilish
+                                    {t('Отмена')}
                                   </p>
                                 </Button>
                                 <Button
@@ -224,7 +226,7 @@ const ProfileTabs = () => {
                                 >
                                   <DoneIcon fill="#031753" />
                                   <p className="text-md max-lg:hidden">
-                                    Saqlash
+                                    {'Сохранить'}
                                   </p>
                                 </Button>
                               </div>
@@ -244,7 +246,7 @@ const ProfileTabs = () => {
                                 >
                                   <EditIcon fill="#031753" />
                                   <p className="text-md max-lg:hidden">
-                                    Изменить аватар
+                                    {t('Изменить аватар')}
                                   </p>
                                 </Button>
                               </>
@@ -258,17 +260,17 @@ const ProfileTabs = () => {
                             onSubmit={form.handleSubmit(onSubmit)}
                             className="space-y-4 mt-4"
                           >
-                            <div className="grid grid-cols-2 gap-4 max-lg:grid-cols-1">
+                            <div className="grid grid-cols-2 gap-4 max-lg:grid-cols-1 items-start">
                               <FormField
                                 control={form.control}
                                 name="firstName"
                                 render={({ field }) => (
                                   <FormItem>
-                                    <FormLabel>Имя</FormLabel>
+                                    <FormLabel>{t('Имя')}</FormLabel>
                                     <FormControl>
                                       <Input
                                         disabled={!edit}
-                                        placeholder="Введите имя"
+                                        placeholder={t('Введите имя')}
                                         className="h-14 rounded-2xl !text-md"
                                         {...field}
                                       />
@@ -282,11 +284,11 @@ const ProfileTabs = () => {
                                 name="lastName"
                                 render={({ field }) => (
                                   <FormItem>
-                                    <FormLabel>Username</FormLabel>
+                                    <FormLabel>{t('Фамилия')}</FormLabel>
                                     <FormControl>
                                       <Input
                                         disabled={!edit}
-                                        placeholder="Введите фамилию"
+                                        placeholder={t('Введите фамилию')}
                                         className="h-14 !text-md rounded-2xl"
                                         {...field}
                                       />
@@ -307,13 +309,13 @@ const ProfileTabs = () => {
                                     }}
                                     className="h-12 rounded-3xl border border-[#DFDFDF] px-8 cursor-pointer text-md max-lg:w-full"
                                   >
-                                    Bekor qilish
+                                    {t('Отмена')}
                                   </Button>
                                   <Button
                                     className="h-12 rounded-3xl px-8 cursor-pointer text-md"
                                     onClick={form.handleSubmit(onSubmit)}
                                   >
-                                    Saqlash
+                                    {t('Сохранить')}
                                   </Button>
                                 </div>
                               ) : (
@@ -321,7 +323,7 @@ const ProfileTabs = () => {
                                   className="h-12 rounded-3xl px-8 cursor-pointer text-md max-lg:w-full"
                                   onClick={() => setEdit(true)}
                                 >
-                                  {`O'zgartirish`}
+                                  {t('Изменение')}
                                 </Button>
                               )}
                             </div>
@@ -330,7 +332,7 @@ const ProfileTabs = () => {
                       </div>
                       <div className="w-full bg-white rounded-2xl flex flex-col px-4 py-4 gap-4">
                         <p className="text-xl font-semibold">
-                          Контактные данные
+                          {t('Контактные данные')}
                         </p>
                         <hr className="h-[2px] bg-[#EDEEF1]" />
                         <Form {...formPhone}>
@@ -345,7 +347,7 @@ const ProfileTabs = () => {
                                 <FormItem>
                                   <div className="flex justify-between w-full gap-1">
                                     <Label className="text-lg font-semibold">
-                                      Номер телефона
+                                      {t('Номер телефона')}
                                     </Label>
                                     {editPhoneState ? (
                                       <div className="flex max-lg:gap-2">
@@ -366,7 +368,7 @@ const ProfileTabs = () => {
                                             />
                                           </div>
                                           <p className="max-lg:hidden">
-                                            Bekor qilish
+                                            {t('Отмена')}
                                           </p>
                                         </Button>
                                         <Button
@@ -383,7 +385,7 @@ const ProfileTabs = () => {
                                             />
                                           </div>
                                           <p className="max-lg:hidden">
-                                            Saqlash
+                                            {t('Сохранить')}
                                           </p>
                                         </Button>
                                       </div>
@@ -402,7 +404,7 @@ const ProfileTabs = () => {
                                           />
                                         </div>
                                         <p className="max-lg:hidden">
-                                          Изменить
+                                          {t('Изменение')}
                                         </p>
                                       </Button>
                                     )}
@@ -410,7 +412,7 @@ const ProfileTabs = () => {
                                   <FormControl>
                                     <Input
                                       disabled={!editPhoneState}
-                                      placeholder="Введите номер телефона"
+                                      placeholder={t('Введите номер телефона')}
                                       className="h-14 rounded-2xl !text-md"
                                       {...field}
                                     />
@@ -433,7 +435,7 @@ const ProfileTabs = () => {
                                 <FormItem>
                                   <div className="flex justify-between w-full gap-1">
                                     <Label className="text-lg font-semibold">
-                                      Электронная почта
+                                      {t('Электронная почта')}
                                     </Label>
                                     {editEmailState ? (
                                       <div className="flex max-lg:gap-2">
@@ -454,7 +456,7 @@ const ProfileTabs = () => {
                                             />
                                           </div>
                                           <p className="max-lg:hidden">
-                                            Bekor qilish
+                                            {t('Отмена')}
                                           </p>
                                         </Button>
                                         <Button
@@ -471,7 +473,7 @@ const ProfileTabs = () => {
                                             />
                                           </div>
                                           <p className="max-lg:hidden">
-                                            Saqlash
+                                            {t('Сохранить')}
                                           </p>
                                         </Button>
                                       </div>
@@ -490,7 +492,7 @@ const ProfileTabs = () => {
                                           />
                                         </div>
                                         <p className="max-lg:hidden">
-                                          Изменить
+                                          {t('Изменение')}
                                         </p>
                                       </Button>
                                     )}
@@ -498,7 +500,7 @@ const ProfileTabs = () => {
                                   <FormControl>
                                     <Input
                                       disabled={!editEmailState}
-                                      placeholder="Введите ваш E-mail "
+                                      placeholder={t('Введите ваш E-mail')}
                                       className="h-14 rounded-2xl !text-md"
                                       {...field}
                                     />

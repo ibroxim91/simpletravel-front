@@ -29,6 +29,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import Drawer from '@mui/material/Drawer';
 import { format, parse } from 'date-fns';
 import { Plus, TrashIcon, UserIcon } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
@@ -43,6 +44,7 @@ type Props = {
 };
 
 export default function ParticipantsStep({ onNext, onPrev }: Props) {
+  const t = useTranslations();
   const [previewOpen, setPreviewOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const [openWhereMobile, setOpenWhereMobile] = useState(false);
@@ -116,12 +118,14 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                     className="flex gap-4 text-white bg-red-500 px-5 py-3 rounded-3xl"
                   >
                     <TrashIcon />
-                    <p>Удалить</p>
+                    <p>{t('Удалить')}</p>
                   </button>
                 )}
               </div>
               <div className="flex items-center justify-between max-lg:flex-col max-lg:items-start max-lg:gap-4">
-                <h1 className="font-bold text-xl">Участник {index + 1}</h1>
+                <h1 className="font-bold text-xl">
+                  {t('Участник')} {index + 1}
+                </h1>
                 <Select
                   onValueChange={(val) => {
                     const p = participantsDate.find(
@@ -148,7 +152,7 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                   }}
                 >
                   <SelectTrigger className="w-60 max-lg:w-full">
-                    <SelectValue placeholder="Сохранённые попутчики" />
+                    <SelectValue placeholder={t('Сохранённые попутчики')} />
                     <KeyboardArrowDownIcon />
                   </SelectTrigger>
                   <SelectContent>
@@ -168,7 +172,7 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                 name={`participants.${index}.gender`}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Пол</FormLabel>
+                    <FormLabel>{t('Пол')}</FormLabel>
                     <FormControl>
                       <div className="flex items-center gap-8 mt-2 max-sm:flex-col max-sm:items-start">
                         <label className="flex items-center gap-2 cursor-pointer">
@@ -179,7 +183,7 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                             onChange={field.onChange}
                             className="w-6 h-6 accent-[#084FE3]"
                           />
-                          Мужчина
+                          {t('Мужчина')}
                         </label>
                         <label className="flex items-center gap-2 cursor-pointer">
                           <Input
@@ -189,7 +193,7 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                             onChange={field.onChange}
                             className="w-6 h-6 accent-[#084FE3]"
                           />
-                          Женщина
+                          {t('Женщина')}
                         </label>
                       </div>
                     </FormControl>
@@ -203,12 +207,14 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                   name={`participants.${index}.firstName`}
                   render={({ field }) => (
                     <FormItem>
-                      <Label className="text-lg font-semibold">Имя</Label>
+                      <Label className="text-lg font-semibold">
+                        {t('Имя')}
+                      </Label>
                       <FormControl>
                         <Input
                           {...field}
                           type="text"
-                          placeholder="Введите имя"
+                          placeholder={t('Введите имя')}
                           className="px-5 h-14 rounded-lg"
                         />
                       </FormControl>
@@ -221,12 +227,14 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                   name={`participants.${index}.lastName`}
                   render={({ field }) => (
                     <FormItem>
-                      <Label className="text-lg font-semibold">Фамилия</Label>
+                      <Label className="text-lg font-semibold">
+                        {t('Фамилия')}
+                      </Label>
                       <FormControl>
                         <Input
                           {...field}
                           type="text"
-                          placeholder="Введите фамилию"
+                          placeholder={t('Введите фамилию')}
                           className="p-5 rounded-lg h-14"
                         />
                       </FormControl>
@@ -241,7 +249,9 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                   name={`participants.${index}.date`}
                   render={({ field }) => (
                     <FormItem>
-                      <Label className="text-lg">Время возвращения</Label>
+                      <Label className="text-lg">
+                        {t('Время возвращения')}
+                      </Label>
                       <FormControl>
                         <div>
                           <div className="max-lg:hidden">
@@ -263,7 +273,7 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                                   />
                                   {field.value
                                     ? format(field.value, 'dd.MM.yyyy')
-                                    : 'Когда'}
+                                    : t('Когда')}
                                 </button>
                               </PopoverTrigger>
                               <PopoverContent
@@ -301,7 +311,7 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                               />
                               {field.value
                                 ? format(field.value, 'dd.MM.yyyy')
-                                : 'Когда'}
+                                : t('Когда')}
                             </button>
                             <Drawer
                               anchor="bottom"
@@ -321,7 +331,7 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                               <div className="flex flex-col gap-4 w-full font-medium">
                                 <div className="flex items-center justify-between">
                                   <p className="text-lg font-semibold">
-                                    Дата отправления
+                                    {t('Дата отправления')}
                                   </p>
                                   <Button
                                     variant={'outline'}
@@ -357,13 +367,13 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                   render={({ field }) => (
                     <FormItem>
                       <Label className="text-lg font-semibold">
-                        Телефон номер
+                        {t('Телефон номер')}
                       </Label>
                       <FormControl>
                         <Input
                           {...field}
                           type="text"
-                          placeholder="Введите номер"
+                          placeholder={t('Введите номер')}
                           className="p-5 rounded-lg h-14"
                         />
                       </FormControl>
@@ -378,7 +388,7 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                 render={({ field }) => (
                   <FormItem>
                     <Label className="text-xl font-semibold text-[#212122]">
-                      Фото/скан паспорта
+                      {t('Фото/скан паспорта')}
                     </Label>
                     <FormControl>
                       <Input
@@ -397,12 +407,14 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                       className="w-full bg-[#EDEEF180] border-2 border-dashed border-[#D3D3D3] flex flex-col items-center gap-2 justify-center py-4 rounded-2xl cursor-pointer hover:bg-[#EDEEF1]"
                     >
                       <p className="font-semibold text-xl text-[#212122]">
-                        Drag or select file
+                        {t('Drag or select file')}
                       </p>
                       <p className="text-[#646465] text-sm text-center">
-                        Drop files here or click to{' '}
-                        <span className="underline text-[#084FE3]">browse</span>{' '}
-                        through your machine.
+                        {t('Drop files here or click to')}{' '}
+                        <span className="underline text-[#084FE3]">
+                          {t('browse')}
+                        </span>{' '}
+                        {t('through your machine')}
                       </p>
                     </label>
                     <FormMessage />
@@ -448,7 +460,7 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                       className="p-2 flex gap-4 rounded-full bg-red-500 text-white max-sm:w-full max-sm:justify-center"
                     >
                       <TrashIcon />
-                      <p className="sm:hidden">Удалить</p>
+                      <p className="sm:hidden">{t('Удалить')}</p>
                     </button>
                     <button
                       type="button"
@@ -459,7 +471,7 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                       }}
                     >
                       <UserIcon />
-                      Посмотреть
+                      {t('Посмотреть')}
                     </button>
                   </div>
                 </div>
@@ -472,7 +484,7 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
             onClick={onPrev}
             className="bg-gray-200 border shadow-sm border-[#D3D3D3] text-gray-800 hover:bg-gray-300 px-10 py-4 rounded-full cursor-pointer"
           >
-            Назад
+            {t('Назад')}
           </button>
           <div className="flex gap-4 max-lg:flex-col">
             <button
@@ -489,13 +501,13 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
               }
               className="flex items-center gap-2 bg-white border px-6 py-3 rounded-full cursor-pointer"
             >
-              <Plus /> Новый участник
+              <Plus /> {t('Новый участник')}
             </button>
             <button
               type="submit"
               className="bg-[#084FE3] text-white px-10 py-4 rounded-full cursor-pointer"
             >
-              Следующий
+              {t('Следующий')}
             </button>
           </div>
         </div>

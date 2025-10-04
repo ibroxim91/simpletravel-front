@@ -1,0 +1,61 @@
+export interface TickectAll {
+  status: true;
+  data: {
+    links: {
+      previous: string;
+      next: string;
+    };
+    total_items: number;
+    total_pages: number;
+    page_size: number;
+    current_page: number;
+    results: {
+      tickets: TickectAllResults[];
+      min_price: number;
+      max_price: number;
+    };
+  };
+}
+
+export interface TickectAllResults {
+  id: number;
+  title: string;
+  price: number;
+  departure_date: string;
+  departure: string;
+  passenger_count: number;
+  rating: number;
+  duration_days: number;
+  destination: string;
+  ticket_images: {
+    image: string;
+  };
+  ticket_amenities: { name: string }[];
+  badge: { id: number; name: string; color: string }[];
+  visa_required: boolean;
+  is_liked: boolean;
+}
+
+export interface TickectAllFilter {
+  departure?: string;
+  departure_date?: string;
+  departure_time?: string;
+  destination?: string;
+  destinations?: string;
+  duration_days?: string;
+  rating?: number;
+  hotel_type?: string;
+  max_price?: number;
+  meal_plan?: string;
+  min_price?: number;
+  most_expensive?: boolean;
+  max_departure_date?: string;
+  min_departure_date?: string;
+  passenger_count?: number;
+  page: number;
+  page_size: number;
+  ticket_amenities?: string;
+  title?: string;
+  visa_required?: boolean | string;
+  cheapest?: boolean;
+}

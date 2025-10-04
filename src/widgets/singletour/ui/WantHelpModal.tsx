@@ -25,6 +25,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import DoneIcon from '@mui/icons-material/Done';
 import Drawer from '@mui/material/Drawer';
 import clsx from 'clsx';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
@@ -43,6 +44,7 @@ const WantHelpModal = ({
   openHelpMobile,
   setOpenHelpMobile,
 }: Props) => {
+  const t = useTranslations();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -94,7 +96,7 @@ const WantHelpModal = ({
                 success && 'justify-center',
               )}
             >
-              {loading && <p className="text-3xl">Отправка...</p>}
+              {loading && <p className="text-3xl">{t('Отправка')}...</p>}
 
               {success && (
                 <Button
@@ -116,7 +118,7 @@ const WantHelpModal = ({
 
               {!loading && !success && !error && (
                 <>
-                  <p className="text-3xl">Стать партнёром</p>
+                  <p className="text-3xl">{t('Нужна помощь?')}</p>
                   <DialogClose asChild>
                     <Button
                       variant={'outline'}
@@ -149,11 +151,11 @@ const WantHelpModal = ({
               {success && (
                 <div className="text-center flex flex-col gap-4 px-4 justify-center">
                   <p className="text-2xl mt-5 text-[#212122] font-semibold">
-                    Заявка успешно отправлено
+                    {t('Заявка успешно отправлено')}
                   </p>
                   <p className="text-[#646465] font-medium text-lg">
-                    Эксперт свяжется с вами в ближайшее время по номеру +
-                    {form.getValues('phone')} позвонив на него
+                    {t('Эксперт свяжется с вами в ближайшее время по номеру')} +
+                    {form.getValues('phone')} {t('позвонив на него')}
                   </p>
                   <div className="mt-4">
                     <Button
@@ -166,7 +168,7 @@ const WantHelpModal = ({
                         onClose(false);
                       }}
                     >
-                      Хорошо
+                      {t('Хорошо')}
                     </Button>
                   </div>
                 </div>
@@ -188,7 +190,7 @@ const WantHelpModal = ({
                       setError(null);
                     }}
                   >
-                    Попробовать снова
+                    {t('Попробовать снова')}
                   </Button>
                 </div>
               )}
@@ -205,12 +207,12 @@ const WantHelpModal = ({
                       render={({ field }) => (
                         <FormItem>
                           <Label className="text-xl font-semibold text-[#212122]">
-                            Название компании
+                            {t('Имя')}
                           </Label>
                           <FormControl>
                             <Input
                               {...field}
-                              placeholder="Введите название вашей компании"
+                              placeholder={t('Введите имя')}
                               className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
                             />
                           </FormControl>
@@ -224,12 +226,12 @@ const WantHelpModal = ({
                       render={({ field }) => (
                         <FormItem className="w-full">
                           <Label className="text-xl font-semibold text-[#212122]">
-                            Номер телефона
+                            {t('Номер телефона')}
                           </Label>
                           <FormControl>
                             <Input
                               {...field}
-                              placeholder="Введите ваш номер телефона"
+                              placeholder={t('Введите ваш номер телефона')}
                               className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
                             />
                           </FormControl>
@@ -242,10 +244,10 @@ const WantHelpModal = ({
                         type="submit"
                         className="px-10 py-8 rounded-4xl text-lg font-medium cursor-pointer"
                       >
-                        Отправить
+                        {t('Отправить')}
                       </Button>
                       <p className="font-medium text-md text-[#646465]">
-                        Я даю согласие на обработку персональных данных
+                        {t('Я даю согласие на обработку персональных данных')}
                       </p>
                     </div>
                   </form>
@@ -285,7 +287,7 @@ const WantHelpModal = ({
       >
         {!success && !error && !loading && (
           <div className="flex justify-between items-center p-4">
-            <p className="text-2xl font-semibold">Стать партнёром</p>
+            <p className="text-2xl font-semibold">{t('Нужна помощь?')}</p>
             <Button
               variant="outline"
               onClick={() => {
@@ -322,11 +324,11 @@ const WantHelpModal = ({
                 <DoneIcon sx={{ width: '38px', height: '38px' }} />
               </Button>
               <p className="text-2xl mt-5 text-[#212122]">
-                Заявка успешно отправлено
+                {t('Заявка успешно отправлено')}
               </p>
               <p className="text-[#646465] font-medium text-md">
-                Эксперт свяжется с вами в ближайшее время по номеру{' '}
-                {form.getValues('phone')} позвонив на него
+                {t('Эксперт свяжется с вами в ближайшее время по номеру')}{' '}
+                {form.getValues('phone')} {t('позвонив на него')}
               </p>
               <Button
                 variant={'default'}
@@ -338,7 +340,7 @@ const WantHelpModal = ({
                   setOpenHelpMobile(false);
                 }}
               >
-                Хорошо
+                {t('Хорошо')}
               </Button>
             </div>
           )}
@@ -351,7 +353,7 @@ const WantHelpModal = ({
                 <CloseIcon sx={{ width: 32, height: 32 }} />
               </Button>
               <p className="text-2xl mt-5 text-[#212122]">
-                Произошла ошибка при отправке
+                {t('Произошла ошибка при отправке')}
               </p>
               <p className="text-xl font-semibold text-[#212122]">{error}</p>
               <Button
@@ -365,7 +367,7 @@ const WantHelpModal = ({
                   setOpenHelpMobile(false);
                 }}
               >
-                Попробовать снова
+                {t('Попробовать снова')}
               </Button>
             </div>
           )}
@@ -382,12 +384,12 @@ const WantHelpModal = ({
                     render={({ field }) => (
                       <FormItem>
                         <Label className="text-xl font-semibold text-[#212122]">
-                          Название компании
+                          {t('Имя')}
                         </Label>
                         <FormControl>
                           <Input
                             {...field}
-                            placeholder="Введите название вашей компании"
+                            placeholder={t('Введите название вашей компании')}
                             className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
                           />
                         </FormControl>
@@ -401,12 +403,12 @@ const WantHelpModal = ({
                     render={({ field }) => (
                       <FormItem className="w-full">
                         <Label className="text-xl font-semibold text-[#212122]">
-                          Номер телефона
+                          {t('Номер телефона')}
                         </Label>
                         <FormControl>
                           <Input
                             {...field}
-                            placeholder="Введите ваш номер телефона"
+                            placeholder={t('Введите ваш номер телефона')}
                             className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
                           />
                         </FormControl>
@@ -420,10 +422,10 @@ const WantHelpModal = ({
                     type="submit"
                     className="px-10 py-8 rounded-4xl w-full text-lg font-medium cursor-pointer"
                   >
-                    Отправить
+                    {t('Отправить')}
                   </Button>
                   <p className="font-medium text-center text-md text-[#646465]">
-                    Я даю согласие на обработку персональных данных
+                    {t('Я даю согласие на обработку персональных данных')}
                   </p>
                 </div>
               </form>

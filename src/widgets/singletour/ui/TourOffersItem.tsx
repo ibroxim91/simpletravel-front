@@ -1,6 +1,9 @@
+import { BASE_URL } from '@/shared/config/api/URLs';
+import { Link } from '@/shared/config/i18n/navigation';
+import { formatPrice } from '@/shared/lib/formatPrice';
+import { TickectAllResults } from '@/widgets/selectour/lib/types';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import TourInfoItem from '../../../../public/images/tourItem1.png';
 
 const slideIn = {
   hidden: { opacity: 0, x: 100 },
@@ -11,9 +14,9 @@ const slideIn = {
   }),
 };
 
-export default function TourOffersItem() {
+export default function TourOffersItem({ data }: { data: TickectAllResults }) {
   return (
-    <>
+    <Link href={`/selectour/${data.id}`}>
       <motion.div
         initial="hidden"
         whileInView="visible"
@@ -22,32 +25,36 @@ export default function TourOffersItem() {
         className="w-full h-full relative cursor-pointer rounded-2xl flex-shrink-0 max-lg:hidden"
       >
         <Image
-          src={TourInfoItem.src}
+          src={BASE_URL + data.ticket_images.image}
           alt="tour offers"
           height={500}
           width={500}
-          className="object-cover rounded-2xl"
+          className="object-cover w-full h-[400px] rounded-2xl"
         />
 
-        <div className="absolute bottom-[10px] left-[10px] text-white hidden">
-          <h1 className="font-bold text-[28px]">Турция</h1>
-          <p className="font-semibold text-sm mt-[5px]">От $700 / 2 чел</p>
+        <div className="absolute bottom-[10px] left-[10px] text-white">
+          <h1 className="font-semibold text-2xl">{data.title}</h1>
+          <p className="font-medium text-sm mt-[5px]">
+            От {formatPrice(data.price)} / {data.passenger_count} чел
+          </p>
         </div>
       </motion.div>
       <div className="w-full h-full relative cursor-pointer rounded-2xl flex-shrink-0 lg:hidden">
         <Image
-          src={TourInfoItem.src}
+          src={BASE_URL + data.ticket_images.image}
           alt="tour offers"
-          height={700}
-          width={700}
-          className="object-cover rounded-2xl"
+          height={500}
+          width={500}
+          className="object-cover w-full h-[400px] rounded-2xl"
         />
 
-        <div className="absolute bottom-[10px] left-[10px] text-white hidden">
-          <h1 className="font-bold text-[28px]">Турция</h1>
-          <p className="font-semibold text-sm mt-[5px]">От $700 / 2 чел</p>
+        <div className="absolute bottom-[10px] left-[10px] text-white">
+          <h1 className="font-semibold text-2xl">{data.title}</h1>
+          <p className="font-medium text-sm mt-[5px]">
+            От {formatPrice(data.price)} / {data.passenger_count} чел
+          </p>
         </div>
       </div>
-    </>
+    </Link>
   );
 }

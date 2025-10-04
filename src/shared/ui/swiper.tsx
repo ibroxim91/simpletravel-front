@@ -5,6 +5,7 @@ import EastIcon from '@mui/icons-material/East';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import IosShareIcon from '@mui/icons-material/IosShare';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import React from 'react';
 import { toast } from 'sonner';
@@ -12,21 +13,19 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import { Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import SwiperImage from '../../../public/images/image1.png';
 import { Link } from '../config/i18n/navigation';
-
-const images = [
-  SwiperImage.src,
-  SwiperImage.src,
-  SwiperImage.src,
-  SwiperImage.src,
-];
 
 interface Props {
   setOpenWatch: React.Dispatch<React.SetStateAction<boolean>>;
+  images: [
+    {
+      image: string;
+    },
+  ];
 }
 
-export default function ImageSwiper({ setOpenWatch }: Props) {
+export default function ImageSwiper({ setOpenWatch, images }: Props) {
+  const t = useTranslations();
   const handleCopy = () => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(window.location.href).then(() => {
@@ -48,15 +47,15 @@ export default function ImageSwiper({ setOpenWatch }: Props) {
         {images.map((img, idx) => (
           <SwiperSlide key={idx}>
             <div
-              className="relative w-full h-[400px]"
+              className="relative w-full h-[500px]"
               onClick={() => setOpenWatch(true)}
             >
               <Image
-                src={img}
+                src={img.image}
                 alt={`Image ${idx + 1}`}
-                className="object-cover"
-                quality={100}
                 fill
+                quality={100}
+                className=" object-cover"
               />
             </div>
           </SwiperSlide>
@@ -76,12 +75,12 @@ export default function ImageSwiper({ setOpenWatch }: Props) {
               }}
             >
               <Link href="/" className="font-medium text-[#ffff]">
-                Главная страница
+                {t('Главная')}
               </Link>
               <Link href="/selectour" className="text-[#ffff] font-medium">
-                Подобрать тур
+                {t('Подобрать тур')}
               </Link>
-              <p className="text-[#ffff] font-medium">Тур страница</p>
+              <p className="text-[#ffff] font-medium">{t('Тур страница')}</p>
             </Breadcrumbs>
           </div>
 
@@ -99,13 +98,13 @@ export default function ImageSwiper({ setOpenWatch }: Props) {
                 href="/"
                 className="font-medium text-[#ffff] max-md:text-sm"
               >
-                Главная страница
+                {t('Главная страница')}
               </Link>
               <Link
                 href="/selectour"
                 className="text-[#ffff] font-medium max-md:text-sm"
               >
-                Подобрать тур
+                {t('Подобрать тур')}
               </Link>
             </Breadcrumbs>
           </div>
@@ -116,7 +115,7 @@ export default function ImageSwiper({ setOpenWatch }: Props) {
               onClick={() => setOpenWatch(true)}
             >
               <AspectRatioIcon />
-              <p className="max-lg:hidden">Полный обзор</p>
+              <p className="max-lg:hidden">{t('Полный обзор')}</p>
             </div>
 
             <div

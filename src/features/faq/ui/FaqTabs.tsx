@@ -2,6 +2,7 @@
 
 import { Tabs, TabsList, TabsTrigger } from '@/shared/ui/tabs';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import CabinetTabs from './CabinetTabs';
 import HotelTabs from './HotelTabs';
@@ -10,6 +11,7 @@ import SupportTabs from './SupportTabs';
 import ToursTabs from './ToursTabs';
 
 const FaqTabs = () => {
+  const t = useTranslations();
   const [activeTab, setActiveTab] = useState('service');
 
   const variants = {
@@ -24,7 +26,9 @@ const FaqTabs = () => {
 
   return (
     <div className="custom-container mt-5">
-      <p className="text-3xl text-[#001452] font-semibold">Ответы на вопросы</p>
+      <p className="text-3xl text-[#001452] font-semibold">
+        {t('Ответы на вопросы')}
+      </p>
       <motion.div
         key="cabinet"
         initial="hidden"
@@ -44,31 +48,31 @@ const FaqTabs = () => {
               value="service"
               className="w-full justify-start text-center cursor-pointer text-md font-semibold data-[state=active]:bg-[#EDEEF1] p-4 rounded-xl data-[state=active]:shadow-sm"
             >
-              О сервисе
+              {t('О сервисе')}
             </TabsTrigger>
             <TabsTrigger
               value="cabinet"
               className="w-full justify-start text-center cursor-pointer text-md font-semibold data-[state=active]:bg-[#EDEEF1] p-4 rounded-xl data-[state=active]:shadow-sm"
             >
-              Личный кабинет
+              {t('Личный кабинет')}
             </TabsTrigger>
             <TabsTrigger
               value="hotel"
               className="w-full justify-start text-center cursor-pointer text-md font-semibold data-[state=active]:bg-[#EDEEF1] p-4 rounded-xl data-[state=active]:shadow-sm"
             >
-              Отели
+              {t('Отели')}
             </TabsTrigger>
             <TabsTrigger
               value="tours"
               className="w-full justify-start text-center cursor-pointer text-md font-semibold data-[state=active]:bg-[#EDEEF1] p-4 rounded-xl data-[state=active]:shadow-sm"
             >
-              Туры
+              {t('Туры')}
             </TabsTrigger>
             <TabsTrigger
               value="support"
               className="w-full justify-start text-center cursor-pointer text-md font-semibold data-[state=active]:bg-[#EDEEF1] p-4 rounded-xl data-[state=active]:shadow-sm"
             >
-              Служба поддержки
+              {t('Служба поддержки')}
             </TabsTrigger>
           </TabsList>
           <div className="flex-1 relative">

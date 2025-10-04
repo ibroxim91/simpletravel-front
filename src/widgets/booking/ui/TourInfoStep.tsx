@@ -5,6 +5,7 @@ import StarIcon from '@mui/icons-material/Star';
 import WhereToVoteIcon from '@mui/icons-material/WhereToVote';
 import Rating from '@mui/material/Rating';
 import clsx from 'clsx';
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import formStore from '../lib/hook';
@@ -15,6 +16,7 @@ type Props = {
 };
 
 export default function TourInfoStep({ onNext, onPrev }: Props) {
+  const t = useTranslations();
   const [selected, setSelected] = useState<number | null>(null);
   const [transport, setTransport] = useState<number | null>(null);
   const {
@@ -36,7 +38,7 @@ export default function TourInfoStep({ onNext, onPrev }: Props) {
   return (
     <div>
       <div className="w-full bg-[#FFFFFF] p-[20px] rounded-[20px] relative">
-        <h1 className="text-[20px] font-bold">Турпакет</h1>
+        <h1 className="text-[20px] font-bold">{t('Турпакет')}</h1>
         <hr className="h-[2px] my-[24px] bg-[#EDEEF1]" />
 
         <div className="flex items-center gap-[20px] my-[20px] max-lg:flex-col max-lg:items-start">
@@ -79,7 +81,9 @@ export default function TourInfoStep({ onNext, onPrev }: Props) {
           </div>
         </div>
 
-        <label className="text-xl font-semibold">Выберите категорию</label>
+        <label className="text-xl font-semibold">
+          {t('Выберите категорию')}
+        </label>
 
         <div className="mt-[8px] grid grid-cols-2 justify-between gap-[16px] max-md:grid-cols-1">
           {options.map((opt) => {
@@ -123,7 +127,7 @@ export default function TourInfoStep({ onNext, onPrev }: Props) {
           })}
         </div>
 
-        <p className="text-xl font-semibold mt-5">Транспорт</p>
+        <p className="text-xl font-semibold mt-5">{t('Транспорт')}</p>
         <div className="mt-[8px] grid grid-cols-2 justify-between gap-[16px] max-md:grid-cols-1">
           {TransportOptions.map((opt) => {
             const inputId = `selectTransport-${opt.id}`;
@@ -172,7 +176,7 @@ export default function TourInfoStep({ onNext, onPrev }: Props) {
           onClick={onPrev}
           className="bg-gray-200 border shadow-sm border-[#D3D3D3] text-gray-800 hover:bg-gray-300 py-4 font-medium px-20 left-0 cursor-pointer rounded-full mt-[20px]"
         >
-          Назад
+          {t('Назад')}
         </button>
         <button
           onClick={() => {
@@ -182,7 +186,7 @@ export default function TourInfoStep({ onNext, onPrev }: Props) {
           }}
           className="bg-[#084FE3] text-white py-4 font-medium px-20 left-0 cursor-pointer rounded-full mt-[20px]"
         >
-          Следующий
+          {t('Следующий')}
         </button>
       </div>
     </div>

@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { IFood } from '../lib/data';
 
 const slideIn = {
   hidden: { opacity: 0, x: 100 },
@@ -11,7 +10,15 @@ const slideIn = {
   }),
 };
 
-export default function TourFoodItem({ food }: { food: IFood }) {
+export default function TourFoodItem({
+  food,
+}: {
+  food: {
+    image: string;
+    name: string;
+    desc: string;
+  };
+}) {
   return (
     <>
       <motion.div
@@ -21,27 +28,39 @@ export default function TourFoodItem({ food }: { food: IFood }) {
         variants={slideIn}
         className="flex items-center flex-col max-lg:hidden"
       >
-        <div className="w-[120px] h-[120px] object-cover cursor-pointer relative">
-          <Image src={food.image} fill alt={food.image} />
+        <div className="w-[120px] h-[120px] object-cover cursor-pointer relative rounded-full">
+          <Image
+            src={food.image}
+            width={500}
+            height={500}
+            quality={100}
+            alt={food.image}
+            className="w-full h-full rounded-full"
+          />
         </div>
 
         <h1 className="text-[16px] mt-6 font-bold text-[#031753]">
           {food.name}
         </h1>
         <p className="text-[14px] text-[#636363] w-[180px] text-center">
-          {food.title}
+          {food.desc}
         </p>
       </motion.div>
       <div className="flex items-center flex-col lg:hidden">
         <div className="w-[120px] h-[120px] object-cover cursor-pointer relative">
-          <Image src={food.image} fill alt={food.image} />
+          <Image
+            src={food.image}
+            fill
+            alt={food.image}
+            className="w-full h-full rounded-full"
+          />
         </div>
 
         <h1 className="text-[16px] mt-6 font-bold text-[#031753]">
           {food.name}
         </h1>
         <p className="text-[14px] text-[#636363] w-[180px] text-center">
-          {food.title}
+          {food.desc}
         </p>
       </div>
     </>

@@ -14,6 +14,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import clsx from 'clsx';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { LoaderCircle } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -25,6 +26,7 @@ interface Props {
 }
 
 const ForgetTwoSteps = ({ setStep }: Props) => {
+  const t = useTranslations();
   const { phone, email } = useLoginPhoneStore();
   const [time, setTime] = useState<number>(30);
   const [error, setError] = useState<boolean>(false);
@@ -76,10 +78,9 @@ const ForgetTwoSteps = ({ setStep }: Props) => {
     } catch {
       setLoading(false);
       setError(true);
-      toast.error('Слишком много попыток.', {
+      toast.error(t('Слишком много попыток'), {
         icon: null,
-        description:
-          'Вы ввели неверные данные 5 раз. Доступ заблокирован на 30 минут.',
+        description: t('Вы ввели неверные данные 5 раз'),
         position: 'bottom-right',
       });
     }
@@ -92,9 +93,9 @@ const ForgetTwoSteps = ({ setStep }: Props) => {
 
   return (
     <div className="w-[50%] bg-white rounded-3xl h-fit py-5 px-10 absolute bottom-0 top-52 max-md:px-2 max-sm:top-16 max-lg:w-[90%] left-1/2 -translate-x-1/2">
-      <p className="text-xl font-semibold">Код аутентификации</p>
+      <p className="text-xl font-semibold">{t('Код аутентификации')}</p>
       <p className="mt-4 text-lg w-[70%] max-lg:w-full max-[340px]:break-words">
-        Введите 5-значный код, который мы только что отправили на{' '}
+        {t('Введите 5-значный код, который мы только что отправили на')}{' '}
         {phone ? (
           <span className="text-[#3E7FFF]">{formatPhone(phone)}</span>
         ) : (
@@ -142,11 +143,11 @@ const ForgetTwoSteps = ({ setStep }: Props) => {
               onClick={handleResend}
               className="text-[#1764FC] underline"
             >
-              Отправить код повторно
+              {t('Отправить код повторно')}
             </button>
           ) : (
             <p className="text-[#646465]">
-              Прислать код повторно через 00:
+              {t('Прислать код повторно через')} 00:
               {time.toString().padStart(2, '0')}
             </p>
           )}
@@ -159,7 +160,7 @@ const ForgetTwoSteps = ({ setStep }: Props) => {
             {loading ? (
               <LoaderCircle className="animate-spin" />
             ) : (
-              'Подтвердить'
+              t('Подтвердить')
             )}
           </Button>
         </form>

@@ -3,12 +3,18 @@
 import { Button } from '@/shared/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
 import { easeOut, motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
+import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import { CardData } from '../lib/data';
-import SendPartner from './SendPartner';
+
+const SendPartner = dynamic(() => import('./SendPartner'), {
+  ssr: false, // serverda render qilinmasin
+});
 
 const Partner = () => {
   const [isMobile, setIsMobile] = useState(false);
+  const t = useTranslations();
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -50,25 +56,14 @@ const Partner = () => {
           className="w-full lg:w-[50%] font-bold text-4xl text-[#212122]"
           variants={fadeUpVariants}
         >
-          Качество отдыха, которому можно доверять
+          {t('Качество отдыха, которому можно доверять')}
         </MotionDiv>
         <MotionDiv
           className="flex flex-col gap-5 w-full lg:w-[50%] text-[#646465] text-md font-medium"
           variants={fadeUpVariants}
         >
-          <p>
-            В Simple Travel мы верим, что каждое путешествие должно быть лёгким,
-            вдохновляющим и незабываемым. Наша миссия — воплотить ваши мечты о
-            путешествиях в реальность, создавая индивидуальные маршруты, которые
-            сочетают комфорт, приключения и знакомство с культурой.
-          </p>
-          <p>
-            Основанная на страсти к открытиям, Simple Travel превратилась в
-            надёжного партнёра для тех, кто ищет больше, чем стандартные туры.
-            Мы специализируемся на создании персонализированных путешествий — от
-            уединённых отпусков в Альпах до ярких уикендов в лучших городах
-            Европы и за её пределами
-          </p>
+          <p>{t('В Simple Travel мы верим')}</p>
+          <p>{t('Основанная на страсти к открытиям')}</p>
         </MotionDiv>
       </MotionDiv>
 
@@ -82,12 +77,10 @@ const Partner = () => {
       >
         <MotionDiv className="flex flex-col gap-5" variants={fadeUpVariants}>
           <p className="w-full lg:w-[50%] font-bold text-4xl text-[#212122]">
-            Мы организуем лучшие туры, какие только возможны
+            {t('Мы организуем лучшие туры, какие только возможны')}
           </p>
           <p className="w-full lg:w-[70%] text-[#646465] text-md font-medium">
-            Мы заботимся о каждой детали вашего путешествия — от выбора маршрута
-            и бронирования отелей до экскурсий и комфортного трансфера. Наши
-            туры созданы, чтобы превратить отдых в незабываемые впечатления
+            {t('Мы заботимся о каждой детали вашего путешествия')}
           </p>
         </MotionDiv>
 
@@ -110,10 +103,10 @@ const Partner = () => {
                 </CardHeader>
                 <CardContent className="flex flex-col gap-2">
                   <p className="text-xl text-[#031753] font-semibold">
-                    {card.title}
+                    {t(card.title)}
                   </p>
                   <p className="text-md text-[#646465] font-medium">
-                    {card.text}
+                    {t(card.text)}
                   </p>
                 </CardContent>
               </Card>

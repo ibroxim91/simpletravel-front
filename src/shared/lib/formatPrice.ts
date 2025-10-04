@@ -1,32 +1,23 @@
-import { getLocale } from 'next-intl/server';
+// lib/formatPrice.ts
 import { LanguageRoutes } from '../config/i18n/types';
 
-/**
- * Format price. With label.
- * @param amount Price
- * @param withLabel Show label. Default false
- * @returns string. Ex. X XXX XXX sum
- */
-const formatPrice = async (amount: number | string, withLabel?: boolean) => {
-  const locale = (await getLocale()) as LanguageRoutes;
+export const formatPrice = (
+  amount: number | string,
+  locale?: LanguageRoutes,
+  withLabel = false,
+) => {
   const label = withLabel
     ? locale === LanguageRoutes.RU
       ? ' сум'
       : locale === LanguageRoutes.EN
         ? ' сўм'
-        : ' so‘m'
+        : " so'm"
     : '';
-  const parts = String(amount).split('.');
-  const dollars = parts[0];
-  const cents = parts.length > 1 ? parts[1] : '00';
 
-  const formattedDollars = dollars.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  const numericAmount = Number(amount) || 0;
+  const formatted = numericAmount
+    .toString()
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 
-  if (String(amount).length === 0) {
-    return formattedDollars + '.' + cents + label;
-  } else {
-    return formattedDollars + label;
-  }
+  return formatted + label;
 };
-
-export default formatPrice;

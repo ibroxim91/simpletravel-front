@@ -3,12 +3,16 @@ import { TabsContent } from '@/shared/ui/tabs';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 import TelegramIcon from '@mui/icons-material/Telegram';
+import { useTranslations } from 'next-intl';
 
 const SupportTabs = () => {
+  const t = useTranslations();
   return (
     <TabsContent value="support" className="flex flex-col gap-4">
       <div className="bg-white px-4 py-6 rounded-3xl w-full shadow-sm">
-        <p className="text-xl text-[#212122] font-semibold">Служба поддержки</p>
+        <p className="text-xl text-[#212122] font-semibold">
+          {t('Служба поддержки')}
+        </p>
         <div className="bg-[#DFDFDF] w-full h-[2px] mt-5" />
         <Link
           href={'https://web.telegram.org/a/#-1001169511702'}
@@ -20,7 +24,9 @@ const SupportTabs = () => {
                 sx={{ color: '#ffff', width: '32px', height: '32px' }}
               />
             </div>
-            <p className="font-semibold text-[#212122]">Онлайн чат телеграм</p>
+            <p className="font-semibold text-[#212122]">
+              {t('Онлайн чат телеграм')}
+            </p>
           </div>
           <ChevronRightIcon sx={{ width: '28px', height: '28px' }} />
         </Link>
@@ -34,7 +40,7 @@ const SupportTabs = () => {
                 sx={{ color: '#ffff', width: '32px', height: '32px' }}
               />
             </div>
-            <p className="font-semibold text-[#212122]">Колл центр</p>
+            <p className="font-semibold text-[#212122]">{t('Колл центр')}</p>
           </div>
           <p className="font-semibold text-[#084FE3]">9778</p>
         </Link>
@@ -48,7 +54,7 @@ const SupportTabs = () => {
                 sx={{ color: '#ffff', width: '32px', height: '32px' }}
               />
             </div>
-            <p className="font-semibold text-[#212122]">Колл центр</p>
+            <p className="font-semibold text-[#212122]">{t('Колл центр')}</p>
           </div>
           <p className="font-semibold text-[#084FE3]">99 222 29 22</p>
         </Link>

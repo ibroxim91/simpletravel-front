@@ -25,7 +25,7 @@ export const ParticipantSchema = z.object({
   passport: z
     .instanceof(File)
     .nullish()
-    .refine((date) => date, { message: 'Обязательное поле' }),
+    .refine((date) => date, { message: 'Majburiy maydon' }),
 });
 
 export const ParticipantsForm = z.object({
@@ -33,6 +33,6 @@ export const ParticipantsForm = z.object({
 });
 
 export const ServicesForm = z.object({
-  excursions: z.string().min(1, { message: 'Обязательное поле' }),
-  additional: z.string().min(1, { message: 'Обязательное поле' }),
+  excursions: z.string().min(1, { message: 'Majburiy maydon' }),
+  additional: z.string().min(1, { message: 'Majburiy maydon' }),
 });

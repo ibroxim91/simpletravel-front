@@ -1,13 +1,7 @@
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/button';
 import { Calendar } from '@/shared/ui/calendar';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from '@/shared/ui/form';
+import { Form, FormControl, FormField, FormItem } from '@/shared/ui/form';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
@@ -18,6 +12,7 @@ import FlightIcon from '@mui/icons-material/Flight';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import Drawer from '@mui/material/Drawer';
 import { format } from 'date-fns';
+import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
@@ -28,6 +23,7 @@ type Props = {
 };
 
 export default function TimeStep({ onNext }: Props) {
+  const t = useTranslations();
   const [open, setOpen] = useState(false);
   const [openWhereMobile, setOpenWhereMobile] = useState(false);
   const [openWhereToMobile, setOpenWhereToMobile] = useState(false);
@@ -74,7 +70,7 @@ export default function TimeStep({ onNext }: Props) {
   return (
     <div className="relative">
       <div className="bg-[#FFFFFF] p-[20px] rounded-[20px]">
-        <h1 className="font-semibold text-[#212122] text-xl">Дата</h1>
+        <h1 className="font-semibold text-[#212122] text-xl">{t('Дата')}</h1>
         <hr className="h-[2px] my-[24px] bg-[#EDEEF1]" />
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -84,11 +80,11 @@ export default function TimeStep({ onNext }: Props) {
                 name="where"
                 render={({ field }) => (
                   <FormItem>
-                    <Label className="text-lg">Откуда</Label>
+                    <Label className="text-lg">{t('Откуда')}</Label>
                     <FormControl>
                       <div className="flex items-center gap-[16px] relative">
                         <Input
-                          placeholder="Ташкент"
+                          placeholder={t('Откуда')}
                           {...field}
                           className=" w-full h-full border-2 border-[#EDEEF1] justify-between p-[15px] rounded-md"
                         />
@@ -102,7 +98,10 @@ export default function TimeStep({ onNext }: Props) {
                         />
                       </div>
                     </FormControl>
-                    <FormMessage />
+                    <p className="text-destructive text-sm">
+                      {form.formState.errors.where &&
+                        t(form.formState.errors.where.message as string)}
+                    </p>
                   </FormItem>
                 )}
               />
@@ -111,11 +110,11 @@ export default function TimeStep({ onNext }: Props) {
                 name="whereTo"
                 render={({ field }) => (
                   <FormItem>
-                    <Label className="text-lg">Куда</Label>
+                    <Label className="text-lg">{t('Куда')}</Label>
                     <FormControl>
                       <div className="flex items-center gap-[16px] relative">
                         <Input
-                          placeholder="Ташкент"
+                          placeholder={t('Куда')}
                           {...field}
                           className=" w-full h-full border-2 border-[#EDEEF1] justify-between p-[15px] rounded-md"
                         />
@@ -129,7 +128,10 @@ export default function TimeStep({ onNext }: Props) {
                         />
                       </div>
                     </FormControl>
-                    <FormMessage />
+                    <p className="text-destructive text-sm">
+                      {form.formState.errors.whereTo &&
+                        t(form.formState.errors.whereTo.message as string)}
+                    </p>
                   </FormItem>
                 )}
               />
@@ -140,7 +142,7 @@ export default function TimeStep({ onNext }: Props) {
                 name="dispatch"
                 render={({ field }) => (
                   <FormItem>
-                    <Label className="text-lg">Дата отправления</Label>
+                    <Label className="text-lg">{t('Дата отправления')}</Label>
                     <FormControl>
                       <div>
                         <div className="max-lg:hidden">
@@ -162,7 +164,7 @@ export default function TimeStep({ onNext }: Props) {
                                 />
                                 {field.value
                                   ? format(field.value, 'dd.MM.yyyy')
-                                  : 'Когда'}
+                                  : t('Когда')}
                               </button>
                             </PopoverTrigger>
                             <PopoverContent
@@ -201,7 +203,7 @@ export default function TimeStep({ onNext }: Props) {
                             />
                             {field.value
                               ? format(field.value, 'dd.MM.yyyy')
-                              : 'Когда'}
+                              : t('Когда')}
                           </button>
                           <Drawer
                             anchor="bottom"
@@ -221,7 +223,7 @@ export default function TimeStep({ onNext }: Props) {
                             <div className="flex flex-col gap-4 w-full font-medium">
                               <div className="flex items-center justify-between">
                                 <p className="text-lg font-semibold">
-                                  Дата отправления
+                                  {t('Дата отправления')}
                                 </p>
                                 <Button
                                   variant={'outline'}
@@ -249,7 +251,10 @@ export default function TimeStep({ onNext }: Props) {
                         </div>
                       </div>
                     </FormControl>
-                    <FormMessage />
+                    <p className="text-destructive text-sm">
+                      {form.formState.errors.dispatch &&
+                        t(form.formState.errors.dispatch.message as string)}
+                    </p>
                   </FormItem>
                 )}
               />
@@ -258,7 +263,7 @@ export default function TimeStep({ onNext }: Props) {
                 name="returned"
                 render={({ field }) => (
                   <FormItem>
-                    <Label className="text-lg">Время возвращения</Label>
+                    <Label className="text-lg">{t('Время возвращения')}</Label>
                     <FormControl>
                       <div>
                         <div className="max-lg:hidden">
@@ -283,7 +288,7 @@ export default function TimeStep({ onNext }: Props) {
                                 />
                                 {field.value
                                   ? format(field.value, 'dd.MM.yyyy')
-                                  : 'Когда'}
+                                  : t('Когда')}
                               </button>
                             </PopoverTrigger>
                             <PopoverContent
@@ -322,7 +327,7 @@ export default function TimeStep({ onNext }: Props) {
                             />
                             {field.value
                               ? format(field.value, 'dd.MM.yyyy')
-                              : 'Когда'}
+                              : t('Когда')}
                           </button>
                           <Drawer
                             anchor="bottom"
@@ -342,7 +347,7 @@ export default function TimeStep({ onNext }: Props) {
                             <div className="flex flex-col gap-4 w-full font-medium">
                               <div className="flex items-center justify-between">
                                 <p className="text-lg font-semibold">
-                                  Время возвращения
+                                  {t('Время возвращения')}
                                 </p>
                                 <Button
                                   variant={'outline'}
@@ -370,7 +375,10 @@ export default function TimeStep({ onNext }: Props) {
                         </div>
                       </div>
                     </FormControl>
-                    <FormMessage />
+                    <p className="text-destructive text-sm">
+                      {form.formState.errors.returned &&
+                        t(form.formState.errors.returned.message as string)}
+                    </p>
                   </FormItem>
                 )}
               />
@@ -382,7 +390,7 @@ export default function TimeStep({ onNext }: Props) {
         className="mt-5 w-96 max-lg:w-full py-8 cursor-pointer text-lg rounded-full bg-[#1764FC]"
         onClick={form.handleSubmit(onSubmit)}
       >
-        Следующий
+        {t('Следующий')}
       </Button>
     </div>
   );

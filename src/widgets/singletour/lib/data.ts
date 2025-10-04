@@ -125,3 +125,74 @@ export const hotelAdditionalInfo: IHotel[] = [
   { title: 'Размер группы', name: '50 человек', icon: Hotel3.src },
   { title: 'Языки', name: 'Английский, Испанский', icon: Hotel4.src },
 ];
+
+export interface ToursDetail {
+  status: boolean;
+  data: {
+    id: number;
+    title: string;
+    price: number;
+    departure_date: string;
+    departure: string;
+    destination: string;
+    languages: string;
+    passenger_count: number;
+    rating: number;
+    hotel_info: string;
+    duration_days: number;
+    hotel_meals: string;
+    ticket_images: [
+      {
+        image: string;
+      },
+    ];
+    ticket_amenities: [{ icon_name: string; name: string }];
+    ticket_included_services: [
+      {
+        image: string;
+        title: string;
+        desc: string;
+      },
+    ];
+    ticket_itinerary: [
+      {
+        title: string;
+        duration: number;
+        ticket_itinerary_image: [
+          {
+            image: string;
+          },
+        ];
+        ticket_itinerary_destinations: [
+          {
+            name: string;
+          },
+        ];
+      },
+    ];
+    ticket_hotel_meals: [
+      {
+        image: string;
+        name: string;
+        desc: string;
+      },
+    ];
+    travel_agency_id: string;
+    ticket_comments: [
+      {
+        user: {
+          id: number;
+          username: string;
+        };
+        text: string;
+        rating: number;
+      },
+    ];
+    tariff: [
+      {
+        name: string;
+      },
+    ];
+    is_liked: string;
+  };
+}

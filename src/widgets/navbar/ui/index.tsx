@@ -21,9 +21,8 @@ import CitySelectMobile from './CitySelectMobile';
 import MobileNavbar from './MobileNavbar';
 
 const Navbar = () => {
-  const t = useTranslations();
   const pathname = usePathname();
-
+  const t = useTranslations();
   const [openMobie, setOpenMobile] = useState(false);
 
   const links = [
@@ -59,7 +58,7 @@ const Navbar = () => {
                 <EmailIcon
                   sx={{ color: 'white', width: '24px', height: '24px' }}
                 />
-                <p className="text-sm">{t('Tourex@gmail.com')}</p>
+                <p className="text-sm">Tourex@gmail.com</p>
               </Link>
               <div className="w-[1px] h-[60%] bg-white max-lg:hidden" />
               <Link
@@ -77,14 +76,16 @@ const Navbar = () => {
         <div className="bg-[#FFFFFF] w-full shadow-sm rounded-b-2xl p-2">
           <div className="flex justify-between custom-container w-full">
             <div className="w-full h-16 flex items-center gap-8">
-              <Image
-                src={Logo}
-                alt="Logo"
-                width={120}
-                height={40}
-                priority
-                className="h-auto w-auto"
-              />
+              <Link href={'/'}>
+                <Image
+                  src={Logo}
+                  alt="Logo"
+                  width={120}
+                  height={40}
+                  priority
+                  className="h-auto w-auto"
+                />
+              </Link>
               <div className="flex gap-4 items-center justify-center h-full max-lg:hidden">
                 {links.map(({ href, label }) => (
                   <div
@@ -119,7 +120,7 @@ const Navbar = () => {
                 </IconButton>
               </Link>
               <div className="w-[1px] h-[30%] bg-ring" />
-              {/* <Link href={'/auth/register'}>
+              <Link href={'/auth/register'}>
                 <Button
                   variant="contained"
                   size="large"
@@ -130,8 +131,8 @@ const Navbar = () => {
                   />
                   <p>{t('Войти')}</p>
                 </Button>
-              </Link> */}
-              <Link href={'/profile?tabs=profile'}>
+              </Link>
+              {/* <Link href={'/profile?tabs=profile'}>
                 <Button
                   variant="contained"
                   size="large"
@@ -140,14 +141,15 @@ const Navbar = () => {
                   <PersonIcon
                     sx={{ color: 'white', width: '24px', height: '24px' }}
                   />
-                  <p>{t('Профиль')}</p>
+                  <p>{t("Профиль")}</p>
                 </Button>
-              </Link>
+              </Link> */}
             </div>
             <div className="flex items-center gap-4 lg:hidden">
               <IconButton
                 onClick={() => setOpenMobile(true)}
                 sx={{ border: '1px solid gray' }}
+                aria-label="Open-menu"
               >
                 <MenuIcon
                   sx={{ color: 'black', width: '20px', height: '20px' }}
@@ -178,7 +180,7 @@ const Navbar = () => {
                 e.href === pathname ? 'text-[#084FE3]' : 'text-[#646465]',
               )}
             >
-              {e.label}
+              {t(e.label)}
             </p>
           </Link>
         ))}

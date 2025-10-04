@@ -12,6 +12,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import clsx from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import ParticipantsStep from './ParticipantsStep';
 import PaymentStep from './PaymentStep';
@@ -20,6 +21,7 @@ import TimeStep from './TimeStep';
 import TourInfoStep from './TourInfoStep';
 
 export default function Booking() {
+  const t = useTranslations();
   const route = useRouter();
   const tabSteps: Record<string, number> = {
     time: 1,
@@ -52,12 +54,12 @@ export default function Booking() {
         }}
       >
         <Link href="/" className="font-medium text-[#646465]">
-          Главная страница
+          {t('Главная')}
         </Link>
-        <Link href={'/tours'} className="text-[#646465] font-medium">
-          Подобрать тур
+        <Link href={'/selectour'} className="text-[#646465] font-medium">
+          {t('Подобрать тур')}
         </Link>
-        <p className="text-[#646465] font-medium">Забронировать</p>
+        <p className="text-[#646465] font-medium">{t('Забронировать')}</p>
       </Breadcrumbs>
 
       <div className="flex items-center gap-[16px] mt-[20px]">
@@ -68,7 +70,7 @@ export default function Booking() {
           <ChevronLeftIcon sx={{ color: '#031753' }} />
         </div>
         <h1 className="text-[#031753] text-[32px] font-semibold">
-          Забронировать
+          {t('Забронировать')}
         </h1>
       </div>
 
@@ -97,7 +99,7 @@ export default function Booking() {
                 <div className="flex gap-4">
                   <CalendarMonthIcon sx={{ width: '28px', height: '28px' }} />
                   <p className={clsx('text-lg', step !== 1 && 'text-black')}>
-                    Дата
+                    {t('Дата')}
                   </p>
                 </div>
                 <div className="flex flex-col items-center justify-center absolute right-5 bottom-0">
@@ -152,7 +154,7 @@ export default function Booking() {
                           : 'text-[#000]',
                     )}
                   >
-                    Участники
+                    {t('Участники')}
                   </p>
                 </div>
                 <div className="flex flex-col items-center justify-center absolute right-5 bottom-0">
@@ -235,7 +237,7 @@ export default function Booking() {
                           : 'text-[#000]',
                     )}
                   >
-                    Отели
+                    {t('Отели')}
                   </p>
                 </div>
                 <div className="flex flex-col items-center justify-center absolute right-5 bottom-0">
@@ -318,7 +320,7 @@ export default function Booking() {
                           : 'text-[#000]',
                     )}
                   >
-                    Услуги
+                    {t('Услуги')}
                   </p>
                 </div>
                 <div className="flex flex-col items-center justify-center absolute right-5 bottom-0">
@@ -401,7 +403,7 @@ export default function Booking() {
                           : 'text-[#000]',
                     )}
                   >
-                    Оплата
+                    {t('Оплата')}
                   </p>
                 </div>
                 <div className="flex flex-col items-center justify-center absolute right-5 top-0">

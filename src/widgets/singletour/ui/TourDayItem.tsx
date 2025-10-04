@@ -2,35 +2,48 @@ import ContactSupportIcon from '@mui/icons-material/ContactSupport';
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import clsx from 'clsx';
 import Image from 'next/image';
-import TourDay1 from '../../../../public/images/tourday1.png';
 
 type Props = {
   isLast?: boolean;
   isFirst?: boolean;
+  data: {
+    title: string;
+    duration: number;
+    ticket_itinerary_image: [
+      {
+        image: string;
+      },
+    ];
+    ticket_itinerary_destinations: [
+      {
+        name: string;
+      },
+    ];
+  };
 };
 
-export default function TourDayItem({ isLast, isFirst }: Props) {
+export default function TourDayItem({ isLast, isFirst, data }: Props) {
   return (
     <div className="flex items-center gap-[20px] relative max-lg:h-[800px] max-lg:flex-col">
       <div className="mt-[16px] max-lg:mt-2 py-[12px] w-[90%] max-lg:w-full max-lg:flex-col max-lg:h-auto px-[12px] flex items-center gap-[20px] bg-[#FFFFFF] rounded-[20px] cursor-pointer">
         <div className="w-[270px] h-[164px] relative max-lg:w-full max-lg:h-auto">
           <Image
-            src={TourDay1.src}
+            src={data.ticket_itinerary_image[0].image}
             width={500}
             height={500}
-            alt={TourDay1.src}
-            className="object-cover w-full h-full"
+            alt={data.title}
+            className="object-cover w-full h-full max-lg:h-[300px]"
           />
         </div>
 
         <div>
-          <h1 className="text-2xl font-semibold">
-            День 1–2 — Бухара (Узбекистан)
-          </h1>
+          <h1 className="text-2xl font-semibold">{data.title}</h1>
           <ul className="flex list-disc list-inside items-center gap-[16px] mt-[16px] text-sm text-[#636363] max-lg:flex-col max-lg:items-start">
-            <li className="marker:text-[#084FE3]">Комплекс Пои-Калян</li>
-            <li className="marker:text-[#084FE3]">Крепость Арк</li>
-            <li className="marker:text-[#084FE3]">Ляби-Хауз</li>
+            {data.ticket_itinerary_destinations.map((e) => (
+              <li className="marker:text-[#084FE3]" key={e.name}>
+                {e.name}
+              </li>
+            ))}
           </ul>
 
           <div className="flex items-center gap-[8px] mt-[24px]">
@@ -46,7 +59,9 @@ export default function TourDayItem({ isLast, isFirst }: Props) {
               sx={{ height: '26px', width: '26px', color: '#084FE3' }}
             />
 
-            <p className="text-[#636363]">Продолжительность: 4 дней</p>
+            <p className="text-[#636363]">
+              Продолжительность: {data.duration} дней
+            </p>
           </div>
         </div>
       </div>

@@ -1,4 +1,6 @@
+import '@fortawesome/fontawesome-svg-core/styles.css'; // MUHIM
 import { ReactNode } from 'react';
+import '../types/fontawesome'; // iconlarni initialize qilish uchun
 
 type Props = {
   children: ReactNode;

@@ -1,20 +1,44 @@
-function Checkbox({
+import { Checkbox } from '@/shared/ui/checkbox';
+import { Label } from '@/shared/ui/label';
+import { Dispatch, SetStateAction } from 'react';
+
+function CheckboxFilter({
   label,
-  defaultChecked,
+  setChecked,
+  value,
+  selectedValue,
+  exclusive,
 }: {
   label: string;
+  value: string;
   defaultChecked?: boolean;
+  selectedValue?: string | null;
+  exclusive?: boolean;
+  setChecked?: Dispatch<SetStateAction<string | null>>;
 }) {
+  const isChecked = exclusive ? selectedValue === value : undefined;
   return (
-    <label className="flex items-center gap-3 cursor-pointer">
-      <input
-        type="checkbox"
-        defaultChecked={defaultChecked}
-        className="w-4 h-4 !text-[#1764FC] border border-[#1764FC] rounded-[10px] !bg-gray-100 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+    <label className="flex items-center gap-3 cursor-pointer mt-2">
+      <Checkbox
+        id={label}
+        checked={isChecked}
+        value={value}
+        className="cursor-pointer"
+        onCheckedChange={(checked) => {
+          if (!setChecked) return;
+
+          if (exclusive) {
+            setChecked(checked ? value : null);
+          } else {
+            setChecked(checked ? value : null);
+          }
+        }}
       />
-      <span className="text-gray-700">{label}</span>
+      <Label className="text-gray-700 text-md cursor-pointer" htmlFor={label}>
+        {label}
+      </Label>
     </label>
   );
 }
 
-export default Checkbox;
+export default CheckboxFilter;

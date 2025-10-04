@@ -1,9 +1,9 @@
-import { Link } from '@/shared/config/i18n/navigation';
 import formatDate from '@/shared/lib/formatDate';
 import { Button } from '@/shared/ui/button';
 import { Calendar } from '@/shared/ui/calendar';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
+import Ticket_Api from '@/widgets/selectour/lib/api';
 import AddIcon from '@mui/icons-material/Add';
 import AirplanemodeActiveIcon from '@mui/icons-material/AirplanemodeActive';
 import ArrowDropUpOutlinedIcon from '@mui/icons-material/ArrowDropUpOutlined';
@@ -13,11 +13,34 @@ import DoneIcon from '@mui/icons-material/Done';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import RemoveIcon from '@mui/icons-material/Remove';
 import SearchIcon from '@mui/icons-material/Search';
+import { useQuery } from '@tanstack/react-query';
 
-import { useState } from 'react';
+import { useRouter } from '@/shared/config/i18n/navigation';
+import { useTranslations } from 'next-intl';
+import { useEffect, useState } from 'react';
 import { DateRange } from 'react-day-picker';
+import { useFilterToursStore } from '../lib/store';
 
 const FilterTours = () => {
+  const t = useTranslations();
+  const route = useRouter();
+  const {
+    setStoreDate,
+    from,
+    date,
+    setStoreToDate,
+    toDate: toDateStore,
+    selectData: selectDataStore,
+    setStoreSelectData,
+    where: wherStore,
+    adults: adultsStore,
+    children: childrenStore,
+    setAdults: setAdultsStore,
+    setChildren: setChildrenStore,
+    setStoreFrom,
+    setStoreWhere,
+    setStorePassenger,
+  } = useFilterToursStore();
   const [openCity, setOpenCity] = useState(false);
   const [ageOpen, setAgeOpen] = useState(false);
   const [where, setWhere] = useState(false);
@@ -28,20 +51,107 @@ const FilterTours = () => {
   const [searchWhere, setSearchWhere] = useState('');
   const [fromDate, setFromDate] = useState<Date | undefined>();
   const [toDate, setToDate] = useState<Date | undefined>();
-  const [selectData, setSelectData] = useState<string>();
+  const [selectData, setSelectData] = useState<string>('');
   const [adults, setAdults] = useState<number>(0);
   const [children, setChildren] = useState<number>(0);
   const selectAge = adults + children;
   const [range, setRange] = useState<DateRange | undefined>();
+  const [cities, setCities] = useState<string[] | []>([]);
+  const [citiesWhere, setCitiesWhere] = useState<string[] | []>([]);
 
-  const cities = ['Самарканд', 'Бухара', 'Наваи', 'Бишкек', 'Казан', 'Астана'];
+  const { data: ticket } = useQuery({
+    queryKey: ['ticket_all'],
+    queryFn: () =>
+      Ticket_Api.GetAllTickets({
+        params: {
+          page: 1,
+          page_size: 8,
+        },
+      }),
+  });
+
+  useEffect(() => {
+    if (ticket) {
+      const uniqueCities = Array.from(
+        new Set(
+          ticket.data.results.tickets.slice(0, 8).map((e) => e.departure),
+        ),
+      );
+      setCities(uniqueCities);
+    }
+  }, [ticket]);
+
+  useEffect(() => {
+    if (ticket) {
+      const uniqueCities = Array.from(
+        new Set(
+          ticket.data.results.tickets.slice(0, 8).map((e) => e.destination),
+        ),
+      );
+      setCitiesWhere(uniqueCities);
+    }
+  }, [ticket]);
+
+  // const cities = ['Самарканд', 'Бухара', 'Наваи', 'Бишкек', 'Казан', 'Астана'];
   const filteredCities = cities.filter((c) =>
     c.toLowerCase().includes(search.toLowerCase()),
   );
 
-  const filteredCitiesWhere = cities.filter((c) =>
+  const filteredCitiesWhere = citiesWhere.filter((c) =>
     c.toLowerCase().includes(searchWhere.toLowerCase()),
   );
+
+  useEffect(() => {
+    if (from) {
+      setSearch(from);
+      setSelectedCity(from);
+    }
+    if (wherStore) {
+      setSearchWhere(wherStore);
+      setSelectedWhere(wherStore);
+    }
+    if (date) {
+      setFromDate(date);
+    }
+    if (toDateStore) {
+      setToDate(toDateStore);
+    }
+    if (selectDataStore) {
+      setSelectData(selectDataStore);
+    }
+    if (adultsStore) {
+      setAdults(adultsStore);
+    }
+
+    if (childrenStore) {
+      setChildren(childrenStore);
+    }
+    if (date && toDateStore) {
+      setRange({ from: date, to: toDateStore });
+      setFromDate(date);
+      setToDate(toDateStore);
+    }
+  }, [
+    from,
+    wherStore,
+    date,
+    selectDataStore,
+    toDateStore,
+    childrenStore,
+    adultsStore,
+  ]);
+
+  const saveFilter = () => {
+    setStoreDate(fromDate);
+    setStoreFrom(search);
+    setStoreToDate(toDate);
+    setStoreWhere(searchWhere);
+    setStoreSelectData(selectData);
+    setStorePassenger(adults + children);
+    setAdultsStore(adults);
+    setChildrenStore(children);
+    route.push('/selectour');
+  };
 
   return (
     <div className="mt-10 bg-white shadow-sm py-4 gap-4 w-full rounded-3xl grid grid-cols-5 items-center px-10 max-lg:hidden font-medium">
@@ -53,13 +163,16 @@ const FilterTours = () => {
           }}
           className="cursor-pointer flex flex-col gap-2"
         >
-          <Label className="font-semibold text-md ">Откуда</Label>
+          <Label className="font-semibold text-md ">{t('Откуда')}</Label>
           <div className="relative">
             <Input
               className="h-[60px] text-md placeholder:text-md"
-              placeholder="Ташкент"
-              value={selectedCity}
-              readOnly
+              placeholder={t('Откуда')}
+              value={search || selectedCity}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setSelectedCity(e.target.value);
+              }}
             />
             <LocationOnIcon
               sx={{
@@ -103,7 +216,7 @@ const FilterTours = () => {
             <div className="relative mb-2">
               <SearchIcon className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400" />
               <Input
-                placeholder="Укажите город"
+                placeholder={t('Укажите город')}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full pl-10 text-black"
@@ -119,6 +232,7 @@ const FilterTours = () => {
                   className="p-2 hover:bg-gray-200 rounded-lg text-black items-center cursor-pointer flex justify-between"
                   onClick={() => {
                     setSelectedCity(cityName);
+                    setSearch(cityName);
                     setOpenCity(false);
                   }}
                 >
@@ -129,7 +243,7 @@ const FilterTours = () => {
                 </div>
               ))
             ) : (
-              <div className="p-2 text-black">Hech narsa topilmadi</div>
+              <div className="p-2 text-black">{t('Не найдено')}</div>
             )}
           </div>
         )}
@@ -143,13 +257,16 @@ const FilterTours = () => {
           }}
           className="cursor-pointer flex flex-col gap-2"
         >
-          <Label className="font-semibold text-md ">Куда</Label>
+          <Label className="font-semibold text-md ">{t('Куда')}</Label>
           <div className="relative">
             <Input
               className="h-[60px] text-md placeholder:text-md"
-              placeholder="Страна, курорт"
-              value={selectedWhere}
-              readOnly
+              placeholder={t('Страна, курорт')}
+              value={searchWhere || selectedWhere}
+              onChange={(e) => {
+                setSearchWhere(e.target.value);
+                setSelectedWhere(e.target.value);
+              }}
             />
             <AirplanemodeActiveIcon
               sx={{
@@ -193,7 +310,7 @@ const FilterTours = () => {
             <div className="relative mb-2">
               <SearchIcon className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400" />
               <Input
-                placeholder="Укажите город"
+                placeholder={t('Укажите город')}
                 value={searchWhere}
                 onChange={(e) => setSearchWhere(e.target.value)}
                 className="w-full pl-10 text-black"
@@ -209,6 +326,7 @@ const FilterTours = () => {
                   className="p-2 hover:bg-gray-200 rounded-lg text-black items-center cursor-pointer flex justify-between"
                   onClick={() => {
                     setSelectedWhere(cityName);
+                    setSearchWhere(cityName);
                     setWhere(false);
                   }}
                 >
@@ -219,7 +337,7 @@ const FilterTours = () => {
                 </div>
               ))
             ) : (
-              <div className="p-2 text-black">Hech narsa topilmadi</div>
+              <div className="p-2 text-black">{t('Не найдено')}</div>
             )}
           </div>
         )}
@@ -232,11 +350,13 @@ const FilterTours = () => {
           }}
           className="cursor-pointer flex flex-col gap-2"
         >
-          <Label className="font-semibold text-md">Дата отправления</Label>
+          <Label className="font-semibold text-md">
+            {t('Дата отправления')}
+          </Label>
           <div className="relative">
             <Input
               className="h-[60px] text-md placeholder:text-md"
-              placeholder="Когда"
+              placeholder={t('Когда')}
               value={selectData}
               readOnly
             />
@@ -281,7 +401,7 @@ const FilterTours = () => {
           >
             <div className="flex gap-2 items-center">
               <Input
-                placeholder="Когда"
+                placeholder={t('Когда')}
                 value={
                   fromDate ? formatDate.format(fromDate, 'DD/MM/YYYY') : ''
                 }
@@ -295,7 +415,7 @@ const FilterTours = () => {
                 sx={{ width: '28px', height: '28px' }}
               />
               <Input
-                placeholder="Выезд"
+                placeholder={t('Выезд')}
                 value={toDate ? formatDate.format(toDate, 'DD/MM/YYYY') : ''}
                 disabled={fromDate === undefined}
                 onChange={(e) => setSearch(e.target.value)}
@@ -324,9 +444,14 @@ const FilterTours = () => {
                   setDataOpen(false);
                   setFromDate(undefined);
                   setToDate(undefined);
+                  setRange(undefined);
+                  setStoreDate(undefined);
+                  setSelectData('');
+                  setStoreSelectData('');
+                  setStoreToDate(undefined);
                 }}
               >
-                Отмена
+                {t('Отмена')}
               </button>
               <button
                 className="bg-blue-600 rounded-3xl text-white"
@@ -341,7 +466,7 @@ const FilterTours = () => {
                   }
                 }}
               >
-                Применять
+                {t('Применять')}
               </button>
             </div>
           </div>
@@ -351,15 +476,15 @@ const FilterTours = () => {
       <div className="relative gap-2 h-full ">
         <div
           onClick={() => {
-            setAgeOpen(!where);
+            setAgeOpen(!ageOpen);
           }}
           className="cursor-pointer flex flex-col gap-2"
         >
-          <Label className="font-semibold text-md">Туристы</Label>
+          <Label className="font-semibold text-md">{t('Туристы')}</Label>
           <div className="relative">
             <Input
               className="h-[60px] text-md placeholder:text-md"
-              placeholder="2 Вызрослых"
+              placeholder={t('Туристы')}
               value={selectAge === 0 ? '' : selectAge}
               readOnly
             />
@@ -394,8 +519,8 @@ const FilterTours = () => {
           >
             <div className="flex justify-between">
               <Label className="flex flex-col gap-0 items-start">
-                <p className="font-semibold text-lg">2 Вызрослых</p>
-                <p className="text-ring text-sm">старше 13 лет</p>
+                <p className="font-semibold text-lg">{t('Вызрослых')}</p>
+                <p className="text-ring text-sm">{t('старше 13 лет')}</p>
               </Label>
               <div className="grid grid-cols-3 border justify-center items-center rounded-lg w-48">
                 <Button
@@ -426,8 +551,8 @@ const FilterTours = () => {
             </div>
             <div className="flex justify-between mt-5">
               <Label className="flex flex-col gap-0 items-start">
-                <p className="font-semibold text-lg">Дети</p>
-                <p className="text-ring text-sm">до 13 лет</p>
+                <p className="font-semibold text-lg">{t('Дети')}</p>
+                <p className="text-ring text-sm">{t('до 13 лет')}</p>
               </Label>
               <div className="grid grid-cols-3 border justify-center items-center rounded-lg w-48">
                 <Button
@@ -462,12 +587,12 @@ const FilterTours = () => {
 
       <div className="flex flex-col gap-2">
         <div className="h-[25px]" />
-        <Link
-          href={'#'}
-          className="bg-blue-600 text-white h-[60px] flex items-center justify-center rounded-4xl text-center font-semibold"
+        <Button
+          className="bg-blue-600 text-lg text-white h-[60px] flex items-center justify-center rounded-4xl text-center font-semibold cursor-pointer"
+          onClick={saveFilter}
         >
-          <p>Искать туры</p>
-        </Link>
+          <p>{t('Искать туры')}</p>
+        </Button>
       </div>
     </div>
   );

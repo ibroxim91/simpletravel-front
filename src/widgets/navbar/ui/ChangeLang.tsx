@@ -1,6 +1,5 @@
 'use client';
 
-import EN from '@/assets/GB.png';
 import RU from '@/assets/RU.png';
 import UZ from '@/assets/UZ.png';
 import { LanguageRoutes } from '@/shared/config/i18n/types';
@@ -20,9 +19,9 @@ import { useState } from 'react';
 
 export function ChangeLang() {
   const { locale } = useParams<{ locale: LanguageRoutes }>();
+  const t = useTranslations();
   const pathname = usePathname();
   const router = useRouter();
-  const t = useTranslations();
   const [open, setOpen] = useState(false);
 
   const languages: {
@@ -30,9 +29,9 @@ export function ChangeLang() {
     label: string;
     flag: StaticImageData;
   }[] = [
-    { code: LanguageRoutes.UZ, label: t('Oʻzbekcha'), flag: UZ },
-    { code: LanguageRoutes.RU, label: t('Русский'), flag: RU },
-    { code: LanguageRoutes.EN, label: t('English'), flag: EN },
+    { code: LanguageRoutes.UZ, label: 'Oʻzbekcha', flag: UZ },
+    { code: LanguageRoutes.RU, label: 'Русский', flag: RU },
+    // { code: LanguageRoutes.EN, label: 'English', flag: EN },
   ];
 
   const changeLocale = (newLocale: LanguageRoutes) => {
@@ -56,10 +55,13 @@ export function ChangeLang() {
         value={locale}
         onValueChange={(newLocale: LanguageRoutes) => changeLocale(newLocale)}
       >
-        <SelectTrigger className="w-auto p-0 border-none bg-transparent cursor-pointer shadow-none focus:ring-0 focus:outline-none gap-2">
+        <SelectTrigger
+          className="w-auto p-0 border-none bg-transparent cursor-pointer shadow-none focus:ring-0 focus:outline-none gap-2"
+          aria-label="Open menu language"
+        >
           <PublicIcon sx={{ color: 'white', width: '24px', height: '24px' }} />
           <p className="text-md text-white font-medium">
-            {languages.find((l) => l.code === locale)?.label}
+            {t(languages.find((l) => l.code === locale)?.label || 'Русский')}
           </p>
         </SelectTrigger>
         {open && (
@@ -89,7 +91,7 @@ export function ChangeLang() {
                   width={24}
                   height={24}
                 />
-                <p className="font-medium text-sm">{lang.label}</p>
+                <p className="font-medium text-sm">{t(lang.label)}</p>
               </SelectItem>
             ))}
           </SelectGroup>

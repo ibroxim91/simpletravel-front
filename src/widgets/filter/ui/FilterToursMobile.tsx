@@ -1,4 +1,4 @@
-import { Link } from '@/shared/config/i18n/navigation';
+import { useRouter } from '@/shared/config/i18n/navigation';
 import formatDate from '@/shared/lib/formatDate';
 import { Button } from '@/shared/ui/button';
 import { Calendar } from '@/shared/ui/calendar';
@@ -14,14 +14,34 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import RemoveIcon from '@mui/icons-material/Remove';
 import SearchIcon from '@mui/icons-material/Search';
 import Drawer from '@mui/material/Drawer';
-import clsx from 'clsx';
-import { useTranslations } from 'next-intl';
 
-import { useState } from 'react';
+import Ticket_Api from '@/widgets/selectour/lib/api';
+import { useQuery } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
+import { useEffect, useState } from 'react';
 import { DateRange } from 'react-day-picker';
+import { useFilterToursStore } from '../lib/store';
 
 const FilterToursMobile = () => {
   const t = useTranslations();
+  const route = useRouter();
+  const {
+    setStoreDate,
+    from,
+    date,
+    setStoreToDate,
+    toDate: toDateStore,
+    selectData: selectDataStore,
+    setStoreSelectData,
+    where: wherStore,
+    adults: adultsStore,
+    children: childrenStore,
+    setAdults: setAdultsStore,
+    setChildren: setChildrenStore,
+    setStoreFrom,
+    setStoreWhere,
+    setStorePassenger,
+  } = useFilterToursStore();
   const [openCityMobile, setOpenCityMobile] = useState(false);
   const [ageOpen, setAgeOpen] = useState(false);
   const [dataOpenMobile, setDataOpenMobile] = useState(false);
@@ -33,19 +53,109 @@ const FilterToursMobile = () => {
   const [searchWhere, setSearchWhere] = useState('');
   const [fromDate, setFromDate] = useState<Date | undefined>();
   const [toDate, setToDate] = useState<Date | undefined>();
-  const [selectData, setSelectData] = useState<string>();
+  const [selectData, setSelectData] = useState<string>('');
   const [adults, setAdults] = useState<number>(0);
   const [range, setRange] = useState<DateRange | undefined>();
   const [children, setChildren] = useState<number>(0);
+  const [cities, setCities] = useState<string[] | []>([]);
+  const [citiesWhere, setCitiesWhere] = useState<string[] | []>([]);
 
-  const cities = ['Самарканд', 'Бухара', 'Наваи', 'Бишкек', 'Казан', 'Астана'];
+  const { data: ticket } = useQuery({
+    queryKey: ['ticket_all'],
+    queryFn: () =>
+      Ticket_Api.GetAllTickets({
+        params: {
+          page: 1,
+          page_size: 8,
+        },
+      }),
+  });
+
+  useEffect(() => {
+    if (ticket) {
+      const uniqueCities = Array.from(
+        new Set(
+          ticket.data.results.tickets.slice(0, 8).map((e) => e.departure),
+        ),
+      );
+      setCities(uniqueCities);
+    }
+  }, [ticket]);
+
+  useEffect(() => {
+    if (ticket) {
+      const uniqueCities = Array.from(
+        new Set(
+          ticket.data.results.tickets.slice(0, 8).map((e) => e.destination),
+        ),
+      );
+      setCitiesWhere(uniqueCities);
+    }
+  }, [ticket]);
+
   const filteredCities = cities.filter((c) =>
     c.toLowerCase().includes(search.toLowerCase()),
   );
 
-  const filteredCitiesWhere = cities.filter((c) =>
+  const filteredCitiesWhere = citiesWhere.filter((c) =>
     c.toLowerCase().includes(searchWhere.toLowerCase()),
   );
+
+  useEffect(() => {
+    if (from) {
+      setSearch(from);
+      setSelectedCity(from);
+    }
+    if (wherStore) {
+      setSearchWhere(wherStore);
+      setSelectedWhere(wherStore);
+    }
+    if (date) {
+      setFromDate(date);
+    }
+    if (toDateStore) {
+      setToDate(toDateStore);
+    }
+    if (selectDataStore) {
+      setSelectData(selectDataStore);
+    }
+    if (adultsStore) {
+      setAdults(adultsStore);
+    }
+
+    if (adultsStore && childrenStore) {
+      setSelectAge(adultsStore + childrenStore);
+    }
+
+    if (childrenStore) {
+      setChildren(childrenStore);
+    }
+    if (date && toDateStore) {
+      setRange({ from: date, to: toDateStore });
+      setFromDate(date);
+      setToDate(toDateStore);
+    }
+  }, [
+    from,
+    wherStore,
+    date,
+    selectDataStore,
+    toDateStore,
+    childrenStore,
+    adultsStore,
+  ]);
+
+  const saveFilter = () => {
+    setStoreDate(fromDate);
+    setStoreFrom(search);
+    setStoreToDate(toDate);
+    setStoreWhere(searchWhere);
+    setStoreSelectData(selectData);
+    setStorePassenger(adults + children);
+    setAdultsStore(adults);
+    setChildrenStore(children);
+    route.push('/selectour');
+  };
 
   return (
     <div className="mt-20 bg-white shadow-sm py-4 gap-4 w-full rounded-3xl grid grid-cols-1 items-center px-10 min-lg:hidden font-medium">
@@ -54,12 +164,12 @@ const FilterToursMobile = () => {
           onClick={() => setOpenCityMobile(!openCityMobile)}
           className="cursor-pointer flex flex-col w-full gap-2"
         >
-          <Label className="font-semibold text-md ">Откуда</Label>
+          <Label className="font-semibold text-md ">{t('Откуда')}</Label>
           <div className="relative w-full">
             <Input
-              className="h-[60px] w-full text-md placeholder:text-md"
-              placeholder="Ташкент"
-              value={selectedCity}
+              className="h-[60px] text-md placeholder:text-md"
+              placeholder={t('Откуда')}
+              value={search || selectedCity}
               readOnly
             />
             <LocationOnIcon
@@ -102,10 +212,13 @@ const FilterToursMobile = () => {
             </div>
             <div className="relative">
               <Input
-                placeholder="Укажите город"
+                placeholder={t('Укажите город')}
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-10 text-black h-[60px]"
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setSelectedCity(e.target.value);
+                }}
+                className="w-full pl-10 text-black"
                 onClick={(e) => e.stopPropagation()}
                 onFocus={(e) => e.stopPropagation()}
               />
@@ -127,6 +240,7 @@ const FilterToursMobile = () => {
                     className="p-2 hover:bg-gray-200 rounded-lg text-black items-center cursor-pointer flex justify-between"
                     onClick={() => {
                       setSelectedCity(cityName);
+                      setSearch(cityName);
                       setOpenCityMobile(false);
                     }}
                   >
@@ -137,7 +251,7 @@ const FilterToursMobile = () => {
                   </div>
                 ))
               ) : (
-                <div className="p-2 text-black">Hech narsa topilmadi</div>
+                <div className="p-2 text-black">{t('Не найдено')}</div>
               )}
             </div>
           </div>
@@ -149,12 +263,12 @@ const FilterToursMobile = () => {
           onClick={() => setWhereMobile(!whereMobile)}
           className="cursor-pointer flex flex-col gap-2 w-full"
         >
-          <Label className="font-semibold text-md">Куда</Label>
+          <Label className="font-semibold text-md">{t('Куда')}</Label>
           <div className="relative">
             <Input
               className="h-[60px] text-md placeholder:text-md"
-              placeholder="Страна, курорт"
-              value={selectedWhere}
+              placeholder={t('Страна, курорт')}
+              value={searchWhere || selectedWhere}
               readOnly
             />
             <AirplanemodeActiveIcon
@@ -198,10 +312,15 @@ const FilterToursMobile = () => {
             </div>
             <div className="relative">
               <Input
-                placeholder={t('Поиск')}
+                placeholder={t('Укажите город')}
                 value={searchWhere}
-                onChange={(e) => setSearchWhere(e.target.value)}
-                className="w-full pl-12 text-base h-[60px]"
+                onChange={(e) => {
+                  setSearchWhere(e.target.value);
+                  setSelectedWhere(e.target.value);
+                }}
+                className="w-full pl-10 text-black"
+                onClick={(e) => e.stopPropagation()}
+                onFocus={(e) => e.stopPropagation()}
               />
               <SearchIcon
                 sx={{
@@ -221,6 +340,7 @@ const FilterToursMobile = () => {
                     className="p-2 hover:bg-gray-200 rounded-lg text-black items-center cursor-pointer flex justify-between"
                     onClick={() => {
                       setSelectedWhere(cityName);
+                      setSearchWhere(cityName);
                       setWhereMobile(false);
                     }}
                   >
@@ -231,7 +351,7 @@ const FilterToursMobile = () => {
                   </div>
                 ))
               ) : (
-                <div className="p-2 text-black">Hech narsa topilmadi</div>
+                <div className="p-2 text-black">{t('Не найдено')}</div>
               )}
             </div>
           </div>
@@ -245,11 +365,13 @@ const FilterToursMobile = () => {
           }}
           className="cursor-pointer flex flex-col gap-2 w-full"
         >
-          <Label className="font-semibold text-md">Дата отправления</Label>
+          <Label className="font-semibold text-md">
+            {t('Дата отправления')}
+          </Label>
           <div className="relative">
             <Input
               className="h-[60px] text-md placeholder:text-md"
-              placeholder="Когда"
+              placeholder={t('Когда')}
               value={selectData}
               readOnly
             />
@@ -297,15 +419,12 @@ const FilterToursMobile = () => {
             </div>
             <div className="flex flex-row gap-2">
               <Input
-                placeholder="Когда"
+                placeholder={t('Когда')}
                 value={
                   fromDate ? formatDate.format(fromDate, 'DD/MM/YYYY') : ''
                 }
-                readOnly
-                className={clsx(
-                  'w-full text-black h-[50px]',
-                  !fromDate && 'border border-red-600',
-                )}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full text-black h-[50px]"
                 onClick={(e) => e.stopPropagation()}
                 onFocus={(e) => e.stopPropagation()}
               />
@@ -315,14 +434,11 @@ const FilterToursMobile = () => {
                 className="self-center mx-2"
               />
               <Input
-                placeholder="Выезд"
+                placeholder={t('Выезд')}
                 value={toDate ? formatDate.format(toDate, 'DD/MM/YYYY') : ''}
-                disabled={!fromDate}
-                readOnly
-                className={clsx(
-                  'w-full text-black h-[50px]',
-                  fromDate && 'border border-red-600',
-                )}
+                disabled={fromDate === undefined}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full text-black h-[50px]"
                 onClick={(e) => e.stopPropagation()}
                 onFocus={(e) => e.stopPropagation()}
               />
@@ -337,7 +453,7 @@ const FilterToursMobile = () => {
                   setFromDate(val?.from);
                   setToDate(val?.to);
                 }}
-                disabled={{ before: new Date() }}
+                showOutsideDays={false}
               />
               {/* <Calendar
                     mode="single"
@@ -386,23 +502,36 @@ const FilterToursMobile = () => {
                     />
                   )} */}
             </div>
-            <div className="grid grid-cols-1 mt-0 gap-2">
+            <div className="grid grid-cols-2 mt-0 gap-2">
               <button
-                className="bg-blue-600 rounded-3xl p-3 text-white font-semibold"
+                className="bg-blue-500/40 rounded-3xl p-3 text-blue-600 cursor-pointer"
                 onClick={() => {
                   setDataOpenMobile(false);
                   setFromDate(undefined);
                   setToDate(undefined);
+                  setRange(undefined);
+                  setStoreDate(undefined);
+                  setSelectData('');
+                  setStoreSelectData('');
+                  setStoreToDate(undefined);
+                }}
+              >
+                {t('Отмена')}
+              </button>
+              <button
+                className="bg-blue-600 rounded-3xl text-white"
+                onClick={() => {
+                  setDataOpenMobile(false);
                   if (fromDate && toDate) {
                     setSelectData(
-                      `${formatDate.format(fromDate, 'DD/MM/YYYY')} - ${formatDate.format(toDate, 'DD/MM/YYYY')}`,
+                      `${formatDate.format(fromDate, 'DD/MM/YYYY') + ' - ' + formatDate.format(toDate, 'DD/MM/YYYY')}`,
                     );
                   } else {
                     setSelectData('');
                   }
                 }}
               >
-                Применять
+                {t('Применять')}
               </button>
             </div>
           </div>
@@ -414,12 +543,12 @@ const FilterToursMobile = () => {
           onClick={() => setAgeOpen(!ageOpen)}
           className="cursor-pointer flex flex-col w-full gap-2"
         >
-          <Label className="font-semibold text-md">Туристы</Label>
+          <Label className="font-semibold text-md">{t('Туристы')}</Label>
           <div className="relative">
             <Input
-              value={selectAge === 0 ? '' : selectAge}
               className="h-[60px] text-md placeholder:text-md"
-              placeholder="2 Вызрослых"
+              placeholder={t('Вызрослых')}
+              value={selectAge === 0 ? '' : selectAge}
               readOnly
             />
           </div>
@@ -452,8 +581,8 @@ const FilterToursMobile = () => {
             </div>
             <div className="flex justify-between">
               <Label className="flex flex-col gap-0 items-start">
-                <p className="font-semibold text-lg">2 Вызрослых</p>
-                <p className="text-ring text-sm">старше 13 лет</p>
+                <p className="font-semibold text-lg">{t('Вызрослых')}</p>
+                <p className="text-ring text-sm">{t('старше 13 лет')}</p>
               </Label>
               <div className="grid grid-cols-3 border justify-center items-center rounded-lg w-48">
                 <Button
@@ -474,9 +603,7 @@ const FilterToursMobile = () => {
                 <Button
                   variant={'ghost'}
                   className="h-full rounded-tl-none rounded-bl-none rounded-br-lg rounded-tr-lg"
-                  onClick={() =>
-                    setAdults((prev) => (prev === 2 ? prev : prev + 1))
-                  }
+                  onClick={() => setAdults((prev) => prev + 1)}
                 >
                   <AddIcon className="text-blue-600" />
                 </Button>
@@ -484,8 +611,8 @@ const FilterToursMobile = () => {
             </div>
             <div className="flex justify-between mt-2">
               <Label className="flex flex-col gap-0 items-start">
-                <p className="font-semibold text-lg">Дети</p>
-                <p className="text-ring text-sm">до 13 лет</p>
+                <p className="font-semibold text-lg">{t('Дети')}</p>
+                <p className="text-ring text-sm">{t('до 13 лет')}</p>
               </Label>
               <div className="grid grid-cols-3 border justify-center items-center rounded-lg w-48">
                 <Button
@@ -521,18 +648,18 @@ const FilterToursMobile = () => {
                 setAgeOpen(false);
               }}
             >
-              Применять
+              {t('Применять')}
             </button>
           </div>
         </Drawer>
       </div>
       <div className="flex flex-col gap-2">
-        <Link
-          href={'#'}
-          className="bg-blue-600 text-white h-[60px] flex items-center justify-center rounded-4xl text-center font-semibold"
+        <Button
+          className="bg-blue-600 text-lg text-white h-[60px] flex items-center justify-center rounded-4xl text-center font-semibold cursor-pointer"
+          onClick={saveFilter}
         >
-          <p>Искать туры</p>
-        </Link>
+          <p>{t('Искать туры')}</p>
+        </Button>
       </div>
     </div>
   );

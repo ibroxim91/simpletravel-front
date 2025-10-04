@@ -1,4 +1,9 @@
-import Selectour from '@/widgets/selectour/ui';
+'use client';
+
+import dynamic from 'next/dynamic';
+const Selectour = dynamic(() => import('@/widgets/selectour/ui'), {
+  ssr: false,
+});
 
 export default function Page() {
   return (

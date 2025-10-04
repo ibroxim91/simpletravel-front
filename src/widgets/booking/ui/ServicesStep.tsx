@@ -11,6 +11,7 @@ import { ExcursionsOptions, ServicesOptions } from '@/widgets/booking/lib/data';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Switch from '@mui/material/Switch';
 import clsx from 'clsx';
+import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
@@ -23,6 +24,7 @@ type Props = {
 };
 
 export default function ServicesStep({ onNext, onPrev }: Props) {
+  const t = useTranslations();
   const [selected, setSelected] = useState<number | null>(null);
   const [service, setService] = useState<number | null>(null);
   const { excursions, setExcursions, tours_category, setToursCategory } =
@@ -59,7 +61,7 @@ export default function ServicesStep({ onNext, onPrev }: Props) {
   return (
     <div>
       <div className="w-full bg-[#FFFFFF] p-[20px] rounded-[20px] relative">
-        <h1 className="text-[20px] font-bold">Услуги</h1>
+        <h1 className="text-[20px] font-bold">{t('Услуги')}</h1>
         <hr className="h-[2px] my-[24px] bg-[#EDEEF1]" />
 
         <Form {...form}>
@@ -69,7 +71,9 @@ export default function ServicesStep({ onNext, onPrev }: Props) {
               name={`excursions`}
               render={({ field }) => (
                 <FormItem>
-                  <Label className="text-xl font-medium">Экскурсии</Label>
+                  <Label className="text-xl font-medium">
+                    {t('Экскурсии')}
+                  </Label>
                   <FormControl>
                     <div className="mt-4 grid grid-cols-2 justify-between gap-[16px] my-5 max-lg:grid-cols-1">
                       {ExcursionsOptions.map((opt) => {
@@ -95,7 +99,7 @@ export default function ServicesStep({ onNext, onPrev }: Props) {
                             <Input
                               type="radio"
                               id={inputId}
-                              name="selectComfort"
+                              name={t('selectComfort')}
                               checked={isChecked}
                               onChange={() => {
                                 setSelected(opt.id);
@@ -118,7 +122,7 @@ export default function ServicesStep({ onNext, onPrev }: Props) {
               render={({ field }) => (
                 <FormItem>
                   <Label className="text-xl font-medium">
-                    Дополнительные услуги
+                    {t('Дополнительные услуги')}
                   </Label>
                   <FormControl>
                     <div className="mt-[8px] grid grid-cols-2 gap-[16px] max-lg:grid-cols-1">
@@ -170,13 +174,13 @@ export default function ServicesStep({ onNext, onPrev }: Props) {
           onClick={onPrev}
           className="bg-gray-200 border shadow-sm border-[#D3D3D3] text-gray-800 hover:bg-gray-300 py-4 font-medium px-20 left-0 cursor-pointer rounded-full mt-[20px]"
         >
-          Назад
+          {t('Назад')}
         </button>
         <button
           onClick={form.handleSubmit(onSubmit)}
           className="bg-[#084FE3] text-white py-4 font-medium px-20 left-0 cursor-pointer rounded-full mt-[20px]"
         >
-          Следующий
+          {t('Следующий')}
         </button>
       </div>
     </div>

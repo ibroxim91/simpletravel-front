@@ -25,76 +25,77 @@ import {
   TableHeader,
   TableRow,
 } from '@/shared/ui/table';
+import { useTranslations } from 'next-intl';
 import { dataPayment, PaymentRow } from '../lib/data';
 import PaginationButtons from './PaginationButtons';
 
-export const columns: ColumnDef<PaymentRow>[] = [
-  {
-    id: 'select',
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && 'indeterminate')
-        }
-        className="bg-white focus:ring-0 border-[#084FE3] size-4 rounded-[5px]"
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: 'id',
-    header: 'Код бронирования',
-    cell: ({ row }) => <div className="capitalize">{row.getValue('id')}</div>,
-  },
-  {
-    accessorKey: 'service',
-    header: 'Название услуги',
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue('service')}</div>
-    ),
-  },
-  {
-    accessorKey: 'amount',
-    header: 'Общая сумма',
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue('amount')}</div>
-    ),
-  },
-  {
-    accessorKey: 'location',
-    header: 'Место положение',
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue('location')}</div>
-    ),
-  },
-  {
-    accessorKey: 'status',
-    header: 'Статус',
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue('status')}</div>
-    ),
-  },
-  {
-    accessorKey: 'detail',
-    header: 'Действие',
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue('detail')}</div>
-    ),
-  },
-];
-
 const ReservationsTabs = () => {
+  const t = useTranslations();
+  const columns: ColumnDef<PaymentRow>[] = [
+    {
+      id: 'select',
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && 'indeterminate')
+          }
+          className="bg-white focus:ring-0 border-[#084FE3] size-4 rounded-[5px]"
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
+      accessorKey: 'id',
+      header: t('Код бронирования'),
+      cell: ({ row }) => <div className="capitalize">{row.getValue('id')}</div>,
+    },
+    {
+      accessorKey: 'service',
+      header: t('Название услуги'),
+      cell: ({ row }) => (
+        <div className="capitalize">{row.getValue('service')}</div>
+      ),
+    },
+    {
+      accessorKey: 'amount',
+      header: t('Общая сумма'),
+      cell: ({ row }) => (
+        <div className="capitalize">{row.getValue('amount')}</div>
+      ),
+    },
+    {
+      accessorKey: 'location',
+      header: t('Место положение'),
+      cell: ({ row }) => (
+        <div className="capitalize">{row.getValue('location')}</div>
+      ),
+    },
+    {
+      accessorKey: 'status',
+      header: t('Статус'),
+      cell: ({ row }) => (
+        <div className="capitalize">{row.getValue('status')}</div>
+      ),
+    },
+    {
+      accessorKey: 'detail',
+      header: t('Действие'),
+      cell: ({ row }) => (
+        <div className="capitalize">{row.getValue('detail')}</div>
+      ),
+    },
+  ];
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
@@ -125,10 +126,10 @@ const ReservationsTabs = () => {
   return (
     <div className="w-full bg-white rounded-3xl">
       <div className="flex items-center px-4 py-4 justify-between">
-        <p className="text-xl font-semibold">Последние бронирования</p>
+        <p className="text-xl font-semibold">{t('Последние бронирования')}</p>
         <div className="relative">
           <Input
-            placeholder="Укажите город"
+            placeholder={t('Укажите город')}
             value={
               (table.getColumn('location')?.getFilterValue() as string) ?? ''
             }
@@ -193,7 +194,7 @@ const ReservationsTabs = () => {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  {t('Не найдено')}
                 </TableCell>
               </TableRow>
             )}
@@ -203,7 +204,7 @@ const ReservationsTabs = () => {
       <div className="flex items-center justify-end space-x-2 py-4 mt-5">
         <div className="flex items-center justify-end space-x-2 py-4 mt-5 px-10 max-lg:mt-0 max-lg:py-0 w-full">
           <div className="text-muted-foreground flex-1 text-md px-10 max-lg:hidden">
-            Showing{' '}
+            {t('Ko‘rsatilmoqda')}{' '}
             {table.getState().pagination.pageIndex *
               table.getState().pagination.pageSize +
               1}
@@ -213,7 +214,7 @@ const ReservationsTabs = () => {
                 table.getState().pagination.pageSize,
               dataPayment.total,
             )}{' '}
-            of {dataPayment.total}
+            {t('от')} {dataPayment.total}
           </div>
           <div className="flex gap-2 max-lg:justify-center max-lg:items-center max-lg:w-full">
             <PaginationButtons table={table} />

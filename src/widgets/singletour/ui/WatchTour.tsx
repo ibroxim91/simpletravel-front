@@ -1,35 +1,37 @@
 import CloseIcon from '@mui/icons-material/Close';
 import Image from 'next/image';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 interface Props {
   onClose: () => void;
-  images: string[];
+  images: [
+    {
+      image: string;
+    },
+  ];
 }
 
 export default function WatchTour({ onClose, images }: Props) {
   const [current, setCurrent] = useState(0);
 
-  // Close on ESC
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-      if (e.key === 'ArrowRight') setCurrent((c) => (c + 1) % images.length);
-      if (e.key === 'ArrowLeft')
-        setCurrent((c) => (c - 1 + images.length) % images.length);
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [onClose, images.length]);
+  // useEffect(() => {
+  //   const onKeyDown = (e: KeyboardEvent) => {
+  //     if (e.key === 'Escape') onClose();
+  //     if (e.key === 'ArrowRight') setCurrent((c) => (c + 1) % images.length);
+  //     if (e.key === 'ArrowLeft')
+  //       setCurrent((c) => (c - 1 + images.length) % images.length);
+  //   };
+  //   window.addEventListener('keydown', onKeyDown);
+  //   return () => window.removeEventListener('keydown', onKeyDown);
+  // }, [onClose, images.length]);
 
-  // Prevent body scroll when modal is open
-  useEffect(() => {
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = prev;
-    };
-  }, []);
+  // useEffect(() => {
+  //   const prev = document.body.style.overflow;
+  //   document.body.style.overflow = 'hidden';
+  //   return () => {
+  //     document.body.style.overflow = prev;
+  //   };
+  // }, []);
 
   const next = useCallback(() => {
     setCurrent((c) => (c + 1) % images.length);
@@ -51,7 +53,7 @@ export default function WatchTour({ onClose, images }: Props) {
       <button
         aria-label="Close"
         onClick={onClose}
-        className="absolute left-1/2 bottom-3 cursor-pointer z-[1001] bg-white/90 hover:bg-white text-black rounded-full p-2 md:p-2.5 shadow focus:outline-none focus:ring-2 focus:ring-white/80"
+        className="absolute left-1/2 lg:hidden bottom-3 cursor-pointer z-[1001] bg-white/90 hover:bg-white text-black rounded-full p-2 md:p-2.5 shadow focus:outline-none focus:ring-2 focus:ring-white/80"
       >
         <CloseIcon />
       </button>
@@ -66,9 +68,10 @@ export default function WatchTour({ onClose, images }: Props) {
         <div className="relative w-full h-[55vh] sm:h-[60vh] md:h-[70vh] rounded-xl sm:rounded-2xl overflow-hidden bg-black/30">
           {images?.[current] && (
             <Image
-              src={images[current]}
+              src={images[current].image}
               alt={`Tour image ${current + 1}`}
               fill
+              quality={100}
               priority
               className="object-cover"
             />
@@ -140,7 +143,7 @@ export default function WatchTour({ onClose, images }: Props) {
                 >
                   <div className="relative h-full w-full">
                     <Image
-                      src={src}
+                      src={src.image}
                       alt={`Thumbnail ${idx + 1}`}
                       fill
                       className="object-cover"

@@ -3,12 +3,10 @@
 import ShoreCrop from '@/assets/Airpods.png';
 import BannerCircle from '@/assets/hotBanner.png';
 import BannerCircleMobile from '@/assets/hotBannerMobile.png';
-import Kuba from '@/assets/Kuba.jpg';
-import OAE from '@/assets/OAE.jpg';
-import ShriLanka from '@/assets/ShriLanka.jpg';
-import Tailand from '@/assets/Tailand.jpg';
-import Turk from '@/assets/Turk.jpg';
+import { BASE_URL } from '@/shared/config/api/URLs';
 import { Link } from '@/shared/config/i18n/navigation';
+import { LanguageRoutes } from '@/shared/config/i18n/types';
+import { formatPrice } from '@/shared/lib/formatPrice';
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import {
@@ -17,80 +15,45 @@ import {
   CarouselContent,
   CarouselItem,
 } from '@/shared/ui/carousel';
+import { Skeleton } from '@/shared/ui/skeleton';
+import Ticket_Api from '@/widgets/selectour/lib/api';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import Rating from '@mui/material/Rating';
+import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
+import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-const data = [
-  {
-    name: 'Pullman Sharjah',
-    rating: 3,
-    popular: true,
-    desc: 'ОАЭ, Шарджа',
-    price: 'от 12 450 000 сум',
-    visa: true,
-    img: Turk,
-  },
-  {
-    name: 'Таиланд',
-    visa: true,
-    popular: false,
-    price: 'от 12 450 000 сум',
-    rating: 3,
-    desc: 'ОАЭ, Шарджа',
-    img: Tailand,
-  },
-  {
-    name: 'Шри-Ланка',
-    price: 'от 12 450 000 сум',
-    visa: true,
-    rating: 1,
-    desc: 'ОАЭ, Шарджа',
-    img: ShriLanka,
-    popular: true,
-  },
-  {
-    name: 'ОАЭ',
-    rating: 2,
-    visa: true,
-    price: 'от 12 450 000 сум',
-    desc: 'ОАЭ, Шарджа',
-    img: OAE,
-    popular: true,
-  },
-  {
-    name: 'Куба',
-    rating: 4,
-    price: 'от 12 450 000 сум',
-    desc: 'ОАЭ, Шарджа',
-    img: Kuba,
-    visa: true,
-    popular: false,
-  },
-  {
-    name: 'Турция',
-    rating: 3,
-    price: 'от 12 450 000 сум',
-    desc: 'ОАЭ, Шарджа',
-    img: Turk,
-    popular: false,
-    visa: true,
-  },
-  {
-    name: 'Таиланд',
-    rating: 4.5,
-    price: 'от 12 450 000 сум',
-    desc: 'ОАЭ, Шарджа',
-    img: Tailand,
-    popular: true,
-    visa: true,
-  },
-];
-
 const HotTours = () => {
+  const t = useTranslations();
+  const { locale } = useParams();
+  const { data: ticket, isLoading } = useQuery({
+    queryKey: ['ticket_no_visa'],
+    queryFn: () =>
+      Ticket_Api.GetAllTickets({
+        params: {
+          page: 1,
+          page_size: 8,
+          visa_required: false,
+        },
+      }),
+  });
+
+  const { data: hotTicket, isLoading: hotLoading } = useQuery({
+    queryKey: ['ticket_hot'],
+    queryFn: () =>
+      Ticket_Api.GetAllTickets({
+        params: {
+          page: 1,
+          page_size: 8,
+          rating: 3.5,
+        },
+      }),
+  });
+
   const [api, setApi] = useState<CarouselApi>();
   const [hot, setHot] = useState<CarouselApi>();
   const [canScrollNext, setCanScrollNext] = useState(false);
@@ -126,8 +89,11 @@ const HotTours = () => {
     <>
       <div className="custom-container mt-20">
         <div className="flex justify-between items-center">
-          <Link href={'#'} className="text-3xl text-[#031753] font-semibold">
-            Увидеть без визы
+          <Link
+            href="/selectour"
+            className="text-3xl text-[#031753] font-semibold"
+          >
+            {t('Увидеть без визы')}
           </Link>
           <div className="flex gap-4">
             <Button
@@ -135,6 +101,7 @@ const HotTours = () => {
               className="rounded-full w-10 h-10 max-lg:hidden"
               onClick={() => api?.scrollPrev()}
               disabled={!canScrollPrev}
+              aria-label="Scroll to previous item"
             >
               <KeyboardBackspaceIcon />
             </Button>
@@ -143,6 +110,7 @@ const HotTours = () => {
               className="rounded-full w-10 h-10 max-lg:hidden"
               onClick={() => api?.scrollNext()}
               disabled={!canScrollNext}
+              aria-label="Scroll to next item"
             >
               <KeyboardBackspaceIcon sx={{ rotate: '180deg' }} />
             </Button>
@@ -150,76 +118,93 @@ const HotTours = () => {
         </div>
         <Carousel className="w-full mt-4 cursor-pointer" setApi={setApi}>
           <CarouselContent>
-            {data.map((e, idx) => (
-              <CarouselItem
-                key={idx}
-                className="flex flex-col w-auto basis-1/4 max-lg:basis-1/3 max-md:basis-[70%] shrink-0 font-medium"
-              >
-                <motion.div
-                  initial={{ opacity: 0, y: 40, scale: 0.95 }}
-                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                  viewport={{ once: false, amount: 0.1 }}
-                  transition={{
-                    duration: 0.6,
-                    delay: idx * 0.15,
-                    ease: 'easeOut',
-                  }}
-                  className="w-full aspect-square relative group overflow-hidden rounded-3xl shadow-lg"
-                >
-                  <Image
-                    src={e.img}
-                    alt={e.name}
-                    fill
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="flex flex-col absolute top-2 left-4 gap-2 z-20">
-                    {e.popular && (
-                      <Badge
-                        variant="destructive"
-                        className="px-4 py-1 text-sm rounded-4xl font-semibold"
+            {isLoading
+              ? Array.from({ length: 4 }).map((_, idx) => (
+                  <CarouselItem
+                    key={idx}
+                    className="flex flex-col w-auto basis-1/4 max-lg:basis-1/3 max-md:basis-[70%] shrink-0"
+                  >
+                    <div className="w-full aspect-square relative overflow-hidden rounded-3xl shadow-lg">
+                      <Skeleton className="w-full h-full" />
+                    </div>
+                    <div className="mt-4 space-y-2">
+                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-4 w-20" />
+                    </div>
+                  </CarouselItem>
+                ))
+              : ticket?.data.results.tickets.map((e, idx) => (
+                  <CarouselItem
+                    key={idx}
+                    className="flex flex-col w-auto basis-1/4 max-lg:basis-1/3 max-md:basis-[70%] shrink-0 font-medium"
+                  >
+                    <Link href={`/selectour/${e.id}`}>
+                      <motion.div
+                        initial={{ opacity: 0, y: 40, scale: 0.95 }}
+                        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                        viewport={{ once: false, amount: 0.1 }}
+                        transition={{
+                          duration: 0.6,
+                          delay: idx * 0.15,
+                          ease: 'easeOut',
+                        }}
+                        className="w-full aspect-square relative group overflow-hidden rounded-3xl shadow-lg"
                       >
-                        Горящие туры
-                      </Badge>
-                    )}
-                    {e.visa && (
-                      <Badge
-                        variant="default"
-                        className="bg-[#031753] text-sm px-4 py-1 rounded-4xl font-semibold"
+                        <Image
+                          src={BASE_URL + e.ticket_images.image}
+                          alt={e.title}
+                          fill
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                        <div className="flex flex-col absolute top-2 left-4 gap-2 z-20">
+                          {e.badge.map((e) => (
+                            <Badge
+                              key={e.id}
+                              variant="default"
+                              className={`bg-${e.color}-500 text-sm px-4 py-1 rounded-4xl font-semibold`}
+                            >
+                              {e.name}
+                            </Badge>
+                          ))}
+                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10" />
+                      </motion.div>
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: false, amount: 0.1 }}
+                        transition={{ duration: 0.6, delay: idx * 0.2 }}
+                        className="mt-4"
                       >
-                        Без визы
-                      </Badge>
-                    )}
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10" />
-                </motion.div>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: false, amount: 0.1 }}
-                  transition={{ duration: 0.6, delay: idx * 0.2 }}
-                  className="mt-4"
-                >
-                  <Rating
-                    name="read-only"
-                    size="small"
-                    value={e.rating}
-                    readOnly
-                  />
-                  <p className="text-xl font-semibold text-[#031753]">
-                    {e.name}
-                  </p>
-                  <p className="text-md text-blue-950">{e.desc}</p>
-                  <p className="mt-2 text-blue-600 font-semibold">{e.price}</p>
-                </motion.div>
-              </CarouselItem>
-            ))}
+                        <Rating
+                          name="read-only"
+                          size="small"
+                          value={e.rating}
+                          readOnly
+                          precision={0.1}
+                        />
+                        <p className="text-xl font-semibold text-[#031753]">
+                          {e.title}
+                        </p>
+                        <p className="text-md text-blue-950">{e.destination}</p>
+                        <p className="mt-2 text-blue-600 font-semibold">
+                          {formatPrice(e.price, locale as LanguageRoutes, true)}
+                        </p>
+                      </motion.div>
+                    </Link>
+                  </CarouselItem>
+                ))}
           </CarouselContent>
         </Carousel>
       </div>
       <div className="custom-container mt-20">
         <div className="flex justify-between items-center">
-          <Link href={'#'} className="text-3xl text-[#031753] font-semibold">
-            Горящие туры
+          <Link
+            href="/selectour"
+            className="text-3xl text-[#031753] font-semibold"
+          >
+            {t('Горящие туры')}
           </Link>
           <div className="flex gap-4">
             <Button
@@ -227,6 +212,7 @@ const HotTours = () => {
               className="rounded-full w-10 h-10 max-lg:hidden"
               onClick={() => hot?.scrollPrev()}
               disabled={!hotScrollPrev}
+              aria-label="Scroll hot tours to previous item"
             >
               <KeyboardBackspaceIcon />
             </Button>
@@ -235,6 +221,7 @@ const HotTours = () => {
               className="rounded-full w-10 h-10 max-lg:hidden"
               onClick={() => hot?.scrollNext()}
               disabled={!hotScrollNext}
+              aria-label="Scroll hot tours to next item"
             >
               <KeyboardBackspaceIcon sx={{ rotate: '180deg' }} />
             </Button>
@@ -243,69 +230,83 @@ const HotTours = () => {
 
         <Carousel className="w-full mt-4 cursor-pointer" setApi={setHot}>
           <CarouselContent>
-            {data.map((e, idx) => (
-              <CarouselItem
-                key={idx}
-                className="flex flex-col w-auto basis-1/4 max-lg:basis-1/3 max-md:basis-[70%] shrink-0 font-medium"
-              >
-                <motion.div
-                  initial={{ opacity: 0, y: 40, scale: 0.95 }}
-                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                  viewport={{ once: false, amount: 0.1 }}
-                  transition={{
-                    duration: 0.6,
-                    delay: idx * 0.15,
-                    ease: 'easeOut',
-                  }}
-                  className="w-full aspect-square relative group overflow-hidden rounded-3xl shadow-lg"
-                >
-                  <Image
-                    src={e.img}
-                    alt={e.name}
-                    fill
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="flex flex-col absolute top-2 left-4 gap-2 z-20">
-                    {e.popular && (
-                      <Badge
-                        variant="destructive"
-                        className="px-4 py-1 rounded-4xl font-semibold"
+            {hotLoading
+              ? Array.from({ length: 4 }).map((_, idx) => (
+                  <CarouselItem
+                    key={idx}
+                    className="flex flex-col w-auto basis-1/4 max-lg:basis-1/3 max-md:basis-[70%] shrink-0"
+                  >
+                    <div className="w-full aspect-square relative overflow-hidden rounded-3xl shadow-lg">
+                      <Skeleton className="w-full h-full" />
+                    </div>
+                    <div className="mt-4 space-y-2">
+                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-4 w-20" />
+                    </div>
+                  </CarouselItem>
+                ))
+              : hotTicket?.data.results.tickets.map((e, idx) => (
+                  <CarouselItem
+                    key={idx}
+                    className="flex flex-col w-auto basis-1/4 max-lg:basis-1/3 max-md:basis-[70%] shrink-0 font-medium"
+                  >
+                    <Link href={`/selectour/${e.id}`}>
+                      <motion.div
+                        initial={{ opacity: 0, y: 40, scale: 0.95 }}
+                        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                        viewport={{ once: false, amount: 0.1 }}
+                        transition={{
+                          duration: 0.6,
+                          delay: idx * 0.15,
+                          ease: 'easeOut',
+                        }}
+                        className="w-full aspect-square relative group overflow-hidden rounded-3xl shadow-lg"
                       >
-                        Горящие туры
-                      </Badge>
-                    )}
-                    {e.visa && (
-                      <Badge
-                        variant="default"
-                        className="bg-[#031753] px-4 py-1 rounded-4xl font-semibold"
+                        <Image
+                          src={BASE_URL + e.ticket_images.image}
+                          alt={e.title}
+                          fill
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                        <div className="flex flex-col absolute top-2 left-4 gap-2 z-20">
+                          {e.badge.map((e) => (
+                            <Badge
+                              key={e.id}
+                              variant="default"
+                              className={`bg-${e.color}-500 text-sm px-4 py-1 rounded-4xl font-semibold`}
+                            >
+                              {e.name}
+                            </Badge>
+                          ))}
+                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10" />
+                      </motion.div>
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: false, amount: 0.1 }}
+                        transition={{ duration: 0.6, delay: idx * 0.2 }}
+                        className="mt-4"
                       >
-                        Без визы
-                      </Badge>
-                    )}
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10" />
-                </motion.div>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: false, amount: 0.1 }}
-                  transition={{ duration: 0.6, delay: idx * 0.2 }}
-                  className="mt-4"
-                >
-                  <Rating
-                    name="read-only"
-                    size="small"
-                    value={e.rating}
-                    readOnly
-                  />
-                  <p className="text-xl font-semibold text-[#031753]">
-                    {e.name}
-                  </p>
-                  <p className="text-sm text-blue-950">{e.desc}</p>
-                  <p className="mt-2 text-blue-600 font-semibold">{e.price}</p>
-                </motion.div>
-              </CarouselItem>
-            ))}
+                        <Rating
+                          name="read-only"
+                          size="small"
+                          value={e.rating}
+                          readOnly
+                          precision={0.1}
+                        />
+                        <p className="text-xl font-semibold text-[#031753]">
+                          {e.title}
+                        </p>
+                        <p className="text-md text-blue-950">{e.destination}</p>
+                        <p className="mt-2 text-blue-600 font-semibold">
+                          {formatPrice(e.price, locale as LanguageRoutes, true)}
+                        </p>
+                      </motion.div>
+                    </Link>
+                  </CarouselItem>
+                ))}
           </CarouselContent>
         </Carousel>
       </div>
@@ -331,7 +332,7 @@ const HotTours = () => {
                   transition={{ duration: 0.8, delay: 0.2 }}
                   className="text-3xl text-[#031753] font-semibold w-96"
                 >
-                  С Simple Travel ваши поездки ещё проще
+                  {t('С Simple Travel ваши поездки ещё проще')}
                 </motion.p>
                 <motion.p
                   initial={{ opacity: 0, y: 30 }}
@@ -339,7 +340,7 @@ const HotTours = () => {
                   transition={{ duration: 0.8, delay: 0.4 }}
                   className="text-mmd text-[#031753]"
                 >
-                  Поддержка 24/7, страховка и дополнительные возможности
+                  {t('Поддержка 24/7, страховка и дополнительные возможности')}
                 </motion.p>
                 <motion.div
                   initial={{ opacity: 0, y: 30 }}
@@ -347,10 +348,12 @@ const HotTours = () => {
                   transition={{ duration: 0.8, delay: 0.6 }}
                 >
                   <Link
-                    href="#"
+                    href="/selectour"
                     className="bg-[#ECF2FF] w-fit py-3 px-10 rounded-4xl flex gap-4"
                   >
-                    <p className="text-blue-600 font-semibold">Узнать больше</p>
+                    <p className="text-blue-600 font-semibold">
+                      {t('Узнать больше')}
+                    </p>
                     <ArrowRightAltIcon className="text-blue-600" />
                   </Link>
                 </motion.div>
@@ -393,16 +396,18 @@ const HotTours = () => {
             </div>
             <div className="absolute z-12 top-10 h-full left-4 flex flex-col gap-4">
               <p className="text-4xl text-[#031753] font-semibold  w-[90%]">
-                С Simple Travel ваши поездки ещё проще
+                {t('С Simple Travel ваши поездки ещё проще')}
               </p>
               <p className="text-2xl text-[#031753]  w-[95%]">
-                Поддержка 24/7, страховка и дополнительные возможности
+                {t('Поддержка 24/7, страховка и дополнительные возможности')}
               </p>
               <Link
-                href={'#'}
+                href="/selectour"
                 className="bg-[#ECF2FF] w-fit py-3 px-5 rounded-4xl flex gap-4"
               >
-                <p className="text-blue-600 font-semibold">Узнать больше</p>
+                <p className="text-blue-600 font-semibold">
+                  {t('Узнать больше')}
+                </p>
                 <ArrowRightAltIcon className="text-blue-600" />
               </Link>
             </div>

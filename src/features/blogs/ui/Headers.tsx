@@ -2,27 +2,34 @@
 
 import Banner_2 from '@/assets/blogsBanner.png';
 import Banner from '@/assets/blogsBanner_1.png';
-import { Link } from '@/shared/config/i18n/navigation';
+import { Link, useRouter } from '@/shared/config/i18n/navigation';
 import { Carousel, CarouselContent, CarouselItem } from '@/shared/ui/carousel';
 import EastIcon from '@mui/icons-material/East';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
+import { useQuery } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { News_Api } from '../lib/api';
 
 const BlogHeader = () => {
+  const t = useTranslations();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { data } = useQuery({
+    queryKey: ['get_tabs'],
+    queryFn: () =>
+      News_Api.getTags({
+        page: 1,
+        page_size: 20,
+      }),
+    select(data) {
+      return data.data.data.results;
+    },
+  });
 
-  const items = [
-    { name: 'Все новости', id: 1 },
-    { name: 'Блог', id: 2 },
-    { name: 'Акции', id: 3 },
-    { name: 'События', id: 4 },
-    { name: 'Статьи', id: 5 },
-  ];
-
-  const initialTab = searchParams.get('tab') || '1';
+  const initialTab = searchParams.get('tab') ?? '';
   const [active, setActive] = useState(initialTab);
 
   useEffect(() => {
@@ -44,19 +51,23 @@ const BlogHeader = () => {
         sx={{ '& .MuiBreadcrumbs-separator': { mx: 2 } }}
       >
         <Link href="/" className="font-medium text-[#646465]">
-          Главная страница
+          {t('Главная')}
         </Link>
         <Link href="/blogs?tab=1" className="text-[#646465] font-medium">
-          Блоги
+          {t('Блоги')}
         </Link>
         <p className="text-[#646465] font-medium">
-          {items.find((e) => e.id === Number(active))?.name}
+          {active === '' ? (
+            t('Все')
+          ) : (
+            <>{data?.find((e) => e.id === Number(active))?.name}</>
+          )}
         </p>
       </Breadcrumbs>
       <div className="w-full h-[350px] mt-10 flex relative justify-between rounded-3xl bg-gradient-to-r to-[#42B5CD] from-[#1764FC]">
         <div className="absolute top-20 left-10 flex flex-col gap-10 z-10">
           <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl w-96 max-lg:w-auto text-white font-semibold">
-            Пресс-релизы и новости
+            {t('Пресс-релизы и новости')}
           </p>
         </div>
         <Carousel
@@ -64,7 +75,18 @@ const BlogHeader = () => {
           opts={{ align: 'start' }}
         >
           <CarouselContent className="gap-2 px-5 sm:px-10">
-            {items.map((item) => (
+            <CarouselItem
+              onClick={() => handleTabClick(String(''))}
+              className={`cursor-pointer flex-none text-center font-semibold py-2 px-6 rounded-lg min-w-[100px] transition 
+                ${
+                  active === String('')
+                    ? 'bg-white text-black font-medium'
+                    : 'bg-white/20 text-white'
+                }`}
+            >
+              <p className="font-semibold">{t(`Все`)}</p>
+            </CarouselItem>
+            {data?.map((item) => (
               <CarouselItem
                 key={item.id}
                 onClick={() => handleTabClick(String(item.id))}
