@@ -88,10 +88,19 @@ const AuthLogin = () => {
       route.push('/profile');
       ref.clear();
     },
-    onError(error: AxiosError<{ data: { detail: string } }>) {
+    onError(
+      error: AxiosError<{
+        non_field_errors: string[];
+        data: { detail: string };
+      }>,
+    ) {
       toast.error(t('Xatolik yuz berdi'), {
         icon: null,
-        description: error.response?.data.data.detail,
+        description:
+          error.response && error.response.data
+            ? error.response?.data?.data?.detail ||
+              error.response?.data?.non_field_errors?.[0]
+            : t('Xatolik yuz berdi'),
         position: 'bottom-right',
       });
     },

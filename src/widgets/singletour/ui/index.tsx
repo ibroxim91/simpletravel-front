@@ -173,6 +173,7 @@ export default function SingleTour() {
             <WantHelpModal
               onClose={setOpenHelp}
               open={openHelp}
+              id={data ? data.travel_agency_id : undefined}
               openHelpMobile={openHelpMobile}
               setOpenHelpMobile={setOpenHelpMobile}
             />

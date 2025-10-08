@@ -1,6 +1,8 @@
 'use client';
 
 import loaderAnimation from '@/assets/lottie/Travel.json';
+import formatPhone from '@/shared/lib/formatPhone';
+import onlyNumber from '@/shared/lib/onlyNember';
 import { Button } from '@/shared/ui/button';
 import {
   Dialog,
@@ -19,12 +21,15 @@ import {
 } from '@/shared/ui/form';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
+import { Body, Support_Api } from '@/widgets/contacts/lib/api';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Player } from '@lottiefiles/react-lottie-player';
 import CloseIcon from '@mui/icons-material/Close';
 import DoneIcon from '@mui/icons-material/Done';
 import Drawer from '@mui/material/Drawer';
+import { useMutation } from '@tanstack/react-query';
 import clsx from 'clsx';
+import { LoaderCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -35,12 +40,14 @@ interface Props {
   open: boolean;
   onClose: (open: boolean) => void;
   openHelpMobile: boolean;
+  id: string | undefined;
   setOpenHelpMobile: (openHelpMobile: boolean) => void;
 }
 
 const WantHelpModal = ({
   onClose,
   open,
+  id,
   openHelpMobile,
   setOpenHelpMobile,
 }: Props) => {
@@ -55,24 +62,28 @@ const WantHelpModal = ({
       phone: '',
     },
   });
+  const suffix = id?.replace('T-100', '');
 
-  async function onSubmit() {
-    setLoading(true);
-    setSuccess(false);
-    setError(null);
-    try {
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve('ok');
-        }, 2000);
-      });
-      setLoading(false);
+  const { mutate, isPending } = useMutation({
+    mutationFn: (body: Body) => {
+      return Support_Api.send(body);
+    },
+    onSuccess() {
       setSuccess(true);
-    } catch {
-      setLoading(false);
-      setError('Произошла ошибка при отправке. Попробуйте ещё раз.');
-    }
+    },
+    onError() {
+      setError('Произошла ошибка при отправке');
+    },
+  });
+
+  async function onSubmit(values: z.infer<typeof sendHelp>) {
+    mutate({
+      name: values.name,
+      phone_number: onlyNumber(values.phone),
+      travel_agency: suffix ? parseInt(suffix, 10) : '',
+    });
   }
+
   return (
     <>
       <Dialog
@@ -230,8 +241,13 @@ const WantHelpModal = ({
                           </Label>
                           <FormControl>
                             <Input
+                              placeholder={t('Введите номер телефона')}
                               {...field}
-                              placeholder={t('Введите ваш номер телефона')}
+                              value={field.value || '+998'}
+                              onChange={(e) =>
+                                field.onChange(formatPhone(e.target.value))
+                              }
+                              maxLength={19}
                               className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
                             />
                           </FormControl>
@@ -244,7 +260,11 @@ const WantHelpModal = ({
                         type="submit"
                         className="px-10 py-8 rounded-4xl text-lg font-medium cursor-pointer"
                       >
-                        {t('Отправить')}
+                        {isPending ? (
+                          <LoaderCircle className="animate-spin" />
+                        ) : (
+                          t('Отправить')
+                        )}
                       </Button>
                       <p className="font-medium text-md text-[#646465]">
                         {t('Я даю согласие на обработку персональных данных')}

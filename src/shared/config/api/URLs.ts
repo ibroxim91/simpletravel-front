@@ -28,10 +28,11 @@ const SAVE_TICKETS = '/api/v1/likes/';
 const GET_SAVED = '/api/v1/likes/';
 
 const SEND_PARTNER = '/api/v1/travel-agency/';
-
+const SEND_SUPPORT = '/api/v1/support/';
 const UPDATE_USER = '/api/v1/auth/user-update/';
 const NEW_PASSWORD = '/api/v1/auth/change-password/';
 const GET_ME = '/api/v1/auth/me/';
+const FAQ = '/api/v1/faq/';
 
 export {
   BASE_URL,
@@ -44,6 +45,7 @@ export {
   EMAIL_SENDOTP,
   EMAIL_SET_PASSWORD,
   ENDP_POSTS,
+  FAQ,
   GET_BLOGS,
   GET_ME,
   GET_SAVED,
@@ -60,5 +62,6 @@ export {
   PHONE_SET_PASSWORD,
   SAVE_TICKETS,
   SEND_PARTNER,
+  SEND_SUPPORT,
   UPDATE_USER,
 };

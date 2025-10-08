@@ -2,6 +2,8 @@
 
 import loaderAnimation from '@/assets/lottie/Travel.json';
 import { Link } from '@/shared/config/i18n/navigation';
+import formatPhone from '@/shared/lib/formatPhone';
+import onlyNumber from '@/shared/lib/onlyNember';
 import { Button } from '@/shared/ui/button';
 import {
   Dialog,
@@ -35,12 +37,14 @@ import XIcon from '@mui/icons-material/X';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Drawer from '@mui/material/Drawer';
 import { Map, Placemark, YMaps } from '@pbe/react-yandex-maps';
+import { useMutation } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
+import { Body, Support_Api } from '../lib/api';
 
 export default function Contacts() {
   const t = useTranslations();
@@ -55,7 +59,6 @@ export default function Contacts() {
   const [open, setOpen] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const form = useForm<z.infer<typeof senPartners>>({
     resolver: zodResolver(senPartners),
@@ -65,42 +68,32 @@ export default function Contacts() {
     },
   });
 
-  async function onSubmit() {
-    setLoading(true);
-    setSuccess(false);
-    setOpen(true);
-    setError(null);
-    try {
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve('ok');
-        }, 2000);
-      });
-      setLoading(false);
+  const { mutate, isPending } = useMutation({
+    mutationFn: (body: Body) => {
+      return Support_Api.send(body);
+    },
+    onSuccess() {
       setSuccess(true);
-    } catch {
-      setLoading(false);
-      setError('Произошла ошибка при отправке. Попробуйте ещё раз.');
-    }
+    },
+    onError() {
+      setError('Произошла ошибка при отправке');
+    },
+  });
+
+  async function onSubmit(values: z.infer<typeof senPartners>) {
+    setOpen(true);
+    mutate({
+      name: values.name,
+      phone_number: onlyNumber(values.phone),
+    });
   }
 
-  async function onSubmitMobile() {
-    setLoading(true);
-    setSuccess(false);
+  async function onSubmitMobile(values: z.infer<typeof senPartners>) {
     setOpenDrawer(true);
-    setError(null);
-    try {
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve('ok');
-        }, 2000);
-      });
-      setLoading(false);
-      setSuccess(true);
-    } catch {
-      setLoading(false);
-      setError('Произошла ошибка при отправке. Попробуйте ещё раз.');
-    }
+    mutate({
+      name: values.name,
+      phone_number: onlyNumber(values.phone),
+    });
   }
 
   // const MAP_EMBED_SRC =
@@ -175,8 +168,13 @@ export default function Contacts() {
                         </Label>
                         <FormControl>
                           <Input
+                            placeholder={t('Введите номер телефона')}
                             {...field}
-                            placeholder={t('Введите ваш номер телефона')}
+                            value={field.value || '+998'}
+                            onChange={(e) =>
+                              field.onChange(formatPhone(e.target.value))
+                            }
+                            maxLength={19}
                             className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
                           />
                         </FormControl>
@@ -277,7 +275,7 @@ export default function Contacts() {
       <Dialog
         open={open}
         onOpenChange={(isOpen) => {
-          if (!loading) {
+          if (!isPending) {
             setOpen(isOpen);
             if (!isOpen) setSuccess(false);
           }
@@ -295,7 +293,7 @@ export default function Contacts() {
                 success && 'justify-center',
               )}
             >
-              {loading && <p className="text-3xl">{t('Отправка')}...</p>}
+              {isPending && <p className="text-3xl">{t('Отправка')}...</p>}
 
               {success && (
                 <Button
@@ -315,7 +313,7 @@ export default function Contacts() {
                 </Button>
               )}
 
-              {!loading && !success && !error && (
+              {!isPending && !success && !error && (
                 <>
                   <p className="text-3xl">{t('Стать партнёром')}</p>
                   <DialogClose asChild>
@@ -323,7 +321,6 @@ export default function Contacts() {
                       variant={'outline'}
                       onClick={() => {
                         setSuccess(false);
-                        setLoading(false);
                         form.reset();
                       }}
                       className="rounded-full p-6 h-12 w-12"
@@ -336,7 +333,7 @@ export default function Contacts() {
             </DialogTitle>
 
             <DialogDescription className="flex flex-col justify-center items-center gap-8">
-              {loading && (
+              {isPending && (
                 <div className="flex justify-center items-center mt-10">
                   <Player
                     autoplay
@@ -363,7 +360,6 @@ export default function Contacts() {
                       onClick={() => {
                         form.reset();
                         setSuccess(false);
-                        setLoading(false);
                         setOpen(false);
                       }}
                     >
@@ -373,10 +369,10 @@ export default function Contacts() {
                 </div>
               )}
 
-              {error && !loading && !success && (
+              {error && !isPending && !success && (
                 <div className="flex flex-col items-center text-center gap-6 mt-6">
                   <p className="text-xl font-semibold text-[#212122]">
-                    {error}
+                    {t(error)}
                   </p>
                   <Button
                     variant="destructive"
@@ -384,7 +380,6 @@ export default function Contacts() {
                     onClick={() => {
                       form.reset();
                       setSuccess(false);
-                      setLoading(false);
                       setOpen(false);
                       setError(null);
                     }}
@@ -406,9 +401,8 @@ export default function Contacts() {
           backdropFilter: 'blur(6px)',
         }}
         onClose={() => {
-          if (!loading) {
+          if (!isPending) {
             setSuccess(false);
-            setLoading(false);
             setError(null);
             form.reset();
             setOpenDrawer(false);
@@ -425,14 +419,13 @@ export default function Contacts() {
           },
         }}
       >
-        {!success && !error && !loading && (
+        {!success && !error && !isPending && (
           <div className="flex justify-between items-center p-4">
             <p className="text-2xl font-semibold">{t('Стать партнёром')}</p>
             <Button
               variant="outline"
               onClick={() => {
                 setSuccess(false);
-                setLoading(false);
                 setError(null);
                 form.reset();
                 setOpenDrawer(false);
@@ -445,7 +438,7 @@ export default function Contacts() {
         )}
 
         <div className="flex-1 overflow-auto">
-          {loading && (
+          {isPending && (
             <div className="flex justify-center items-center h-full">
               <Player
                 autoplay
@@ -455,7 +448,7 @@ export default function Contacts() {
               />
             </div>
           )}
-          {success && !loading && (
+          {success && !isPending && (
             <div className="flex flex-col items-center justify-center gap-4 h-full px-4 text-center">
               <Button
                 color="#38DA2A"
@@ -476,7 +469,6 @@ export default function Contacts() {
                 onClick={() => {
                   form.reset();
                   setSuccess(false);
-                  setLoading(false);
                   setOpenDrawer(false);
                 }}
               >
@@ -484,7 +476,7 @@ export default function Contacts() {
               </Button>
             </div>
           )}
-          {error && !loading && !success && (
+          {error && !isPending && !success && (
             <div className="flex flex-col items-center justify-center gap-4 h-full px-4 text-center">
               <Button
                 color="#E03137"
@@ -502,7 +494,6 @@ export default function Contacts() {
                 onClick={() => {
                   form.reset();
                   setSuccess(false);
-                  setLoading(false);
                   setError(null);
                   setOpenDrawer(false);
                 }}
