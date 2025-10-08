@@ -6,4 +6,59 @@ const GET_TICKETS = '/api/v1/tickets/';
 const GET_BLOGS = '/api/v1/post/';
 const GET_TAGS = '/api/v1/category/';
 
-export { BASE_URL, ENDP_POSTS, GET_BLOGS, GET_TAGS, GET_TICKETS };
+//Auth
+const PHONE_SENDOTP = '/api/v1/auth/register/';
+const PHONE_RESTER_PASSWORD = '/api/v1/auth/reset-password/';
+const PHONE_LOGIN = '/api/v1/auth/token/phone/';
+const EMAIL_LOGIN = '/api/v1/auth/token/email/';
+const PHONE_CONFIRMOTP = '/api/v1/auth/confirm/';
+const PHONE_CONFIRM_RESET_PASS = '/api/v1/auth/reset-password-confirm/';
+const PHONE_RESEND_OTP = '/api/v1/auth/resend/';
+const EMAIL_CONFIRMOTP = '/api/v1/email-auth/confirm/';
+const EMAIL_CONFIRM_RESET_PASS = '/api/v1/email-auth/reset-password-confirm/';
+const PHONE_SET_PASSWORD = '/api/v1/auth/set-password/';
+const PHONE_RESET_PASS = '/api/v1/auth/reset-password-set/';
+const EMAIL_RESET_PASS = '/api/v1/email-auth/reset-password-set/';
+const EMAIL_SET_PASSWORD = '/api/v1/email-auth/set-password-email/';
+const EMAIL_SENDOTP = '/api/v1/email-auth/register/';
+const EMAIL_RESEND_PASSWORD = '/api/v1/email-auth/reset-password/';
+const EMAIL_RESEND_OTP = '/api/v1/email-auth/resend/';
+
+const SAVE_TICKETS = '/api/v1/likes/';
+const GET_SAVED = '/api/v1/likes/';
+
+const SEND_PARTNER = '/api/v1/travel-agency/';
+
+const UPDATE_USER = '/api/v1/auth/user-update/';
+const NEW_PASSWORD = '/api/v1/auth/change-password/';
+const GET_ME = '/api/v1/auth/me/';
+
+export {
+  BASE_URL,
+  EMAIL_CONFIRM_RESET_PASS,
+  EMAIL_CONFIRMOTP,
+  EMAIL_LOGIN,
+  EMAIL_RESEND_OTP,
+  EMAIL_RESEND_PASSWORD,
+  EMAIL_RESET_PASS,
+  EMAIL_SENDOTP,
+  EMAIL_SET_PASSWORD,
+  ENDP_POSTS,
+  GET_BLOGS,
+  GET_ME,
+  GET_SAVED,
+  GET_TAGS,
+  GET_TICKETS,
+  NEW_PASSWORD,
+  PHONE_CONFIRM_RESET_PASS,
+  PHONE_CONFIRMOTP,
+  PHONE_LOGIN,
+  PHONE_RESEND_OTP,
+  PHONE_RESET_PASS,
+  PHONE_RESTER_PASSWORD,
+  PHONE_SENDOTP,
+  PHONE_SET_PASSWORD,
+  SAVE_TICKETS,
+  SEND_PARTNER,
+  UPDATE_USER,
+};

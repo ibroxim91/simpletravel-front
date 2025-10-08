@@ -1,7 +1,10 @@
 'use client';
 
+import { Auth_Api } from '@/features/auth/lib/api';
 import SupportTabs from '@/features/faq/ui/SupportTabs';
+import { removeRefToken, removeToken } from '@/shared/config/api/saveToke';
 import { Link, useRouter } from '@/shared/config/i18n/navigation';
+import formatPhone from '@/shared/lib/formatPhone';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
 import { Button } from '@/shared/ui/button';
 import {
@@ -21,12 +24,17 @@ import DoneIcon from '@mui/icons-material/Done';
 import EastIcon from '@mui/icons-material/East';
 import EditIcon from '@mui/icons-material/Edit';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { AnimatePresence, motion } from 'framer-motion';
+import { LoaderCircle, LogOutIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import z from 'zod';
+import { User_Api } from '../lib/api';
 import { editUserEmail, editUserName, editUserPhone } from '../lib/form';
 import ReservationsTabs from './ReservationsTabs';
 import SettingTabs from './SettingTabs';
@@ -36,8 +44,12 @@ const ProfileTabs = () => {
   const t = useTranslations();
   const [activeTab, setActiveTab] = useState('profile');
   const router = useRouter();
+  const queryClient = useQueryClient();
   const searchParams = useSearchParams();
-
+  const { data: user } = useQuery({
+    queryKey: ['get_me'],
+    queryFn: () => User_Api.getMe(),
+  });
   const variants = {
     hidden: { opacity: 0, x: 80 },
     visible: { opacity: 1, x: 0 },
@@ -50,7 +62,8 @@ const ProfileTabs = () => {
   const [edit, setEdit] = useState<boolean>(false);
   const [editPhoneState, setEditPhoneState] = useState<boolean>(false);
   const [editEmailState, setEditEmailState] = useState<boolean>(false);
-  const [avatar, setAvatar] = useState<string>('');
+  const [avatar, setAvatar] = useState<File | undefined>(undefined);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
@@ -83,14 +96,72 @@ const ProfileTabs = () => {
   });
 
   useEffect(() => {
-    form.reset({
-      firstName: 'Baxodir',
-      lastName: 'Darobov',
-    });
-  }, [form]);
+    if (user && user.data.data.phone) {
+      formPhone.reset({
+        phone: formatPhone(user.data.data.phone),
+      });
+    }
+  }, [formPhone, user]);
 
-  function onSubmit() {
-    setEdit(false);
+  useEffect(() => {
+    if (user && user.data.data.email) {
+      formEmail.reset({
+        emial: user.data.data.email,
+      });
+    }
+  }, [formEmail, user]);
+
+  useEffect(() => {
+    if (user) {
+      form.reset({
+        firstName: user.data.data.first_name,
+        lastName: user.data.data.last_name,
+      });
+    }
+  }, [form, user]);
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: ({
+      first_name,
+      last_name,
+      avatar,
+    }: {
+      first_name: string;
+      last_name: string;
+      avatar?: File;
+    }) => {
+      return Auth_Api.updateUser({ first_name, last_name, avatar });
+    },
+    onSuccess() {
+      setEdit(false);
+      setAvatarPreview(null);
+      setAvatar(undefined);
+      queryClient.clear();
+    },
+    onError(error: AxiosError<{ non_field_errors: [string] }>) {
+      toast.error(t('Xatolik yuz berdi'), {
+        icon: null,
+        description: error.name,
+        position: 'bottom-right',
+      });
+    },
+  });
+
+  function updateAvatar() {
+    if (avatar) {
+      mutate({
+        first_name: user ? user.data.data.first_name : '',
+        last_name: user ? user.data.data.last_name : '',
+        avatar,
+      });
+    }
+  }
+
+  function onSubmit(values: z.infer<typeof editUserName>) {
+    mutate({
+      first_name: values.firstName,
+      last_name: values.lastName,
+    });
   }
 
   function editPhone() {
@@ -104,8 +175,8 @@ const ProfileTabs = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const url = URL.createObjectURL(file);
-      setAvatar(url);
+      setAvatar(file);
+      setAvatarPreview(URL.createObjectURL(file));
     }
   };
 
@@ -127,7 +198,23 @@ const ProfileTabs = () => {
       </Breadcrumbs>
 
       <div className="mt-10">
-        <p className="text-3xl text-[#031753] font-semibold">{t('Профиль')}</p>
+        <div className="flex justify-between items-center">
+          <p className="text-3xl text-[#031753] font-semibold">
+            {t('Профиль')}
+          </p>
+          <button
+            className="text-red-500 items-center flex gap-2 cursor-pointer font-medium lg:hidden"
+            onClick={() => {
+              removeToken();
+              removeRefToken();
+              queryClient.clear();
+              router.push('/');
+            }}
+          >
+            <LogOutIcon className="size-5" />
+            <p>{t('Chiqish')}</p>
+          </button>
+        </div>
         <motion.div
           key="cabinet"
           initial="hidden"
@@ -194,13 +281,34 @@ const ProfileTabs = () => {
                         <div className="flex justify-between items-center">
                           <div className="flex gap-2 items-center">
                             <Avatar className="w-16 h-16 rounded-lg">
-                              <AvatarImage src={avatar} />
+                              <AvatarImage
+                                src={
+                                  avatarPreview // agar preview mavjud bo‘lsa, uni ko‘rsat
+                                    ? avatarPreview
+                                    : user?.data.data.avatar // agar backenddan kelgan avatar bo‘lsa
+                                      ? user.data.data.avatar
+                                      : undefined
+                                }
+                                alt="User Avatar"
+                              />
                               <AvatarFallback className="w-16 h-16 rounded-lg">
-                                DB
+                                {user
+                                  ? user.data.data.first_name
+                                      .toUpperCase()
+                                      .slice(0, 1) +
+                                    user.data.data.last_name
+                                      .toUpperCase()
+                                      .slice(0, 1)
+                                  : 'DB'}
                               </AvatarFallback>
                             </Avatar>
+
                             <p className="font-semibold text-lg">
-                              Darobov Baxodir
+                              {user
+                                ? user?.data.data.first_name +
+                                  ' ' +
+                                  user?.data.data.last_name
+                                : ''}
                             </p>
                           </div>
                           <div>
@@ -209,7 +317,8 @@ const ProfileTabs = () => {
                                 <Button
                                   variant={'secondary'}
                                   onClick={() => {
-                                    setAvatar('');
+                                    setAvatar(undefined);
+                                    setAvatarPreview(null);
                                   }}
                                   className="h-12 rounded-3xl border border-[#DFDFDF] px-8 cursor-pointer text-md"
                                 >
@@ -218,11 +327,10 @@ const ProfileTabs = () => {
                                     {t('Отмена')}
                                   </p>
                                 </Button>
+
                                 <Button
                                   className="h-12 rounded-3xl px-8 cursor-pointer text-md"
-                                  onClick={() => {
-                                    setAvatar('');
-                                  }}
+                                  onClick={updateAvatar}
                                 >
                                   <DoneIcon fill="#031753" />
                                   <p className="text-md max-lg:hidden">
@@ -315,7 +423,11 @@ const ProfileTabs = () => {
                                     className="h-12 rounded-3xl px-8 cursor-pointer text-md"
                                     onClick={form.handleSubmit(onSubmit)}
                                   >
-                                    {t('Сохранить')}
+                                    {isPending ? (
+                                      <LoaderCircle className="animate-spin" />
+                                    ) : (
+                                      t('Сохранить')
+                                    )}
                                   </Button>
                                 </div>
                               ) : (
@@ -394,6 +506,7 @@ const ProfileTabs = () => {
                                         variant={'ghost'}
                                         className="text-[#084FE3] max-lg:!p-0 hover:bg-white hover:text-[#084FE3] cursor-pointer text-md font-semibold flex items-center"
                                         onClick={() => setEditPhoneState(true)}
+                                        disabled
                                       >
                                         <div className="lg:hidden border p-2 rounded-full flex justify-center">
                                           <EditIcon
@@ -482,6 +595,7 @@ const ProfileTabs = () => {
                                         variant={'ghost'}
                                         className="text-[#084FE3] max-lg:!p-0 hover:bg-white hover:text-[#084FE3] cursor-pointer text-md font-semibold flex items-center"
                                         onClick={() => setEditEmailState(true)}
+                                        disabled
                                       >
                                         <div className="lg:hidden border p-2 rounded-full flex justify-center">
                                           <EditIcon
@@ -572,6 +686,18 @@ const ProfileTabs = () => {
             </AnimatePresence>
           </Tabs>
         </motion.div>
+        <button
+          className="text-red-500 items-center flex gap-2 cursor-pointer font-medium mt-10 max-lg:hidden"
+          onClick={() => {
+            removeToken();
+            removeRefToken();
+            queryClient.clear();
+            router.push('/');
+          }}
+        >
+          <LogOutIcon className="size-5" />
+          <p>{t('Chiqish')}</p>
+        </button>
       </div>
     </div>
   );

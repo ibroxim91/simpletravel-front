@@ -8,9 +8,17 @@ import {
 } from './data';
 
 export const News_Api = {
-  async getAllNews({ page, page_size }: { page: number; page_size: number }) {
+  async getAllNews({
+    page,
+    page_size,
+    category,
+  }: {
+    page: number;
+    page_size: number;
+    category?: number | string;
+  }) {
     const res = await httpClient.get<All_Blogs_Type>(GET_BLOGS, {
-      params: { page, page_size },
+      params: { page, page_size, category },
     });
     return res;
   },

@@ -35,7 +35,11 @@ const MobileNavbar = ({ setOpen, open }: Props) => {
       anchor="right"
       open={open}
       onClose={() => setOpen(false)}
-      sx={{ position: 'sticky', top: '0px', zIndex: '50', bgcolor: '#edeef1' }}
+      sx={{
+        position: 'sticky',
+        top: '0px',
+        bgcolor: '#edeef1',
+      }}
     >
       <div className="w-screen" />
       <div className="bg-[#031753] p-2 relative">

@@ -7,6 +7,7 @@ const authRoutes = [
   '/auth/edit-password',
   '/auth/forget-password',
   '/auth/register',
+  '/auth/login',
 ];
 
 export default function ConditionalFooter() {

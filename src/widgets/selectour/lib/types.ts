@@ -13,6 +13,18 @@ export interface TickectAll {
       tickets: TickectAllResults[];
       min_price: number;
       max_price: number;
+      hotel_amenities: string[];
+      hotel_features_by_type: {
+        type: string;
+        features: string[];
+      }[];
+      hotel_types: string[];
+      top_destinations: {
+        destination: string;
+      }[];
+      top_duration: {
+        duration: number;
+      }[];
     };
   };
 }
@@ -41,11 +53,15 @@ export interface TickectAllFilter {
   departure_date?: string;
   departure_time?: string;
   destination?: string;
+  hotel_name?: string;
+  hotel_feature?: string[];
   destinations?: string;
   duration_days?: string;
   rating?: number;
+  hotel_rating?: string;
   hotel_type?: string;
   max_price?: number;
+  hotel_amenity?: string;
   meal_plan?: string;
   min_price?: number;
   most_expensive?: boolean;

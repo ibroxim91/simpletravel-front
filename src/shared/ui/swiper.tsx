@@ -1,10 +1,12 @@
 'use client';
 
+import Ticket_Api from '@/widgets/selectour/lib/api';
 import AspectRatioIcon from '@mui/icons-material/AspectRatio';
 import EastIcon from '@mui/icons-material/East';
-import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
 import IosShareIcon from '@mui/icons-material/IosShare';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import React from 'react';
@@ -17,6 +19,8 @@ import { Link } from '../config/i18n/navigation';
 
 interface Props {
   setOpenWatch: React.Dispatch<React.SetStateAction<boolean>>;
+  id: number;
+  is_liked: boolean;
   images: [
     {
       image: string;
@@ -24,7 +28,12 @@ interface Props {
   ];
 }
 
-export default function ImageSwiper({ setOpenWatch, images }: Props) {
+export default function ImageSwiper({
+  setOpenWatch,
+  images,
+  id,
+  is_liked,
+}: Props) {
   const t = useTranslations();
   const handleCopy = () => {
     if (navigator.clipboard) {
@@ -33,6 +42,42 @@ export default function ImageSwiper({ setOpenWatch, images }: Props) {
       });
     }
   };
+  const queryClient = useQueryClient();
+  const { mutate } = useMutation({
+    mutationFn: ({ ticket }: { ticket: number }) => {
+      return Ticket_Api.saveTickets({ ticket });
+    },
+    onSuccess() {
+      queryClient.refetchQueries({ queryKey: ['ticket_all'] });
+      queryClient.refetchQueries({ queryKey: ['get_saved'] });
+      queryClient.refetchQueries({ queryKey: ['tickets_detail'] });
+    },
+    onError(error: { message: string }) {
+      toast.error(t('Xatolik yuz berdi'), {
+        icon: null,
+        description: error.message,
+        position: 'bottom-right',
+      });
+    },
+  });
+
+  const { mutate: deletLike } = useMutation({
+    mutationFn: ({ ticket }: { ticket: number }) => {
+      return Ticket_Api.removeTickets({ id: ticket });
+    },
+    onSuccess() {
+      queryClient.refetchQueries({ queryKey: ['ticket_all'] });
+      queryClient.refetchQueries({ queryKey: ['get_saved'] });
+      queryClient.refetchQueries({ queryKey: ['tickets_detail'] });
+    },
+    onError(error: { message: string }) {
+      toast.error(t('Xatolik yuz berdi'), {
+        icon: null,
+        description: error.message,
+        position: 'bottom-right',
+      });
+    },
+  });
   return (
     <div className="w-full mx-auto square relative">
       <Swiper
@@ -125,8 +170,25 @@ export default function ImageSwiper({ setOpenWatch, images }: Props) {
               <IosShareIcon />
             </div>
 
-            <div className="flex items-center gap-5 bg-[#FFFFFF33] rounded-full cursor-pointer backdrop-blur-2xl justify-center px-4 py-4">
-              <FavoriteIcon />
+            <div
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (is_liked) {
+                  deletLike({
+                    ticket: id,
+                  });
+                } else if (!is_liked) {
+                  mutate({
+                    ticket: id,
+                  });
+                }
+              }}
+              className="flex items-center gap-5 bg-[#FFFFFF33] rounded-full cursor-pointer backdrop-blur-2xl justify-center px-4 py-4"
+            >
+              <FavoriteRoundedIcon
+                sx={{ color: is_liked ? '#E03137' : '#fff' }}
+              />
             </div>
           </div>
         </div>

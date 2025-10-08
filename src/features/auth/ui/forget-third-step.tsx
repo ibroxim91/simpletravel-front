@@ -12,9 +12,14 @@ import {
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
+import { LoaderCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import z from 'zod';
+import { Auth_Api } from '../lib/api';
+import { useLoginPhoneStore } from '../lib/store';
 
 const formSchema = z
   .object({
@@ -32,6 +37,7 @@ const formSchema = z
 
 const ForgetThirdStep = () => {
   const t = useTranslations();
+  const { phone, email, token } = useLoginPhoneStore();
   const route = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -41,8 +47,44 @@ const ForgetThirdStep = () => {
     },
   });
 
-  function onSubmit() {
-    route.push('/profile');
+  const { mutate, isPending } = useMutation({
+    mutationFn: ({ password, token }: { password: string; token: string }) => {
+      return Auth_Api.resetPass({
+        password,
+        token: token,
+      });
+    },
+    onSuccess() {
+      route.push('/profile?tabs=profile');
+      toast.success('Parol muvaffaqiyatli tiklandi');
+    },
+  });
+
+  const { mutate: emailMutate, isPending: emailPending } = useMutation({
+    mutationFn: ({ password, token }: { password: string; token: string }) => {
+      return Auth_Api.resetPassEmail({
+        password,
+        token: token,
+      });
+    },
+    onSuccess() {
+      route.push('/profile?tabs=profile');
+      toast.success('Parol muvaffaqiyatli tiklandi');
+    },
+  });
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    if (phone !== undefined) {
+      mutate({
+        password: values.password,
+        token: token,
+      });
+    } else if (email !== undefined) {
+      emailMutate({
+        password: values.password,
+        token: token,
+      });
+    }
   }
 
   return (
@@ -94,9 +136,14 @@ const ForgetThirdStep = () => {
           />
           <Button
             type="submit"
+            disabled={emailPending || isPending}
             className="w-full px-4 py-8 rounded-full bg-[#1764FC] hover:bg-[#1764FC0] cursor-pointer"
           >
-            {t('Сохранить новый пароль')}
+            {emailPending || isPending ? (
+              <LoaderCircle className="animate-spin" />
+            ) : (
+              t('Сохранить новый пароль')
+            )}
           </Button>
         </form>
       </Form>

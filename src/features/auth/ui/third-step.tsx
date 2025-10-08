@@ -1,7 +1,9 @@
 'use client';
 
 import { useWelcomeStore } from '@/features/profile/lib/hook';
+import { saveRefToken, saveToken } from '@/shared/config/api/saveToke';
 import { useRouter } from '@/shared/config/i18n/navigation';
+import onlyNumber from '@/shared/lib/onlyNember';
 import { Button } from '@/shared/ui/button';
 import {
   Form,
@@ -13,11 +15,16 @@ import {
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Check } from 'lucide-react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
+import { Check, LoaderCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import z from 'zod';
+import { Auth_Api } from '../lib/api';
+import { useLoginPhoneStore } from '../lib/store';
 
 const formSchema = z
   .object({
@@ -35,7 +42,9 @@ const formSchema = z
 
 const ThirdStep = () => {
   const t = useTranslations();
+  const ref = useQueryClient();
   const route = useRouter();
+  const { phone, email } = useLoginPhoneStore();
   const { setOpenModalMobile, setOpenModal } = useWelcomeStore();
   const [license, setLicense] = useState<boolean>(false);
   const form = useForm<z.infer<typeof formSchema>>({
@@ -46,10 +55,60 @@ const ThirdStep = () => {
     },
   });
 
-  function onSubmit() {
-    route.push('/profile');
-    setOpenModalMobile(true);
-    setOpenModal(true);
+  const { mutate: setPasswordPhone, isPending } = useMutation({
+    mutationFn: ({ phone, password }: { phone: string; password: string }) => {
+      return Auth_Api.PasswordPhone({ phone, password });
+    },
+    onSuccess(data) {
+      saveToken(data.data.data.token.access);
+      saveRefToken(data.data.data.token.refresh);
+      route.push('/profile');
+      ref.clear();
+      setOpenModalMobile(true);
+      setOpenModal(true);
+    },
+    onError(error: AxiosError<{ data: { detail: string } }>) {
+      toast.error(t('Xatolik yuz berdi'), {
+        icon: null,
+        description: error.response?.data.data.detail,
+        position: 'bottom-right',
+      });
+    },
+  });
+
+  const { mutate: setPasswordEmail, isPending: emailPending } = useMutation({
+    mutationFn: ({ email, password }: { email: string; password: string }) => {
+      return Auth_Api.PasswordEmail({ email, password });
+    },
+    onSuccess(data) {
+      saveToken(data.data.data.token.access);
+      saveRefToken(data.data.data.token.refresh);
+      route.push('/profile');
+      ref.clear();
+      setOpenModalMobile(true);
+      setOpenModal(true);
+    },
+    onError(error: AxiosError<{ data: { detail: string } }>) {
+      toast.error(t('Xatolik yuz berdi'), {
+        icon: null,
+        description: error.response?.data.data.detail,
+        position: 'bottom-right',
+      });
+    },
+  });
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    if (phone !== undefined) {
+      setPasswordPhone({
+        password: values.password,
+        phone: onlyNumber(phone),
+      });
+    } else if (email !== undefined) {
+      setPasswordEmail({
+        password: values.password,
+        email,
+      });
+    }
   }
 
   return (
@@ -120,7 +179,11 @@ const ThirdStep = () => {
             disabled={!license}
             className="w-full px-4 py-8 rounded-full bg-[#1764FC] hover:bg-[#1764FC0] cursor-pointer"
           >
-            {t('Зарегистрироваться')}
+            {isPending || emailPending ? (
+              <LoaderCircle className="animate-spin" />
+            ) : (
+              t('Зарегистрироваться')
+            )}
           </Button>
         </form>
       </Form>

@@ -4,6 +4,8 @@ import loaderAnimation from '@/assets/lottie/Travel.json';
 import Partners_1 from '@/assets/partners_1.png';
 import Partners_2 from '@/assets/partners_2.png';
 import Partners_3 from '@/assets/partners_3.png';
+import formatPhone from '@/shared/lib/formatPhone';
+import onlyNumber from '@/shared/lib/onlyNember';
 import { Button } from '@/shared/ui/button';
 import { Card, CardContent } from '@/shared/ui/card';
 import {
@@ -29,13 +31,16 @@ import { Player } from '@lottiefiles/react-lottie-player';
 import CloseIcon from '@mui/icons-material/Close';
 import DoneIcon from '@mui/icons-material/Done';
 import Drawer from '@mui/material/Drawer';
+import { useMutation } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { easeOut, motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import z from 'zod';
+import { Send_Partner, SendPartnerBody } from '../lib/api';
 import senPartners from '../lib/form';
 
 const SendPartner = () => {
@@ -46,14 +51,13 @@ const SendPartner = () => {
   const repeatedPartners = [...partners, ...partners, ...partners];
   const [error, setError] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const form = useForm<z.infer<typeof senPartners>>({
     resolver: zodResolver(senPartners),
     defaultValues: {
       name: '',
       phone: '',
-      address: ' ',
+      address: '',
       email: '',
       license: undefined,
       website: '',
@@ -90,23 +94,38 @@ const SendPartner = () => {
 
   const MotionDiv = isMobile ? 'div' : motion.div;
 
-  async function onSubmit() {
-    setLoading(true);
-    setSuccess(false);
-    setError(null);
-    try {
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve('ok');
-        }, 2000);
-      });
-      setLoading(false);
+  const { mutate, isPending } = useMutation({
+    mutationFn: (body: SendPartnerBody) => {
+      return Send_Partner.send(body);
+    },
+    onSuccess() {
+      toast.success(t("So'rov muvaffaqiyatli jo'natildi"));
       setSuccess(true);
-    } catch {
-      setLoading(false);
-      setError('Произошла ошибка при отправке. Попробуйте ещё раз.');
+      form.reset();
+    },
+    onError() {
+      setError('Произошла ошибка при отправке');
+    },
+  });
+
+  async function onSubmit(values: z.infer<typeof senPartners>) {
+    const formData = new FormData();
+    formData.append('name', values.name);
+    formData.append('addres', values.address);
+    formData.append('email', values.email);
+    formData.append('phone', onlyNumber(values.phone));
+    formData.append('instagram', values.instagram || '');
+    formData.append('web_site', values.website || '');
+
+    if (values.license && Array.isArray(values.license)) {
+      values.license.forEach((file) => {
+        formData.append('documents', file);
+      });
     }
+
+    mutate(formData as unknown as SendPartnerBody);
   }
+
   return (
     <>
       <MotionDiv
@@ -132,7 +151,7 @@ const SendPartner = () => {
             <Dialog
               open={open}
               onOpenChange={(isOpen) => {
-                if (!loading) {
+                if (!isPending) {
                   setOpen(isOpen);
                   if (!isOpen) setSuccess(false);
                 }
@@ -146,7 +165,7 @@ const SendPartner = () => {
 
               <DialogContent
                 showCloseButton={false}
-                className="rounded-4xl !max-w-4xl"
+                className="rounded-4xl !max-w-4xl !max-h-[90%] !overflow-y-scroll scrollbar-hide"
               >
                 <DialogHeader>
                   <DialogTitle
@@ -156,7 +175,7 @@ const SendPartner = () => {
                       success && 'justify-center',
                     )}
                   >
-                    {loading && <p className="text-3xl">{t('Отправка')}</p>}
+                    {isPending && <p className="text-3xl">{t('Отправка')}</p>}
 
                     {success && (
                       <Button
@@ -176,7 +195,7 @@ const SendPartner = () => {
                       </Button>
                     )}
 
-                    {!loading && !success && !error && (
+                    {!isPending && !success && !error && (
                       <>
                         <p className="text-3xl">{t('Стать партнёром')}</p>
                         <DialogClose asChild>
@@ -184,7 +203,6 @@ const SendPartner = () => {
                             variant={'outline'}
                             onClick={() => {
                               setSuccess(false);
-                              setLoading(false);
                               form.reset();
                             }}
                             className="rounded-full p-6 h-12 w-12"
@@ -197,7 +215,7 @@ const SendPartner = () => {
                   </DialogTitle>
 
                   <DialogDescription className="flex flex-col justify-center items-center gap-8">
-                    {loading && (
+                    {isPending && (
                       <div className="flex justify-center items-center mt-10">
                         <Player
                           autoplay
@@ -217,7 +235,8 @@ const SendPartner = () => {
                           {t(
                             'Эксперт свяжется с вами в ближайшее время по номеру',
                           )}{' '}
-                          +{form.getValues('phone')} {t('позвонив на него')}
+                          {formatPhone(form.getValues('phone'))}{' '}
+                          {t('позвонив на него')}
                         </p>
                         <div className="mt-4">
                           <Button
@@ -226,7 +245,6 @@ const SendPartner = () => {
                             onClick={() => {
                               form.reset();
                               setSuccess(false);
-                              setLoading(false);
                               setOpen(false);
                             }}
                           >
@@ -236,7 +254,7 @@ const SendPartner = () => {
                       </div>
                     )}
 
-                    {error && !loading && !success && (
+                    {error && !isPending && !success && (
                       <div className="flex flex-col items-center text-center gap-6 mt-6">
                         <p className="text-xl font-semibold text-[#212122]">
                           {error}
@@ -247,7 +265,6 @@ const SendPartner = () => {
                           onClick={() => {
                             form.reset();
                             setSuccess(false);
-                            setLoading(false);
                             setOpen(false);
                             setError(null);
                           }}
@@ -257,7 +274,7 @@ const SendPartner = () => {
                       </div>
                     )}
 
-                    {!loading && !success && !error && (
+                    {!isPending && !success && !error && (
                       <Form {...form}>
                         <form
                           onSubmit={form.handleSubmit(onSubmit)}
@@ -306,42 +323,126 @@ const SendPartner = () => {
                           <FormField
                             control={form.control}
                             name="license"
-                            render={({ field }) => (
-                              <FormItem>
-                                <Label className="text-xl font-semibold text-[#212122]">
-                                  {t('Свидетельств/Лицензияо')}
-                                </Label>
-                                <FormControl>
-                                  <Input
-                                    onChange={(e) => {
-                                      const file = e.target.files?.[0];
-                                      field.onChange(file);
-                                    }}
-                                    onBlur={field.onBlur}
-                                    type="file"
-                                    className="hidden"
-                                    id="license-file"
-                                  />
-                                </FormControl>
-                                <label
-                                  htmlFor="license-file"
-                                  className="w-full bg-[#EDEEF180] border-2 border-dashed border-[#D3D3D3] flex flex-col items-center gap-2 justify-center py-4 rounded-2xl cursor-pointer hover:bg-[#EDEEF1]"
-                                >
-                                  <p className="font-semibold text-xl text-[#212122]">
-                                    {t('Drag or select file')}
-                                  </p>
-                                  <p className="text-[#646465] text-sm">
-                                    {t('Drop files here or click to browse')}
-                                  </p>
-                                  {field.value && (
-                                    <p className="text-[#212122] mt-2 font-medium">
-                                      {t('Выбран файл')}: {field.value.name}
+                            render={({ field }) => {
+                              const files = Array.isArray(field.value)
+                                ? field.value
+                                : [];
+
+                              const handleFileChange = (
+                                e: React.ChangeEvent<HTMLInputElement>,
+                              ) => {
+                                const selectedFiles = Array.from(
+                                  e.target.files || [],
+                                );
+                                field.onChange([...files, ...selectedFiles]);
+                              };
+
+                              const handleRemoveFile = (index: number) => {
+                                const updated = files.filter(
+                                  (_, i) => i !== index,
+                                );
+                                field.onChange(updated);
+                              };
+
+                              return (
+                                <FormItem>
+                                  <Label className="text-xl font-semibold text-[#212122]">
+                                    {t('Файлы (лицензии, документы и т.д.)')}
+                                  </Label>
+                                  <FormControl>
+                                    <Input
+                                      onChange={handleFileChange}
+                                      onBlur={field.onBlur}
+                                      type="file"
+                                      multiple
+                                      className="hidden"
+                                      id="license-files"
+                                    />
+                                  </FormControl>
+
+                                  {/* Drag/drop joyi */}
+                                  <label
+                                    htmlFor="license-files"
+                                    className="w-full bg-[#EDEEF180] border-2 border-dashed border-[#D3D3D3] flex flex-col items-center gap-2 justify-center py-4 rounded-2xl cursor-pointer hover:bg-[#EDEEF1]"
+                                  >
+                                    <p className="font-semibold text-xl text-[#212122]">
+                                      {t('Drag or select files')}
                                     </p>
+                                    <p className="text-[#646465] text-sm">
+                                      {t('Drop files here or click to browse')}
+                                    </p>
+                                    {files.length > 0 && (
+                                      <p className="text-[#212122] mt-2 font-medium">
+                                        {t('Выбрано файлов')}: {files.length}
+                                      </p>
+                                    )}
+                                  </label>
+
+                                  {/* Fayllar ro‘yxati */}
+                                  {files.length > 0 && (
+                                    <div className="mt-4 flex flex-col gap-3">
+                                      {files.map((file, index) => {
+                                        return (
+                                          <div
+                                            key={index}
+                                            className="flex items-center justify-between p-3 border border-[#EDEEF1] rounded-xl bg-white"
+                                          >
+                                            <div className="flex items-center gap-3">
+                                              {/* Agar rasm bo‘lsa preview */}
+                                              {file.type.startsWith(
+                                                'image/',
+                                              ) ? (
+                                                <div className="relative w-[50px] h-[50px]">
+                                                  <Image
+                                                    src={URL.createObjectURL(
+                                                      file,
+                                                    )}
+                                                    alt={file.name}
+                                                    fill
+                                                    className="object-cover rounded-md"
+                                                  />
+                                                </div>
+                                              ) : (
+                                                <div className="w-[50px] h-[50px] flex items-center justify-center bg-[#EDEEF1] rounded-md">
+                                                  <p className="text-sm text-[#646465] font-medium overflow-hidden">
+                                                    FILE
+                                                  </p>
+                                                </div>
+                                              )}
+                                              <div>
+                                                <p className="font-semibold text-sm truncate max-w-[140px]">
+                                                  {file.name}
+                                                </p>
+                                                <p className="text-xs text-[#646465]">
+                                                  {(file.size / 1024).toFixed(
+                                                    1,
+                                                  )}{' '}
+                                                  KB
+                                                </p>
+                                              </div>
+                                            </div>
+
+                                            <Button
+                                              type="button"
+                                              variant="destructive"
+                                              onClick={() =>
+                                                handleRemoveFile(index)
+                                              }
+                                              className="rounded-full h-10 w-10 flex items-center justify-center"
+                                            >
+                                              <CloseIcon
+                                                sx={{ width: 20, height: 20 }}
+                                              />
+                                            </Button>
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
                                   )}
-                                </label>
-                                <FormMessage />
-                              </FormItem>
-                            )}
+                                  <FormMessage />
+                                </FormItem>
+                              );
+                            }}
                           />
                           <div className="flex gap-4 w-full items-start">
                             <FormField
@@ -373,10 +474,15 @@ const SendPartner = () => {
                                   </Label>
                                   <FormControl>
                                     <Input
+                                      placeholder={t('Введите номер телефона')}
                                       {...field}
-                                      placeholder={t(
-                                        'Введите ваш номер телефона',
-                                      )}
+                                      value={field.value || '+998'}
+                                      onChange={(e) =>
+                                        field.onChange(
+                                          formatPhone(e.target.value),
+                                        )
+                                      }
+                                      maxLength={19}
                                       className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
                                     />
                                   </FormControl>
@@ -385,25 +491,46 @@ const SendPartner = () => {
                               )}
                             />
                           </div>
-                          <FormField
-                            control={form.control}
-                            name="website"
-                            render={({ field }) => (
-                              <FormItem className="w-full">
-                                <Label className="text-xl font-semibold text-[#212122]">
-                                  {t('Instagram / Вебсайт')}
-                                </Label>
-                                <FormControl>
-                                  <Input
-                                    {...field}
-                                    placeholder="https://example.com"
-                                    className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+                          <div className="flex gap-4">
+                            <FormField
+                              control={form.control}
+                              name="website"
+                              render={({ field }) => (
+                                <FormItem className="w-full">
+                                  <Label className="text-xl font-semibold text-[#212122]">
+                                    {t('Вебсайт')}
+                                  </Label>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      placeholder="https://example.com"
+                                      className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            <FormField
+                              control={form.control}
+                              name="instagram"
+                              render={({ field }) => (
+                                <FormItem className="w-full">
+                                  <Label className="text-xl font-semibold text-[#212122]">
+                                    {t('Instagram')}
+                                  </Label>
+                                  <FormControl>
+                                    <Input
+                                      {...field}
+                                      placeholder="https://example.com"
+                                      className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
                           <div className="flex gap-4 items-center">
                             <Button
                               type="submit"
@@ -517,9 +644,8 @@ const SendPartner = () => {
           backdropFilter: 'blur(6px)',
         }}
         onClose={() => {
-          if (!loading) {
+          if (!isPending) {
             setSuccess(false);
-            setLoading(false);
             setError(null);
             form.reset();
             setOpenDrawer(false);
@@ -536,14 +662,13 @@ const SendPartner = () => {
           },
         }}
       >
-        {!success && !error && !loading && (
+        {!success && !error && !isPending && (
           <div className="flex justify-between items-center p-4">
             <p className="text-2xl font-semibold">{t('Стать партнёром')}</p>
             <Button
               variant="outline"
               onClick={() => {
                 setSuccess(false);
-                setLoading(false);
                 setError(null);
                 form.reset();
                 setOpenDrawer(false);
@@ -556,7 +681,7 @@ const SendPartner = () => {
         )}
 
         <div className="flex-1 overflow-auto">
-          {loading && (
+          {isPending && (
             <div className="flex justify-center items-center h-full">
               <Player
                 autoplay
@@ -566,7 +691,7 @@ const SendPartner = () => {
               />
             </div>
           )}
-          {success && !loading && (
+          {success && !isPending && (
             <div className="flex flex-col items-center justify-center gap-4 h-full px-4 text-center">
               <Button
                 color="#38DA2A"
@@ -587,7 +712,6 @@ const SendPartner = () => {
                 onClick={() => {
                   form.reset();
                   setSuccess(false);
-                  setLoading(false);
                   setOpenDrawer(false);
                 }}
               >
@@ -595,7 +719,7 @@ const SendPartner = () => {
               </Button>
             </div>
           )}
-          {error && !loading && !success && (
+          {error && !isPending && !success && (
             <div className="flex flex-col items-center justify-center gap-4 h-full px-4 text-center">
               <Button
                 color="#E03137"
@@ -613,7 +737,6 @@ const SendPartner = () => {
                 onClick={() => {
                   form.reset();
                   setSuccess(false);
-                  setLoading(false);
                   setError(null);
                   setOpenDrawer(false);
                 }}
@@ -622,7 +745,7 @@ const SendPartner = () => {
               </Button>
             </div>
           )}
-          {!loading && !success && !error && (
+          {!isPending && !success && !error && (
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
@@ -669,42 +792,109 @@ const SendPartner = () => {
                 <FormField
                   control={form.control}
                   name="license"
-                  render={({ field }) => (
-                    <FormItem>
-                      <Label className="text-xl font-semibold text-[#212122]">
-                        {t('Свидетельств/Лицензияо')}
-                      </Label>
-                      <FormControl>
-                        <Input
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            field.onChange(file);
-                          }}
-                          onBlur={field.onBlur}
-                          type="file"
-                          className="hidden"
-                          id="license-file"
-                        />
-                      </FormControl>
-                      <label
-                        htmlFor="license-file"
-                        className="w-full bg-[#EDEEF180] border-2 border-dashed border-[#D3D3D3] flex flex-col items-center gap-2 justify-center py-4 rounded-2xl cursor-pointer hover:bg-[#EDEEF1]"
-                      >
-                        <p className="font-semibold text-xl text-[#212122]">
-                          {t('Drag or select file')}
-                        </p>
-                        <p className="text-[#646465] text-sm">
-                          {t('Drop files here or click to browse')}
-                        </p>
-                        {field.value && (
-                          <p className="text-[#212122] mt-2 font-medium">
-                            {t('Выбран файл')}: {field.value.name}
+                  render={({ field }) => {
+                    const files = Array.isArray(field.value) ? field.value : [];
+
+                    const handleFileChange = (
+                      e: React.ChangeEvent<HTMLInputElement>,
+                    ) => {
+                      const selectedFiles = Array.from(e.target.files || []);
+                      field.onChange([...files, ...selectedFiles]);
+                    };
+
+                    const handleRemoveFile = (index: number) => {
+                      const updated = files.filter((_, i) => i !== index);
+                      field.onChange(updated);
+                    };
+
+                    return (
+                      <FormItem>
+                        <Label className="text-xl font-semibold text-[#212122]">
+                          {t('Файлы (лицензии, документы и т.д.)')}
+                        </Label>
+                        <FormControl>
+                          <Input
+                            onChange={handleFileChange}
+                            onBlur={field.onBlur}
+                            type="file"
+                            multiple
+                            className="hidden"
+                            id="license-files"
+                          />
+                        </FormControl>
+
+                        {/* Drag/drop joyi */}
+                        <label
+                          htmlFor="license-files"
+                          className="w-full bg-[#EDEEF180] border-2 border-dashed border-[#D3D3D3] flex flex-col items-center gap-2 justify-center py-4 rounded-2xl cursor-pointer hover:bg-[#EDEEF1]"
+                        >
+                          <p className="font-semibold text-xl text-[#212122]">
+                            {t('Drag or select files')}
                           </p>
+                          <p className="text-[#646465] text-sm">
+                            {t('Drop files here or click to browse')}
+                          </p>
+                          {files.length > 0 && (
+                            <p className="text-[#212122] mt-2 font-medium">
+                              {t('Выбрано файлов')}: {files.length}
+                            </p>
+                          )}
+                        </label>
+
+                        {/* Fayllar ro‘yxati */}
+                        {files.length > 0 && (
+                          <div className="mt-4 flex flex-col gap-3">
+                            {files.map((file, index) => {
+                              return (
+                                <div
+                                  key={index}
+                                  className="flex items-center justify-between p-3 border border-[#EDEEF1] rounded-xl bg-white"
+                                >
+                                  <div className="flex items-center gap-3">
+                                    {/* Agar rasm bo‘lsa preview */}
+                                    {file.type.startsWith('image/') ? (
+                                      <div className="relative w-[50px] h-[50px]">
+                                        <Image
+                                          src={URL.createObjectURL(file)}
+                                          alt={file.name}
+                                          fill
+                                          className="object-cover rounded-md"
+                                        />
+                                      </div>
+                                    ) : (
+                                      <div className="w-[50px] h-[50px] flex items-center justify-center bg-[#EDEEF1] rounded-md">
+                                        <p className="text-sm text-[#646465] font-medium overflow-hidden">
+                                          FILE
+                                        </p>
+                                      </div>
+                                    )}
+                                    <div>
+                                      <p className="font-semibold text-sm truncate max-w-[140px]">
+                                        {file.name}
+                                      </p>
+                                      <p className="text-xs text-[#646465]">
+                                        {(file.size / 1024).toFixed(1)} KB
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  <Button
+                                    type="button"
+                                    variant="destructive"
+                                    onClick={() => handleRemoveFile(index)}
+                                    className="rounded-full h-10 w-10 flex items-center justify-center"
+                                  >
+                                    <CloseIcon sx={{ width: 20, height: 20 }} />
+                                  </Button>
+                                </div>
+                              );
+                            })}
+                          </div>
                         )}
-                      </label>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
                 />
                 <FormField
                   control={form.control}
@@ -735,8 +925,32 @@ const SendPartner = () => {
                       </Label>
                       <FormControl>
                         <Input
+                          placeholder={t('Введите номер телефона')}
                           {...field}
-                          placeholder="Введите ваш номер телефона"
+                          value={field.value || '+998'}
+                          onChange={(e) =>
+                            field.onChange(formatPhone(e.target.value))
+                          }
+                          maxLength={19}
+                          className="h-[60px] !text-lg rounded-xl"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="instagram"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <Label className="text-xl font-semibold text-[#212122]">
+                        {t('Instagram')}
+                      </Label>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="https://example.com"
                           className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
                         />
                       </FormControl>
@@ -750,7 +964,7 @@ const SendPartner = () => {
                   render={({ field }) => (
                     <FormItem className="w-full">
                       <Label className="text-xl font-semibold text-[#212122]">
-                        {t('Instagram / Вебсайт')}
+                        {t('Вебсайт')}
                       </Label>
                       <FormControl>
                         <Input

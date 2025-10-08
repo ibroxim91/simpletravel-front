@@ -167,7 +167,6 @@ const FilterHotel = () => {
             sx={{
               position: 'absolute',
               top: '85px',
-              zIndex: 60,
               fontSize: '32px',
               color: 'white',
               filter: 'drop-shadow(0px 0px 0px rgba(0,0,0,0.3))',
@@ -178,7 +177,7 @@ const FilterHotel = () => {
 
         {openCity && (
           <div
-            className="absolute top-[105px] border border-white shadow-2xl rounded-2xl bg-white w-60 z-50 p-2"
+            className="absolute top-[105px] border border-white shadow-2xl rounded-2xl bg-white w-60 z-40 p-2"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="relative mb-2">
@@ -259,7 +258,6 @@ const FilterHotel = () => {
             sx={{
               position: 'absolute',
               top: '85px',
-              zIndex: 60,
               fontSize: '32px',
               color: 'white',
               filter: 'drop-shadow(0px 0px 0px rgba(0,0,0,0.3))',
@@ -270,7 +268,7 @@ const FilterHotel = () => {
 
         {dataOpen && (
           <div
-            className="absolute top-[105px] border border-white shadow-2xl rounded-2xl bg-white z-50 p-2"
+            className="absolute top-[105px] border border-white shadow-2xl rounded-2xl bg-white z-40 p-2"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex gap-2 items-center">
@@ -370,7 +368,6 @@ const FilterHotel = () => {
             sx={{
               position: 'absolute',
               top: '85px',
-              zIndex: 60,
               fontSize: '32px',
               color: 'white',
               filter: 'drop-shadow(0px 0px 0px rgba(0,0,0,0.3))',
@@ -388,7 +385,7 @@ const FilterHotel = () => {
 
         {ageOpen && (
           <div
-            className="absolute top-[105px] border border-white shadow-2xl rounded-2xl bg-white z-50 p-2 px-4 w-96 font-medium"
+            className="absolute top-[105px] border border-white shadow-2xl rounded-2xl bg-white z-40 p-2 px-4 w-96 font-medium"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between">

@@ -1,7 +1,14 @@
 'use client';
-import BlogHeader from '@/features/blogs/ui/Headers';
-import News from '@/features/blogs/ui/News';
+import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
+
+const BlogHeader = dynamic(() => import('@/features/blogs/ui/Headers'), {
+  ssr: false,
+});
+
+const News = dynamic(() => import('@/features/blogs/ui/News'), {
+  ssr: false,
+});
 
 const Blogs = () => {
   return (

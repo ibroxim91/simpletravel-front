@@ -45,7 +45,7 @@ export function ChangeLang() {
     <div className="relative px-0 flex gap-2 text-white items-center h-full">
       {open && (
         <div
-          className="fixed inset-0 bg-black/40 -z-10 overflow-y-scroll"
+          className="fixed inset-0 bg-black/40 z-40"
           onClick={() => setOpen(false)}
         />
       )}
@@ -68,15 +68,14 @@ export function ChangeLang() {
           <ArrowDropUpOutlinedIcon
             sx={{
               position: 'absolute',
-              bottom: '-23px',
-              zIndex: 60,
+              bottom: '-30px',
               fontSize: '32px',
               color: 'white',
               left: '8px',
             }}
           />
         )}
-        <SelectContent className="mt-1.5 border-white shadow-md bg-white mr-2">
+        <SelectContent className="mt-1.5 border-white shadow-md bg-white mr-2 z-[999999999]">
           <SelectGroup>
             {languages.map((lang) => (
               <SelectItem

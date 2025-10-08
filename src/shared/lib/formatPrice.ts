@@ -9,7 +9,7 @@ export const formatPrice = (
   const label = withLabel
     ? locale === LanguageRoutes.RU
       ? ' сум'
-      : locale === LanguageRoutes.EN
+      : locale === LanguageRoutes.UZ
         ? ' сўм'
         : " so'm"
     : '';

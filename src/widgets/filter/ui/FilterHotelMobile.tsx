@@ -268,20 +268,21 @@ const FilterHotelMobile = () => {
         </div>
         <Drawer
           anchor="bottom"
-          open={dataOpenMobile}
+          className=""
           onClose={() => {
             setDataOpenMobile(false);
             setFromDate(undefined);
             setToDate(undefined);
           }}
+          open={dataOpenMobile}
           PaperProps={{
             sx: {
               borderTopLeftRadius: 16,
               borderTopRightRadius: 16,
               padding: 2,
-              width: '100vw',
-              maxHeight: '95vh',
+              width: '100%',
               overflow: 'auto',
+              height: '50%',
             },
           }}
         >

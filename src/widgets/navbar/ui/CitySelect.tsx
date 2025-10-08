@@ -102,7 +102,6 @@ const CitySelect = () => {
           sx={{
             position: 'absolute',
             bottom: '-30px',
-            zIndex: 60,
             fontSize: '32px',
             color: 'white',
             left: '8px',

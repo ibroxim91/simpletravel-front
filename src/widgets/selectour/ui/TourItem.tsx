@@ -7,15 +7,57 @@ import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
 import Rating from '@mui/material/Rating';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import { CalendarDays, MapPinCheckInside, Plane, User } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
+import { toast } from 'sonner';
+import Ticket_Api from '../lib/api';
 import { TickectAllResults } from '../lib/types';
 
 export default function TourItem({ data }: { data: TickectAllResults }) {
   const { locale } = useParams();
+  const t = useTranslations();
+  const queryClient = useQueryClient();
+  const { mutate } = useMutation({
+    mutationFn: ({ ticket }: { ticket: number }) => {
+      return Ticket_Api.saveTickets({ ticket });
+    },
+    onSuccess() {
+      queryClient.refetchQueries({ queryKey: ['ticket_all'] });
+      queryClient.refetchQueries({ queryKey: ['get_saved'] });
+      queryClient.refetchQueries({ queryKey: ['tickets_detail'] });
+    },
+    onError(error: { message: string }) {
+      toast.error(t('Xatolik yuz berdi'), {
+        icon: null,
+        description: error.message,
+        position: 'bottom-right',
+      });
+    },
+  });
+
+  const { mutate: deletLike } = useMutation({
+    mutationFn: ({ ticket }: { ticket: number }) => {
+      return Ticket_Api.removeTickets({ id: ticket });
+    },
+    onSuccess() {
+      queryClient.refetchQueries({ queryKey: ['ticket_all'] });
+      queryClient.refetchQueries({ queryKey: ['get_saved'] });
+      queryClient.refetchQueries({ queryKey: ['tickets_detail'] });
+    },
+    onError(error: { message: string }) {
+      toast.error(t('Xatolik yuz berdi'), {
+        icon: null,
+        description: error.message,
+        position: 'bottom-right',
+      });
+    },
+  });
+
   return (
     <Link href={`/selectour/${data.id}`}>
       <motion.div
@@ -30,8 +72,21 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
         className="h-[300px] max-xl:h-[350px] flex cursor-pointer relative w-full items-center mt-5 rounded-3xl bg-[#ffff] max-lg:flex-col max-lg:h-auto"
       >
         <Button
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (data.is_liked) {
+              deletLike({
+                ticket: data.id,
+              });
+            } else if (!data.is_liked) {
+              mutate({
+                ticket: data.id,
+              });
+            }
+          }}
           className={clsx(
-            'absolute cursor-pointer z-10 border-2 w-10 h-10 rounded-full right-4 top-5',
+            'absolute cursor-pointer z-40 border-2 w-10 h-10 rounded-full right-4 top-5',
             data.is_liked
               ? 'bg-[#FFE4E5] border-[#E0313733] hover:bg-[#FFE4E5]'
               : 'bg-[#FFFF] border-[#DFDFDF] hover:bg-[#FFFF]',

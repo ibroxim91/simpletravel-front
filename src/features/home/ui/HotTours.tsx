@@ -91,6 +91,7 @@ const HotTours = () => {
         <div className="flex justify-between items-center">
           <Link
             href="/selectour"
+            prefetch
             className="text-3xl text-[#031753] font-semibold"
           >
             {t('Увидеть без визы')}

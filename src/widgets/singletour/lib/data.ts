@@ -193,6 +193,6 @@ export interface ToursDetail {
         name: string;
       },
     ];
-    is_liked: string;
+    is_liked: boolean;
   };
 }

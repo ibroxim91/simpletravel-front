@@ -1,6 +1,7 @@
 'use client';
 
 import Logo from '@/assets/navLogo.png';
+import { User_Api } from '@/features/profile/lib/api';
 import { Link, usePathname } from '@/shared/config/i18n/navigation';
 import EmailIcon from '@mui/icons-material/Email';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -11,6 +12,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import SearchIcon from '@mui/icons-material/Search';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
+import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
@@ -24,6 +26,10 @@ const Navbar = () => {
   const pathname = usePathname();
   const t = useTranslations();
   const [openMobie, setOpenMobile] = useState(false);
+  const { data: user } = useQuery({
+    queryKey: ['get_me'],
+    queryFn: () => User_Api.getMe(),
+  });
 
   const links = [
     { href: '/', label: 'Главная' },
@@ -35,10 +41,25 @@ const Navbar = () => {
   ];
 
   const linksMobile = [
-    { href: '/', label: 'Главная', icon: HomeIcon },
-    { href: '/selectour', label: 'Подобрать тур', icon: SearchIcon },
-    { href: '/saved', label: 'Избранное', icon: FavoriteIcon },
-    { href: '/profile?tabs=profile', label: 'Профиль', icon: PersonIcon },
+    { href: '/', label: 'Главная', icon: HomeIcon, active: '/' },
+    {
+      href: '/selectour',
+      label: 'Подобрать тур',
+      icon: SearchIcon,
+      active: '/selectour',
+    },
+    {
+      href: '/saved',
+      label: 'Избранное',
+      icon: FavoriteIcon,
+      active: '/saved',
+    },
+    {
+      href: user ? '/profile?tabs=profile' : '/auth/register',
+      label: 'Профиль',
+      icon: PersonIcon,
+      active: '/profile',
+    },
   ];
 
   return (
@@ -91,7 +112,7 @@ const Navbar = () => {
                   <div
                     key={label}
                     className={clsx(
-                      'h-full text-md flex items-center font-medium',
+                      'h-full text-md flex items-center font-medium max-xl:text-sm',
                       pathname === href
                         ? 'text-blue-600 border-b border-b-blue-600 underline-offset-4'
                         : 'text-black hover:text-blue-600',
@@ -120,30 +141,33 @@ const Navbar = () => {
                 </IconButton>
               </Link>
               <div className="w-[1px] h-[30%] bg-ring" />
-              <Link href={'/auth/register'}>
-                <Button
-                  variant="contained"
-                  size="large"
-                  sx={{ borderRadius: '34px', gap: '8px' }}
-                >
-                  <PersonIcon
-                    sx={{ color: 'white', width: '24px', height: '24px' }}
-                  />
-                  <p>{t('Войти')}</p>
-                </Button>
-              </Link>
-              {/* <Link href={'/profile?tabs=profile'}>
-                <Button
-                  variant="contained"
-                  size="large"
-                  sx={{ borderRadius: '34px', gap: '8px' }}
-                >
-                  <PersonIcon
-                    sx={{ color: 'white', width: '24px', height: '24px' }}
-                  />
-                  <p>{t("Профиль")}</p>
-                </Button>
-              </Link> */}
+              {user ? (
+                <Link href={'/profile?tabs=profile'}>
+                  <Button
+                    variant="contained"
+                    size="large"
+                    sx={{ borderRadius: '34px', gap: '8px' }}
+                  >
+                    <PersonIcon
+                      sx={{ color: 'white', width: '24px', height: '24px' }}
+                    />
+                    <p>{t('Профиль')}</p>
+                  </Button>
+                </Link>
+              ) : (
+                <Link href={'/auth/register'}>
+                  <Button
+                    variant="contained"
+                    size="large"
+                    sx={{ borderRadius: '34px', gap: '8px' }}
+                  >
+                    <PersonIcon
+                      sx={{ color: 'white', width: '24px', height: '24px' }}
+                    />
+                    <p>{t('Войти')}</p>
+                  </Button>
+                </Link>
+              )}
             </div>
             <div className="flex items-center gap-4 lg:hidden">
               <IconButton
@@ -171,13 +195,13 @@ const Navbar = () => {
               sx={{
                 width: '34px',
                 height: '34px',
-                color: e.href === pathname ? '#084FE3' : '#646465',
+                color: e.active === pathname ? '#084FE3' : '#646465',
               }}
             />
             <p
               className={clsx(
                 'max-md:text-[12px] text-center max-[400px]:!text-[8px]',
-                e.href === pathname ? 'text-[#084FE3]' : 'text-[#646465]',
+                e.active === pathname ? 'text-[#084FE3]' : 'text-[#646465]',
               )}
             >
               {t(e.label)}

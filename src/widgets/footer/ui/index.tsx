@@ -90,13 +90,19 @@ const Footer = () => {
               <p className="text-white font-semibold">{t('Страница')}</p>
             </div>
             <div className="flex flex-col gap-1">
-              <p className="text-ring text-sm">{t('Главная')}</p>
+              <Link href={'/'} className="text-ring text-sm w-fit">
+                {t('Главная')}
+              </Link>
             </div>
             <div className="flex flex-col gap-1">
-              <p className="text-ring text-sm">{t('Подобрать тур')}</p>
+              <Link href={'/selectour'} className="text-ring text-sm w-fit">
+                {t('Подобрать тур')}
+              </Link>
             </div>
             <div className="flex flex-col gap-1">
-              <p className="text-ring text-sm">{t('Блоги')}</p>
+              <Link href={'/blogs'} className="text-ring text-sm w-fit">
+                {t('Блоги')}
+              </Link>
             </div>
           </div>
           <div className="flex flex-col gap-4">

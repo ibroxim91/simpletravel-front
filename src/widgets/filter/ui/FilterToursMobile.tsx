@@ -401,7 +401,7 @@ const FilterToursMobile = () => {
               borderTopRightRadius: 16,
               padding: 2,
               width: '100vw',
-              maxHeight: '95vh',
+              maxHeight: '80vh',
               overflow: 'auto',
             },
           }}
@@ -443,9 +443,9 @@ const FilterToursMobile = () => {
                 onFocus={(e) => e.stopPropagation()}
               />
             </div>
-            <div className="grid grid-cols-1 mt-4">
+            <div className="grid grid-cols-1 mt-2">
               <Calendar
-                className="w-full max-w-2xl mx-auto"
+                className="w-full max-w-xl mx-auto"
                 mode="range"
                 selected={range}
                 onSelect={(val) => {

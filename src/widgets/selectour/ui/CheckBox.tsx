@@ -2,21 +2,25 @@ import { Checkbox } from '@/shared/ui/checkbox';
 import { Label } from '@/shared/ui/label';
 import { Dispatch, SetStateAction } from 'react';
 
-function CheckboxFilter({
+type CheckboxFilterProps<T extends string | string[] | null> = {
+  label: string;
+  value: string;
+  selectedValue?: T;
+  exclusive?: boolean;
+  setChecked?: Dispatch<SetStateAction<T>>;
+};
+
+function CheckboxFilter<T extends string | string[] | null>({
   label,
-  setChecked,
   value,
   selectedValue,
   exclusive,
-}: {
-  label: string;
-  value: string;
-  defaultChecked?: boolean;
-  selectedValue?: string | null;
-  exclusive?: boolean;
-  setChecked?: Dispatch<SetStateAction<string | null>>;
-}) {
-  const isChecked = exclusive ? selectedValue === value : undefined;
+  setChecked,
+}: CheckboxFilterProps<T>) {
+  const isChecked = Array.isArray(selectedValue)
+    ? selectedValue.includes(value)
+    : selectedValue === value;
+
   return (
     <label className="flex items-center gap-3 cursor-pointer mt-2">
       <Checkbox
@@ -27,10 +31,18 @@ function CheckboxFilter({
         onCheckedChange={(checked) => {
           if (!setChecked) return;
 
-          if (exclusive) {
-            setChecked(checked ? value : null);
+          if (Array.isArray(selectedValue)) {
+            // multiple tanlov uchun
+            if (checked) {
+              setChecked([...selectedValue, value] as T);
+            } else {
+              setChecked(selectedValue.filter((v) => v !== value) as T);
+            }
+          } else if (exclusive) {
+            // bitta tanlovli checkbox
+            setChecked((checked ? value : null) as T);
           } else {
-            setChecked(checked ? value : null);
+            setChecked((checked ? value : null) as T);
           }
         }}
       />

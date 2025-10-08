@@ -1,5 +1,6 @@
 'use client';
 
+import { Auth_Api } from '@/features/auth/lib/api';
 import { Button } from '@/shared/ui/button';
 import {
   Dialog,
@@ -22,9 +23,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import CloseIcon from '@mui/icons-material/Close';
 import Drawer from '@mui/material/Drawer';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { useMutation } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import clsx from 'clsx';
+import { LoaderCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import z from 'zod';
 import { welcomeForm } from '../lib/form';
 import { useWelcomeStore } from '../lib/hook';
@@ -41,9 +46,35 @@ const Welcome = () => {
   });
   const isMobile = useMediaQuery('(max-width:1024px)');
 
-  function onSubmit() {
-    setOpen(false);
+  const { mutate, isPending } = useMutation({
+    mutationFn: ({
+      first_name,
+      last_name,
+    }: {
+      first_name: string;
+      last_name: string;
+    }) => {
+      return Auth_Api.updateUser({ first_name, last_name });
+    },
+    onSuccess() {
+      setOpen(false);
+    },
+    onError(error: AxiosError<{ non_field_errors: [string] }>) {
+      toast.error(t('Xatolik yuz berdi'), {
+        icon: null,
+        description: error.name,
+        position: 'bottom-right',
+      });
+    },
+  });
+
+  function onSubmit(values: z.infer<typeof welcomeForm>) {
+    mutate({
+      first_name: values.firstName,
+      last_name: values.lastName,
+    });
   }
+
   const formContent = (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 w-full">
@@ -89,7 +120,11 @@ const Welcome = () => {
           type="submit"
           className="px-14 py-8 rounded-4xl text-lg font-medium cursor-pointer bg-[#1764FC] hover:bg-[#1764FC] max-lg:w-full max-lg:mt-10"
         >
-          {t('Сохранить')}
+          {isPending ? (
+            <LoaderCircle className="animate-spin" />
+          ) : (
+            t('Сохранить')
+          )}
         </Button>
       </form>
     </Form>
@@ -98,7 +133,7 @@ const Welcome = () => {
   return (
     <>
       {!isMobile ? (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open}>
           <DialogContent
             className="rounded-4xl !max-w-3xl"
             showCloseButton={false}

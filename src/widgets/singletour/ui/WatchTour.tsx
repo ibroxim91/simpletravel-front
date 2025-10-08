@@ -47,7 +47,7 @@ export default function WatchTour({ onClose, images }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-[1000] bg-black/60 backdrop-blur-2xl flex items-center justify-center p-2 md:p-4"
+      className="fixed inset-0 z-[99999999] bg-black/60 backdrop-blur-2xl flex items-center justify-center p-2 md:p-4"
       onClick={onBackdrop}
     >
       <button

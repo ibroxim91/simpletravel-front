@@ -185,6 +185,8 @@ export default function SingleTour() {
             {data && (
               <div className="flex flex-col gap-[20px]">
                 <Swiper
+                  id={data.id}
+                  is_liked={data.is_liked}
                   images={data.ticket_images}
                   setOpenWatch={setOpenWatch}
                 />

@@ -20,7 +20,7 @@ function FilterSection({
         className="flex justify-between items-center mb-2 cursor-pointer"
         onClick={toggleHide}
       >
-        <p className="font-bold">{title}</p>
+        <p className="font-semibold">{title}</p>
         {hide ? <ChevronDownIcon /> : <ChevronUpIcon />}
       </div>
       {!hide && children}

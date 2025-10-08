@@ -1,3 +1,5 @@
+import formatPhone from '@/shared/lib/formatPhone';
+import onlyNumber from '@/shared/lib/onlyNember';
 import { Button } from '@/shared/ui/button';
 import {
   Form,
@@ -10,10 +12,15 @@ import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
+import { LoaderCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Dispatch, SetStateAction } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import z from 'zod';
+import { Auth_Api } from '../lib/api';
 import { useLoginPhoneStore } from '../lib/store';
 
 interface Props {
@@ -24,9 +31,7 @@ const ForgetOneStep = ({ setStep }: Props) => {
   const t = useTranslations();
   const { setEmail, setPhone } = useLoginPhoneStore();
   const phoneFormSchema = z.object({
-    phone: z
-      .string()
-      .regex(/^\+?\d{9,15}$/, 'Введите корректный номер телефона'),
+    phone: z.string().min(17, { message: 'Введите корректный номер телефона' }),
   });
 
   const emailFormSchema = z.object({
@@ -47,14 +52,50 @@ const ForgetOneStep = ({ setStep }: Props) => {
     },
   });
 
+  const { mutate: phoneMutate, isPending } = useMutation({
+    mutationFn: ({ phone }: { phone: string }) => {
+      return Auth_Api.resetPasswordPhone({ phone });
+    },
+    onSuccess() {
+      setStep(2);
+    },
+    onError(error: AxiosError<{ data: { detail: string } }>) {
+      toast.error(t('Xatolik yuz berdi'), {
+        icon: null,
+        description: error.response?.data.data.detail,
+        position: 'bottom-right',
+      });
+    },
+  });
+
+  const { mutate: emailMutate, isPending: emailPending } = useMutation({
+    mutationFn: ({ email }: { email: string }) => {
+      return Auth_Api.resetPasswordEmail({ email });
+    },
+    onSuccess() {
+      setStep(2);
+    },
+    onError(error: AxiosError<{ data: { email: string } }>) {
+      toast.error(t('Xatolik yuz berdi'), {
+        icon: null,
+        description: error.response?.data.data.email,
+        position: 'bottom-right',
+      });
+    },
+  });
+
   function onSubmitEmail(values: z.infer<typeof emailFormSchema>) {
     setEmail(values.email);
-    setStep(2);
+    emailMutate({
+      email: values.email,
+    });
   }
 
   function onSubmitPhone(values: z.infer<typeof phoneFormSchema>) {
-    setPhone(values.phone);
-    setStep(2);
+    setPhone(onlyNumber(values.phone));
+    phoneMutate({
+      phone: onlyNumber(values.phone),
+    });
   }
   return (
     <Tabs
@@ -95,6 +136,11 @@ const ForgetOneStep = ({ setStep }: Props) => {
                     <Input
                       placeholder={t('Введите номер телефона')}
                       {...field}
+                      value={field.value || '+998'}
+                      onChange={(e) =>
+                        field.onChange(formatPhone(e.target.value))
+                      }
+                      maxLength={19}
                       className="h-[60px] !text-lg rounded-xl"
                     />
                   </FormControl>
@@ -104,9 +150,14 @@ const ForgetOneStep = ({ setStep }: Props) => {
             />
             <Button
               type="submit"
+              disabled={isPending}
               className="w-full py-8 text-lg bg-[#1764FC] hover:bg-[#1764FC] rounded-full cursor-pointer"
             >
-              {t('Получить код')}
+              {isPending ? (
+                <LoaderCircle className="animate-spin" />
+              ) : (
+                t('Получить код')
+              )}
             </Button>
           </form>
         </Form>
@@ -139,7 +190,11 @@ const ForgetOneStep = ({ setStep }: Props) => {
               type="submit"
               className="w-full py-8 text-lg bg-[#1764FC] hover:bg-[#1764FC] rounded-full cursor-pointer"
             >
-              {t('Получить код')}
+              {emailPending ? (
+                <LoaderCircle className="animate-spin" />
+              ) : (
+                t('Получить код')
+              )}
             </Button>
           </form>
         </Form>

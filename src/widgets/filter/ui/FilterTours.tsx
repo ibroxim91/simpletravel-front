@@ -189,7 +189,7 @@ const FilterTours = () => {
 
         {openCity && (
           <div
-            className="fixed inset-0 z-40 "
+            className="fixed inset-0 z-10"
             onClick={() => setOpenCity(false)}
           />
         )}
@@ -199,7 +199,7 @@ const FilterTours = () => {
             sx={{
               position: 'absolute',
               top: '85px',
-              zIndex: 60,
+              zIndex: 40,
               fontSize: '32px',
               color: 'white',
               filter: 'drop-shadow(0px 0px 0px rgba(0,0,0,0.3))',
@@ -210,7 +210,7 @@ const FilterTours = () => {
 
         {openCity && (
           <div
-            className="absolute top-[105px] border border-white shadow-2xl rounded-2xl bg-white w-60 z-50 p-2"
+            className="absolute top-[105px] border border-white shadow-2xl rounded-2xl bg-white w-60 z-40 p-2"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="relative mb-2">
@@ -286,7 +286,7 @@ const FilterTours = () => {
             sx={{
               position: 'absolute',
               top: '85px',
-              zIndex: 60,
+              zIndex: 50,
               fontSize: '32px',
               color: 'white',
               filter: 'drop-shadow(0px 0px 0px rgba(0,0,0,0.3))',
@@ -296,15 +296,12 @@ const FilterTours = () => {
         )}
 
         {where && (
-          <div
-            className="fixed inset-0 z-40 "
-            onClick={() => setWhere(false)}
-          />
+          <div className="fixed inset-0 z-40" onClick={() => setWhere(false)} />
         )}
 
         {where && (
           <div
-            className="absolute top-[105px] border border-white shadow-2xl rounded-2xl bg-white w-60 z-50 p-2"
+            className="absolute top-[105px] border border-white shadow-2xl rounded-2xl bg-white w-60 z-40 p-2"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="relative mb-2">
@@ -385,7 +382,7 @@ const FilterTours = () => {
             sx={{
               position: 'absolute',
               top: '85px',
-              zIndex: 60,
+              zIndex: 50,
               fontSize: '32px',
               color: 'white',
               filter: 'drop-shadow(0px 0px 0px rgba(0,0,0,0.3))',
@@ -396,7 +393,7 @@ const FilterTours = () => {
 
         {dataOpen && (
           <div
-            className="absolute top-[105px] border border-white shadow-2xl rounded-2xl bg-white z-50 p-2"
+            className="absolute top-[105px] border border-white shadow-2xl rounded-2xl bg-white z-40 p-2"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex gap-2 items-center">
@@ -496,7 +493,7 @@ const FilterTours = () => {
             sx={{
               position: 'absolute',
               top: '85px',
-              zIndex: 60,
+              zIndex: 50,
               fontSize: '32px',
               color: 'white',
               filter: 'drop-shadow(0px 0px 0px rgba(0,0,0,0.3))',
@@ -514,7 +511,7 @@ const FilterTours = () => {
 
         {ageOpen && (
           <div
-            className="absolute top-[105px] border border-white shadow-2xl rounded-2xl bg-white z-50 p-2 px-4 w-96 font-medium"
+            className="absolute top-[105px] border border-white shadow-2xl rounded-2xl bg-white z-40 p-2 px-4 w-96 font-medium"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between">

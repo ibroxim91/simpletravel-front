@@ -13,10 +13,15 @@ import {
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
+import { LoaderCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import z from 'zod';
+import { Auth_Api } from '../lib/api';
 
 const formSchema = z
   .object({
@@ -47,11 +52,40 @@ const AuthEditPassword = () => {
     },
   });
 
-  function onSubmit() {
-    route.push('/profile');
+  const { mutate, isPending } = useMutation({
+    mutationFn: ({
+      new_password,
+      old_password,
+    }: {
+      old_password: string;
+      new_password: string;
+    }) => {
+      return Auth_Api.newPassword({
+        new_password,
+        old_password,
+      });
+    },
+    onSuccess() {
+      route.push('/profile');
+      toast.success(t("Paro muvaffaqiyatli o'zgardi"));
+    },
+    onError(error: AxiosError<{ data: { detail: string } }>) {
+      toast.error(t('Xatolik yuz berdi'), {
+        icon: null,
+        description: error.response?.data.data.detail,
+        position: 'bottom-right',
+      });
+    },
+  });
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    mutate({
+      new_password: values.password,
+      old_password: values.oldPassword,
+    });
   }
   return (
-    <div className="custom-container mt-2 relative h-[700px]">
+    <div className="custom-container mt-2 relative h-[880px]">
       <Image
         src={Banner}
         alt="banner"
@@ -137,12 +171,20 @@ const AuthEditPassword = () => {
             </Link>
             <Button
               type="submit"
+              disabled={isPending}
               className="w-full px-4 py-8 rounded-full mt-3 bg-[#1764FC] hover:bg-[#1764FC0] cursor-pointer"
             >
-              {t('Сохранить новый пароль')}
+              {isPending ? (
+                <LoaderCircle className="animate-spin" />
+              ) : (
+                t('Сохранить новый пароль')
+              )}
             </Button>
           </form>
         </Form>
+      </div>
+      <div className="absolute max-lg:bottom-20 lg:bottom-5 w-full flex justify-center">
+        <p>{t('2025 © Все права защищены')}</p>
       </div>
     </div>
   );

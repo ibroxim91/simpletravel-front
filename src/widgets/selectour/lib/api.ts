@@ -1,11 +1,31 @@
 import httpClient from '@/shared/config/api/httpClient';
-import { GET_TICKETS } from '@/shared/config/api/URLs';
+import { GET_TICKETS, SAVE_TICKETS } from '@/shared/config/api/URLs';
+import qs from 'qs';
 import { TickectAll, TickectAllFilter } from './types';
 
 const Ticket_Api = {
-  async GetAllTickets({ params }: { params: TickectAllFilter }) {
-    const res = await httpClient.get<TickectAll>(GET_TICKETS, { params });
+  async GetAllTickets({
+    params,
+  }: {
+    params: TickectAllFilter;
+    paramsSerializer?: (params: TickectAllFilter) => string;
+  }) {
+    const res = await httpClient.get<TickectAll>(GET_TICKETS, {
+      params,
+      paramsSerializer: (params: Record<string, null>) =>
+        qs.stringify(params, { arrayFormat: 'repeat' }),
+    });
     return res.data;
+  },
+
+  async saveTickets({ ticket }: { ticket: number }) {
+    const res = await httpClient.post(SAVE_TICKETS, { ticket });
+    return res;
+  },
+
+  async removeTickets({ id }: { id: number }) {
+    const res = await httpClient.delete(`${SAVE_TICKETS}${id}/`);
+    return res;
   },
 };
 
