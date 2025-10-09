@@ -1,9 +1,14 @@
 'use client';
-import ProfileTabs from '@/features/profile/ui/ProfileTabs';
-import Welcome from '@/features/profile/ui/welcome';
 import { getToken } from '@/shared/config/api/saveToke';
 import { useRouter } from '@/shared/config/i18n/navigation';
+import dynamic from 'next/dynamic';
 import { Suspense, useEffect } from 'react';
+const ProfileTabs = dynamic(() => import('@/features/profile/ui/ProfileTabs'), {
+  ssr: false,
+});
+const Welcome = dynamic(() => import('@/features/profile/ui/welcome'), {
+  ssr: false,
+});
 
 const Profile = () => {
   const router = useRouter();

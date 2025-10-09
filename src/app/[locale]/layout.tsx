@@ -1,4 +1,4 @@
-import { golosText } from '@/shared/config/fonts';
+import { sfPro } from '@/shared/config/fonts';
 import { routing } from '@/shared/config/i18n/routing';
 import QueryProvider from '@/shared/config/react-query/QueryProvider';
 import { ThemeProvider } from '@/shared/config/theme-provider';
@@ -42,7 +42,7 @@ export default async function RootLayout({ children, params }: Props) {
   return (
     <html lang={locale} suppressHydrationWarning>
       <body
-        className={`${golosText.className} antialiased min-h-screen flex flex-col relative`}
+        className={`${sfPro.className} !font-stretch-100% antialiased min-h-screen flex flex-col relative`}
       >
         <NextIntlClientProvider locale={locale}>
           <ThemeProvider

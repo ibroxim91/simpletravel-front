@@ -53,7 +53,7 @@ const BlogHeader = () => {
         <Link href="/" className="font-medium text-[#646465]">
           {t('Главная')}
         </Link>
-        <Link href="/blogs?tab=1" className="text-[#646465] font-medium">
+        <Link href="/blogs?tab=" className="text-[#646465] font-medium">
           {t('Блоги')}
         </Link>
         <p className="text-[#646465] font-medium">

@@ -112,7 +112,7 @@ const Navbar = () => {
                   <div
                     key={label}
                     className={clsx(
-                      'h-full text-md flex items-center font-medium max-xl:text-sm',
+                      'h-full xl:text-lg flex items-center font-medium text-md',
                       pathname === href
                         ? 'text-blue-600 border-b border-b-blue-600 underline-offset-4'
                         : 'text-black hover:text-blue-600',

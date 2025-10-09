@@ -275,7 +275,7 @@
   "Слишком много попыток": "Urinishlar juda ko‘p",
   "Вы ввели неверные данные 5 раз": "Siz noto‘g‘ri ma’lumotni 5 marta kiritdingiz. Kirish 30 daqiqaga bloklandi",
   "Код аутентификации": "Tasdiqlash kodi",
-  "Введите 5-значный код, который мы только что отправили на": "Biz hozirgina yuborgan 5 xonali kodni kiriting",
+  "Введите 5-значный код, который мы только что отправили на": "Biz hozirgina yuborgan 4 xonali kodni kiriting",
   "Отправить код повторно": "Kodni qayta yuborish",
   "Прислать код повторно через": "Kodni qayta yuborish vaqti:",
   "Подтвердить": "Tasdiqlash",

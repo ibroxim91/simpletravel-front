@@ -1,5 +1,12 @@
-import FaqTabs from '@/features/faq/ui/FaqTabs';
-import HeadresFaq from '@/features/faq/ui/HeadresFaq';
+'use client';
+import dynamic from 'next/dynamic';
+
+const HeadresFaq = dynamic(() => import('@/features/faq/ui/HeadresFaq'), {
+  ssr: false,
+});
+const FaqTabs = dynamic(() => import('@/features/faq/ui/FaqTabs'), {
+  ssr: false,
+});
 
 const Faq = () => {
   return (

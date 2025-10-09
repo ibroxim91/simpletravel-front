@@ -1,18 +1,20 @@
 'use client';
+
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
-const MyFavourite = dynamic(() => import('@/features/saved/ui/MyFavourite'), {
+
+const BlogDetail = dynamic(() => import('@/features/blogs/ui/BlogDetail'), {
   ssr: false,
 });
 
-const Saved = () => {
+const BlogDetailClient = () => {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense>
       <div className="flex flex-col gap-10 mb-10 overflow-hidden">
-        <MyFavourite />
+        <BlogDetail />
       </div>
     </Suspense>
   );
 };
 
-export default Saved;
+export default BlogDetailClient;

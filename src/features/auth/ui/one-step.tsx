@@ -147,12 +147,6 @@ const OneStep = ({ setStep }: Props) => {
                     />
                   </FormControl>
                   <FormMessage />
-                  <Link
-                    href={'/auth/forget-password'}
-                    className="text-end font-medium text-red-500"
-                  >
-                    {t('Parol esdan chiqdimi')}
-                  </Link>
                 </FormItem>
               )}
             />
@@ -190,12 +184,6 @@ const OneStep = ({ setStep }: Props) => {
                     />
                   </FormControl>
                   <FormMessage />
-                  <Link
-                    href={'/auth/forget-password'}
-                    className="text-end font-medium text-red-500"
-                  >
-                    {t('Parol esdan chiqdimi')}
-                  </Link>
                 </FormItem>
               )}
             />

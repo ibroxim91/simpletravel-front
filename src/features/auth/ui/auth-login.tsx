@@ -196,6 +196,12 @@ const AuthLogin = () => {
                       />
                     </FormControl>
                     <FormMessage />
+                    <Link
+                      href={'/auth/forget-password'}
+                      className="text-end font-medium text-red-500"
+                    >
+                      {t('Parol esdan chiqdimi')}
+                    </Link>
                   </FormItem>
                 )}
               />
@@ -255,6 +261,12 @@ const AuthLogin = () => {
                       />
                     </FormControl>
                     <FormMessage />
+                    <Link
+                      href={'/auth/forget-password'}
+                      className="text-end font-medium text-red-500"
+                    >
+                      {t('Parol esdan chiqdimi')}
+                    </Link>
                   </FormItem>
                 )}
               />

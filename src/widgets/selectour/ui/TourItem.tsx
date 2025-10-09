@@ -99,9 +99,11 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
         <div className="h-full aspect-square rounded-3xl w-[40%] relative max-lg:w-full">
           <Image
             src={BASE_URL + data.ticket_images.image}
-            alt="tour"
+            alt={data.title}
+            fetchPriority="high"
             className="w-full h-full object-cover rounded-3xl"
             width={500}
+            priority
             height={500}
             quality={100}
           />

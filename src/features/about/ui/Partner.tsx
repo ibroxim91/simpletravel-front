@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react';
 import { CardData } from '../lib/data';
 
 const SendPartner = dynamic(() => import('./SendPartner'), {
-  ssr: false, // serverda render qilinmasin
+  ssr: false,
 });
 
 const Partner = () => {

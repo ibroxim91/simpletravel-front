@@ -23,7 +23,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import CloseIcon from '@mui/icons-material/Close';
 import Drawer from '@mui/material/Drawer';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import clsx from 'clsx';
 import { LoaderCircle } from 'lucide-react';
@@ -36,6 +36,7 @@ import { useWelcomeStore } from '../lib/hook';
 
 const Welcome = () => {
   const { openModal: open, setOpenModal: setOpen } = useWelcomeStore();
+  const queryClient = useQueryClient();
   const t = useTranslations();
   const form = useForm<z.infer<typeof welcomeForm>>({
     resolver: zodResolver(welcomeForm),
@@ -57,6 +58,7 @@ const Welcome = () => {
       return Auth_Api.updateUser({ first_name, last_name });
     },
     onSuccess() {
+      queryClient.invalidateQueries();
       setOpen(false);
     },
     onError(error: AxiosError<{ non_field_errors: [string] }>) {
