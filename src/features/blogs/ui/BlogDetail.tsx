@@ -27,6 +27,9 @@ const BlogDetail = () => {
     queryFn: () => News_Api.getAllNews({ page: 1, page_size: 9 }),
   });
 
+  const newsData = news?.data?.data;
+  const allNewsData = data?.data?.data?.results;
+
   return (
     <div className="custom-container mt-5">
       <Breadcrumbs
@@ -62,36 +65,43 @@ const BlogDetail = () => {
           </>
         ) : (
           <>
+            {/* ⚡ Optimized animations */}
             <motion.p
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
               className="font-semibold text-2xl"
             >
-              {news?.data.data.title}
+              {newsData?.title}
             </motion.p>
+
             <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
             >
+              {/* ⚡ Optimized image loading */}
               <Image
-                src={news?.data.data.image || ''}
-                alt={news?.data.data.text || ''}
-                quality={100}
+                src={newsData?.image || ''}
+                alt={newsData?.text || ''}
+                quality={85}
                 width={744}
                 height={460}
+                sizes="(max-width: 768px) 100vw, 744px"
+                priority
                 className="w-full mt-5 rounded-3xl"
               />
+
               <div className="mt-4 gap-10 flex items-center max-lg:flex-col max-lg:items-start max-lg:gap-2">
                 <div className="flex items-center gap-2 text-[#212122] max-md:text-[12px]">
                   <Calendar1 width={24} height={24} color="#084FE3" />
                   <p>
-                    {news &&
-                      formatDate.format(news.data.data.created, 'DD.MM.YYYY')}
+                    {newsData &&
+                      formatDate.format(newsData.created, 'DD.MM.YYYY')}
                   </p>
                 </div>
-                {news && news?.data.data.post_tags.length > 0 && (
+
+                {newsData && newsData?.post_tags?.length > 0 && (
                   <div className="flex items-center gap-2 text-[#212122] max-md:text-[12px]">
                     <PinIcon
                       className="rotate-45"
@@ -100,7 +110,7 @@ const BlogDetail = () => {
                       fill="#084FE3"
                       color="#084FE3"
                     />
-                    {news.data.data.post_tags.map((e) => (
+                    {newsData.post_tags.map((e) => (
                       <p className="max-lg:hidden" key={e.id}>
                         #{e.name}
                       </p>
@@ -111,30 +121,19 @@ const BlogDetail = () => {
             </motion.div>
 
             <div className="mt-10 max-md:mt-5">
-              {news?.data.data.post_images.map((item) => (
+              {newsData?.post_images?.map((item, idx) => (
                 <div key={item.image}>
-                  <motion.p
-                    initial={{ opacity: 0, x: -30 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.8, delay: 0.2 }}
-                    className="text-[#212122] text-lg"
-                  >
-                    {item.text}
-                  </motion.p>
-                  <motion.div
-                    initial={{ opacity: 0, x: 30 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.8, delay: 0.2 }}
-                  >
-                    <Image
-                      src={item.image}
-                      alt={item.text}
-                      quality={100}
-                      width={500}
-                      height={500}
-                      className="w-full h-full object-contain mt-5 rounded-3xl"
-                    />
-                  </motion.div>
+                  <p className="text-[#212122] text-lg">{item.text}</p>
+                  <Image
+                    src={item.image}
+                    alt={item.text}
+                    quality={80}
+                    width={500}
+                    height={500}
+                    sizes="(max-width: 768px) 100vw, 500px"
+                    loading={idx > 0 ? 'lazy' : undefined}
+                    className="w-full h-full object-contain mt-5 rounded-3xl"
+                  />
                 </div>
               ))}
             </div>
@@ -171,10 +170,10 @@ const BlogDetail = () => {
                     <Skeleton className="h-10 w-full rounded-3xl mt-4" />
                   </CarouselItem>
                 ))
-              : data?.data.data.results.map((e, idx) => (
+              : allNewsData?.map((e, idx) => (
                   <CarouselItem
                     className="flex flex-col h-[500px] w-auto basis-1/3 max-lg:basis-1/2 max-md:basis-[80%]"
-                    key={idx}
+                    key={e.id}
                   >
                     <div className="bg-white rounded-3xl h-[500px]">
                       <Link
@@ -182,18 +181,15 @@ const BlogDetail = () => {
                         className="w-full flex flex-col justify-between h-full"
                       >
                         <div>
-                          <motion.div
-                            initial={{ opacity: 0, y: 30 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: idx * 0.15 }}
-                            className="w-full aspect-square h-[300px] relative group overflow-hidden rounded-3xl shadow-lg"
-                          >
+                          <div className="w-full aspect-square h-[300px] relative group overflow-hidden rounded-3xl shadow-lg">
                             <Image
                               src={e.image}
                               alt={e.short_text}
                               fill
-                              fetchPriority="high"
-                              priority
+                              sizes="(max-width: 768px) 80vw, (max-width: 1024px) 50vw, 33vw"
+                              quality={75}
+                              priority={idx < 2}
+                              loading={idx >= 2 ? 'lazy' : undefined}
                               className="rounded-3xl object-cover transition-transform duration-500 group-hover:scale-110"
                             />
                             <div className="flex flex-col absolute bottom-2 left-2 z-20">
@@ -202,30 +198,21 @@ const BlogDetail = () => {
                               </Badge>
                             </div>
                             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                          </motion.div>
+                          </div>
 
-                          <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: idx * 0.2 }}
-                            className="mt-2 flex flex-col gap-2 px-4"
-                          >
+                          <div className="mt-2 flex flex-col gap-2 px-4">
                             <p className="text-xl font-semibold text-[#031753]">
                               {e.short_title}
                             </p>
                             <p className="text-md text-[#646465]">
                               {e.short_text}
                             </p>
-                          </motion.div>
+                          </div>
                         </div>
-                        <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          whileInView={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.5, delay: idx * 0.25 }}
-                          className="w-[80%] bg-[#ECF2FF] font-semibold mt-4 mx-auto py-3 mb-3 rounded-4xl text-center text-blue-600 hover:bg-blue-100 transition-colors"
-                        >
+
+                        <div className="w-[80%] bg-[#ECF2FF] font-semibold mt-4 mx-auto py-3 mb-3 rounded-4xl text-center text-blue-600 hover:bg-blue-100 transition-colors">
                           {t('Узнать больше')}
-                        </motion.div>
+                        </div>
                       </Link>
                     </div>
                   </CarouselItem>

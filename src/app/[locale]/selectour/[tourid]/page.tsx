@@ -167,8 +167,7 @@ export default async function SingleTourPage({ params }: Props) {
   };
 
   return (
-    <>
-      {/* 🧩 SEO structured data */}
+    <Suspense>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -177,11 +176,9 @@ export default async function SingleTourPage({ params }: Props) {
       />
 
       <main>
-        <Suspense>
-          <h1 className="sr-only">{title}</h1>
-          <SingleTourClient />
-        </Suspense>
+        <h1 className="sr-only">{title}</h1>
+        <SingleTourClient />
       </main>
-    </>
+    </Suspense>
   );
 }

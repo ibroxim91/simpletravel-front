@@ -1,4 +1,9 @@
 import { News_Api } from '@/features/blogs/lib/api';
+import {
+  HydrationBoundary,
+  QueryClient,
+  dehydrate,
+} from '@tanstack/react-query';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 import BlogDetailClient from './BlogDetailClient';
@@ -7,12 +12,10 @@ type Props = {
   params: Promise<{ locale: string; id: string }>;
 };
 
-// 🧠 SEO metadata
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, id } = await params;
 
   try {
-    // 🔍 Blog ma’lumotini olish (SEO uchun sarlavha, rasm va h.k.)
     const res = await News_Api.getNewsDetail({ id: Number(id) });
     const blog = res?.data?.data;
 
@@ -40,14 +43,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         type: 'article',
         locale,
         siteName,
-        images: [
-          {
-            url: image,
-            width: 1200,
-            height: 630,
-            alt: title,
-          },
-        ],
+        images: [{ url: image, width: 1200, height: 630, alt: title }],
       },
       twitter: {
         card: 'summary_large_image',
@@ -74,20 +70,32 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function BlogDetailPage({ params }: Props) {
   const { locale, id } = await params;
+  const queryClient = new QueryClient();
+  await Promise.all([
+    queryClient.prefetchQuery({
+      queryKey: ['detail_news', id],
+      queryFn: () => News_Api.getNewsDetail({ id: Number(id) }),
+      staleTime: 60 * 1000,
+    }),
+    queryClient.prefetchQuery({
+      queryKey: ['all_news'],
+      queryFn: () => News_Api.getAllNews({ page: 1, page_size: 9 }),
+      staleTime: 60 * 1000,
+    }),
+  ]);
 
-  // 🔍 Blog ma’lumotlarini oldindan olish (schema uchun)
-  const res = await News_Api.getNewsDetail({ id: Number(id) });
-  const blog = res?.data?.data;
+  const dehydratedState = dehydrate(queryClient);
+
+  const newsData = queryClient.getQueryData(['detail_news', id]) as any;
+  const blog = newsData?.data?.data;
 
   const title = blog?.slug || 'Blog maqolasi';
-  const description =
-    blog?.text || blog?.text || 'Sayohat va turizm haqidagi blog maqolasi';
+  const description = blog?.text || 'Sayohat va turizm haqidagi blog maqolasi';
   const image = blog?.image
     ? `${process.env.NEXT_PUBLIC_API_URL}${blog.image}`
     : '/og-blog-detail.jpg';
   const datePublished = blog?.created || new Date().toISOString();
 
-  // 🧾 JSON-LD structured data
   const blogPostingSchema = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
@@ -155,21 +163,19 @@ export default async function BlogDetailPage({ params }: Props) {
   };
 
   return (
-    <>
-      {/* SEO structured data */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify([blogPostingSchema, breadcrumbSchema]),
-        }}
-      />
-
-      <main>
-        <Suspense>
+    <HydrationBoundary state={dehydratedState}>
+      <Suspense>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify([blogPostingSchema, breadcrumbSchema]),
+          }}
+        />
+        <main>
           <h1 className="sr-only">{title}</h1>
           <BlogDetailClient />
-        </Suspense>
-      </main>
-    </>
+        </main>
+      </Suspense>
+    </HydrationBoundary>
   );
 }

@@ -37,12 +37,10 @@ export interface Detail_Blogs_Type {
         text: string;
       },
     ];
-    post_tags: [
-      {
-        id: number;
-        name: string;
-      },
-    ];
+    post_tags: {
+      id: number;
+      name: string;
+    }[];
     is_public: boolean;
     slug: string;
     created: string;
