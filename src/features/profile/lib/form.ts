@@ -31,13 +31,14 @@ export const ParticipantProfileSchema = z.object({
   }),
   passport: z
     .any()
-    .optional()
     .refine(
       (val) =>
-        !val ||
-        val instanceof File ||
-        (Array.isArray(val) && val.every((v) => v instanceof File)),
-      { message: 'Invalid file format' },
+        val &&
+        (val instanceof File ||
+          (Array.isArray(val) &&
+            val.length > 0 &&
+            val.every((v) => v instanceof File))),
+      { message: 'Majburiy maydon' },
     ),
 });
 
@@ -50,16 +51,5 @@ export const EditParticipantProfileSchema = z.object({
     .nullish()
     .refine((date) => date, { message: 'Дата обязательна' }),
   phone: z.string().min(17, { message: 'Telefon raqam xato' }),
-  passport: z
-    .any()
-    .optional()
-    .refine(
-      (val) =>
-        !val ||
-        (Array.isArray(val) &&
-          val.every((v) => v instanceof File || typeof v === 'string')) ||
-        val instanceof File ||
-        typeof val === 'string',
-      { message: 'Invalid file format' },
-    ),
+  passport: z.any().optional(),
 });

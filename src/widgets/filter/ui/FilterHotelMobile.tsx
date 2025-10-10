@@ -282,7 +282,7 @@ const FilterHotelMobile = () => {
               padding: 2,
               width: '100%',
               overflow: 'auto',
-              height: '50%',
+              maxHeight: '80vh',
             },
           }}
         >
@@ -325,7 +325,7 @@ const FilterHotelMobile = () => {
             </div>
             <div className="grid grid-cols-1 mt-4">
               <Calendar
-                className="w-full max-w-2xl mx-auto"
+                className="w-full max-w-xl mx-auto"
                 mode="range"
                 selected={range}
                 onSelect={(val) => {

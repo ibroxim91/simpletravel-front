@@ -200,7 +200,7 @@ const Navbar = () => {
             />
             <p
               className={clsx(
-                'max-md:text-[12px] text-center max-[400px]:!text-[8px]',
+                'max-md:text-sm text-center max-sm:text-xs',
                 e.active === pathname ? 'text-[#084FE3]' : 'text-[#646465]',
               )}
             >

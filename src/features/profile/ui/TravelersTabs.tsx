@@ -21,7 +21,7 @@ function TravelersTabs() {
         {add ? (
           <CreatePatrners setAdded={setAdded} />
         ) : edit ? (
-          <EditPartners setAdded={setEdit} id={id} />
+          <EditPartners setAdded={setEdit} id={id} setId={setId} />
         ) : (
           <GetPartners setAdded={setAdded} setEdit={setEdit} setId={setId} />
         )}

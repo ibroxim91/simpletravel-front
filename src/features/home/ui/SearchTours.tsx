@@ -20,7 +20,7 @@ const SearchTours = () => {
   const t = useTranslations();
 
   return (
-    <div className="min-h-[500px] custom-container">
+    <div className="min-h-[500px] custom-container border border-[#edeef1]">
       <div className="relative rounded-4xl">
         <div className="w-full h-[300px] overflow-hidden rounded-4xl max-lg:hidden bg-gradient-to-r from-[#084FE3] via-[#20C1F2] to-[#33AAFF] relative">
           <motion.div

@@ -33,11 +33,15 @@ import z from 'zod';
 import { User_Api } from '../lib/api';
 import { EditParticipantProfileSchema } from '../lib/form';
 
+type PassportType = File | { id: number; image: string };
+
 const EditPartners = ({
   setAdded,
   id,
+  setId,
 }: {
   setAdded: Dispatch<SetStateAction<boolean>>;
+  setId: Dispatch<SetStateAction<number | undefined>>;
   id: number | undefined;
 }) => {
   const t = useTranslations();
@@ -78,9 +82,11 @@ const EditPartners = ({
       form.setValue('phone', formatPhone(oneParticipant.data.phone_number));
       if (oneParticipant.data.participant_pasport_image) {
         const passportImages =
-          oneParticipant.data.participant_pasport_image.map(
-            (item: { id: number; image: string }) => item.image,
-          );
+          oneParticipant.data.participant_pasport_image.map((item) => ({
+            id: item.id,
+            image: item.image,
+          }));
+
         form.setValue(
           'passport',
           passportImages.length ? passportImages : null,
@@ -97,9 +103,11 @@ const EditPartners = ({
     },
     onSuccess() {
       queryClient.refetchQueries({ queryKey: ['participant_all'] });
+      queryClient.refetchQueries({ queryKey: ['participant_one'] });
       toast.success(t('Hamroh muvaffaqiyatli tahrirlandi'));
       form.reset();
       setAdded(false);
+      setId(undefined);
     },
     onError() {
       toast.error(t('Xatolik yuz berdi'));
@@ -112,9 +120,8 @@ const EditPartners = ({
     },
     onSuccess() {
       queryClient.refetchQueries({ queryKey: ['participant_all'] });
+      queryClient.refetchQueries({ queryKey: ['participant_one'] });
       toast.success(t("Hamrohga tegishli rasm muvaffaqiyatli o'chirildi"));
-      form.reset();
-      setAdded(false);
     },
     onError() {
       toast.error(t('Xatolik yuz berdi'));
@@ -144,7 +151,7 @@ const EditPartners = ({
 
       files.forEach((file) => {
         if (file instanceof File) {
-          formData.append('participant_pasport_image', file);
+          formData.append('pasport_images', file);
         }
       });
     }
@@ -428,7 +435,7 @@ const EditPartners = ({
             />
             {passportValue && passportValue.length > 0 && (
               <div className="w-full flex flex-col gap-2 mt-4">
-                {passportValue.map((file: File, index: number) => (
+                {passportValue.map((file: PassportType, index: number) => (
                   <div
                     key={index}
                     className="w-full flex items-center justify-between p-3 border-2 border-[#EDEEF1] rounded-xl"
@@ -437,9 +444,11 @@ const EditPartners = ({
                       <div className="relative w-[50px] h-[50px]">
                         <Image
                           src={
-                            typeof file === 'string'
-                              ? file
-                              : URL.createObjectURL(file)
+                            file instanceof File
+                              ? URL.createObjectURL(file)
+                              : typeof file === 'string'
+                                ? file
+                                : file.image
                           }
                           alt="passport"
                           fill
@@ -448,10 +457,10 @@ const EditPartners = ({
                       </div>
                       <div>
                         <h1 className="font-bold text-sm truncate max-w-[150px]">
-                          {file.name}
+                          {'name' in file ? file.name : 'Image'}
                         </h1>
                         <p className="text-xs text-[#718096]">
-                          {file.size
+                          {'size' in file
                             ? (file.size / 1024).toFixed(1) + 'KB'
                             : 'Image'}
                         </p>
@@ -461,26 +470,36 @@ const EditPartners = ({
                       <Button
                         variant="destructive"
                         size="sm"
+                        type="button"
                         onClick={() => {
-                          const newFiles = [...passportValue];
-                          const removed = newFiles.splice(index, 1)[0];
+                          if (!passportValue) return;
+
+                          const newFiles = [...passportValue]; // kopiya
+                          const removed = newFiles.splice(index, 1)[0]; // elementni o'chirish
                           form.setValue(
                             'passport',
                             newFiles.length ? newFiles : null,
                           );
 
-                          if (typeof removed === 'string') {
-                            deleteImage({ id: removed });
+                          // Agar serverdagi rasm bo'lsa, o'chirish mutation chaqirish
+                          if (
+                            removed &&
+                            typeof removed !== 'string' &&
+                            'id' in removed
+                          ) {
+                            deleteImage({ id: removed.id });
                           }
                         }}
                       >
                         <TrashIcon />
                       </Button>
+
                       <Button
                         variant="outline"
                         size="sm"
+                        type="button"
                         onClick={() => {
-                          setPreviewFile(file);
+                          setPreviewFile(file instanceof File ? file : null);
                           setPreviewOpen(true);
                         }}
                       >
@@ -496,7 +515,10 @@ const EditPartners = ({
           <div className="flex gap-2 max-lg:grid max-lg:grid-cols-2 mt-5 sticky bottom-0">
             <button
               type="button"
-              onClick={() => setAdded(false)}
+              onClick={() => {
+                setAdded(false);
+                setId(undefined);
+              }}
               className="bg-[#FFFFFF] border shadow-nonde border-[#DFDFDF] text-[#031753] hover:bg-[#FFFFFF] px-14 py-3 max-lg:px-0 rounded-full cursor-pointer"
             >
               {t('Отмена')}

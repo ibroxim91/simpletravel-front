@@ -23,7 +23,7 @@ import Drawer from '@mui/material/Drawer';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
-import { TrashIcon, UserIcon } from 'lucide-react';
+import { LoaderCircle, TrashIcon, UserIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { Dispatch, SetStateAction, useState } from 'react';
@@ -60,7 +60,7 @@ const CreatePatrners = ({
   const passportValue = form.watch('passport');
   const dateValue = form.watch('date');
 
-  const { mutate: added } = useMutation({
+  const { mutate: added, isPending } = useMutation({
     mutationFn: (body: FormData) => {
       return User_Api.createParticipant(body);
     },
@@ -416,6 +416,7 @@ const CreatePatrners = ({
                     <div className="flex gap-2">
                       <Button
                         variant="destructive"
+                        type="button"
                         size="sm"
                         onClick={() => {
                           const newFiles = [...passportValue];
@@ -430,6 +431,7 @@ const CreatePatrners = ({
                       </Button>
                       <Button
                         variant="outline"
+                        type="button"
                         size="sm"
                         onClick={() => {
                           setPreviewFile(file);
@@ -458,7 +460,11 @@ const CreatePatrners = ({
               onClick={form.handleSubmit(onSubmit)}
               className="bg-[#1764FC] border shadow-nonde text-white border-[#DFDFDF] hover:bg-[#1764FC] px-14 py-3 max-lg:px-0 rounded-full cursor-pointer"
             >
-              {t('Сохранить')}
+              {isPending ? (
+                <LoaderCircle className="animate-spin" />
+              ) : (
+                t('Сохранить')
+              )}
             </button>
           </div>
         </form>

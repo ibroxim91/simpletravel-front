@@ -232,7 +232,11 @@ const MyFavourite = () => {
                         {e.ticket.destination}
                       </p>
                       <p className="mt-2 text-blue-600 font-semibold">
-                        {e.ticket.price}
+                        {formatPrice(
+                          e.ticket.price,
+                          locale as LanguageRoutes,
+                          true,
+                        )}
                       </p>
                     </div>
                   </motion.div>
