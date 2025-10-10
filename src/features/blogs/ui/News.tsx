@@ -35,17 +35,6 @@ const News = () => {
   const searchParams = useSearchParams();
   const initialTab = searchParams.get('tab') ?? '';
 
-  // const { data: tags } = useQuery({
-  //   queryKey: ['get_tabs', initialTab],
-  //   queryFn: () =>
-  //     News_Api.getTagDetail({
-  //       id: Number(initialTab),
-  //     }),
-  //   select(data) {
-  //     return data.data.data;
-  //   },
-  // });
-
   const router = useRouter();
   const { data, isLoading } = useQuery({
     queryKey: ['all_news', currentPage, initialTab],
@@ -105,11 +94,11 @@ const News = () => {
               viewport={{ once: false, amount: 0.1 }}
               transition={{ duration: 0.4, delay: idx * 0.1 }}
             >
-              <Link href={`/blogs/${item.id}`} className="w-full">
-                <Card className="!p-0 rounded-3xl cursor-pointer overflow-hidden">
+              <Link href={`/blogs/${item.id}`} className="w-ful">
+                <Card className="!p-0 rounded-3xl cursor-pointer overflow-hidden h-full flex justify-between">
                   <CardHeader className="!p-0 relative">
                     <motion.div
-                      className="w-full h-[200px] overflow-hidden rounded-3xl"
+                      className="w-full h-[250px] overflow-hidden rounded-3xl"
                       whileHover={{ scale: 1.05 }}
                       transition={{ duration: 0.3 }}
                     >

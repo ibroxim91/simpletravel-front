@@ -115,7 +115,7 @@ const BlogHeader = () => {
             alt="banner_2"
             priority
             quality={100}
-            className="absolute w-[70%] h-[370px] -top-10 right-0 z-0 object-contain"
+            className="absolute w-[70%] max-md:w-[60%] max-[310px]:!w-[50%] h-[370px] -top-10 right-0 z-0 object-contain"
           />
         </div>
       </div>
