@@ -20,13 +20,11 @@ const BlogDetail = () => {
   const { data: news, isLoading } = useQuery({
     queryKey: ['detail_news', id],
     queryFn: () => News_Api.getNewsDetail({ id: Number(id) }),
-    select: (data) => data.data.data,
   });
 
   const { data, isLoading: isLoadingNews } = useQuery({
     queryKey: ['all_news'],
     queryFn: () => News_Api.getAllNews({ page: 1, page_size: 9 }),
-    select: (data) => data.data.data,
   });
 
   return (
@@ -70,7 +68,7 @@ const BlogDetail = () => {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="font-semibold text-2xl"
             >
-              {news?.title}
+              {news?.data.data.title}
             </motion.p>
             <motion.div
               initial={{ opacity: 0, x: 30 }}
@@ -78,8 +76,8 @@ const BlogDetail = () => {
               transition={{ duration: 0.8, delay: 0.2 }}
             >
               <Image
-                src={news?.image || ''}
-                alt={news?.text || ''}
+                src={news?.data.data.image || ''}
+                alt={news?.data.data.text || ''}
                 quality={100}
                 width={744}
                 height={460}
@@ -88,9 +86,12 @@ const BlogDetail = () => {
               <div className="mt-4 gap-10 flex items-center max-lg:flex-col max-lg:items-start max-lg:gap-2">
                 <div className="flex items-center gap-2 text-[#212122] max-md:text-[12px]">
                   <Calendar1 width={24} height={24} color="#084FE3" />
-                  <p>{news && formatDate.format(news.created, 'DD.MM.YYYY')}</p>
+                  <p>
+                    {news &&
+                      formatDate.format(news.data.data.created, 'DD.MM.YYYY')}
+                  </p>
                 </div>
-                {news && news?.post_tags.length > 0 && (
+                {news && news?.data.data.post_tags.length > 0 && (
                   <div className="flex items-center gap-2 text-[#212122] max-md:text-[12px]">
                     <PinIcon
                       className="rotate-45"
@@ -99,7 +100,7 @@ const BlogDetail = () => {
                       fill="#084FE3"
                       color="#084FE3"
                     />
-                    {news.post_tags.map((e) => (
+                    {news.data.data.post_tags.map((e) => (
                       <p className="max-lg:hidden" key={e.id}>
                         #{e.name}
                       </p>
@@ -110,7 +111,7 @@ const BlogDetail = () => {
             </motion.div>
 
             <div className="mt-10 max-md:mt-5">
-              {news?.post_images.map((item) => (
+              {news?.data.data.post_images.map((item) => (
                 <div key={item.image}>
                   <motion.p
                     initial={{ opacity: 0, x: -30 }}
@@ -170,7 +171,7 @@ const BlogDetail = () => {
                     <Skeleton className="h-10 w-full rounded-3xl mt-4" />
                   </CarouselItem>
                 ))
-              : data?.results.map((e, idx) => (
+              : data?.data.data.results.map((e, idx) => (
                   <CarouselItem
                     className="flex flex-col h-[500px] w-auto basis-1/3 max-lg:basis-1/2 max-md:basis-[80%]"
                     key={idx}
