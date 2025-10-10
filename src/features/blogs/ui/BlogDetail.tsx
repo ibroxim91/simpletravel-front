@@ -2,7 +2,7 @@ import { Link } from '@/shared/config/i18n/navigation';
 import formatDate from '@/shared/lib/formatDate';
 import { Badge } from '@/shared/ui/badge';
 import { Carousel, CarouselContent, CarouselItem } from '@/shared/ui/carousel';
-import { Skeleton } from '@/shared/ui/skeleton'; // 🔥 shadcn skeleton
+import { Skeleton } from '@/shared/ui/skeleton';
 import EastIcon from '@mui/icons-material/East';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import { useQuery } from '@tanstack/react-query';
@@ -38,6 +38,7 @@ const BlogDetail = () => {
     select(data) {
       return data.data.data;
     },
+    enabled: !!news,
   });
 
   return (

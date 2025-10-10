@@ -79,6 +79,7 @@ export default function SingleTour() {
           rating: 3.5,
         },
       }),
+    enabled: !!data,
   });
 
   const [openWatch, setOpenWatch] = useState<boolean>(false);

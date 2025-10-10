@@ -23,7 +23,6 @@ import {
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Player } from '@lottiefiles/react-lottie-player';
 import CallEndIcon from '@mui/icons-material/CallEnd';
 import CloseIcon from '@mui/icons-material/Close';
 import DoneIcon from '@mui/icons-material/Done';
@@ -41,10 +40,15 @@ import { useMutation } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
+import dynamic from 'next/dynamic';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
 import { Body, Support_Api } from '../lib/api';
+const Player = dynamic(
+  () => import('@lottiefiles/react-lottie-player').then((mod) => mod.Player),
+  { ssr: false },
+);
 
 export default function Contacts() {
   const t = useTranslations();
