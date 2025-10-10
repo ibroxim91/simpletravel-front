@@ -155,7 +155,7 @@ export default async function BlogDetailPage({ params }: Props) {
   };
 
   return (
-    <Suspense>
+    <>
       {/* SEO structured data */}
       <script
         type="application/ld+json"
@@ -165,9 +165,11 @@ export default async function BlogDetailPage({ params }: Props) {
       />
 
       <main>
-        <h1 className="sr-only">{title}</h1>
-        <BlogDetailClient />
+        <Suspense>
+          <h1 className="sr-only">{title}</h1>
+          <BlogDetailClient />
+        </Suspense>
       </main>
-    </Suspense>
+    </>
   );
 }

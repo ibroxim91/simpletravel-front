@@ -1,12 +1,7 @@
 'use client';
 
+import AuthForgetPassword from '@/features/auth/ui/auth-forget-password';
 import { useTranslations } from 'next-intl';
-import dynamic from 'next/dynamic';
-
-const AuthForgetPassword = dynamic(
-  () => import('@/features/auth/ui/auth-forget-password'),
-  { ssr: false },
-);
 
 const ForgetPasswordClient = () => {
   const t = useTranslations();

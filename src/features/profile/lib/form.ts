@@ -26,9 +26,40 @@ export const ParticipantProfileSchema = z.object({
     .date({ required_error: 'Дата обязательна' })
     .nullish()
     .refine((date) => date, { message: 'Дата обязательна' }),
-  phone: z.string().regex(/^\+?\d{9,15}$/, 'Введите корректный номер телефона'),
+  phone: z.string().min(17, {
+    message: 'Telefon raqam xato',
+  }),
   passport: z
-    .instanceof(File)
+    .any()
+    .optional()
+    .refine(
+      (val) =>
+        !val ||
+        val instanceof File ||
+        (Array.isArray(val) && val.every((v) => v instanceof File)),
+      { message: 'Invalid file format' },
+    ),
+});
+
+export const EditParticipantProfileSchema = z.object({
+  gender: z.enum(['male', 'female']),
+  firstName: z.string().min(1, 'Имя обязательно'),
+  lastName: z.string().min(1, 'Фамилия обязательна'),
+  date: z
+    .date({ required_error: 'Дата обязательна' })
     .nullish()
-    .refine((date) => date, { message: 'Обязательное поле' }),
+    .refine((date) => date, { message: 'Дата обязательна' }),
+  phone: z.string().min(17, { message: 'Telefon raqam xato' }),
+  passport: z
+    .any()
+    .optional()
+    .refine(
+      (val) =>
+        !val ||
+        (Array.isArray(val) &&
+          val.every((v) => v instanceof File || typeof v === 'string')) ||
+        val instanceof File ||
+        typeof val === 'string',
+      { message: 'Invalid file format' },
+    ),
 });

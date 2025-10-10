@@ -1,9 +1,8 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import dynamic from 'next/dynamic';
 
-const Auth = dynamic(() => import('@/features/auth/ui/auth'), { ssr: false });
+import Auth from '@/features/auth/ui/auth';
 
 const RegisterClient = () => {
   const t = useTranslations();

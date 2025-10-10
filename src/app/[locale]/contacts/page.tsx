@@ -27,7 +27,6 @@ const getMetadataByLocale = (locale: string) => {
   }
 };
 
-// 🧩 SEO metadata (dynamic locale bilan)
 export async function generateMetadata({
   params,
 }: {

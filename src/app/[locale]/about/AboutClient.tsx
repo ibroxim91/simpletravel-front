@@ -1,16 +1,8 @@
 'use client';
 
-import dynamic from 'next/dynamic';
-
-const Sertificat = dynamic(() => import('@/features/about/ui/Sertificat'), {
-  ssr: true,
-});
-const Partner = dynamic(() => import('@/features/about/ui/Partner'), {
-  ssr: true,
-});
-const Header = dynamic(() => import('@/features/about/ui/Header'), {
-  ssr: true,
-});
+import Header from '@/features/about/ui/Header';
+import Partner from '@/features/about/ui/Partner';
+import Sertificat from '@/features/about/ui/Sertificat';
 
 const AboutClient = () => {
   return (

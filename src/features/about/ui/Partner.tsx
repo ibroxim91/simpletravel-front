@@ -4,13 +4,9 @@ import { Button } from '@/shared/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
 import { easeOut, motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
-import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import { CardData } from '../lib/data';
-
-const SendPartner = dynamic(() => import('./SendPartner'), {
-  ssr: false,
-});
+import SendPartner from './SendPartner';
 
 const Partner = () => {
   const [isMobile, setIsMobile] = useState(false);

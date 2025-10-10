@@ -27,14 +27,13 @@ import {
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Player } from '@lottiefiles/react-lottie-player';
 import CloseIcon from '@mui/icons-material/Close';
 import DoneIcon from '@mui/icons-material/Done';
-import Drawer from '@mui/material/Drawer';
 import { useMutation } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { easeOut, motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -42,6 +41,12 @@ import { toast } from 'sonner';
 import z from 'zod';
 import { Send_Partner, SendPartnerBody } from '../lib/api';
 import senPartners from '../lib/form';
+const Player = dynamic(
+  () => import('@lottiefiles/react-lottie-player').then((mod) => mod.Player),
+  { ssr: false },
+);
+
+const Drawer = dynamic(() => import('@mui/material/Drawer'), { ssr: false });
 
 const SendPartner = () => {
   const t = useTranslations();

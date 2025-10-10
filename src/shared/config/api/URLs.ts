@@ -32,6 +32,8 @@ const SEND_SUPPORT = '/api/v1/support/';
 const UPDATE_USER = '/api/v1/auth/user-update/';
 const NEW_PASSWORD = '/api/v1/auth/change-password/';
 const GET_ME = '/api/v1/auth/me/';
+const PARTICIPANT = '/api/v1/participant/';
+const PARTICIPANT_IMAGE = '/api/v1/participant-image/';
 const FAQ = '/api/v1/faq/';
 
 export {
@@ -52,6 +54,8 @@ export {
   GET_TAGS,
   GET_TICKETS,
   NEW_PASSWORD,
+  PARTICIPANT,
+  PARTICIPANT_IMAGE,
   PHONE_CONFIRM_RESET_PASS,
   PHONE_CONFIRMOTP,
   PHONE_LOGIN,

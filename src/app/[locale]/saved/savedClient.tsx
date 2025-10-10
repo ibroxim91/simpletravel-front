@@ -1,16 +1,14 @@
 'use client';
-
-import BlogDetail from '@/features/blogs/ui/BlogDetail';
+import MyFavourite from '@/features/saved/ui/MyFavourite';
 import { Suspense } from 'react';
-
-const BlogDetailClient = () => {
+const SavedClient = () => {
   return (
     <Suspense>
       <div className="flex flex-col gap-10 mb-10 overflow-hidden">
-        <BlogDetail />
+        <MyFavourite />
       </div>
     </Suspense>
   );
 };
 
-export default BlogDetailClient;
+export default SavedClient;

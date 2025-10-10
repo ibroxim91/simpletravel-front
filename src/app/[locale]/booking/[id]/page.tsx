@@ -1,8 +1,6 @@
 'use client';
 
-import dynamic from 'next/dynamic';
-
-const Booking = dynamic(() => import('@/widgets/booking/ui'), { ssr: false });
+import Booking from '@/widgets/booking/ui';
 
 export default function page() {
   return (

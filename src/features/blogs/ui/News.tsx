@@ -14,16 +14,20 @@ import {
   PaginationLink,
 } from '@/shared/ui/pagination';
 import { Skeleton } from '@/shared/ui/skeleton';
-import { Player } from '@lottiefiles/react-lottie-player';
 import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { News_Api } from '../lib/api';
+const Player = dynamic(
+  () => import('@lottiefiles/react-lottie-player').then((mod) => mod.Player),
+  { ssr: false },
+);
 
 const News = () => {
   const t = useTranslations();

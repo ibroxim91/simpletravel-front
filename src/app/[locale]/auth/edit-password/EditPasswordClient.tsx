@@ -1,11 +1,6 @@
 'use client';
 
-import dynamic from 'next/dynamic';
-
-const AuthEditPassword = dynamic(
-  () => import('@/features/auth/ui/auth-edit-password'),
-  { ssr: false },
-);
+import AuthEditPassword from '@/features/auth/ui/auth-edit-password';
 
 const EditPasswordClient = () => {
   return (
