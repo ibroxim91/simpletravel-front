@@ -1,4 +1,5 @@
 import { News_Api } from '@/features/blogs/lib/api';
+import { Detail_Blogs_Type } from '@/features/blogs/lib/data';
 import {
   HydrationBoundary,
   QueryClient,
@@ -86,8 +87,11 @@ export default async function BlogDetailPage({ params }: Props) {
 
   const dehydratedState = dehydrate(queryClient);
 
-  const newsData = queryClient.getQueryData(['detail_news', id]) as any;
-  const blog = newsData?.data?.data;
+  const newsData = queryClient.getQueryData([
+    'detail_news',
+    id,
+  ]) as Detail_Blogs_Type;
+  const blog = newsData?.data;
 
   const title = blog?.slug || 'Blog maqolasi';
   const description = blog?.text || 'Sayohat va turizm haqidagi blog maqolasi';
