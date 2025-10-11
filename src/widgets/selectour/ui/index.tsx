@@ -3,6 +3,7 @@
 import loaderAnimation from '@/assets/lottie/Travel Tour.json';
 import { Link, useRouter } from '@/shared/config/i18n/navigation';
 import formatDate from '@/shared/lib/formatDate';
+import { formatPrice } from '@/shared/lib/formatPrice';
 import { Button } from '@/shared/ui/button';
 import {
   Pagination,
@@ -85,6 +86,13 @@ export default function Selectour() {
 
   const { from, date, passenger, where, toDate, selectData } =
     useFilterToursStore();
+
+  const handleInputChange = (value: string, index: number) => {
+    const numericValue = Number(value.replace(/\s/g, '')) || 0;
+    const newRange = [...priceRange];
+    newRange[index] = numericValue;
+    setPriceRange(newRange);
+  };
 
   const [openFilter, setFilter] = useState(false);
   const { data: ticket, isLoading } = useQuery({
@@ -237,19 +245,15 @@ export default function Selectour() {
             />
             <div className="flex justify-between mt-3 border border-[#DFDFDF] rounded-xl p-3">
               <input
-                type="number"
-                value={priceRange[0]}
-                onChange={(e) =>
-                  setPriceRange([+e.target.value, priceRange[1]])
-                }
+                type="text"
+                value={formatPrice(priceRange[0])}
+                onChange={(e) => handleInputChange(e.target.value, 0)}
                 className="w-1/2 border-none outline-none text-gray-600"
               />
               <input
-                type="number"
-                value={priceRange[1]}
-                onChange={(e) =>
-                  setPriceRange([priceRange[0], +e.target.value])
-                }
+                type="text"
+                value={formatPrice(priceRange[1])}
+                onChange={(e) => handleInputChange(e.target.value, 1)}
                 className="w-1/2 border-none outline-none text-right text-gray-600"
               />
             </div>
