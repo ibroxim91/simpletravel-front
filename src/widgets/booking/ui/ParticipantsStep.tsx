@@ -256,7 +256,6 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                       },
                     );
                   }}
-                  disabled={!!userIds[index]}
                 >
                   <SelectTrigger className="w-60 max-lg:w-full">
                     <SelectValue placeholder={t('Сохранённые попутчики')} />
