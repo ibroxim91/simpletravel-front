@@ -1,6 +1,6 @@
-import TourImage from '@/assets/Paris.jpg';
 import { Input } from '@/shared/ui/input';
-import { options, TransportOptions } from '@/widgets/booking/lib/data';
+import AirplaneTicketIcon from '@mui/icons-material/AirplaneTicket';
+import LocalTaxiIcon from '@mui/icons-material/LocalTaxi';
 import StarIcon from '@mui/icons-material/Star';
 import WhereToVoteIcon from '@mui/icons-material/WhereToVote';
 import Rating from '@mui/material/Rating';
@@ -8,20 +8,24 @@ import clsx from 'clsx';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import { Get_Info } from '../lib/api';
 import formStore from '../lib/hook';
 
 type Props = {
   onNext: () => void;
+  data: Get_Info | undefined;
   onPrev: () => void;
 };
 
-export default function TourInfoStep({ onNext, onPrev }: Props) {
+export default function TourInfoStep({ onNext, onPrev, data }: Props) {
   const t = useTranslations();
-  const [selected, setSelected] = useState<number | null>(null);
-  const [transport, setTransport] = useState<number | null>(null);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [transport, setTransport] = useState<string | null>(null);
+
   const {
     additional,
     setAdditional,
+    setTarif,
     transport: storeTranpsort,
     setTransport: setStoreTransport,
   } = formStore();
@@ -44,7 +48,7 @@ export default function TourInfoStep({ onNext, onPrev }: Props) {
         <div className="flex items-center gap-[20px] my-[20px] max-lg:flex-col max-lg:items-start">
           <div className="relative rounded-2xl aspect-square w-48 cursor-pointer max-lg:w-full">
             <Image
-              src={TourImage.src}
+              src={data?.data.image_banner || ''}
               alt="tour"
               className="object-cover rounded-2xl"
               fill
@@ -57,26 +61,30 @@ export default function TourInfoStep({ onNext, onPrev }: Props) {
               <Rating
                 name="read-only"
                 size="medium"
-                value={4}
+                value={data?.data.rating}
                 readOnly
-                sx={{ color: '#F08125' }}
+                precision={0.1}
               />
             </div>
 
             <h1 className="text-2xl font-semibold mt-1 text-[#031753]">
-              Memories Varadero
+              {data?.data.title}
             </h1>
             <div className="flex items-center gap-1 mt-1">
               <WhereToVoteIcon
                 sx={{ width: '24px', height: '24px', color: '#084FE3' }}
               />
-              <p className="text-[#031753] font-normal">ОАЭ, Шарджа</p>
+              <p className="text-[#031753] font-normal">
+                {data?.data.destination}
+              </p>
             </div>
 
             <ul className="flex items-center gap-[20px] mt-2 list-disc list-inside max-lg:flex-col max-lg:items-start">
-              <li className="text-md text-[#646465]">Открытый бассейн</li>
-              <li className="text-md text-[#646465]">Первая линия пляжа</li>
-              <li className="text-md text-[#646465]">Анимация</li>
+              {data?.data.ticket_amenities.map((e) => (
+                <li key={e.name} className="text-md text-[#646465]">
+                  {e.name}
+                </li>
+              ))}
             </ul>
           </div>
         </div>
@@ -86,13 +94,16 @@ export default function TourInfoStep({ onNext, onPrev }: Props) {
         </label>
 
         <div className="mt-[8px] grid grid-cols-2 justify-between gap-[16px] max-md:grid-cols-1">
-          {options.map((opt) => {
-            const inputId = `selectComfort-${opt.id}`;
-            const isChecked = selected === opt.id;
+          {data?.data.tariff.map((opt) => {
+            const inputId = `selectComfort-${opt.name}`;
+            const isChecked = selected === opt.name;
             return (
               <div
-                key={opt.id}
-                onClick={() => setSelected(opt.id)}
+                key={opt.name}
+                onClick={() => {
+                  setSelected(opt.name);
+                  setTarif(opt);
+                }}
                 className={`flex w-full justify-between items-center py-[17px] px-[20px] cursor-pointer border rounded-xl bg-[#EDEEF180] border-[#EDEEF1]`}
               >
                 <label
@@ -111,7 +122,7 @@ export default function TourInfoStep({ onNext, onPrev }: Props) {
                       isChecked ? 'text-[#084FE3]' : 'text-[#212122]',
                     )}
                   >
-                    {opt.label}
+                    {opt.name}
                   </p>
                 </label>
                 <Input
@@ -119,7 +130,7 @@ export default function TourInfoStep({ onNext, onPrev }: Props) {
                   id={inputId}
                   name="selectComfort"
                   checked={isChecked}
-                  onChange={() => setSelected(opt.id)}
+                  onChange={() => setSelected(opt.name)}
                   className="w-6 h-6 accent-[#084FE3]"
                 />
               </div>
@@ -129,33 +140,42 @@ export default function TourInfoStep({ onNext, onPrev }: Props) {
 
         <p className="text-xl font-semibold mt-5">{t('Транспорт')}</p>
         <div className="mt-[8px] grid grid-cols-2 justify-between gap-[16px] max-md:grid-cols-1">
-          {TransportOptions.map((opt) => {
-            const inputId = `selectTransport-${opt.id}`;
-            const isChecked = transport === opt.id;
-            const Icon = opt.icon;
+          {data?.data.transports.map((opt) => {
+            const inputId = `selectTransport-${opt.name}`;
+            const isChecked = transport === opt.name;
             return (
               <div
-                key={opt.id}
-                onClick={() => setTransport(opt.id)}
+                key={opt.name}
+                onClick={() => setTransport(opt.name)}
                 className={`flex w-full justify-between items-center py-[17px] px-[20px] cursor-pointer border rounded-xl bg-[#EDEEF180] border-[#EDEEF1]`}
               >
                 <label
                   htmlFor={inputId}
                   className="flex items-center mr-[20px] gap-[10px] cursor-pointer"
                 >
-                  <Icon
-                    sx={{
-                      color: isChecked ? '#084FE3' : '#212122',
-                      width: '30px',
-                      height: '30px',
-                    }}
-                  />
+                  {opt.icon_name === 'avia' ? (
+                    <AirplaneTicketIcon
+                      sx={{
+                        color: isChecked ? '#084FE3' : '#212122',
+                        width: '30px',
+                        height: '30px',
+                      }}
+                    />
+                  ) : (
+                    <LocalTaxiIcon
+                      sx={{
+                        color: isChecked ? '#084FE3' : '#212122',
+                        width: '30px',
+                        height: '30px',
+                      }}
+                    />
+                  )}
                   <p
                     className={clsx(
                       isChecked ? 'text-[#084FE3]' : 'text-[#212122]',
                     )}
                   >
-                    {opt.label}
+                    {opt.name}
                   </p>
                 </label>
                 <Input
@@ -163,7 +183,7 @@ export default function TourInfoStep({ onNext, onPrev }: Props) {
                   id={inputId}
                   name="selectTransport"
                   checked={isChecked}
-                  onChange={() => setTransport(opt.id)}
+                  onChange={() => setTransport(opt.name)}
                   className="w-6 h-6 accent-[#084FE3]"
                 />
               </div>

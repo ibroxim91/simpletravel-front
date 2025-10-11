@@ -89,7 +89,7 @@ export default function ImageSwiper({
         slidesPerView={1}
         className="mySwiper"
       >
-        {images.map((img, idx) => (
+        {images?.map((img, idx) => (
           <SwiperSlide key={idx}>
             <div
               className="relative w-full h-[500px]"

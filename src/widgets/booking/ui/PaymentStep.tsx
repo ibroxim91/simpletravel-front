@@ -10,15 +10,16 @@ import { useParams } from 'next/navigation';
 import { useRef, useState } from 'react';
 import PaymePayment from '../../../../public/images/payme-payment.png';
 import UzumPayment from '../../../../public/images/uzum-payment.png';
-import { options, TransportOptions } from '../lib/data';
+import { Get_Info } from '../lib/api';
 import formStore from '../lib/hook';
 import PaidModal from './PaidModal';
 
 type Props = {
   onPrev: () => void;
+  data: Get_Info | undefined;
 };
 
-export default function PaymentStep({ onPrev }: Props) {
+export default function PaymentStep({ onPrev, data }: Props) {
   const t = useTranslations();
   const { locale } = useParams();
   const [isPaid, setIsPaid] = useState<boolean>(false);
@@ -27,8 +28,10 @@ export default function PaymentStep({ onPrev }: Props) {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
-  const { where, whereTo, dispatch, additional, returned, user, transport } =
+  const { where, whereTo, dispatch, returned, user, transport, tariff } =
     formStore();
+
+  const store = formStore();
 
   async function onSubmit() {
     setLoading(true);
@@ -76,7 +79,8 @@ export default function PaymentStep({ onPrev }: Props) {
         <hr className="h-[2px] my-[24px] bg-[#EDEEF1] " />
         <div className="flex my-5 justify-between flex-col items-start gap-2 bg-[#EDEEF180] p-[20px] rounded-[20px] border-2 border-[#EDEEF180]">
           <h1 className="text-2xl font-bold">
-            {formatPrice('22450000', locale as LanguageRoutes, true)}
+            {store.total_price &&
+              formatPrice(store.total_price, locale as LanguageRoutes, true)}
           </h1>
           <p className="text-[#050B08] font-medium">{t('Общая сумма')}</p>
         </div>
@@ -192,7 +196,7 @@ export default function PaymentStep({ onPrev }: Props) {
           </p>
         </div>
 
-        <h1 className="mt-5 text-lg font-bold">{t('Попутчики')}</h1>
+        <h1 className="mt-5 text-lg font-bold">{t('Мои попутчики')}</h1>
         {user.map((e, index) => (
           <div
             key={index}
@@ -200,7 +204,7 @@ export default function PaymentStep({ onPrev }: Props) {
       ${index % 2 === 0 ? 'bg-[#EDEEF1]' : 'bg-white'}`}
           >
             <p>
-              {t('Попутчик')} {index + 1}
+              {t('Мои попутчики')} {index + 1}
             </p>
             <p className="!text-black text-end break-words">
               {e.firstName} {e.lastName}
@@ -218,76 +222,71 @@ export default function PaymentStep({ onPrev }: Props) {
         <h1 className="mt-5 text-lg font-bold">{t('Турпакет')}</h1>
         <div className="grid grid-cols-2 items-center justify-between w-full my-2 bg-[#EDEEF1] px-[8px] py-[5px] rounded-[8px] text-[#646465]">
           <p className="text-md">{t('Отель')}</p>
-          <p className="!text-black text-end break-words">Memories Varadero</p>
+          <p className="!text-black text-end break-words">{data?.data.title}</p>
         </div>
 
         <div className="grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465]">
           <p className="text-md">{t('Локация')}</p>
-          <p className="!text-black text-end break-words">ОАЭ, Шарджа</p>
+          <p className="!text-black text-end break-words">
+            {data?.data.destination}
+          </p>
         </div>
 
         <div className="grid grid-cols-2 items-center justify-between w-full my-2 bg-[#EDEEF1] px-[8px] py-[5px] rounded-[8px] text-[#646465]">
           <p className="text-md">{t('Рейтинг')}</p>
-          <p className="!text-black text-end break-words">4/5 {t('звёзды')}</p>
+          <p className="!text-black text-end break-words">
+            {data?.data.rating} {t('звёзды')}
+          </p>
         </div>
 
         <div className="grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465]">
           <p className="text-md break-words">{t('Характеристики')}</p>
-          <p className="!text-black text-end break-words">
-            {t('Открытый бассейн, Анимация, Первая линия пляжа')}
-          </p>
+          {data?.data.ticket_amenities.slice(0, 1).map((e) => (
+            <p className="!text-black text-end break-words" key={e.name}>
+              {e.name}...
+            </p>
+          ))}
         </div>
 
         <div className="grid grid-cols-2 items-center justify-between w-full my-2 bg-[#EDEEF1] px-[8px] py-[5px] rounded-[8px] text-[#646465]">
           <p className="text-md">{t('Тип пакета')}</p>
-          <p className="!text-black text-end break-words">
-            {options.find((e) => e.id === additional)?.label}
-          </p>
+          <p className="!text-black text-end break-words">{tariff.name}</p>
         </div>
 
         <div className="grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465]">
           <p className="text-md">{t('Транспорт')}</p>
-          <p className="!text-black text-end break-words">
-            {TransportOptions.find((e) => e.id === transport)?.label}
-          </p>
+          <p className="!text-black text-end break-words">{transport}</p>
         </div>
 
         <h1 className="mt-5 text-lg font-bold">{t('Услуги')}</h1>
-        <div className="grid grid-cols-2 items-center justify-between w-full my-2 bg-[#EDEEF1] px-[8px] py-[5px] rounded-[8px] text-[#646465]">
-          <p className="text-md">{t('Городская экскурсия')}</p>
-          <p className="!text-black text-end break-words">
-            {formatPrice('1450000', locale as LanguageRoutes, true)}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465]">
-          <p className="text-md">{t('Поездка на пляж')}</p>
-          <p className="!text-black text-end break-words">
-            {formatPrice('1450000', locale as LanguageRoutes, true)}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 items-center justify-between w-full my-2 bg-[#EDEEF1] px-[8px] py-[5px] rounded-[8px] text-[#646465]">
-          <p className="text-md">Ночной тур</p>
-          <p className="!text-black text-end break-words">
-            {formatPrice('1450000', locale as LanguageRoutes, true)}
-          </p>
-        </div>
+        {store.paidService.map((e, i) => (
+          <div
+            key={e.id || i}
+            className={`grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465] ${
+              i % 2 === 0 ? 'bg-[#EDEEF1]' : 'bg-white'
+            }`}
+          >
+            <p className="text-md">{e.name}</p>
+            <p className="!text-black text-end break-words">
+              {formatPrice(e.price, locale as LanguageRoutes, true)}
+            </p>
+          </div>
+        ))}
 
         <h1 className="mt-5 text-lg font-bold">{t('Дополнительные услуги')}</h1>
-        <div className="grid grid-cols-2 items-center justify-between w-full my-2 bg-[#EDEEF1] px-[8px] py-[5px] rounded-[8px] text-[#646465]">
-          <p className="text-md">{t('Страховка')}</p>
-          <p className="!text-black text-end break-words">
-            {formatPrice('1450000', locale as LanguageRoutes, true)}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465]">
-          <p className="text-md">{t('Визовая поддержка')}</p>
-          <p className="!text-black text-end break-words">
-            {formatPrice('1450000', locale as LanguageRoutes, true)}
-          </p>
-        </div>
+        {store.tours_category.map((e, i) => (
+          <div
+            key={e.id || i}
+            className={`grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465] ${
+              i % 2 === 0 ? 'bg-[#EDEEF1]' : 'bg-white'
+            }`}
+          >
+            <p className="text-md">{e.name}</p>
+            {/* <p className="!text-black text-end break-words">
+              {formatPrice('1450000', locale as LanguageRoutes, true)}
+            </p> */}
+          </div>
+        ))}
       </div>
 
       <PaidModal

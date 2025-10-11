@@ -59,7 +59,7 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
   });
 
   return (
-    <Link href={`/selectour/${data.id}`}>
+    <Link href={`/selectour/${data.id}`} prefetch={false}>
       <motion.div
         initial={{ opacity: 0, x: 30 }}
         whileInView={{ opacity: 1, x: 0 }}
@@ -98,7 +98,7 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
         </Button>
         <div className="h-full aspect-square rounded-3xl w-[40%] relative max-lg:w-full">
           <Image
-            src={BASE_URL + data.ticket_images.image}
+            src={BASE_URL + data.ticket_images}
             alt={data.title}
             fetchPriority="high"
             className="w-full h-full object-cover rounded-3xl"

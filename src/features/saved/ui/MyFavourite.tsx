@@ -420,7 +420,7 @@ const MyFavourite = () => {
                             className="w-full aspect-square relative group overflow-hidden rounded-3xl shadow-lg"
                           >
                             <Image
-                              src={BASE_URL + e.ticket_images.image}
+                              src={BASE_URL + e.ticket_images}
                               alt={e.title}
                               fill
                               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"

@@ -95,7 +95,7 @@ const Populardestinations = () => {
                 className="block relative w-full h-full"
               >
                 <Image
-                  src={BASE_URL + ticket[0].ticket_images.image}
+                  src={BASE_URL + ticket[0].ticket_images}
                   alt={ticket[0].title}
                   fill
                   sizes="(max-width: 1920px) 100vw, 33vw"
@@ -140,7 +140,7 @@ const Populardestinations = () => {
                     className="block relative w-full h-full"
                   >
                     <Image
-                      src={BASE_URL + ticket[1].ticket_images.image}
+                      src={BASE_URL + ticket[1].ticket_images}
                       alt={ticket[1].title}
                       fill
                       sizes="(max-width: 1920px) 100vw, 33vw"
@@ -182,7 +182,7 @@ const Populardestinations = () => {
                     className="block relative w-full h-full"
                   >
                     <Image
-                      src={BASE_URL + ticket[2].ticket_images.image}
+                      src={BASE_URL + ticket[2].ticket_images}
                       alt={ticket[2].title}
                       fill
                       sizes="(max-width: 1920px) 100vw, 33vw"
@@ -225,7 +225,7 @@ const Populardestinations = () => {
                     className="block relative w-full h-full"
                   >
                     <Image
-                      src={BASE_URL + ticket[3].ticket_images.image}
+                      src={BASE_URL + ticket[3].ticket_images}
                       alt={ticket[3].title}
                       fill
                       sizes="(max-width: 1920px) 100vw, 33vw"
@@ -267,7 +267,7 @@ const Populardestinations = () => {
                     className="block relative w-full h-full"
                   >
                     <Image
-                      src={BASE_URL + ticket[4].ticket_images.image}
+                      src={BASE_URL + ticket[4].ticket_images}
                       alt={ticket[4].title}
                       fill
                       sizes="(max-width: 1920px) 100vw, 33vw"

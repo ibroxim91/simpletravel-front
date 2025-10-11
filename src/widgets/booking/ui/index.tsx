@@ -10,10 +10,14 @@ import PaymentsIcon from '@mui/icons-material/Payments';
 import PersonIcon from '@mui/icons-material/Person';
 import SettingsIcon from '@mui/icons-material/Settings';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
+import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
+import { useParams } from 'next/navigation';
 import { useState } from 'react';
+import { Ticketorder_Api } from '../lib/api';
+import formStore from '../lib/hook';
 import ParticipantsStep from './ParticipantsStep';
 import PaymentStep from './PaymentStep';
 import ServicesStep from './ServicesStep';
@@ -23,6 +27,8 @@ import TourInfoStep from './TourInfoStep';
 export default function Booking() {
   const t = useTranslations();
   const route = useRouter();
+  const { id } = useParams();
+  const { reset } = formStore();
   const tabSteps: Record<string, number> = {
     time: 1,
     participants: 2,
@@ -42,6 +48,14 @@ export default function Booking() {
     hidden: { opacity: 0, x: -30 },
     visible: { opacity: 1, x: 0 },
   };
+  const { data } = useQuery({
+    queryKey: ['tickets_info', id],
+    queryFn: () => Ticketorder_Api.ticketorder_info({ id: Number(id) }),
+    select(data) {
+      return data.data;
+    },
+  });
+
   return (
     <div className="custom-container py-[16px]">
       <Breadcrumbs
@@ -65,7 +79,10 @@ export default function Booking() {
       <div className="flex items-center gap-[16px] mt-[20px]">
         <div
           className="w-[40px] h-[40px] cursor-pointer border-2 border-[#DFDFDF] bg-white rounded-full flex items-center justify-center"
-          onClick={() => route.back()}
+          onClick={() => {
+            route.back();
+            reset();
+          }}
         >
           <ChevronLeftIcon sx={{ color: '#031753' }} />
         </div>
@@ -462,6 +479,7 @@ export default function Booking() {
                     transition={{ duration: 0.5 }}
                   >
                     <TimeStep
+                      data={data}
                       onNext={() => {
                         setActiveTab('participants');
                         setStep(tabSteps['participants']);
@@ -502,6 +520,7 @@ export default function Booking() {
                     transition={{ duration: 0.5 }}
                   >
                     <TourInfoStep
+                      data={data}
                       onNext={() => {
                         setActiveTab('services');
                         setStep(tabSteps['services']);
@@ -524,6 +543,7 @@ export default function Booking() {
                     transition={{ duration: 0.5 }}
                   >
                     <ServicesStep
+                      data={data}
                       onNext={() => {
                         setActiveTab('payment');
                         setStep(tabSteps['payment']);
@@ -546,6 +566,7 @@ export default function Booking() {
                     transition={{ duration: 0.5 }}
                   >
                     <PaymentStep
+                      data={data}
                       onPrev={() => {
                         setActiveTab('services');
                         setStep(tabSteps['services']);

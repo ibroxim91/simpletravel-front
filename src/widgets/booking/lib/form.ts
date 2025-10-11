@@ -14,6 +14,7 @@ export const TimesStepForm = z.object({
 });
 
 export const ParticipantSchema = z.object({
+  userId: z.number().optional(),
   gender: z.enum(['male', 'female']),
   firstName: z.string().min(1, 'Имя обязательно'),
   lastName: z.string().min(1, 'Фамилия обязательна'),
@@ -21,11 +22,8 @@ export const ParticipantSchema = z.object({
     .date({ required_error: 'Дата обязательна' })
     .nullish()
     .refine((date) => date, { message: 'Дата обязательна' }),
-  phone: z.string().regex(/^\+?\d{9,15}$/, 'Введите корректный номер телефона'),
-  passport: z
-    .instanceof(File)
-    .nullish()
-    .refine((date) => date, { message: 'Majburiy maydon' }),
+  phone: z.string().min(17, 'Введите корректный номер телефона'),
+  passport: z.any().optional(),
 });
 
 export const ParticipantsForm = z.object({
@@ -33,6 +31,10 @@ export const ParticipantsForm = z.object({
 });
 
 export const ServicesForm = z.object({
-  excursions: z.string().min(1, { message: 'Majburiy maydon' }),
-  additional: z.string().min(1, { message: 'Majburiy maydon' }),
+  excursions: z
+    .array(z.number())
+    .min(1, { message: 'Kamida bitta ekskursiya tanlang' }),
+  additional: z
+    .array(z.number())
+    .min(1, { message: 'Kamida bitta xizmat tanlang' }),
 });

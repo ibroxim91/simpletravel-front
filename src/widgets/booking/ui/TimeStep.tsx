@@ -1,3 +1,4 @@
+import formatDate from '@/shared/lib/formatDate';
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/button';
 import { Calendar } from '@/shared/ui/calendar';
@@ -11,18 +12,19 @@ import CloseIcon from '@mui/icons-material/Close';
 import FlightIcon from '@mui/icons-material/Flight';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import Drawer from '@mui/material/Drawer';
-import { format } from 'date-fns';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
+import { Get_Info } from '../lib/api';
 import { TimesStepForm } from '../lib/form';
 import formStore from '../lib/hook';
 type Props = {
   onNext: () => void;
+  data: Get_Info | undefined;
 };
 
-export default function TimeStep({ onNext }: Props) {
+export default function TimeStep({ onNext, data }: Props) {
   const t = useTranslations();
   const [open, setOpen] = useState(false);
   const [openWhereMobile, setOpenWhereMobile] = useState(false);
@@ -67,6 +69,17 @@ export default function TimeStep({ onNext }: Props) {
     setReturned(values.returned);
   }
 
+  useEffect(() => {
+    if (data) {
+      const departure = new Date(data.data.departure_date);
+
+      form.setValue('where', data.data.departure);
+      form.setValue('whereTo', data.data.destination);
+      form.setValue('dispatch', departure);
+      form.setValue('returned', new Date(data.data.travel_time));
+    }
+  }, [data, form]);
+
   return (
     <div className="relative">
       <div className="bg-[#FFFFFF] p-[20px] rounded-[20px]">
@@ -86,6 +99,7 @@ export default function TimeStep({ onNext }: Props) {
                         <Input
                           placeholder={t('Откуда')}
                           {...field}
+                          disabled
                           className=" w-full h-full border-2 border-[#EDEEF1] justify-between p-[15px] rounded-md"
                         />
                         <LocationOnIcon
@@ -114,6 +128,7 @@ export default function TimeStep({ onNext }: Props) {
                     <FormControl>
                       <div className="flex items-center gap-[16px] relative">
                         <Input
+                          disabled
                           placeholder={t('Куда')}
                           {...field}
                           className=" w-full h-full border-2 border-[#EDEEF1] justify-between p-[15px] rounded-md"
@@ -163,7 +178,7 @@ export default function TimeStep({ onNext }: Props) {
                                   }}
                                 />
                                 {field.value
-                                  ? format(field.value, 'dd.MM.yyyy')
+                                  ? formatDate.format(field.value, 'DD.MM.YYYY')
                                   : t('Когда')}
                               </button>
                             </PopoverTrigger>
@@ -202,7 +217,7 @@ export default function TimeStep({ onNext }: Props) {
                               }}
                             />
                             {field.value
-                              ? format(field.value, 'dd.MM.yyyy')
+                              ? formatDate.format(field.value, 'DD.MM.YYYY')
                               : t('Когда')}
                           </button>
                           <Drawer
@@ -287,7 +302,7 @@ export default function TimeStep({ onNext }: Props) {
                                   }}
                                 />
                                 {field.value
-                                  ? format(field.value, 'dd.MM.yyyy')
+                                  ? formatDate.format(field.value, 'DD.MM.YYYY')
                                   : t('Когда')}
                               </button>
                             </PopoverTrigger>
@@ -326,7 +341,7 @@ export default function TimeStep({ onNext }: Props) {
                               }}
                             />
                             {field.value
-                              ? format(field.value, 'dd.MM.yyyy')
+                              ? formatDate.format(field.value, 'DD.MM.YYYY')
                               : t('Когда')}
                           </button>
                           <Drawer

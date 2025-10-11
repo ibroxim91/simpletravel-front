@@ -3,6 +3,7 @@ import {
   GET_ME,
   PARTICIPANT,
   PARTICIPANT_IMAGE,
+  TICKETORDER,
 } from '@/shared/config/api/URLs';
 
 interface GetMe {
@@ -26,7 +27,7 @@ interface GetMe {
   };
 }
 
-interface GetAllParticipantData {
+export interface GetAllParticipantData {
   status: boolean;
   data: {
     links: {
@@ -61,6 +62,94 @@ interface GetOneParticipantData {
         image: string;
       },
     ];
+  };
+}
+
+interface GetAllOrder {
+  status: boolean;
+  data: {
+    links: {
+      previous: string;
+      next: string;
+    };
+    total_items: number;
+    total_pages: number;
+    page_size: number;
+    current_page: number;
+    results: {
+      id: number;
+      departure: string;
+      destination: string;
+      departure_date: string;
+      arrival_time: string;
+      participant: {
+        id: number;
+        first_name: string;
+        last_name: string;
+        gender: 'male' | 'female';
+      }[];
+      ticket: {
+        id: 1;
+        title: string;
+        service_name: string;
+        location_name: string;
+      };
+      tariff: string;
+      transport: string;
+      extra_service: {
+        id: number;
+        name: string;
+      }[];
+      extra_paid_service: {
+        id: number;
+        name: string;
+        price: number;
+      }[];
+      total_price: number;
+      order_status: string;
+    }[];
+  };
+}
+
+interface GetOrderId {
+  status: boolean;
+  data: {
+    id: number;
+    departure: string;
+    destination: string;
+    departure_date: string;
+    arrival_time: string;
+    participant: [
+      {
+        id: number;
+        first_name: string;
+        last_name: string;
+        gender: 'male' | 'female';
+      },
+    ];
+    ticket: {
+      id: number;
+      title: string;
+      service_name: string;
+      location_name: string;
+    };
+    tariff: string;
+    transport: string;
+    extra_service: [
+      {
+        id: number;
+        name: string;
+      },
+    ];
+    extra_paid_service: [
+      {
+        id: number;
+        name: string;
+        price: number;
+      },
+    ];
+    total_price: number;
+    order_status: string;
   };
 }
 
@@ -114,6 +203,21 @@ export const User_Api = {
 
   async deleteParticipantImage({ id }: { id: string | number }) {
     const res = await httpClient.delete(`${PARTICIPANT_IMAGE}${id}/`);
+    return res;
+  },
+
+  async getOrder({ page, page_size }: { page: number; page_size: number }) {
+    const res = await httpClient.get<GetAllOrder>(TICKETORDER, {
+      params: {
+        page,
+        page_size,
+      },
+    });
+    return res;
+  },
+
+  async getOrderId({ id }: { id: number }) {
+    const res = await httpClient.get<GetOrderId>(`${TICKETORDER}${id}/`);
     return res;
   },
 };

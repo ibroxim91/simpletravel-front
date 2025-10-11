@@ -35,6 +35,8 @@ const GET_ME = '/api/v1/auth/me/';
 const PARTICIPANT = '/api/v1/participant/';
 const PARTICIPANT_IMAGE = '/api/v1/participant-image/';
 const FAQ = '/api/v1/faq/';
+const TICKETORDER_INFO = '/api/v1/get-ticket-info/';
+const TICKETORDER = '/api/v1/ticketorder/';
 
 export {
   BASE_URL,
@@ -67,5 +69,7 @@ export {
   SAVE_TICKETS,
   SEND_PARTNER,
   SEND_SUPPORT,
+  TICKETORDER,
+  TICKETORDER_INFO,
   UPDATE_USER,
 };

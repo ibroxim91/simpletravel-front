@@ -1,5 +1,8 @@
 'use client';
 
+import { User_Api } from '@/features/profile/lib/api';
+import formatDate from '@/shared/lib/formatDate';
+import formatPhone from '@/shared/lib/formatPhone';
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/button';
 import { Calendar } from '@/shared/ui/calendar';
@@ -27,16 +30,19 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import CloseIcon from '@mui/icons-material/Close';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import Drawer from '@mui/material/Drawer';
-import { format, parse } from 'date-fns';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
+import { format } from 'date-fns';
 import { Plus, TrashIcon, UserIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import z from 'zod';
-import { participantsDate } from '../lib/data';
 import { ParticipantsForm } from '../lib/form';
 import formStore from '../lib/hook';
+
+type PassportType = File | { id: number; image: string };
 
 type Props = {
   onNext: () => void;
@@ -46,10 +52,34 @@ type Props = {
 export default function ParticipantsStep({ onNext, onPrev }: Props) {
   const t = useTranslations();
   const [previewOpen, setPreviewOpen] = useState(false);
-  const [open, setOpen] = useState(false);
+  const [openCalendar, setOpenCalendar] = useState<Record<number, boolean>>({});
   const [openWhereMobile, setOpenWhereMobile] = useState(false);
-  const [previewFile, setPreviewFile] = useState<File | null>(null);
+  const [previewFile, setPreviewFile] = useState<PassportType | null>(null);
   const { addUser, user } = formStore();
+  const [userIds, setUserIds] = useState<(number | undefined)[]>([]);
+
+  const {
+    data: allParticipant,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ['participant_all'],
+    queryFn: ({ pageParam = 1 }) =>
+      User_Api.getAllParticipant({
+        page: pageParam,
+        page_size: 5,
+      }),
+    getNextPageParam: (lastPage) => {
+      const { links, current_page, total_pages } = lastPage.data.data;
+      if (links.next && current_page < total_pages) {
+        return current_page + 1;
+      }
+      return undefined;
+    },
+
+    initialPageParam: 1,
+  });
 
   const form = useForm<z.infer<typeof ParticipantsForm>>({
     resolver: zodResolver(ParticipantsForm),
@@ -80,22 +110,75 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
     control: form.control,
     name: 'participants',
   });
+  const queryClient = useQueryClient();
 
-  function onSubmit(values: z.infer<typeof ParticipantsForm>) {
-    formStore.setState({ user: [] }); // avval user massivni tozalaymiz
+  async function onSubmit(values: z.infer<typeof ParticipantsForm>) {
+    const createPromises = [];
 
-    values.participants.forEach((p) => {
-      addUser({
-        birthDate: p.date ?? null,
-        gender: p.gender,
-        firstName: p.firstName,
-        lastName: p.lastName,
-        passport: p.passport ?? null,
-        phone: p.phone,
+    for (let index = 0; index < values.participants.length; index++) {
+      const participant = values.participants[index];
+      const selectedUserId = userIds[index];
+
+      if (selectedUserId) {
+        addUser({
+          userId: selectedUserId,
+          birthDate: new Date(participant.date!),
+          firstName: participant.firstName,
+          gender: participant.gender,
+          lastName: participant.lastName,
+          passport: participant.passport,
+          phone: participant.phone,
+        });
+        continue;
+      }
+      const formData = new FormData();
+      formData.append('gender', participant.gender);
+      formData.append('first_name', participant.firstName);
+      formData.append('last_name', participant.lastName);
+      formData.append('phone_number', participant.phone);
+      formData.append(
+        'birth_date',
+        formatDate.format(participant.date!, 'YYYY-MM-DD') || '',
+      );
+
+      if (participant.passport) {
+        const files = Array.isArray(participant.passport)
+          ? participant.passport
+          : [participant.passport];
+        files.forEach((file) => {
+          if (file instanceof File) {
+            formData.append('pasport_images', file);
+          }
+        });
+      }
+
+      const promise = User_Api.createParticipant(formData).then((res) => {
+        const newUser = res.data.data;
+        addUser({
+          userId: newUser.id,
+          birthDate: new Date(newUser.birth_date),
+          firstName: newUser.first_name,
+          gender: newUser.gender,
+          lastName: newUser.last_name,
+          passport: newUser.participant_pasport_image,
+          phone: newUser.phone_number,
+        });
       });
-    });
 
-    onNext();
+      createPromises.push(promise);
+    }
+
+    try {
+      if (createPromises.length > 0) {
+        await Promise.all(createPromises);
+      }
+
+      toast.success(t('Hamroh(lar) muvaffaqiyatli saqlandi'));
+      queryClient.refetchQueries({ queryKey: ['participant_all'] });
+      onNext();
+    } catch {
+      toast.error(t('Xatolik yuz berdi'));
+    }
   }
 
   return (
@@ -114,7 +197,11 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                 {fields.length > 1 && (
                   <button
                     type="button"
-                    onClick={() => remove(index)}
+                    onClick={() => {
+                      remove(index);
+                      // ✅ userIds dan ham o'chiramiz
+                      setUserIds((prev) => prev.filter((_, i) => i !== index));
+                    }}
                     className="flex gap-4 text-white bg-red-500 px-5 py-3 rounded-3xl"
                   >
                     <TrashIcon />
@@ -127,43 +214,88 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                   {t('Участник')} {index + 1}
                 </h1>
                 <Select
-                  onValueChange={(val) => {
-                    const p = participantsDate.find(
-                      (p) => `${p.firstName}-${p.lastName}` === val,
+                  value={userIds[index]?.toString() ?? ''}
+                  onValueChange={(value) => {
+                    const selectedId = Number(value);
+
+                    // ✅ userId holatini saqlaymiz
+                    setUserIds((prev) => {
+                      const updated = [...prev];
+                      updated[index] = selectedId;
+                      return updated;
+                    });
+
+                    // ✅ Foydalanuvchini olib kelamiz
+                    User_Api.getOneParticipant({ id: selectedId }).then(
+                      (res) => {
+                        const p = res.data;
+                        form.setValue(
+                          `participants.${index}.gender`,
+                          p.data.gender,
+                        );
+                        form.setValue(
+                          `participants.${index}.firstName`,
+                          p.data.first_name,
+                        );
+                        form.setValue(
+                          `participants.${index}.lastName`,
+                          p.data.last_name,
+                        );
+                        form.setValue(
+                          `participants.${index}.date`,
+                          new Date(p.data.birth_date),
+                        );
+                        form.setValue(
+                          `participants.${index}.phone`,
+                          formatPhone(p.data.phone_number),
+                        );
+                        form.setValue(
+                          `participants.${index}.passport`,
+                          p.data.participant_pasport_image,
+                        );
+                      },
                     );
-                    if (!p) return;
-                    const parsedDate = parse(
-                      p.birthDate,
-                      'dd.MM.yyyy',
-                      new Date(),
-                    );
-                    form.setValue(
-                      `participants.${index}.firstName`,
-                      p.firstName,
-                    );
-                    form.setValue(`participants.${index}.lastName`, p.lastName);
-                    form.setValue(`participants.${index}.phone`, p.phone);
-                    form.setValue(
-                      `participants.${index}.gender`,
-                      p.gender as 'male' | 'female',
-                    );
-                    form.setValue(`participants.${index}.date`, parsedDate);
-                    form.setValue(`participants.${index}.passport`, null);
                   }}
+                  disabled={!!userIds[index]}
                 >
                   <SelectTrigger className="w-60 max-lg:w-full">
                     <SelectValue placeholder={t('Сохранённые попутчики')} />
                     <KeyboardArrowDownIcon />
                   </SelectTrigger>
-                  <SelectContent>
-                    {participantsDate.map((p, idx) => (
-                      <SelectItem
-                        key={idx}
-                        value={`${p.firstName}-${p.lastName}`}
-                      >
-                        {p.firstName} {p.lastName}
-                      </SelectItem>
-                    ))}
+
+                  <SelectContent
+                    onScroll={(e) => {
+                      const bottom =
+                        e.currentTarget.scrollTop +
+                          e.currentTarget.clientHeight >=
+                        e.currentTarget.scrollHeight - 50;
+                      if (bottom && hasNextPage && !isFetchingNextPage) {
+                        fetchNextPage();
+                      }
+                    }}
+                    className="!max-h-[150px] !overflow-y-auto"
+                  >
+                    {allParticipant?.pages.some(
+                      (page) => page.data.data.results.length > 0,
+                    ) ? (
+                      allParticipant.pages.map((page) =>
+                        page.data.data.results.map((p) => (
+                          <SelectItem key={p.id} value={`${p.id}`}>
+                            {p.first_name} {p.last_name}
+                          </SelectItem>
+                        )),
+                      )
+                    ) : (
+                      <div className="text-center text-gray-500 p-3">
+                        {t('Нет сохранённых участников')}
+                      </div>
+                    )}
+
+                    {isFetchingNextPage && (
+                      <div className="text-center p-2 text-gray-500 text-sm">
+                        {t('Загрузка...')}
+                      </div>
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -255,7 +387,15 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                       <FormControl>
                         <div>
                           <div className="max-lg:hidden">
-                            <Popover open={open} onOpenChange={setOpen}>
+                            <Popover
+                              open={!!openCalendar[index]}
+                              onOpenChange={(isOpen) =>
+                                setOpenCalendar((prev) => ({
+                                  ...prev,
+                                  [index]: isOpen,
+                                }))
+                              }
+                            >
                               <PopoverTrigger asChild>
                                 <button
                                   className={cn(
@@ -285,10 +425,12 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                                   selected={dateValue ? dateValue : undefined}
                                   onSelect={(d) => {
                                     field.onChange(d);
-                                    setOpen(false);
+                                    setOpenCalendar((prev) => ({
+                                      ...prev,
+                                      [index]: false,
+                                    }));
                                   }}
                                   captionLayout="dropdown"
-                                  disabled={{ before: new Date() }}
                                 />
                               </PopoverContent>
                             </Popover>
@@ -375,6 +517,11 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                           type="text"
                           placeholder={t('Введите номер')}
                           className="p-5 rounded-lg h-14"
+                          value={field.value || '+998'}
+                          onChange={(e) =>
+                            field.onChange(formatPhone(e.target.value))
+                          }
+                          maxLength={19}
                         />
                       </FormControl>
                       <FormMessage />
@@ -394,9 +541,18 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                       <Input
                         onChange={(e) => {
                           const file = e.target.files?.[0];
-                          field.onChange(file);
+                          if (file) {
+                            const current = form.getValues(
+                              `participants.${index}.passport`,
+                            );
+                            const updated = Array.isArray(current)
+                              ? [...current, file]
+                              : [file];
+                            field.onChange(updated);
+                          }
                         }}
                         type="file"
+                        multiple
                         className="hidden"
                         accept="image/*"
                         id={`passport-file-${index}`}
@@ -421,59 +577,79 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                   </FormItem>
                 )}
               />
-              {passportValue && (
-                <div className="w-full flex items-center max-lg:flex-col max-lg:gap-4 max-lg:items-start justify-between p-3 border-2 border-[#EDEEF1] rounded-xl">
-                  <div className="flex items-center gap-4">
-                    <div className="relative w-[50px] h-[50px] cursor-pointer">
-                      <Image
-                        src={
-                          typeof passportValue === 'string'
-                            ? passportValue // agar string URL bo‘lsa
-                            : URL.createObjectURL(passportValue as File) // agar File bo‘lsa
-                        }
-                        alt="passport"
-                        fill
-                        className="object-contain rounded-md"
-                      />
-                    </div>
-                    <div>
-                      <div className="max-w-[100px] sm:max-w-[80%] truncate">
-                        <h1 className="font-bold text-sm truncate">
-                          {typeof passportValue === 'string'
-                            ? passportValue
-                            : (passportValue as File)?.name}
-                        </h1>
+              {passportValue && passportValue.length > 0 && (
+                <div className="w-full flex flex-col gap-2 mt-4">
+                  {passportValue.map((file: PassportType, imgIndex: number) => (
+                    <div
+                      key={imgIndex}
+                      className="w-full flex items-center justify-between p-3 border-2 border-[#EDEEF1] rounded-xl"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="relative w-[50px] h-[50px]">
+                          <Image
+                            src={
+                              file instanceof File
+                                ? URL.createObjectURL(file)
+                                : typeof file === 'string'
+                                  ? file
+                                  : file.image
+                            }
+                            alt="passport"
+                            fill
+                            className="object-contain rounded-md"
+                          />
+                        </div>
+                        <div>
+                          <h1 className="font-bold text-sm truncate max-w-[150px]">
+                            {'name' in file ? file.name : 'Image'}
+                          </h1>
+                          <p className="text-xs text-[#718096]">
+                            {'size' in file
+                              ? (file.size / 1024).toFixed(1) + 'KB'
+                              : 'Image'}
+                          </p>
+                        </div>
                       </div>
-                      {typeof passportValue !== 'string' && (
-                        <p className="text-xs text-[#718096]">
-                          {((passportValue?.size || 0) / 1024).toFixed(1)} KB
-                        </p>
-                      )}
+
+                      <div className="flex gap-2">
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          type="button"
+                          disabled={!(file instanceof File)}
+                          onClick={() => {
+                            if (!passportValue) return;
+
+                            const newFiles = Array.isArray(passportValue)
+                              ? [...passportValue]
+                              : [];
+
+                            newFiles.splice(imgIndex, 1);
+
+                            form.setValue(
+                              `participants.${index}.passport`,
+                              newFiles.length ? newFiles : null,
+                            );
+
+                            form.trigger(`participants.${index}.passport`);
+                          }}
+                        >
+                          <TrashIcon />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          type="button"
+                          onClick={() => {
+                            setPreviewFile(file);
+                            setPreviewOpen(true);
+                          }}
+                        >
+                          <UserIcon />
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2 max-sm:flex-col max-sm:items-start max-sm:w-full">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        form.setValue(`participants.${index}.passport`, null)
-                      }
-                      className="p-2 flex gap-4 rounded-full bg-red-500 text-white max-sm:w-full max-sm:justify-center"
-                    >
-                      <TrashIcon />
-                      <p className="sm:hidden">{t('Удалить')}</p>
-                    </button>
-                    <button
-                      type="button"
-                      className="flex items-center gap-2 bg-[#084FE3] text-white px-3 py-2 rounded-full max-sm:w-full max-sm:justify-center"
-                      onClick={() => {
-                        setPreviewFile(passportValue as File);
-                        setPreviewOpen(true);
-                      }}
-                    >
-                      <UserIcon />
-                      {t('Посмотреть')}
-                    </button>
-                  </div>
+                  ))}
                 </div>
               )}
             </div>
@@ -481,6 +657,7 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
         })}
         <div className="flex gap-4 justify-between max-lg:flex-col-reverse">
           <button
+            type="button"
             onClick={onPrev}
             className="bg-gray-200 border shadow-sm border-[#D3D3D3] text-gray-800 hover:bg-gray-300 px-10 py-4 rounded-full cursor-pointer"
           >
@@ -489,7 +666,7 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
           <div className="flex gap-4 max-lg:flex-col">
             <button
               type="button"
-              onClick={() =>
+              onClick={() => {
                 append({
                   gender: 'male',
                   firstName: '',
@@ -497,8 +674,9 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                   phone: '',
                   date: null,
                   passport: null,
-                })
-              }
+                });
+                setUserIds((prev) => [...prev, undefined]);
+              }}
               className="flex items-center gap-2 bg-white border px-6 py-3 rounded-full cursor-pointer"
             >
               <Plus /> {t('Новый участник')}
@@ -518,9 +696,11 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
           {previewFile && (
             <Image
               src={
-                typeof previewFile === 'string'
-                  ? previewFile
-                  : URL.createObjectURL(previewFile)
+                previewFile instanceof File
+                  ? URL.createObjectURL(previewFile)
+                  : typeof previewFile === 'string'
+                    ? previewFile
+                    : previewFile.image
               }
               alt="passport-preview"
               width={800}

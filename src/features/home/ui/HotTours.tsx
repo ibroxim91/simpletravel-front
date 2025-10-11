@@ -153,7 +153,7 @@ const HotTours = () => {
                         className="w-full aspect-square relative group overflow-hidden rounded-3xl shadow-lg"
                       >
                         <Image
-                          src={BASE_URL + e.ticket_images.image}
+                          src={BASE_URL + e.ticket_images}
                           alt={e.title}
                           fill
                           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
@@ -264,12 +264,14 @@ const HotTours = () => {
                         }}
                         className="w-full aspect-square relative group overflow-hidden rounded-3xl shadow-lg"
                       >
-                        <Image
-                          src={BASE_URL + e.ticket_images.image}
-                          alt={e.title}
-                          fill
-                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                        />
+                        {e.ticket_images && (
+                          <Image
+                            src={BASE_URL + e.ticket_images}
+                            alt={e.title}
+                            fill
+                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                          />
+                        )}
                         <div className="flex flex-col absolute top-2 left-4 gap-2 z-20">
                           {e.badge.map((e) => (
                             <Badge

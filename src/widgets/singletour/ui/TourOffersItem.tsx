@@ -25,7 +25,7 @@ export default function TourOffersItem({ data }: { data: TickectAllResults }) {
         className="w-full h-full relative cursor-pointer rounded-2xl flex-shrink-0 max-lg:hidden"
       >
         <Image
-          src={BASE_URL + data.ticket_images.image}
+          src={BASE_URL + data.ticket_images}
           alt="tour offers"
           height={500}
           width={500}
@@ -41,7 +41,7 @@ export default function TourOffersItem({ data }: { data: TickectAllResults }) {
       </motion.div>
       <div className="w-full h-full relative cursor-pointer rounded-2xl flex-shrink-0 lg:hidden">
         <Image
-          src={BASE_URL + data.ticket_images.image}
+          src={BASE_URL + data.ticket_images}
           alt="tour offers"
           height={500}
           width={500}

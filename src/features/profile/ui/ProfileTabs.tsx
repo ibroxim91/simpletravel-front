@@ -36,6 +36,7 @@ import { toast } from 'sonner';
 import z from 'zod';
 import { User_Api } from '../lib/api';
 import { editUserEmail, editUserName, editUserPhone } from '../lib/form';
+import ReservationsDeatilTabs from './ReservationsDeatilTabs';
 import ReservationsTabs from './ReservationsTabs';
 import SettingTabs from './SettingTabs';
 import TravelersTabs from './TravelersTabs';
@@ -43,6 +44,8 @@ import TravelersTabs from './TravelersTabs';
 const ProfileTabs = () => {
   const t = useTranslations();
   const [activeTab, setActiveTab] = useState('profile');
+  const [orderDetail, setOrderDetil] = useState<boolean>(false);
+  const [orderDetailId, setOrderDetilId] = useState<number | null>(null);
   const router = useRouter();
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
@@ -283,9 +286,9 @@ const ProfileTabs = () => {
                             <Avatar className="w-16 h-16 rounded-lg">
                               <AvatarImage
                                 src={
-                                  avatarPreview // agar preview mavjud bo‘lsa, uni ko‘rsat
+                                  avatarPreview
                                     ? avatarPreview
-                                    : user?.data.data.avatar // agar backenddan kelgan avatar bo‘lsa
+                                    : user?.data.data.avatar
                                       ? user.data.data.avatar
                                       : undefined
                                 }
@@ -632,7 +635,9 @@ const ProfileTabs = () => {
               )}
               {activeTab === 'reservations' && (
                 <motion.div
-                  key="reservations"
+                  key={
+                    orderDetail ? `reservations-${orderDetail}` : 'reservations'
+                  }
                   initial="hidden"
                   animate="visible"
                   exit="exit"
@@ -641,7 +646,17 @@ const ProfileTabs = () => {
                   transition={{ duration: 0.5 }}
                 >
                   <TabsContent value="reservations">
-                    <ReservationsTabs />
+                    {orderDetail ? (
+                      <ReservationsDeatilTabs
+                        id={orderDetailId}
+                        setDetail={setOrderDetil}
+                      />
+                    ) : (
+                      <ReservationsTabs
+                        setDetail={setOrderDetil}
+                        setOrderDetilId={setOrderDetilId}
+                      />
+                    )}
                   </TabsContent>
                 </motion.div>
               )}

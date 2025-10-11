@@ -17,6 +17,7 @@ import Drawer from '@mui/material/Drawer';
 import clsx from 'clsx';
 import { useTranslations } from 'next-intl';
 import { Dispatch, SetStateAction } from 'react';
+import formStore from '../lib/hook';
 
 interface Props {
   onClose: () => void;
@@ -45,6 +46,8 @@ export default function PaidModal({
 }: Props) {
   const t = useTranslations();
   const router = useRouter();
+  const { reset } = formStore();
+
   return (
     <>
       <CardContent className="grid-cols-2 grid w-full h-full max-lg:grid-cols-1 mb-5">
@@ -53,6 +56,7 @@ export default function PaidModal({
           onOpenChange={() => {
             if (!loading) {
               onClose();
+              reset();
             }
           }}
         >
@@ -136,6 +140,7 @@ export default function PaidModal({
                           setSuccess(false);
                           setLoading(false);
                           onClose();
+                          reset();
                           router.push('/');
                         }}
                       >
@@ -148,6 +153,7 @@ export default function PaidModal({
                           setSuccess(false);
                           setLoading(false);
                           onClose();
+                          reset();
                           router.push('/profile?tabs=reservations');
                         }}
                       >
@@ -169,6 +175,7 @@ export default function PaidModal({
                         setSuccess(false);
                         setLoading(false);
                         onClose();
+                        reset();
                         setError(null);
                       }}
                     >
@@ -191,6 +198,7 @@ export default function PaidModal({
         }}
         onClose={() => {
           if (!loading) {
+            reset();
             setSuccess(false);
             setLoading(false);
             setError(null);
@@ -260,6 +268,7 @@ export default function PaidModal({
                     setSuccess(false);
                     setLoading(false);
                     onClose();
+                    reset();
                     router.push('/');
                   }}
                 >
@@ -272,6 +281,7 @@ export default function PaidModal({
                     setSuccess(false);
                     setLoading(false);
                     onClose();
+                    reset();
                     router.push('/profile?tabs=reservations');
                   }}
                 >

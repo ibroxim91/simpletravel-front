@@ -105,11 +105,35 @@ export type Payment = {
 
 export type PaymentRow = {
   id: number;
-  location: string;
-  service: string;
-  amount: string;
-  detail: string;
-  status: string;
+  departure: string;
+  destination: string;
+  departure_date: string;
+  arrival_time: string;
+  participant: {
+    id: number;
+    first_name: string;
+    last_name: string;
+    gender: 'male' | 'female';
+  }[];
+  ticket: {
+    id: number;
+    service_name: string;
+    title: string;
+    location_name: string;
+  };
+  tariff: string;
+  transport: string;
+  extra_service: {
+    id: number;
+    name: string;
+  }[];
+  extra_paid_service: {
+    id: number;
+    name: string;
+    price: number;
+  }[];
+  total_price: number;
+  order_status: string;
 };
 
 export type Traveler = {

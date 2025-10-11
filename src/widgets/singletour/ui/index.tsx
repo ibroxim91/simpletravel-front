@@ -1,5 +1,6 @@
 'use client';
 
+import { User_Api } from '@/features/profile/lib/api';
 import { Link } from '@/shared/config/i18n/navigation';
 import { LanguageRoutes } from '@/shared/config/i18n/types';
 import { formatPrice } from '@/shared/lib/formatPrice';
@@ -38,6 +39,7 @@ import { TicketsDetailAPi } from '../lib/api';
 import HotelInfoItem from './HotelInfoItem';
 import ReviewsItem from './ReviewsItem';
 import TourDayItem from './TourDayItem';
+import TourDetailLoading from './TourDetailLoading';
 import TourFoodItem from './TourFoodItem';
 import TourItem from './TourItem';
 import TourOffersItem from './TourOffersItem';
@@ -80,6 +82,11 @@ export default function SingleTour() {
         },
       }),
     enabled: !!data,
+  });
+
+  const { data: user } = useQuery({
+    queryKey: ['get_me'],
+    queryFn: () => User_Api.getMe(),
   });
 
   const [openWatch, setOpenWatch] = useState<boolean>(false);
@@ -160,6 +167,10 @@ export default function SingleTour() {
       return () => cancelAnimationFrame(id);
     }
   }, [isAnimating]);
+
+  if (isLoading) {
+    return <TourDetailLoading />;
+  }
 
   return (
     <div className="bg-white">
@@ -253,7 +264,7 @@ export default function SingleTour() {
                 variants={fadeInUp}
                 className="grid grid-cols-5 w-full items-start mt-5 gap-5 max-xl:grid-cols-2 max-md:grid-cols-1"
               >
-                {data.ticket_amenities.map((info, index) => {
+                {data.ticket_amenities?.map((info, index) => {
                   const IconComponent =
                     LucideIcons[
                       info.icon_name as keyof typeof LucideIcons.icons
@@ -281,14 +292,32 @@ export default function SingleTour() {
                 variants={fadeInUp}
                 className="flex items-center gap-4 mt-5 max-lg:flex-col"
               >
-                <Link href={`/booking/64`} className="max-lg:w-full">
+                {user ? (
+                  <Link href={`/booking/${data.id}`} className="max-lg:w-full">
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      className="bg-[#1764FC] rounded-[43px] px-[70px] py-[14px] text-white cursor-pointer text-sm max-lg:w-full"
+                    >
+                      {t('Забронировать')}
+                    </motion.button>
+                  </Link>
+                ) : (
                   <motion.button
                     whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      toast.error(t('Xatolik yuz berdi'), {
+                        icon: null,
+                        description: t(
+                          "Bron qilish uchun ro'yxatdan o'tishingiz kerak",
+                        ),
+                        position: 'bottom-right',
+                      });
+                    }}
                     className="bg-[#1764FC] rounded-[43px] px-[70px] py-[14px] text-white cursor-pointer text-sm max-lg:w-full"
                   >
                     {t('Забронировать')}
                   </motion.button>
-                </Link>
+                )}
                 <motion.button
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setOpenHelp(true)}
@@ -424,7 +453,7 @@ export default function SingleTour() {
                   setApi={setTourApi}
                 >
                   <CarouselContent>
-                    {data.ticket_included_services.map((item, key) => (
+                    {data.ticket_included_services?.map((item, key) => (
                       <CarouselItem
                         key={key}
                         className="flex flex-col w-auto basis-1/5 max-xl:basis-1/3 max-lg:basis-1/2 max-md:basis-[60%] shrink-0 font-medium"
@@ -487,7 +516,7 @@ export default function SingleTour() {
                 variants={slideIn}
                 className="mt-10 max-lg:hidden"
               >
-                {data.ticket_itinerary.map((item, key) => (
+                {data.ticket_itinerary?.map((item, key) => (
                   <motion.div
                     key={key}
                     custom={key}
@@ -499,7 +528,7 @@ export default function SingleTour() {
                     <TourDayItem
                       key={key}
                       data={item}
-                      isLast={key + 1 === data.ticket_itinerary.length}
+                      isLast={key + 1 === data.ticket_itinerary?.length}
                       isFirst={key + 1 === 1}
                     />
                   </motion.div>
@@ -510,7 +539,7 @@ export default function SingleTour() {
                 {data.ticket_itinerary && (
                   <Carousel className="w-full cursor-pointer" setApi={setApi}>
                     <CarouselContent>
-                      {data.ticket_itinerary.map((item, key) => (
+                      {data.ticket_itinerary?.map((item, key) => (
                         <CarouselItem
                           key={key}
                           className="flex flex-col w-auto basis-[80%] shrink-0 font-medium"
@@ -518,7 +547,7 @@ export default function SingleTour() {
                           <TourDayItem
                             key={key}
                             data={item}
-                            isLast={key + 1 === data.ticket_itinerary.length}
+                            isLast={key + 1 === data.ticket_itinerary?.length}
                             isFirst={key + 1 === 1}
                           />
                         </CarouselItem>
@@ -551,7 +580,7 @@ export default function SingleTour() {
                     className="w-full"
                   >
                     <CarouselContent className="-ml-4">
-                      {data.ticket_hotel_meals.map((item, index) => (
+                      {data.ticket_hotel_meals?.map((item, index) => (
                         <CarouselItem
                           key={index}
                           className="flex flex-col w-auto basis-1/5 max-xl:basis-1/3 max-lg:basis-1/3 max-md:basis-[50%] max-[420px]:!basis-[70%] shrink-0 font-medium"
@@ -712,13 +741,13 @@ export default function SingleTour() {
               >
                 {t('Отзывы наших клиентов')}
               </motion.h1>
-              {data.ticket_comments.length > 0 ? (
+              {data.ticket_comments?.length > 0 ? (
                 <Carousel
                   className="w-full mt-4 cursor-pointer px-4"
                   setApi={setApi}
                 >
                   <CarouselContent>
-                    {data.ticket_comments.map((item, key) => (
+                    {data.ticket_comments?.map((item, key) => (
                       <CarouselItem
                         key={item.user.id}
                         className={
@@ -820,7 +849,7 @@ export default function SingleTour() {
               <Carousel className="w-full mt-4 cursor-pointer" setApi={setApi}>
                 <CarouselContent>
                   {hotTicket &&
-                    hotTicket.data.results.tickets.map((item, key) => (
+                    hotTicket.data.results.tickets?.map((item, key) => (
                       <CarouselItem
                         key={key}
                         className="basis-1/4 max-lg:basis-1/2 max-md:basis-[80%]"

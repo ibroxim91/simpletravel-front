@@ -39,9 +39,7 @@ export interface TickectAllResults {
   rating: number;
   duration_days: number;
   destination: string;
-  ticket_images: {
-    image: string;
-  };
+  ticket_images: string;
   ticket_amenities: { name: string }[];
   badge: { id: number; name: string; color: string }[];
   visa_required: boolean;
