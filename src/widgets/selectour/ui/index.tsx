@@ -127,8 +127,6 @@ export default function Selectour() {
     }
   }, [savedData]);
 
-  console.log(filterLocal);
-
   const { data: ticket, isLoading } = useQuery({
     queryKey: [
       'ticket_all',

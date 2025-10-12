@@ -17,28 +17,10 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { DateRange } from 'react-day-picker';
-import { useFilterToursStore } from '../lib/store';
 
 const FilterHotel = () => {
   const t = useTranslations();
   const route = useRouter();
-  const {
-    setStoreDate,
-    from,
-    date,
-    setStoreToDate,
-    toDate: toDateStore,
-    selectData: selectDataStore,
-    setStoreSelectData,
-    where: wherStore,
-    adults: adultsStore,
-    children: childrenStore,
-    setAdults: setAdultsStore,
-    setChildren: setChildrenStore,
-    setStoreFrom,
-    setStoreWhere,
-    setStorePassenger,
-  } = useFilterToursStore();
   const [openCity, setOpenCity] = useState(false);
   const [ageOpen, setAgeOpen] = useState(false);
   const [dataOpen, setDataOpen] = useState(false);
@@ -297,10 +279,7 @@ const FilterHotel = () => {
                   setFromDate(undefined);
                   setToDate(undefined);
                   setRange(undefined);
-                  setStoreDate(undefined);
                   setSelectData('');
-                  setStoreSelectData('');
-                  setStoreToDate(undefined);
                 }}
               >
                 {t('Отмена')}
