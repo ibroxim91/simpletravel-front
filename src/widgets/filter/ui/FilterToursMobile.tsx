@@ -102,59 +102,35 @@ const FilterToursMobile = () => {
   );
 
   useEffect(() => {
-    if (from) {
-      setSearch(from);
-      setSelectedCity(from);
+    const savedData = localStorage.getItem('filterTours');
+    if (savedData) {
+      const parsed = JSON.parse(savedData);
+      setSearch(parsed.from || '');
+      setSelectedCity(parsed.from || '');
+      setSearchWhere(parsed.where || '');
+      setSelectedWhere(parsed.where || '');
+      setAdults(parsed.adults || 0);
+      setChildren(parsed.children || 0);
+      setSelectData(parsed.selectData || '');
+      if (parsed.date) setFromDate(new Date(parsed.date));
+      if (parsed.toDate) setToDate(new Date(parsed.toDate));
+      if (parsed.date && parsed.toDate)
+        setRange({ from: new Date(parsed.date), to: new Date(parsed.toDate) });
     }
-    if (wherStore) {
-      setSearchWhere(wherStore);
-      setSelectedWhere(wherStore);
-    }
-    if (date) {
-      setFromDate(date);
-    }
-    if (toDateStore) {
-      setToDate(toDateStore);
-    }
-    if (selectDataStore) {
-      setSelectData(selectDataStore);
-    }
-    if (adultsStore) {
-      setAdults(adultsStore);
-    }
-
-    if (adultsStore && childrenStore) {
-      setSelectAge(adultsStore + childrenStore);
-    }
-
-    if (childrenStore) {
-      setChildren(childrenStore);
-    }
-    if (date && toDateStore) {
-      setRange({ from: date, to: toDateStore });
-      setFromDate(date);
-      setToDate(toDateStore);
-    }
-  }, [
-    from,
-    wherStore,
-    date,
-    selectDataStore,
-    toDateStore,
-    childrenStore,
-    adultsStore,
-  ]);
+  }, []);
 
   const saveFilter = () => {
-    setStoreDate(fromDate);
-    setStoreFrom(search);
-    setStoreToDate(toDate);
-    setStoreWhere(searchWhere);
-    setStoreSelectData(selectData);
-    setStorePassenger(adults + children);
-    setAdultsStore(adults);
-    setChildrenStore(children);
-    route.push('/selectour');
+    const dataToSave = {
+      from: search,
+      where: searchWhere,
+      date: fromDate,
+      toDate: toDate,
+      selectData: selectData,
+      adults,
+      children,
+    };
+    localStorage.setItem('filterTours', JSON.stringify(dataToSave));
+    route.push('/selectour?page=1');
   };
 
   return (

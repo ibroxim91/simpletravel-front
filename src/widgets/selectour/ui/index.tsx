@@ -19,7 +19,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/ui/select';
-import { useFilterToursStore } from '@/widgets/filter/lib/store';
 import FilterTours from '@/widgets/filter/ui/FilterTours';
 import FilterToursMobile from '@/widgets/filter/ui/FilterToursMobile';
 import CloseIcon from '@mui/icons-material/Close';
@@ -45,6 +44,7 @@ import { TickectAllFilter } from '../lib/types';
 import CheckboxFilter from './CheckBox';
 import FilterSection from './FilterSection';
 import TourItem from './TourItem';
+
 const Player = dynamic(
   () => import('@lottiefiles/react-lottie-player').then((mod) => mod.Player),
   { ssr: false },
@@ -72,6 +72,15 @@ export default function Selectour() {
   const [visa, setVisa] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const router = useRouter();
+  const [filterLocal, setFilterLocal] = useState<{
+    adults: number;
+    children: number;
+    from: string;
+    date: string;
+    toDate: string;
+    selectData: string;
+    where: string;
+  }>();
   const [selectedDurations, setSelectedDurations] = useState<string | null>(
     null,
   );
@@ -83,10 +92,8 @@ export default function Selectour() {
   const [hotelType, setHotelTypes] = useState<string | null>(null);
   const [hotelAmenities, setHotelAmenitie] = useState<string | null>(null);
   const [hotelFeature, setHotelFeature] = useState<string[]>([]);
-
-  const { from, date, passenger, where, toDate, selectData } =
-    useFilterToursStore();
-
+  const [openFilter, setFilter] = useState(false);
+  const savedData = localStorage.getItem('filterTours');
   const handleInputChange = (value: string, index: number) => {
     const numericValue = Number(value.replace(/\s/g, '')) || 0;
     const newRange = [...priceRange];
@@ -94,25 +101,48 @@ export default function Selectour() {
     setPriceRange(newRange);
   };
 
-  const [openFilter, setFilter] = useState(false);
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [
+    savedData,
+    cheaper,
+    expensive,
+    hotelType,
+    hotelName,
+    priceRange,
+    visa,
+    selectedDurations,
+    selectedDestinations,
+    mealPlan,
+    hotelAmenities,
+    hotelRating,
+    hotelFeature,
+  ]);
+
+  useEffect(() => {
+    if (savedData) {
+      const parsed = JSON.parse(savedData);
+      setFilterLocal(parsed);
+      setSelectedDestinations(parsed.where);
+    }
+  }, [savedData]);
+
+  console.log(filterLocal);
+
   const { data: ticket, isLoading } = useQuery({
     queryKey: [
       'ticket_all',
-      from,
-      where,
-      date,
+      savedData,
+      selectedDestinations,
       cheaper,
       expensive,
-      selectData,
-      toDate,
-      passenger,
+      filterLocal,
       currentPage,
       hotelType,
       hotelName,
       priceRange,
       visa,
       selectedDurations,
-      selectedDestinations,
       mealPlan,
       hotelAmenities,
       hotelRating,
@@ -121,23 +151,26 @@ export default function Selectour() {
     queryFn: () => {
       const params: TickectAllFilter = {
         page: currentPage,
-        page_size: 8,
-        departure: from,
+        page_size: 10,
+        departure: filterLocal ? filterLocal.from : '',
+        destination: selectedDestinations === null ? '' : selectedDestinations,
         hotel_amenity: hotelAmenities ?? '',
         hotel_name: hotelName,
         hotel_type: hotelType ?? '',
-        destination:
-          where || selectedDestinations === null ? '' : selectedDestinations,
         cheapest: cheaper,
         most_expensive: expensive,
-        min_departure_date: date ? formatDate.format(date, 'YYYY-MM-DD') : '',
-        max_departure_date: toDate
-          ? formatDate.format(toDate, 'YYYY-MM-DD')
+        min_departure_date: filterLocal?.date
+          ? formatDate.format(filterLocal?.date, 'YYYY-MM-DD')
           : '',
-        passenger_count: passenger,
+        max_departure_date: filterLocal?.toDate
+          ? formatDate.format(filterLocal.toDate, 'YYYY-MM-DD')
+          : '',
+        passenger_count: filterLocal
+          ? filterLocal?.children + filterLocal?.adults
+          : undefined,
         min_price: priceRange[0],
-        visa_required: visa === 'visa' ? true : visa === 'no_visa' ? false : '',
         max_price: priceRange[1],
+        visa_required: visa === 'visa' ? true : visa === 'no_visa' ? false : '',
         hotel_rating: hotelRating ?? '',
         duration_days: selectedDurations ?? '',
         meal_plan: mealPlan ?? '',
@@ -162,14 +195,14 @@ export default function Selectour() {
       setFeatures(ticket.data.results.hotel_features_by_type);
       initialized.current = true;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ticket]);
-
-  useEffect(() => {
-    const handleScroll = () => {};
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [
+    ticket,
+    setDurationDays,
+    setDestinations,
+    setHotelType,
+    setHotelAmenities,
+    setFeatures,
+  ]);
 
   useEffect(() => {
     router.push(`selectour?page=${currentPage}`);
@@ -455,42 +488,6 @@ export default function Selectour() {
             <FilterSection title={t('Стоимость')}>
               <Slider
                 range
-                min={100}
-                max={10000}
-                value={priceRange}
-                onChange={(v) => setPriceRange(v as number[])}
-              />
-              <div className="flex justify-between mt-3 border border-[#DFDFDF] rounded-xl p-3">
-                <input
-                  type="number"
-                  value={priceRange[0]}
-                  onChange={(e) =>
-                    setPriceRange([+e.target.value, priceRange[1]])
-                  }
-                  className="w-1/2 border-none outline-none text-gray-600"
-                />
-                <input
-                  type="number"
-                  value={priceRange[1]}
-                  onChange={(e) =>
-                    setPriceRange([priceRange[0], +e.target.value])
-                  }
-                  className="w-1/2 border-none outline-none text-right text-gray-600"
-                />
-              </div>
-            </FilterSection>
-
-            <FilterSection title={t('Название отеля')}>
-              <input
-                type="text"
-                placeholder={t('Название отеля')}
-                className="w-full border rounded-xl px-3 py-2 outline-none"
-              />
-            </FilterSection>
-
-            <FilterSection title={t('Стоимость')}>
-              <Slider
-                range
                 min={2500000}
                 max={100000000}
                 value={priceRange}
@@ -498,19 +495,15 @@ export default function Selectour() {
               />
               <div className="flex justify-between mt-3 border border-[#DFDFDF] rounded-xl p-3">
                 <input
-                  type="number"
-                  value={priceRange[0]}
-                  onChange={(e) =>
-                    setPriceRange([+e.target.value, priceRange[1]])
-                  }
+                  type="text"
+                  value={formatPrice(priceRange[0])}
+                  onChange={(e) => handleInputChange(e.target.value, 0)}
                   className="w-1/2 border-none outline-none text-gray-600"
                 />
                 <input
-                  type="number"
-                  value={priceRange[1]}
-                  onChange={(e) =>
-                    setPriceRange([priceRange[0], +e.target.value])
-                  }
+                  type="text"
+                  value={formatPrice(priceRange[1])}
+                  onChange={(e) => handleInputChange(e.target.value, 1)}
                   className="w-1/2 border-none outline-none text-right text-gray-600"
                 />
               </div>
@@ -690,7 +683,9 @@ export default function Selectour() {
             >
               <div className="w-full flex justify-between items-center max-lg:flex-col max-lg:items-start max-lg:gap-5">
                 <h1 className="font-bold text-2xl text-start">
-                  {where ? ` ${where}${t('ga tegishli')}` : t('Umumiy')}{' '}
+                  {filterLocal?.where
+                    ? ` ${filterLocal?.where}${t('ga tegishli')}`
+                    : t('Umumiy')}{' '}
                   {ticket ? (
                     <>
                       {ticket.data.total_items} {t('ta tur topildi')}
