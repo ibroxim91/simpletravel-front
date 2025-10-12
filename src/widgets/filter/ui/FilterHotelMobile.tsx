@@ -52,7 +52,9 @@ const FilterHotelMobile = () => {
     if (ticket) {
       const uniqueCities = Array.from(
         new Set(
-          ticket.data.results.tickets.slice(0, 8).map((e) => e.destination),
+          ticket.data.results.top_destinations
+            .slice(0, 8)
+            .map((e) => e.destination),
         ),
       );
       setCitiesWhere(uniqueCities);

@@ -51,7 +51,9 @@ const FilterHotel = () => {
     if (ticket) {
       const uniqueCities = Array.from(
         new Set(
-          ticket.data.results.tickets.slice(0, 8).map((e) => e.departure),
+          ticket.data.results.top_destinations
+            .slice(0, 8)
+            .map((e) => e.destination),
         ),
       );
       setCities(uniqueCities);
