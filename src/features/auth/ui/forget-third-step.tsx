@@ -58,7 +58,7 @@ const ForgetThirdStep = () => {
       });
     },
     onSuccess() {
-      if (callbackUrl) {
+      if (callbackUrl && callbackUrl !== 'null') {
         route.push(callbackUrl);
       } else {
         route.push('/profile');

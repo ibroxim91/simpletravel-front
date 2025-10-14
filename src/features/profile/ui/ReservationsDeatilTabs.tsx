@@ -82,6 +82,25 @@ const ReservationsDeatilTabs = ({
     }
   }
 
+  const { mutate: downloadPdf } = useMutation({
+    mutationFn: (body: { order_id: number; lang: string }) =>
+      Ticketorder_Api.downloadPdf(body),
+    onSuccess: (res) => {
+      const blob = new Blob([res.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `ticket-order-${store?.data.data.id}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    },
+    onError: () => {
+      toast.error('Произошла ошибка при отправке. Попробуйте ещё раз.');
+    },
+  });
+
   return (
     <>
       <div className="w-full bg-[#FFFFFF] p-[20px] rounded-[20px] relative">
@@ -253,7 +272,12 @@ const ReservationsDeatilTabs = ({
       <div className="w-full bg-[#FFFFFF] p-[20px] rounded-[20px] mt-5">
         <div className="flex items-center justify-between max-lg:flex-col max-lg:gap-4 max-lg:items-start">
           <h1 className="text-2xl font-bold">{t('Подробности заказа')}</h1>
-          <button className="flex items-center gap-[10px] cursor-pointer px-[15px] py-[10px] border-2 rounded-full border-[#DFDFDF] max-lg:w-full justify-center hover:bg-gray-50 transition-colors">
+          <button
+            onClick={() =>
+              downloadPdf({ lang: 'uz', order_id: store?.data.data.id! })
+            }
+            className="flex items-center gap-[10px] cursor-pointer px-[15px] py-[10px] border-2 rounded-full border-[#DFDFDF] max-lg:w-full justify-center hover:bg-gray-50 transition-colors"
+          >
             <InsertDriveFileIcon sx={{ color: '#031753' }} />
             <p className="text-[#031753] font-semibold text-lg">
               {t('Скачать PDF')}

@@ -71,7 +71,7 @@ const AuthLogin = () => {
       saveRefToken(data.data.refresh);
       ref.clear();
 
-      if (callbackUrl) {
+      if (callbackUrl && callbackUrl !== 'null') {
         route.push(callbackUrl);
       } else {
         route.push('/profile');

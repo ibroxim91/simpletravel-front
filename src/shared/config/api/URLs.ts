@@ -38,9 +38,11 @@ const FAQ = '/api/v1/faq/';
 const TICKETORDER_INFO = '/api/v1/get-ticket-info/';
 const TICKETORDER = '/api/v1/ticketorder/';
 const PAYMENTS = '/api/v1/payments_link/';
+const DONWLOAD_PDF = '/api/v1/get-order-pdf/';
 
 export {
   BASE_URL,
+  DONWLOAD_PDF,
   EMAIL_CONFIRM_RESET_PASS,
   EMAIL_CONFIRMOTP,
   EMAIL_LOGIN,

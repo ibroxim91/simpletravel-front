@@ -65,7 +65,7 @@ const ThirdStep = () => {
     onSuccess(data) {
       saveToken(data.data.data.token.access);
       saveRefToken(data.data.data.token.refresh);
-      if (callbackUrl) {
+      if (callbackUrl && callbackUrl !== 'null') {
         route.push(callbackUrl);
       } else {
         route.push('/profile');

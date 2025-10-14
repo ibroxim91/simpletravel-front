@@ -1,5 +1,6 @@
 import httpClient from '@/shared/config/api/httpClient';
 import {
+  DONWLOAD_PDF,
   PAYMENTS,
   TICKETORDER,
   TICKETORDER_INFO,
@@ -87,6 +88,13 @@ export const Ticketorder_Api = {
     const res = await httpClient.post(`${PAYMENTS}${paymentType}/`, {
       order_id,
       return_url,
+    });
+    return res;
+  },
+
+  async downloadPdf(body: { order_id: number; lang: string }) {
+    const res = await httpClient.post(DONWLOAD_PDF, body, {
+      responseType: 'blob',
     });
     return res;
   },
