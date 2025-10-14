@@ -138,6 +138,7 @@ const Populardestinations = () => {
                 {ticket && ticket[1] && (
                   <Link
                     href={`/selectour/${ticket[1].id}`}
+                    prefetch={true}
                     className="block relative w-full h-full"
                   >
                     <Image
@@ -180,6 +181,7 @@ const Populardestinations = () => {
                 {ticket && ticket[2] && (
                   <Link
                     href={`/selectour/${ticket[2].id}`}
+                    prefetch={true}
                     className="block relative w-full h-full"
                   >
                     <Image
@@ -223,6 +225,7 @@ const Populardestinations = () => {
                 {ticket && ticket[3] && (
                   <Link
                     href={`/selectour/${ticket[3].id}`}
+                    prefetch={true}
                     className="block relative w-full h-full"
                   >
                     <Image
@@ -265,6 +268,7 @@ const Populardestinations = () => {
                 {ticket && ticket[4] && (
                   <Link
                     href={`/selectour/${ticket[4].id}`}
+                    prefetch={true}
                     className="block relative w-full h-full"
                   >
                     <Image
@@ -343,7 +347,7 @@ const Populardestinations = () => {
                   whileTap={{ scale: 0.95 }}
                 >
                   <Link
-                    href="/selectour  "
+                    href="/selectour"
                     className="bg-[#ECF2FF] w-fit py-4 px-10 rounded-4xl flex gap-4 shadow-md"
                   >
                     <p className="text-blue-600 font-semibold">

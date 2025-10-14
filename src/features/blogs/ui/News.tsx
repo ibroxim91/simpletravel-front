@@ -94,7 +94,11 @@ const News = () => {
               viewport={{ once: false, amount: 0.1 }}
               transition={{ duration: 0.4, delay: idx * 0.1 }}
             >
-              <Link href={`/blogs/${item.id}`} className="w-ful">
+              <Link
+                href={`/blogs/${item.id}`}
+                className="w-ful"
+                prefetch={true}
+              >
                 <Card className="!p-0 rounded-3xl cursor-pointer overflow-hidden h-full flex justify-between">
                   <CardHeader className="!p-0 relative">
                     <motion.div

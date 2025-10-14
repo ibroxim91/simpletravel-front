@@ -177,6 +177,7 @@ const BlogDetail = () => {
                     <div className="bg-white rounded-3xl h-[500px]">
                       <Link
                         href={`/blogs/${e.id}`}
+                        prefetch={true}
                         className="w-full flex flex-col justify-between h-full"
                       >
                         <div>
