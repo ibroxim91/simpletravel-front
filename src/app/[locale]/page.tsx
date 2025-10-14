@@ -93,7 +93,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             : 'Tours Site',
       images: [
         {
-          url: '/og-home.jpg',
+          url: '/Logo_blue.png',
           width: 1200,
           height: 630,
           alt:
@@ -159,7 +159,7 @@ export default async function Home({ params }: Props) {
           ? 'Сайт туров'
           : 'Tours Site',
     url: process.env.NEXT_PUBLIC_SITE_URL || 'https://yoursite.com',
-    logo: `${process.env.NEXT_PUBLIC_SITE_URL}/logo.png`,
+    logo: `${process.env.NEXT_PUBLIC_SITE_URL}/Logo_blue.png`,
     description:
       locale === 'uz'
         ? 'Professional turizm agentligi. Eng yaxshi turlar va xizmatlar.'

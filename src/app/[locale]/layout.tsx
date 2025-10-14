@@ -16,8 +16,23 @@ import '../globals.css';
 
 export const metadata: Metadata = {
   title: PRODUCT_INFO.name,
-  description: PRODUCT_INFO.description,
-  icons: PRODUCT_INFO.favicon,
+  description: PRODUCT_INFO.desc,
+  keywords: PRODUCT_INFO.keyword,
+  openGraph: {
+    title: PRODUCT_INFO.name,
+    description: PRODUCT_INFO.desc,
+    url: 'https://simple-travel-blond.vercel.app/',
+    siteName: PRODUCT_INFO.name,
+    images: [
+      {
+        url: 'https://simple-travel-blond.vercel.app/Logo_blue.png',
+        width: 1200,
+        height: 630,
+        alt: PRODUCT_INFO.name,
+      },
+    ],
+    type: 'website',
+  },
 };
 
 type Props = {

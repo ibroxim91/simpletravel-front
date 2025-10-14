@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     const image = tour?.ticket_images?.[0]?.image
       ? `${process.env.NEXT_PUBLIC_API_URL}${tour.ticket_images[0].image}`
-      : '/og-tour-default.jpg';
+      : '/Logo_blue.png';
 
     return {
       title: `${title} | ${siteName}`,
@@ -101,7 +101,7 @@ export default async function SingleTourPage({ params }: Props) {
 
   const image = tour?.ticket_images?.[0]?.image
     ? `${process.env.NEXT_PUBLIC_API_URL}${tour.ticket_images[0].image}`
-    : '/og-tour-default.jpg';
+    : '/Logo_blue.png';
 
   const datePublished = new Date().toISOString();
 

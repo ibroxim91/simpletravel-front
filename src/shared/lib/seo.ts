@@ -77,7 +77,7 @@ export const getSeoMetadata = (
       siteName: t.siteName,
       images: [
         {
-          url: `${baseUrl}/og-${pagePath.replace('/', '') || 'home'}-${locale}.jpg`,
+          url: `${baseUrl}/Logo_blue.png`,
           width: 1200,
           height: 630,
           alt: t.siteName,
@@ -88,9 +88,7 @@ export const getSeoMetadata = (
       card: 'summary_large_image',
       title: fullTitle,
       description: pageDescription || t.description,
-      images: [
-        `${baseUrl}/og-${pagePath.replace('/', '') || 'home'}-${locale}.jpg`,
-      ],
+      images: [`${baseUrl}/Logo_blue.png`],
     },
     alternates: {
       canonical: `${baseUrl}/${locale}${pagePath}`,

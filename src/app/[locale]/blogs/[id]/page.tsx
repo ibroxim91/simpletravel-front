@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       blog?.title || blog?.text || 'Sayohat va turizm haqidagi blog maqolasi';
     const image = blog?.image
       ? `${process.env.NEXT_PUBLIC_API_URL}${blog.image}`
-      : '/og-blog-detail.jpg';
+      : '/Logo_blue.png';
 
     const siteName =
       locale === 'uz'
@@ -83,7 +83,7 @@ export default async function BlogDetailPage({ params }: Props) {
     blog?.text || blog?.text || 'Sayohat va turizm haqidagi blog maqolasi';
   const image = blog?.image
     ? `${process.env.NEXT_PUBLIC_API_URL}${blog.image}`
-    : '/og-blog-detail.jpg';
+    : '/Logo_blue.png';
   const datePublished = blog?.created || new Date().toISOString();
 
   // 🧾 JSON-LD structured data

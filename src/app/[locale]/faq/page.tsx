@@ -73,7 +73,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             : 'Tours Site',
       images: [
         {
-          url: '/og-faq.jpg',
+          url: '/Logo_blue.png',
           width: 1200,
           height: 630,
           alt:

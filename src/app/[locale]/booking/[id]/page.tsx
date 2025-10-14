@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       siteName,
       images: [
         {
-          url: `${process.env.NEXT_PUBLIC_SITE_URL}/og-booking.jpg`,
+          url: `${process.env.NEXT_PUBLIC_SITE_URL}/Logo_blue.png`,
           width: 1200,
           height: 630,
           alt: title,
@@ -54,7 +54,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card: 'summary_large_image',
       title: `${title} | ${siteName}`,
       description,
-      images: [`${process.env.NEXT_PUBLIC_SITE_URL}/og-booking.jpg`],
+      images: [`${process.env.NEXT_PUBLIC_SITE_URL}/Logo_blue.png`],
     },
     alternates: {
       canonical: `${process.env.NEXT_PUBLIC_SITE_URL}/${locale}/booking/${id}`,

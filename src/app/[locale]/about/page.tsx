@@ -66,7 +66,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       siteName: 'Ваш сайт туров',
       images: [
         {
-          url: '/og-about.jpg',
+          url: '/Logo_blue.png',
           width: 1200,
           height: 630,
           alt: titles[locale as keyof typeof titles] || titles.uz,

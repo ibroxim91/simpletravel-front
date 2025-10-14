@@ -48,7 +48,7 @@ export async function generateMetadata({
       siteName: PRODUCT_INFO.name,
       images: [
         {
-          url: `${process.env.NEXT_PUBLIC_SITE_URL}/og-image.jpg`,
+          url: `${process.env.NEXT_PUBLIC_SITE_URL}/Logo_blue.png`,
           width: 1200,
           height: 630,
           alt: meta.title,
@@ -60,15 +60,13 @@ export async function generateMetadata({
       card: 'summary_large_image',
       title: meta.title,
       description: meta.description,
-      images: [`${process.env.NEXT_PUBLIC_SITE_URL}/og-image.jpg`],
+      images: [`${process.env.NEXT_PUBLIC_SITE_URL}/Logo_blue.png`],
     },
     alternates: {
       canonical: url,
     },
   };
 }
-
-// 🧱 Page komponenti
 export default function Page() {
   return (
     <Suspense>
