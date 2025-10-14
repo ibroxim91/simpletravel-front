@@ -83,7 +83,7 @@ const ReservationsDeatilTabs = ({
   }
 
   const { mutate: downloadPdf } = useMutation({
-    mutationFn: (body: { order_id: number; lang: string }) =>
+    mutationFn: (body: { order_id: number | null; lang: string }) =>
       Ticketorder_Api.downloadPdf(body),
     onSuccess: (res) => {
       const blob = new Blob([res.data], { type: 'application/pdf' });
@@ -274,7 +274,10 @@ const ReservationsDeatilTabs = ({
           <h1 className="text-2xl font-bold">{t('Подробности заказа')}</h1>
           <button
             onClick={() =>
-              downloadPdf({ lang: 'uz', order_id: store?.data.data.id! })
+              downloadPdf({
+                lang: 'uz',
+                order_id: store ? store.data.data.id : null,
+              })
             }
             className="flex items-center gap-[10px] cursor-pointer px-[15px] py-[10px] border-2 rounded-full border-[#DFDFDF] max-lg:w-full justify-center hover:bg-gray-50 transition-colors"
           >

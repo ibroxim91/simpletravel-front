@@ -92,7 +92,7 @@ export const Ticketorder_Api = {
     return res;
   },
 
-  async downloadPdf(body: { order_id: number; lang: string }) {
+  async downloadPdf(body: { order_id: number | null; lang: string }) {
     const res = await httpClient.post(DONWLOAD_PDF, body, {
       responseType: 'blob',
     });
