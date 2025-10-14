@@ -18,6 +18,11 @@ export const metadata: Metadata = {
   title: PRODUCT_INFO.name,
   description: PRODUCT_INFO.desc,
   keywords: PRODUCT_INFO.keyword,
+  icons: {
+    icon: '/Logo.svg',
+    shortcut: '/Logo.svg',
+    apple: '/Logo_blue.png',
+  },
   openGraph: {
     title: PRODUCT_INFO.name,
     description: PRODUCT_INFO.desc,
