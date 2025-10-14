@@ -58,11 +58,7 @@ const ForgetThirdStep = () => {
       });
     },
     onSuccess() {
-      if (callbackUrl && callbackUrl !== 'null') {
-        route.push(callbackUrl);
-      } else {
-        route.push('/profile');
-      }
+      route.push('/auth/login');
       toast.success('Parol muvaffaqiyatli tiklandi');
     },
   });
