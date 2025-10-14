@@ -14,7 +14,7 @@ const PRODUCT_INFO = {
     'popular destinations',
     'vacation',
   ],
-  // url: 'https://www.shadcnblocks.com',
+  url: 'https://simple-travel-blond.vercel.app/',
   // socials: {
   //   telegram: 'https://t.me/usmanov_dev',
   //   instagram: 'https://t.me/usmanov_dev',
