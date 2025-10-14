@@ -3,6 +3,17 @@ const PRODUCT_INFO = {
   description: 'Simple Travel',
   logo: '/Logo_blue.png',
   favicon: '/Logo.svg',
+  desc: 'Find the perfect tour for your vacation. Hot tours, popular destinations, travel news. Book trips online with the best deals',
+  keyword: [
+    'online tours',
+    'hot tours',
+    'travel',
+    'vacation abroad',
+    'travel agency',
+    'tour booking',
+    'popular destinations',
+    'vacation',
+  ],
   // url: 'https://www.shadcnblocks.com',
   // socials: {
   //   telegram: 'https://t.me/usmanov_dev',
