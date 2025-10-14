@@ -104,7 +104,6 @@ export default function Selectour() {
   useEffect(() => {
     setCurrentPage(1);
   }, [
-    savedData,
     cheaper,
     expensive,
     hotelType,
@@ -120,12 +119,29 @@ export default function Selectour() {
   ]);
 
   useEffect(() => {
-    if (savedData) {
-      const parsed = JSON.parse(savedData);
-      setFilterLocal(parsed);
-      setSelectedDestinations(parsed.where);
-    }
-  }, [savedData]);
+    const departure = searchParams.get('departure');
+    const destination = searchParams.get('destination');
+    const dateFrom = searchParams.get('dateFrom');
+    const dateTo = searchParams.get('dateTo');
+    const adultsParam = searchParams.get('adults');
+    const childrenParam = searchParams.get('children');
+
+    const filterData = {
+      from: departure || '',
+      where: destination || '',
+      date: dateFrom || '',
+      toDate: dateTo || '',
+      selectData:
+        dateFrom && dateTo
+          ? `${formatDate.format(new Date(dateFrom), 'DD/MM/YYYY')} - ${formatDate.format(new Date(dateTo), 'DD/MM/YYYY')}`
+          : '',
+      adults: adultsParam ? parseInt(adultsParam) : 0,
+      children: childrenParam ? parseInt(childrenParam) : 0,
+    };
+
+    setFilterLocal(filterData);
+    if (destination) setSelectedDestinations(destination);
+  }, [searchParams]);
 
   const { data: ticket, isLoading } = useQuery({
     queryKey: [
@@ -203,8 +219,11 @@ export default function Selectour() {
   ]);
 
   useEffect(() => {
-    router.push(`selectour?page=${currentPage}`);
-  }, [currentPage, router]);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('page', currentPage.toString());
+
+    router.replace(`/selectour?${params.toString()}`, { scroll: false });
+  }, [currentPage, router, searchParams]);
 
   useEffect(() => {
     if (searchParams.get('page')) {

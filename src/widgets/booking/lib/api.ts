@@ -1,5 +1,9 @@
 import httpClient from '@/shared/config/api/httpClient';
-import { TICKETORDER, TICKETORDER_INFO } from '@/shared/config/api/URLs';
+import {
+  PAYMENTS,
+  TICKETORDER,
+  TICKETORDER_INFO,
+} from '@/shared/config/api/URLs';
 
 export interface Get_Info {
   status: boolean;
@@ -65,8 +69,25 @@ export const Ticketorder_Api = {
     const res = await httpClient.get<Get_Info>(`${TICKETORDER_INFO}${id}/`);
     return res;
   },
+
   async ticketorder_create(body: Create_Ticketorder) {
     const res = await httpClient.post(TICKETORDER, body);
+    return res;
+  },
+
+  async payments({
+    paymentType,
+    order_id,
+    return_url,
+  }: {
+    paymentType: string;
+    return_url: string;
+    order_id: number;
+  }) {
+    const res = await httpClient.post(`${PAYMENTS}${paymentType}/`, {
+      order_id,
+      return_url,
+    });
     return res;
   },
 };

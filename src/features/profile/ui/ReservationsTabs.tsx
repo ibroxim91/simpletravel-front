@@ -12,13 +12,21 @@ import {
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table';
-import { Banknote, EyeIcon, Loader2 } from 'lucide-react';
+import { Banknote, EyeIcon, Loader2, Plus } from 'lucide-react';
 import * as React from 'react';
 
+import Click from '@/assets/Click.png';
+import { useRouter } from '@/shared/config/i18n/navigation';
 import { LanguageRoutes } from '@/shared/config/i18n/types';
 import { formatPrice } from '@/shared/lib/formatPrice';
 import { Button } from '@/shared/ui/button';
 import { Checkbox } from '@/shared/ui/checkbox';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/shared/ui/dialog';
 import {
   Table,
   TableBody,
@@ -27,9 +35,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/shared/ui/table';
-import { useQuery } from '@tanstack/react-query';
+import { Ticketorder_Api } from '@/widgets/booking/lib/api';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 import { useParams } from 'next/navigation';
+import { toast } from 'sonner';
+import PaymePayment from '../../../../public/images/payme-payment.png';
 import { User_Api } from '../lib/api';
 import { PaymentRow } from '../lib/data';
 import PaginationButtons from './PaginationButtons';
@@ -44,7 +56,36 @@ const ReservationsTabs = ({
   const t = useTranslations();
   const [page, setPage] = React.useState<number>(1);
   const page_size = 10;
+  const [paymentTypes, setPaymentType] = React.useState<string>('');
   const { locale } = useParams();
+  const route = useRouter();
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = React.useState(false);
+  const [selectedOrderId, setSelectedOrderId] = React.useState<number | null>(
+    null,
+  );
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: ({
+      order_id,
+      return_url,
+    }: {
+      paymentType: string;
+      return_url: string;
+      order_id: number;
+    }) => {
+      return Ticketorder_Api.payments({
+        return_url,
+        order_id,
+        paymentType: paymentTypes,
+      });
+    },
+    onSuccess: (res) => {
+      route.push(res.data.url);
+    },
+    onError: () => {
+      toast.error('Произошла ошибка при отправке. Попробуйте ещё раз.');
+    },
+  });
 
   const { data: order, isLoading } = useQuery({
     queryKey: ['order_all', page],
@@ -194,6 +235,10 @@ const ReservationsTabs = ({
             disabled={row.getValue('order_status') !== 'pending_payment'}
             className="flex items-center cursor-pointer gap-2 bg-green-100 border border-green-100 text-green-600 hover:bg-green-100 hover:text-green-600 hover:border-green-100 transition-colors duration-300 text-md font-medium"
             variant="outline"
+            onClick={() => {
+              setSelectedOrderId(row.getValue('id'));
+              setIsPaymentModalOpen(true);
+            }}
           >
             <Banknote className="w-5 h-5" />
             {t("To'lash")}
@@ -209,6 +254,24 @@ const ReservationsTabs = ({
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+
+  const handlePayment = () => {
+    if (!paymentTypes) {
+      toast.error('Пожалуйста, выберите способ оплаты');
+      return;
+    }
+
+    if (selectedOrderId) {
+      mutate({
+        order_id: selectedOrderId,
+        paymentType: paymentTypes,
+        return_url:
+          process.env.NEXT_PUBLIC_ORDER_RETURN_LINK ||
+          'http://localhost:3000/uz',
+      });
+      setIsPaymentModalOpen(false);
+    }
+  };
 
   const tableData = order?.data?.data?.results || [];
   const totalItems = order?.data?.data?.total_items || 0;
@@ -256,6 +319,13 @@ const ReservationsTabs = ({
     <div className="w-full bg-white rounded-3xl">
       <div className="flex items-center px-4 py-4 justify-between">
         <p className="text-xl font-semibold">{t('Последние бронирования')}</p>
+        <Button
+          className="text-white text-md font-semibold cursor-pointer"
+          onClick={() => route.push('/selectour')}
+        >
+          <Plus />
+          <p>{t("Bron qo'shish")}</p>
+        </Button>
       </div>
       <div className="overflow-hidden">
         <Table className="!border-none !px-4">
@@ -331,6 +401,131 @@ const ReservationsTabs = ({
           </div>
         </div>
       </div>
+
+      <Dialog open={isPaymentModalOpen} onOpenChange={setIsPaymentModalOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">
+              {t('Способ оплаты')}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-1 gap-4 mt-4">
+            {/* <label
+              onClick={() => setPaymentType('uzum')}
+              htmlFor="payment-uzum-modal"
+              className="cursor-pointer flex items-center gap-[10px] justify-between bg-[#EDEEF180] p-[20px] rounded-[20px] border-2 hover:border-[#084FE3] transition-colors"
+              style={{
+                borderColor: paymentTypes === 'uzum' ? '#084FE3' : '#EDEEF180',
+              }}
+            >
+              <div className="flex items-center gap-[20px]">
+                <div className="w-[40px] h-[40px] relative rounded-[10px] overflow-hidden">
+                  <Image
+                    src={UzumPayment.src}
+                    alt="uzum-payment"
+                    className="object-cover"
+                    fill
+                    quality={100}
+                  />
+                </div>
+                <p className="text-xl font-bold">{t('Uzum bank')}</p>
+              </div>
+              <input
+                type="radio"
+                id="payment-uzum-modal"
+                name="payment-modal"
+                checked={paymentTypes === 'uzum'}
+                onChange={() => setPaymentType('uzum')}
+                className="w-[20px] h-[20px] cursor-pointer"
+              />
+            </label> */}
+
+            <label
+              onClick={() => setPaymentType('payme')}
+              htmlFor="payment-payme-modal"
+              className="cursor-pointer flex items-center gap-[10px] justify-between bg-[#EDEEF180] p-[20px] rounded-[20px] border-2 hover:border-[#084FE3] transition-colors"
+              style={{
+                borderColor: paymentTypes === 'payme' ? '#084FE3' : '#EDEEF180',
+              }}
+            >
+              <div className="flex items-center gap-[20px]">
+                <div className="w-[40px] h-[40px] relative rounded-[10px] overflow-hidden">
+                  <Image
+                    src={PaymePayment.src}
+                    alt="payme-payment"
+                    className="object-cover"
+                    fill
+                    quality={100}
+                  />
+                </div>
+                <p className="text-xl font-bold">{t('Payme')}</p>
+              </div>
+              <input
+                type="radio"
+                id="payment-payme-modal"
+                name="payment-modal"
+                checked={paymentTypes === 'payme'}
+                onChange={() => setPaymentType('payme')}
+                className="w-[20px] h-[20px] cursor-pointer"
+              />
+            </label>
+
+            <label
+              onClick={() => setPaymentType('click')}
+              htmlFor="payment-click-modal"
+              className="cursor-pointer flex items-center gap-[10px] justify-between bg-[#EDEEF180] p-[20px] rounded-[20px] border-2 hover:border-[#084FE3] transition-colors"
+              style={{
+                borderColor: paymentTypes === 'click' ? '#084FE3' : '#EDEEF180',
+              }}
+            >
+              <div className="flex items-center gap-[20px]">
+                <div className="w-[60px] h-[60px] relative rounded-[10px] overflow-hidden">
+                  <Image
+                    src={Click.src}
+                    alt="click-payment"
+                    className="object-cover"
+                    fill
+                    quality={100}
+                  />
+                </div>
+                <p className="text-xl font-bold">Click</p>
+              </div>
+              <input
+                type="radio"
+                id="payment-click-modal"
+                name="payment-modal"
+                checked={paymentTypes === 'click'}
+                onChange={() => setPaymentType('click')}
+                className="w-[20px] h-[20px] cursor-pointer"
+              />
+            </label>
+          </div>
+
+          <div className="flex gap-4 mt-6">
+            <Button
+              variant="outline"
+              onClick={() => setIsPaymentModalOpen(false)}
+              className="flex-1 h-[50px] font-semibold text-md cursor-pointer"
+            >
+              {t('Отмена')}
+            </Button>
+            <Button
+              onClick={handlePayment}
+              disabled={!paymentTypes || isPending}
+              className="flex-1 bg-[#084FE3] h-[50px] font-semibold text-md cursor-pointer text-white hover:bg-[#0640b8]"
+            >
+              {isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  {t('Загрузка')}...
+                </>
+              ) : (
+                t('Перейти к оплате')
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

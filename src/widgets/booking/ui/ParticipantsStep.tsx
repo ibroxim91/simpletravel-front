@@ -380,9 +380,7 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                   name={`participants.${index}.date`}
                   render={({ field }) => (
                     <FormItem>
-                      <Label className="text-lg">
-                        {t('Время возвращения')}
-                      </Label>
+                      <Label className="text-lg">{t('Дата рождения')}</Label>
                       <FormControl>
                         <div>
                           <div className="max-lg:hidden">
@@ -412,7 +410,7 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                                   />
                                   {field.value
                                     ? format(field.value, 'dd.MM.yyyy')
-                                    : t('Когда')}
+                                    : t('Дата рождения')}
                                 </button>
                               </PopoverTrigger>
                               <PopoverContent

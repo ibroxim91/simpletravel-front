@@ -19,6 +19,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { Check, LoaderCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -44,6 +45,8 @@ const ThirdStep = () => {
   const t = useTranslations();
   const ref = useQueryClient();
   const route = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl');
   const { phone, email } = useLoginPhoneStore();
   const { setOpenModalMobile, setOpenModal } = useWelcomeStore();
   const [license, setLicense] = useState<boolean>(false);
@@ -62,7 +65,11 @@ const ThirdStep = () => {
     onSuccess(data) {
       saveToken(data.data.data.token.access);
       saveRefToken(data.data.data.token.refresh);
-      route.push('/profile');
+      if (callbackUrl) {
+        route.push(callbackUrl);
+      } else {
+        route.push('/profile');
+      }
       ref.clear();
       setOpenModalMobile(true);
       setOpenModal(true);
@@ -83,7 +90,7 @@ const ThirdStep = () => {
     onSuccess(data) {
       saveToken(data.data.data.token.access);
       saveRefToken(data.data.data.token.refresh);
-      route.push('/profile');
+      route.back();
       ref.clear();
       setOpenModalMobile(true);
       setOpenModal(true);

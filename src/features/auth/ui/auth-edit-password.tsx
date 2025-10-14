@@ -66,7 +66,7 @@ const AuthEditPassword = () => {
       });
     },
     onSuccess() {
-      route.push('/profile');
+      route.back();
       toast.success(t("Paro muvaffaqiyatli o'zgardi"));
     },
     onError(error: AxiosError<{ data: { detail: string } }>) {

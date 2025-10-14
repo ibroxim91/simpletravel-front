@@ -20,6 +20,7 @@ import { AxiosError } from 'axios';
 import { LoaderCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import z from 'zod';
@@ -29,6 +30,8 @@ const AuthLogin = () => {
   const t = useTranslations();
   const ref = useQueryClient();
   const route = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl');
   const phoneFormSchema = z.object({
     phone: z.string().min(17, { message: 'Введите корректный номер телефона' }),
     password: z
@@ -66,8 +69,13 @@ const AuthLogin = () => {
     onSuccess(data) {
       saveToken(data.data.access);
       saveRefToken(data.data.refresh);
-      route.push('/profile');
       ref.clear();
+
+      if (callbackUrl) {
+        route.push(callbackUrl);
+      } else {
+        route.push('/profile');
+      }
     },
     onError(error: AxiosError<{ non_field_errors: [string] }>) {
       toast.error(t('Xatolik yuz berdi'), {
@@ -85,7 +93,7 @@ const AuthLogin = () => {
     onSuccess(data) {
       saveToken(data.data.access);
       saveRefToken(data.data.refresh);
-      route.push('/profile');
+      route.back();
       ref.clear();
     },
     onError(
@@ -197,7 +205,7 @@ const AuthLogin = () => {
                     </FormControl>
                     <FormMessage />
                     <Link
-                      href={'/auth/forget-password'}
+                      href={`/auth/forget-password?callbackUrl=${callbackUrl}`}
                       className="text-end font-medium text-red-500"
                     >
                       {t('Parol esdan chiqdimi')}
@@ -262,7 +270,7 @@ const AuthLogin = () => {
                     </FormControl>
                     <FormMessage />
                     <Link
-                      href={'/auth/forget-password'}
+                      href={`/auth/forget-password?callbackUrl=${callbackUrl}`}
                       className="text-end font-medium text-red-500"
                     >
                       {t('Parol esdan chiqdimi')}
@@ -285,7 +293,10 @@ const AuthLogin = () => {
         </TabsContent>
         <p className="mt-5 text-center text-[#646465] font-medium text-md">
           {t("Hisobingiz yo'qmi")}{' '}
-          <Link href={'/auth/register/'} className="text-[#084FE3] ">
+          <Link
+            href={`/auth/register?callbackUrl=${callbackUrl}`}
+            className="text-[#084FE3] "
+          >
             {t("Ro'yxatdan o'tish")}
           </Link>
         </p>

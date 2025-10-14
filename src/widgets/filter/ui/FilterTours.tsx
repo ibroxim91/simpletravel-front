@@ -77,35 +77,48 @@ const FilterTours = () => {
   );
 
   useEffect(() => {
-    const savedData = localStorage.getItem('filterTours');
-    if (savedData) {
-      const parsed = JSON.parse(savedData);
-      setSearch(parsed.from || '');
-      setSelectedCity(parsed.from || '');
-      setSearchWhere(parsed.where || '');
-      setSelectedWhere(parsed.where || '');
-      setAdults(parsed.adults || 0);
-      setChildren(parsed.children || 0);
-      setSelectData(parsed.selectData || '');
-      if (parsed.date) setFromDate(new Date(parsed.date));
-      if (parsed.toDate) setToDate(new Date(parsed.toDate));
-      if (parsed.date && parsed.toDate)
-        setRange({ from: new Date(parsed.date), to: new Date(parsed.toDate) });
+    const searchParams = new URLSearchParams(window.location.search);
+
+    const departure = searchParams.get('departure');
+    const destination = searchParams.get('destination');
+    const dateFrom = searchParams.get('dateFrom');
+    const dateTo = searchParams.get('dateTo');
+    const adultsParam = searchParams.get('adults');
+    const childrenParam = searchParams.get('children');
+
+    if (departure) {
+      setSearch(departure);
+      setSelectedCity(departure);
+    }
+    if (destination) {
+      setSearchWhere(destination);
+      setSelectedWhere(destination);
+    }
+    if (dateFrom) setFromDate(new Date(dateFrom));
+    if (dateTo) setToDate(new Date(dateTo));
+    if (adultsParam) setAdults(parseInt(adultsParam));
+    if (childrenParam) setChildren(parseInt(childrenParam));
+
+    if (dateFrom && dateTo) {
+      setRange({ from: new Date(dateFrom), to: new Date(dateTo) });
+      setSelectData(
+        `${formatDate.format(new Date(dateFrom), 'DD/MM/YYYY')} - ${formatDate.format(new Date(dateTo), 'DD/MM/YYYY')}`,
+      );
     }
   }, []);
 
   const saveFilter = () => {
-    const dataToSave = {
-      from: search,
-      where: searchWhere,
-      date: fromDate,
-      toDate: toDate,
-      selectData: selectData,
-      adults,
-      children,
-    };
-    localStorage.setItem('filterTours', JSON.stringify(dataToSave));
-    route.push('/selectour?page=1');
+    const params = new URLSearchParams();
+
+    if (search) params.set('departure', search);
+    if (searchWhere) params.set('destination', searchWhere);
+    if (fromDate)
+      params.set('dateFrom', formatDate.format(fromDate, 'YYYY-MM-DD'));
+    if (toDate) params.set('dateTo', formatDate.format(toDate, 'YYYY-MM-DD'));
+    if (adults > 0) params.set('adults', adults.toString());
+    if (children > 0) params.set('children', children.toString());
+
+    route.push(`/selectour?page=1&${params.toString()}`);
   };
 
   return (

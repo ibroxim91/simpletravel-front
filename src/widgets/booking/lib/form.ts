@@ -31,10 +31,6 @@ export const ParticipantsForm = z.object({
 });
 
 export const ServicesForm = z.object({
-  excursions: z
-    .array(z.number())
-    .min(1, { message: 'Kamida bitta ekskursiya tanlang' }),
-  additional: z
-    .array(z.number())
-    .min(1, { message: 'Kamida bitta xizmat tanlang' }),
+  excursions: z.array(z.number()).default([]),
+  additional: z.array(z.number()).default([]),
 });

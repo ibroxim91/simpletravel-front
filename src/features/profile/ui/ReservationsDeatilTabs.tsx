@@ -1,12 +1,21 @@
+import Click from '@/assets/Click.png';
+import { useRouter } from '@/shared/config/i18n/navigation';
 import { LanguageRoutes } from '@/shared/config/i18n/types';
 import formatDate from '@/shared/lib/formatDate';
 import { formatPrice } from '@/shared/lib/formatPrice';
+import { Button } from '@/shared/ui/button';
+import { Ticketorder_Api } from '@/widgets/booking/lib/api';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
+import { Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 import { useParams } from 'next/navigation';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import PaymePayment from '../../../../public/images/payme-payment.png';
 import { User_Api } from '../lib/api';
 
 const ReservationsDeatilTabs = ({
@@ -17,12 +26,61 @@ const ReservationsDeatilTabs = ({
   setDetail: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const { locale } = useParams();
+  const [paymentTypes, setPaymentType] = useState<string | null>(null);
   const t = useTranslations();
+  const route = useRouter();
   const { data: store } = useQuery({
     queryKey: ['order_detail', id],
     queryFn: () => User_Api.getOrderId({ id: id! }),
     enabled: !!id,
   });
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: ({
+      order_id,
+      return_url,
+    }: {
+      paymentType: string;
+      return_url: string;
+      order_id: number;
+    }) => {
+      return Ticketorder_Api.payments({
+        return_url,
+        order_id,
+        paymentType: paymentTypes!,
+      });
+    },
+    onSuccess: (res) => {
+      route.push(res.data.url);
+    },
+    onError: () => {
+      toast.error('Произошла ошибка при отправке. Попробуйте ещё раз.');
+    },
+  });
+
+  async function onSubmit() {
+    if (store) {
+      mutate({
+        order_id: store.data.data.id!,
+        paymentType: 'click',
+        return_url:
+          process.env.NEXT_PUBLIC_ORDER_RETURN_LINK ||
+          'http://localhost:3000/uz',
+      });
+    }
+  }
+
+  async function onSubmitMobile() {
+    if (store) {
+      mutate({
+        order_id: store.data.data.id!,
+        paymentType: 'click',
+        return_url:
+          process.env.NEXT_PUBLIC_ORDER_RETURN_LINK ||
+          'http://localhost:3000/uz',
+      });
+    }
+  }
 
   return (
     <>
@@ -65,16 +123,130 @@ const ReservationsDeatilTabs = ({
           </div>
         </div>
         <hr className="h-[2px] my-[24px] bg-[#EDEEF1] " />
-        <div className="flex my-5 justify-between flex-col items-start gap-2 bg-[#EDEEF180] p-[20px] rounded-[20px] border-2 border-[#EDEEF180]">
-          <h1 className="text-2xl font-bold">
-            {store?.data.data.total_price &&
-              formatPrice(
-                store?.data.data.total_price,
-                locale as LanguageRoutes,
-                true,
-              )}
-          </h1>
-          <p className="text-[#050B08] font-medium">{t('Общая сумма')}</p>
+        <div className="w-full bg-[#FFFFFF] p-[20px] rounded-[20px] relative">
+          <p className="text-2xl font-bold">{t('Оплата')}</p>
+          <hr className="h-[2px] my-[24px] bg-[#EDEEF1] " />
+          <div className="flex my-5 justify-between flex-col items-start gap-2 bg-[#EDEEF180] p-[20px] rounded-[20px] border-2 border-[#EDEEF180]">
+            <h1 className="text-2xl font-bold">
+              {store?.data.data.total_price &&
+                formatPrice(
+                  store?.data.data.total_price,
+                  locale as LanguageRoutes,
+                  true,
+                )}
+            </h1>
+            <p className="text-[#050B08] font-medium">{t('Общая сумма')}</p>
+          </div>
+
+          <label className="text-lg font-semibold text-[#121212]">
+            {t('Способ оплаты')}
+          </label>
+          <div className="grid grid-cols-2 gap-[20px] mt-2 max-lg:grid-cols-1">
+            {/* <label
+              htmlFor="payment-payme"
+              className="cursor-pointer flex items-center gap-[10px] justify-between bg-[#EDEEF180] p-[20px] rounded-[20px] border-2 border-[#EDEEF180]"
+            >
+              <div className="flex items-center gap-[20px]">
+                <div className="w-[40px] h-[40px] relative rounded-[10px] overflow-hidden">
+                  <Image
+                    src={UzumPayment.src}
+                    alt="uzum-payment"
+                    className="object-cover"
+                    fill
+                    quality={100}
+                  />
+                </div>
+                <p className="text-xl font-bold">{t('Uzum bank')}</p>
+              </div>
+              <input
+                type="radio"
+                id="payment-payme"
+                name="payment"
+                className="w-[20px] h-[20px] border-2 border-[#EDEEF180] cursor-pointer"
+              />
+            </label> */}
+
+            <label
+              onClick={() => setPaymentType('payme')}
+              htmlFor="payment-uzum"
+              className="cursor-pointer flex items-center gap-[10px] justify-between bg-[#EDEEF180] p-[20px] rounded-[20px] border-2 border-[#EDEEF180]"
+            >
+              <div className="flex items-center gap-[20px]">
+                <div className="w-[40px] h-[40px] relative rounded-[10px] overflow-hidden">
+                  <Image
+                    src={PaymePayment.src}
+                    alt="payme-payment"
+                    className="object-cover"
+                    fill
+                    quality={100}
+                  />
+                </div>
+                <p className="text-xl font-bold">{t('Payme')}</p>
+              </div>
+              <input
+                type="radio"
+                id="payment-uzum"
+                name="payment"
+                className="w-[20px] h-[20px] border-2 border-[#EDEEF180] cursor-pointer"
+              />
+            </label>
+
+            <label
+              onClick={() => setPaymentType('click')}
+              htmlFor="payment-click"
+              className="cursor-pointer flex items-center gap-[10px] justify-between bg-[#EDEEF180] p-[20px] rounded-[20px] border-2 border-[#EDEEF180]"
+            >
+              <div className="flex items-center gap-[20px]">
+                <div className="w-[60px] h-[60px] relative rounded-[10px] overflow-hidden">
+                  <Image
+                    src={Click.src}
+                    alt="payme-click"
+                    className="object-cover"
+                    fill
+                    quality={100}
+                  />
+                </div>
+                <p className="text-xl font-bold">Click</p>
+              </div>
+              <input
+                type="radio"
+                id="payment-click"
+                name="payment"
+                className="w-[20px] h-[20px] border-2 border-[#EDEEF180] cursor-pointer"
+              />
+            </label>
+          </div>
+        </div>
+
+        <div className="flex justify-between max-lg:flex-col">
+          <Button
+            onClick={onSubmit}
+            disabled={paymentTypes === null}
+            className="bg-[#084FE3] max-lg:hidden text-white py-6 font-medium px-10 left-0 cursor-pointer rounded-full mt-[20px]"
+          >
+            {isPending ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                {t('Загрузка')}...
+              </>
+            ) : (
+              t('Перейти к оплате')
+            )}
+          </Button>
+          <Button
+            disabled={paymentTypes === null}
+            onClick={onSubmitMobile}
+            className="bg-[#084FE3] text-white lg:hidden py-6 font-medium px-10 left-0 cursor-pointer rounded-full mt-[20px]"
+          >
+            {isPending ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                {t('Загрузка')}...
+              </>
+            ) : (
+              t('Перейти к оплате')
+            )}
+          </Button>
         </div>
       </div>
 

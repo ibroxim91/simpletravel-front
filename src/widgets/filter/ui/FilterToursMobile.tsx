@@ -4,6 +4,7 @@ import { Button } from '@/shared/ui/button';
 import { Calendar } from '@/shared/ui/calendar';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
+import Ticket_Api from '@/widgets/selectour/lib/api';
 import AddIcon from '@mui/icons-material/Add';
 import AirplanemodeActiveIcon from '@mui/icons-material/AirplanemodeActive';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
@@ -14,8 +15,6 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import RemoveIcon from '@mui/icons-material/Remove';
 import SearchIcon from '@mui/icons-material/Search';
 import Drawer from '@mui/material/Drawer';
-
-import Ticket_Api from '@/widgets/selectour/lib/api';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
@@ -61,17 +60,13 @@ const FilterToursMobile = () => {
         ),
       );
       setCities(uniqueCities);
-    }
-  }, [ticket]);
 
-  useEffect(() => {
-    if (ticket) {
-      const uniqueCities = Array.from(
+      const uniqueCitiesWhere = Array.from(
         new Set(
           ticket.data.results.tickets.slice(0, 8).map((e) => e.destination),
         ),
       );
-      setCitiesWhere(uniqueCities);
+      setCitiesWhere(uniqueCitiesWhere);
     }
   }, [ticket]);
 
@@ -84,35 +79,48 @@ const FilterToursMobile = () => {
   );
 
   useEffect(() => {
-    const savedData = localStorage.getItem('filterTours');
-    if (savedData) {
-      const parsed = JSON.parse(savedData);
-      setSearch(parsed.from || '');
-      setSelectedCity(parsed.from || '');
-      setSearchWhere(parsed.where || '');
-      setSelectedWhere(parsed.where || '');
-      setAdults(parsed.adults || 0);
-      setChildren(parsed.children || 0);
-      setSelectData(parsed.selectData || '');
-      if (parsed.date) setFromDate(new Date(parsed.date));
-      if (parsed.toDate) setToDate(new Date(parsed.toDate));
-      if (parsed.date && parsed.toDate)
-        setRange({ from: new Date(parsed.date), to: new Date(parsed.toDate) });
+    const searchParams = new URLSearchParams(window.location.search);
+
+    const departure = searchParams.get('departure');
+    const destination = searchParams.get('destination');
+    const dateFrom = searchParams.get('dateFrom');
+    const dateTo = searchParams.get('dateTo');
+    const adultsParam = searchParams.get('adults');
+    const childrenParam = searchParams.get('children');
+
+    if (departure) {
+      setSearch(departure);
+      setSelectedCity(departure);
+    }
+    if (destination) {
+      setSearchWhere(destination);
+      setSelectedWhere(destination);
+    }
+    if (dateFrom) setFromDate(new Date(dateFrom));
+    if (dateTo) setToDate(new Date(dateTo));
+    if (adultsParam) setAdults(parseInt(adultsParam));
+    if (childrenParam) setChildren(parseInt(childrenParam));
+
+    if (dateFrom && dateTo) {
+      setRange({ from: new Date(dateFrom), to: new Date(dateTo) });
+      setSelectData(
+        `${formatDate.format(new Date(dateFrom), 'DD/MM/YYYY')} - ${formatDate.format(new Date(dateTo), 'DD/MM/YYYY')}`,
+      );
     }
   }, []);
 
   const saveFilter = () => {
-    const dataToSave = {
-      from: search,
-      where: searchWhere,
-      date: fromDate,
-      toDate: toDate,
-      selectData: selectData,
-      adults,
-      children,
-    };
-    localStorage.setItem('filterTours', JSON.stringify(dataToSave));
-    route.push('/selectour?page=1');
+    const params = new URLSearchParams();
+
+    if (search) params.set('departure', search);
+    if (searchWhere) params.set('destination', searchWhere);
+    if (fromDate)
+      params.set('dateFrom', formatDate.format(fromDate, 'YYYY-MM-DD'));
+    if (toDate) params.set('dateTo', formatDate.format(toDate, 'YYYY-MM-DD'));
+    if (adults > 0) params.set('adults', adults.toString());
+    if (children > 0) params.set('children', children.toString());
+
+    route.push(`/selectour?page=1&${params.toString()}`);
   };
 
   return (
@@ -413,52 +421,6 @@ const FilterToursMobile = () => {
                 }}
                 showOutsideDays={false}
               />
-              {/* <Calendar
-                    mode="single"
-                    className="w-full max-sm:hidden"
-                    selected={fromDate}
-                    onSelect={setFromDate}
-                    disabled={(date: Date) => {
-                      const today = new Date();
-                      today.setHours(0, 0, 0, 0);
-                      return date < today;
-                    }}
-                  />
-                  <Calendar
-                    mode="single"
-                    className="w-full max-sm:hidden"
-                    selected={toDate}
-                    onSelect={setToDate}
-                    disabled={(date: Date) => {
-                      if (!fromDate) return true;
-                      return date <= fromDate;
-                    }}
-                  /> */}
-              {/* {!fromDate && (
-                    <Calendar
-                      mode="single"
-                      className="w-full h-auto min-sm:hidden"
-                      selected={fromDate}
-                      onSelect={setFromDate}
-                      disabled={(date: Date) => {
-                        const today = new Date();
-                        today.setHours(0, 0, 0, 0);
-                        return date < today;
-                      }}
-                    />
-                  )}
-                  {fromDate && (
-                    <Calendar
-                      mode="single"
-                      className="w-full min-sm:hidden"
-                      selected={toDate}
-                      onSelect={setToDate}
-                      disabled={(date: Date) => {
-                        if (!fromDate) return true;
-                        return date <= fromDate;
-                      }}
-                    />
-                  )} */}
             </div>
             <div className="grid grid-cols-2 mt-0 gap-2">
               <button

@@ -1,5 +1,5 @@
 import { BASE_URL } from '@/shared/config/api/URLs';
-import { Link } from '@/shared/config/i18n/navigation';
+import { Link, useRouter } from '@/shared/config/i18n/navigation';
 import { LanguageRoutes } from '@/shared/config/i18n/types';
 import formatDate from '@/shared/lib/formatDate';
 import { formatPrice } from '@/shared/lib/formatPrice';
@@ -21,6 +21,7 @@ import { TickectAllResults } from '../lib/types';
 export default function TourItem({ data }: { data: TickectAllResults }) {
   const { locale } = useParams();
   const t = useTranslations();
+  const route = useRouter();
   const queryClient = useQueryClient();
   const { mutate } = useMutation({
     mutationFn: ({ ticket }: { ticket: number }) => {
@@ -31,12 +32,10 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
       queryClient.refetchQueries({ queryKey: ['get_saved'] });
       queryClient.refetchQueries({ queryKey: ['tickets_detail'] });
     },
-    onError(error: { message: string }) {
-      toast.error(t('Xatolik yuz berdi'), {
-        icon: null,
-        description: error.message,
-        position: 'bottom-right',
-      });
+    onError() {
+      route.push(
+        `/auth/login?callbackUrl=${encodeURIComponent(window.location.href)}`,
+      );
     },
   });
 
@@ -59,7 +58,7 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
   });
 
   return (
-    <Link href={`/selectour/${data.id}`} prefetch={false}>
+    <Link href={`/selectour/${data.id}`} prefetch={true}>
       <motion.div
         initial={{ opacity: 0, x: 30 }}
         whileInView={{ opacity: 1, x: 0 }}

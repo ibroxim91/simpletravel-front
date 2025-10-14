@@ -26,7 +26,6 @@ const FilterHotelMobile = () => {
   const [dataOpenMobile, setDataOpenMobile] = useState(false);
   const [whereMobile, setWhereMobile] = useState(false);
   const [selectAge, setSelectAge] = useState<number>(0);
-  const [search, setSearch] = useState('');
   const [selectedWhere, setSelectedWhere] = useState('');
   const [searchWhere, setSearchWhere] = useState('');
   const [fromDate, setFromDate] = useState<Date | undefined>();
@@ -66,34 +65,42 @@ const FilterHotelMobile = () => {
   );
 
   useEffect(() => {
-    const savedData = localStorage.getItem('filterTours');
-    if (savedData) {
-      const parsed = JSON.parse(savedData);
-      setSearch(parsed.from || '');
-      setSearchWhere(parsed.where || '');
-      setSelectedWhere(parsed.where || '');
-      setAdults(parsed.adults || 0);
-      setChildren(parsed.children || 0);
-      setSelectData(parsed.selectData || '');
-      if (parsed.date) setFromDate(new Date(parsed.date));
-      if (parsed.toDate) setToDate(new Date(parsed.toDate));
-      if (parsed.date && parsed.toDate)
-        setRange({ from: new Date(parsed.date), to: new Date(parsed.toDate) });
+    const searchParams = new URLSearchParams(window.location.search);
+
+    const destination = searchParams.get('destination');
+    const dateFrom = searchParams.get('dateFrom');
+    const dateTo = searchParams.get('dateTo');
+    const adultsParam = searchParams.get('adults');
+    const childrenParam = searchParams.get('children');
+
+    if (destination) {
+      setSearchWhere(destination);
+      setSelectedWhere(destination);
+    }
+    if (dateFrom) setFromDate(new Date(dateFrom));
+    if (dateTo) setToDate(new Date(dateTo));
+    if (adultsParam) setAdults(parseInt(adultsParam));
+    if (childrenParam) setChildren(parseInt(childrenParam));
+
+    if (dateFrom && dateTo) {
+      setRange({ from: new Date(dateFrom), to: new Date(dateTo) });
+      setSelectData(
+        `${formatDate.format(new Date(dateFrom), 'DD/MM/YYYY')} - ${formatDate.format(new Date(dateTo), 'DD/MM/YYYY')}`,
+      );
     }
   }, []);
 
   const saveFilter = () => {
-    const dataToSave = {
-      from: search,
-      where: searchWhere,
-      date: fromDate,
-      toDate: toDate,
-      selectData: selectData,
-      adults,
-      children,
-    };
-    localStorage.setItem('filterTours', JSON.stringify(dataToSave));
-    route.push('/selectour?page=1');
+    const params = new URLSearchParams();
+
+    if (searchWhere) params.set('destination', searchWhere);
+    if (fromDate)
+      params.set('dateFrom', formatDate.format(fromDate, 'YYYY-MM-DD'));
+    if (toDate) params.set('dateTo', formatDate.format(toDate, 'YYYY-MM-DD'));
+    if (adults > 0) params.set('adults', adults.toString());
+    if (children > 0) params.set('children', children.toString());
+
+    route.push(`/selectour?page=1&${params.toString()}`);
   };
 
   return (
@@ -264,7 +271,6 @@ const FilterHotelMobile = () => {
                 value={
                   fromDate ? formatDate.format(fromDate, 'DD/MM/YYYY') : ''
                 }
-                onChange={(e) => setSearch(e.target.value)}
                 className="w-full text-black h-[50px]"
                 onClick={(e) => e.stopPropagation()}
                 onFocus={(e) => e.stopPropagation()}
@@ -278,7 +284,6 @@ const FilterHotelMobile = () => {
                 placeholder={t('Выезд')}
                 value={toDate ? formatDate.format(toDate, 'DD/MM/YYYY') : ''}
                 disabled={fromDate === undefined}
-                onChange={(e) => setSearch(e.target.value)}
                 className="w-full text-black h-[50px]"
                 onClick={(e) => e.stopPropagation()}
                 onFocus={(e) => e.stopPropagation()}
@@ -296,52 +301,6 @@ const FilterHotelMobile = () => {
                 }}
                 showOutsideDays={false}
               />
-              {/* <Calendar
-                    mode="single"
-                    className="w-full max-sm:hidden"
-                    selected={fromDate}
-                    onSelect={setFromDate}
-                    disabled={(date: Date) => {
-                      const today = new Date();
-                      today.setHours(0, 0, 0, 0);
-                      return date < today;
-                    }}
-                  />
-                  <Calendar
-                    mode="single"
-                    className="w-full max-sm:hidden"
-                    selected={toDate}
-                    onSelect={setToDate}
-                    disabled={(date: Date) => {
-                      if (!fromDate) return true;
-                      return date <= fromDate;
-                    }}
-                  /> */}
-              {/* {!fromDate && (
-                    <Calendar
-                      mode="single"
-                      className="w-full h-auto min-sm:hidden"
-                      selected={fromDate}
-                      onSelect={setFromDate}
-                      disabled={(date: Date) => {
-                        const today = new Date();
-                        today.setHours(0, 0, 0, 0);
-                        return date < today;
-                      }}
-                    />
-                  )}
-                  {fromDate && (
-                    <Calendar
-                      mode="single"
-                      className="w-full min-sm:hidden"
-                      selected={toDate}
-                      onSelect={setToDate}
-                      disabled={(date: Date) => {
-                        if (!fromDate) return true;
-                        return date <= fromDate;
-                      }}
-                    />
-                  )} */}
             </div>
             <div className="grid grid-cols-2 mt-0 gap-2">
               <button

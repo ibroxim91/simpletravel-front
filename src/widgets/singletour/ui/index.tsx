@@ -1,7 +1,7 @@
 'use client';
 
 import { User_Api } from '@/features/profile/lib/api';
-import { Link } from '@/shared/config/i18n/navigation';
+import { Link, useRouter } from '@/shared/config/i18n/navigation';
 import { LanguageRoutes } from '@/shared/config/i18n/types';
 import { formatPrice } from '@/shared/lib/formatPrice';
 import { Button } from '@/shared/ui/button';
@@ -62,6 +62,7 @@ const slideIn = {
 
 export default function SingleTour() {
   const t = useTranslations();
+  const route = useRouter();
   const { tourid, locale } = useParams();
   const { data, isLoading } = useQuery({
     queryKey: ['tickets_detail', tourid],
@@ -305,13 +306,9 @@ export default function SingleTour() {
                   <motion.button
                     whileTap={{ scale: 0.95 }}
                     onClick={() => {
-                      toast.error(t('Xatolik yuz berdi'), {
-                        icon: null,
-                        description: t(
-                          "Bron qilish uchun ro'yxatdan o'tishingiz kerak",
-                        ),
-                        position: 'bottom-right',
-                      });
+                      route.push(
+                        `/auth/login?callbackUrl=${encodeURIComponent(window.location.href)}`,
+                      );
                     }}
                     className="bg-[#1764FC] rounded-[43px] px-[70px] py-[14px] text-white cursor-pointer text-sm max-lg:w-full"
                   >

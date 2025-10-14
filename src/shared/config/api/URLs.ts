@@ -37,6 +37,7 @@ const PARTICIPANT_IMAGE = '/api/v1/participant-image/';
 const FAQ = '/api/v1/faq/';
 const TICKETORDER_INFO = '/api/v1/get-ticket-info/';
 const TICKETORDER = '/api/v1/ticketorder/';
+const PAYMENTS = '/api/v1/payments_link/';
 
 export {
   BASE_URL,
@@ -58,6 +59,7 @@ export {
   NEW_PASSWORD,
   PARTICIPANT,
   PARTICIPANT_IMAGE,
+  PAYMENTS,
   PHONE_CONFIRM_RESET_PASS,
   PHONE_CONFIRMOTP,
   PHONE_LOGIN,

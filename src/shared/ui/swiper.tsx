@@ -15,7 +15,7 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import { Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Link } from '../config/i18n/navigation';
+import { Link, useRouter } from '../config/i18n/navigation';
 
 interface Props {
   setOpenWatch: React.Dispatch<React.SetStateAction<boolean>>;
@@ -35,6 +35,7 @@ export default function ImageSwiper({
   is_liked,
 }: Props) {
   const t = useTranslations();
+  const route = useRouter();
   const handleCopy = () => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(window.location.href).then(() => {
@@ -52,12 +53,10 @@ export default function ImageSwiper({
       queryClient.refetchQueries({ queryKey: ['get_saved'] });
       queryClient.refetchQueries({ queryKey: ['tickets_detail'] });
     },
-    onError(error: { message: string }) {
-      toast.error(t('Xatolik yuz berdi'), {
-        icon: null,
-        description: error.message,
-        position: 'bottom-right',
-      });
+    onError() {
+      route.push(
+        `/auth/login?callbackUrl=${encodeURIComponent(window.location.href)}`,
+      );
     },
   });
 

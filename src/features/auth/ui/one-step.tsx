@@ -17,6 +17,7 @@ import { useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { LoaderCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import { Dispatch, SetStateAction } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -30,6 +31,8 @@ interface Props {
 
 const OneStep = ({ setStep }: Props) => {
   const t = useTranslations();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl');
   const { setEmail, setPhone } = useLoginPhoneStore();
   const phoneFormSchema = z.object({
     phone: z.string().min(17, { message: 'Введите корректный номер телефона' }),
@@ -202,7 +205,10 @@ const OneStep = ({ setStep }: Props) => {
       </TabsContent>
       <p className="mt-5 text-center text-[#646465] font-medium text-md">
         {t('Hisobingiz bormi')}{' '}
-        <Link href={'/auth/login/'} className="text-[#084FE3] ">
+        <Link
+          href={`/auth/login?callbackUrl=${callbackUrl}`}
+          className="text-[#084FE3] "
+        >
           {t('Kirish')}
         </Link>
       </p>

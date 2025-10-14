@@ -1,75 +1,87 @@
 'use client';
 
+import Click from '@/assets/Click.png';
+import { useRouter } from '@/shared/config/i18n/navigation';
 import { LanguageRoutes } from '@/shared/config/i18n/types';
 import formatDate from '@/shared/lib/formatDate';
 import { formatPrice } from '@/shared/lib/formatPrice';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import { useMutation } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { useRef, useState } from 'react';
+import { toast } from 'sonner';
 import PaymePayment from '../../../../public/images/payme-payment.png';
-import UzumPayment from '../../../../public/images/uzum-payment.png';
-import { Get_Info } from '../lib/api';
+import { Get_Info, Ticketorder_Api } from '../lib/api';
 import formStore from '../lib/hook';
 import PaidModal from './PaidModal';
 
 type Props = {
   onPrev: () => void;
   data: Get_Info | undefined;
+  orderId: number | undefined;
 };
 
-export default function PaymentStep({ onPrev, data }: Props) {
+export default function PaymentStep({ onPrev, data, orderId }: Props) {
   const t = useTranslations();
   const { locale } = useParams();
   const [isPaid, setIsPaid] = useState<boolean>(false);
   const [isPaidMobile, setIsPaidMobile] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const route = useRouter();
+  const [paymentTypes, setPaymentType] = useState<string | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const { where, whereTo, dispatch, returned, user, transport, tariff } =
     formStore();
 
+  const { mutate, isPending } = useMutation({
+    mutationFn: ({
+      order_id,
+      return_url,
+    }: {
+      paymentType: string;
+      return_url: string;
+      order_id: number;
+    }) => {
+      return Ticketorder_Api.payments({
+        return_url,
+        order_id,
+        paymentType: paymentTypes!,
+      });
+    },
+    onSuccess: (res) => {
+      route.push(res.data.url);
+    },
+    onError: () => {
+      setError('Произошла ошибка при отправке. Попробуйте ещё раз.');
+      toast.error('Произошла ошибка при отправке. Попробуйте ещё раз.');
+    },
+  });
+
   const store = formStore();
 
   async function onSubmit() {
-    setLoading(true);
     setIsPaid(true);
-    setSuccess(false);
-    setError(null);
-    try {
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve('ok');
-        }, 2000);
-      });
-      setLoading(false);
-      setSuccess(true);
-    } catch {
-      setLoading(false);
-      setError('Произошла ошибка при отправке. Попробуйте ещё раз.');
-    }
+    mutate({
+      order_id: orderId!,
+      paymentType: 'click',
+      return_url:
+        process.env.NEXT_PUBLIC_ORDER_RETURN_LINK || 'http://localhost:3000/uz',
+    });
   }
 
   async function onSubmitMobile() {
-    setLoading(true);
     setIsPaidMobile(true);
     setSuccess(false);
 
-    setError(null);
-    try {
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve('ok');
-        }, 2000);
-      });
-      setLoading(false);
-      setSuccess(true);
-    } catch {
-      setLoading(false);
-      setError('Произошла ошибка при отправке. Попробуйте ещё раз.');
-    }
+    mutate({
+      order_id: orderId!,
+      paymentType: 'click',
+      return_url:
+        process.env.NEXT_PUBLIC_ORDER_RETURN_LINK || 'http://localhost:3000/uz',
+    });
   }
 
   return (
@@ -89,7 +101,7 @@ export default function PaymentStep({ onPrev, data }: Props) {
           {t('Способ оплаты')}
         </label>
         <div className="grid grid-cols-2 gap-[20px] mt-2 max-lg:grid-cols-1">
-          <label
+          {/* <label
             htmlFor="payment-payme"
             className="cursor-pointer flex items-center gap-[10px] justify-between bg-[#EDEEF180] p-[20px] rounded-[20px] border-2 border-[#EDEEF180]"
           >
@@ -111,9 +123,10 @@ export default function PaymentStep({ onPrev, data }: Props) {
               name="payment"
               className="w-[20px] h-[20px] border-2 border-[#EDEEF180] cursor-pointer"
             />
-          </label>
+          </label> */}
 
           <label
+            onClick={() => setPaymentType('payme')}
             htmlFor="payment-uzum"
             className="cursor-pointer flex items-center gap-[10px] justify-between bg-[#EDEEF180] p-[20px] rounded-[20px] border-2 border-[#EDEEF180]"
           >
@@ -136,6 +149,31 @@ export default function PaymentStep({ onPrev, data }: Props) {
               className="w-[20px] h-[20px] border-2 border-[#EDEEF180] cursor-pointer"
             />
           </label>
+
+          <label
+            onClick={() => setPaymentType('click')}
+            htmlFor="payment-click"
+            className="cursor-pointer flex items-center gap-[10px] justify-between bg-[#EDEEF180] p-[20px] rounded-[20px] border-2 border-[#EDEEF180]"
+          >
+            <div className="flex items-center gap-[20px]">
+              <div className="w-[60px] h-[60px] relative rounded-[10px] overflow-hidden">
+                <Image
+                  src={Click.src}
+                  alt="payme-click"
+                  className="object-cover"
+                  fill
+                  quality={100}
+                />
+              </div>
+              <p className="text-xl font-bold">Click</p>
+            </div>
+            <input
+              type="radio"
+              id="payment-click"
+              name="payment"
+              className="w-[20px] h-[20px] border-2 border-[#EDEEF180] cursor-pointer"
+            />
+          </label>
         </div>
       </div>
 
@@ -147,14 +185,27 @@ export default function PaymentStep({ onPrev, data }: Props) {
           {t('Назад')}
         </button>
         <button
+          disabled={paymentTypes === null}
           onClick={onSubmit}
-          className="bg-[#084FE3] max-lg:hidden text-white py-4 font-medium px-10 left-0 cursor-pointer rounded-full mt-[20px]"
+          className={`py-4 font-medium px-10 left-0 rounded-full mt-[20px] max-lg:hidden
+    ${
+      paymentTypes === null
+        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+        : 'bg-[#084FE3] text-white cursor-pointer hover:bg-[#063bc2]'
+    }`}
         >
           {t('Перейти к оплате')}
         </button>
+
         <button
+          disabled={paymentTypes === null}
           onClick={onSubmitMobile}
-          className="bg-[#084FE3] text-white lg:hidden py-4 font-medium px-10 left-0 cursor-pointer rounded-full mt-[20px]"
+          className={`py-4 font-medium px-10 left-0 rounded-full mt-[20px] lg:hidden 
+    ${
+      paymentTypes === null
+        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+        : 'bg-[#084FE3] text-white cursor-pointer hover:bg-[#063bc2]'
+    }`}
         >
           {t('Перейти к оплате')}
         </button>
@@ -258,35 +309,44 @@ export default function PaymentStep({ onPrev, data }: Props) {
           <p className="!text-black text-end break-words">{transport}</p>
         </div>
 
-        <h1 className="mt-5 text-lg font-bold">{t('Услуги')}</h1>
-        {store.paidService.map((e, i) => (
-          <div
-            key={e.id || i}
-            className={`grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465] ${
-              i % 2 === 0 ? 'bg-[#EDEEF1]' : 'bg-white'
-            }`}
-          >
-            <p className="text-md">{e.name}</p>
-            <p className="!text-black text-end break-words">
-              {formatPrice(e.price, locale as LanguageRoutes, true)}
-            </p>
-          </div>
-        ))}
-
-        <h1 className="mt-5 text-lg font-bold">{t('Дополнительные услуги')}</h1>
-        {store.tours_category.map((e, i) => (
-          <div
-            key={e.id || i}
-            className={`grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465] ${
-              i % 2 === 0 ? 'bg-[#EDEEF1]' : 'bg-white'
-            }`}
-          >
-            <p className="text-md">{e.name}</p>
-            {/* <p className="!text-black text-end break-words">
+        {store.paidService.length > 0 && (
+          <>
+            <h1 className="mt-5 text-lg font-bold">{t('Услуги')}</h1>
+            {store.paidService.map((e, i) => (
+              <div
+                key={e.id || i}
+                className={`grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465] ${
+                  i % 2 === 0 ? 'bg-[#EDEEF1]' : 'bg-white'
+                }`}
+              >
+                <p className="text-md">{e.name}</p>
+                <p className="!text-black text-end break-words">
+                  {formatPrice(e.price, locale as LanguageRoutes, true)}
+                </p>
+              </div>
+            ))}
+          </>
+        )}
+        {store.paidService.length > 0 && (
+          <>
+            <h1 className="mt-5 text-lg font-bold">
+              {t('Дополнительные услуги')}
+            </h1>
+            {store.tours_category.map((e, i) => (
+              <div
+                key={e.id || i}
+                className={`grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465] ${
+                  i % 2 === 0 ? 'bg-[#EDEEF1]' : 'bg-white'
+                }`}
+              >
+                <p className="text-md">{e.name}</p>
+                {/* <p className="!text-black text-end break-words">
               {formatPrice('1450000', locale as LanguageRoutes, true)}
-            </p> */}
-          </div>
-        ))}
+              </p> */}
+              </div>
+            ))}
+          </>
+        )}
       </div>
 
       <PaidModal
@@ -294,12 +354,11 @@ export default function PaymentStep({ onPrev, data }: Props) {
           setIsPaid(false);
           setIsPaidMobile(false);
         }}
-        loading={loading}
+        loading={isPending}
         openDrawer={isPaidMobile}
         setOpenDrawer={setIsPaidMobile}
         open={isPaid}
         setSuccess={setSuccess}
-        setLoading={setLoading}
         setError={setError}
         success={success}
         error={error}

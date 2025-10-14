@@ -93,6 +93,7 @@ const Populardestinations = () => {
               <Link
                 href={`/selectour/${ticket[0].id}`}
                 className="block relative w-full h-full"
+                prefetch={true}
               >
                 <Image
                   src={BASE_URL + ticket[0].ticket_images}

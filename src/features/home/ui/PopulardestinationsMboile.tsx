@@ -34,7 +34,10 @@ const PopulardestinationsMboile = () => {
   return (
     <div className="custom-container mt-10 lg:hidden">
       <div className="flex justify-between items-center">
-        <Link href={'#'} className="text-2xl text-[#031753] font-semibold">
+        <Link
+          href={'/selectour'}
+          className="text-2xl text-[#031753] font-semibold"
+        >
           {t('Популярные направления')}
         </Link>
       </div>
@@ -50,7 +53,11 @@ const PopulardestinationsMboile = () => {
               key={e.id}
               className="basis-1/2 max-sm:basis-1/1 h-[200px] font-medium"
             >
-              <div className="rounded-3xl w-full relative h-full">
+              <Link
+                href={`/selectour/${ticket[0].id}`}
+                prefetch={true}
+                className="rounded-3xl w-full relative h-full"
+              >
                 <Image
                   src={BASE_URL + e.ticket_images}
                   width={528}
@@ -71,7 +78,7 @@ const PopulardestinationsMboile = () => {
                     / {ticket[0].passenger_count} {t('чел')}
                   </p>
                 </div>
-              </div>
+              </Link>
             </CarouselItem>
           ))}
         </CarouselContent>

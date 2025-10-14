@@ -10,14 +10,13 @@ import {
 } from '@/shared/ui/form';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
-import { zodResolver } from '@hookform/resolvers/zod';
 import Switch from '@mui/material/Switch';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { LoaderCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import z from 'zod';
@@ -29,9 +28,15 @@ type Props = {
   onNext: () => void;
   onPrev: () => void;
   data: Get_Info | undefined;
+  setOrderId: Dispatch<SetStateAction<number | undefined>>;
 };
 
-export default function ServicesStep({ onNext, onPrev, data }: Props) {
+export default function ServicesStep({
+  onNext,
+  onPrev,
+  data,
+  setOrderId,
+}: Props) {
   const t = useTranslations();
   const { locale, id } = useParams();
   const queryClient = useQueryClient();
@@ -41,7 +46,8 @@ export default function ServicesStep({ onNext, onPrev, data }: Props) {
   const { mutate, isPending } = useMutation({
     mutationFn: (body: Create_Ticketorder) =>
       Ticketorder_Api.ticketorder_create(body),
-    onSuccess: () => {
+    onSuccess: (res) => {
+      setOrderId(res.data.data.id);
       toast.success(t('Tur muvaffaqiyatli bron qilindi'));
       queryClient.refetchQueries({ queryKey: ['order_all'] });
       onNext();
@@ -60,13 +66,7 @@ export default function ServicesStep({ onNext, onPrev, data }: Props) {
     setTotalPrice,
   } = formStore();
 
-  const form = useForm<z.infer<typeof ServicesForm>>({
-    resolver: zodResolver(ServicesForm),
-    defaultValues: {
-      additional: [],
-      excursions: [],
-    },
-  });
+  const form = useForm<z.infer<typeof ServicesForm>>();
 
   const store = formStore();
   useEffect(() => {
@@ -109,7 +109,6 @@ export default function ServicesStep({ onNext, onPrev, data }: Props) {
         ? prev.filter((s) => s !== id)
         : [...prev, id];
 
-      // Update tours_category in store with full data
       const selectedServicesData = data?.data.extra_service
         .filter((service) => updated.includes(service.id))
         .map((service) => ({

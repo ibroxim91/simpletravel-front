@@ -26,6 +26,7 @@ import TourInfoStep from './TourInfoStep';
 
 export default function Booking() {
   const t = useTranslations();
+  const [orderId, setOrderId] = useState<number>();
   const route = useRouter();
   const { id } = useParams();
   const { reset } = formStore();
@@ -544,6 +545,7 @@ export default function Booking() {
                   >
                     <ServicesStep
                       data={data}
+                      setOrderId={setOrderId}
                       onNext={() => {
                         setActiveTab('payment');
                         setStep(tabSteps['payment']);
@@ -567,6 +569,7 @@ export default function Booking() {
                   >
                     <PaymentStep
                       data={data}
+                      orderId={orderId}
                       onPrev={() => {
                         setActiveTab('services');
                         setStep(tabSteps['services']);

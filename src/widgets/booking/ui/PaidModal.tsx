@@ -23,7 +23,6 @@ interface Props {
   onClose: () => void;
   setError: Dispatch<SetStateAction<string | null>>;
   setSuccess: Dispatch<SetStateAction<boolean>>;
-  setLoading: Dispatch<SetStateAction<boolean>>;
   loading: boolean;
   success: boolean;
   error: string | null;
@@ -37,7 +36,6 @@ export default function PaidModal({
   error,
   loading,
   success,
-  setLoading,
   setSuccess,
   setError,
   openDrawer,
@@ -100,7 +98,6 @@ export default function PaidModal({
                         variant={'outline'}
                         onClick={() => {
                           setSuccess(false);
-                          setLoading(false);
                         }}
                         className="rounded-full p-6 h-12 w-12"
                       >
@@ -138,7 +135,6 @@ export default function PaidModal({
                         className="rounded-3xl border-2 border-[#DFDFDF] bg-white text-[#031753] px-10 font-semibold cursor-pointer hover:bg-white py-4 h-fit w-fit"
                         onClick={() => {
                           setSuccess(false);
-                          setLoading(false);
                           onClose();
                           reset();
                           router.push('/');
@@ -151,7 +147,6 @@ export default function PaidModal({
                         className="rounded-3xl bg-[#1764FC] px-10 font-semibold cursor-pointer py-4 h-fit w-fit"
                         onClick={() => {
                           setSuccess(false);
-                          setLoading(false);
                           onClose();
                           reset();
                           router.push('/profile?tabs=reservations');
@@ -173,7 +168,6 @@ export default function PaidModal({
                       className="rounded-3xl px-10 cursor-pointer py-4 h-fit w-fit font-semibold"
                       onClick={() => {
                         setSuccess(false);
-                        setLoading(false);
                         onClose();
                         reset();
                         setError(null);
@@ -200,7 +194,6 @@ export default function PaidModal({
           if (!loading) {
             reset();
             setSuccess(false);
-            setLoading(false);
             setError(null);
             setOpenDrawer(false);
           }
@@ -223,7 +216,6 @@ export default function PaidModal({
               variant="outline"
               onClick={() => {
                 setSuccess(false);
-                setLoading(false);
                 setError(null);
                 setOpenDrawer(false);
               }}
@@ -266,7 +258,6 @@ export default function PaidModal({
                   className="rounded-3xl border-2 border-[#DFDFDF] bg-white text-[#031753] px-10 font-semibold cursor-pointer hover:bg-white py-4 h-fit w-full"
                   onClick={() => {
                     setSuccess(false);
-                    setLoading(false);
                     onClose();
                     reset();
                     router.push('/');
@@ -279,7 +270,6 @@ export default function PaidModal({
                   className="rounded-3xl bg-[#1764FC] px-10 font-semibold cursor-pointer py-4 h-fit w-full"
                   onClick={() => {
                     setSuccess(false);
-                    setLoading(false);
                     onClose();
                     reset();
                     router.push('/profile?tabs=reservations');
@@ -307,7 +297,6 @@ export default function PaidModal({
                 className="rounded-3xl px-10 absolute bottom-2 cursor-pointer py-4 h-fit w-[90%]"
                 onClick={() => {
                   setSuccess(false);
-                  setLoading(false);
                   setError(null);
                   setOpenDrawer(false);
                 }}
