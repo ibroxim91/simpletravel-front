@@ -37,7 +37,6 @@ import Hotel4 from '../../../../public/images/hotel4.png';
 import Statue from '../../../../public/images/statue.png';
 import { TicketsDetailAPi } from '../lib/api';
 import HotelInfoItem from './HotelInfoItem';
-import ReviewsItem from './ReviewsItem';
 import TourDayItem from './TourDayItem';
 import TourDetailLoading from './TourDetailLoading';
 import TourFoodItem from './TourFoodItem';
@@ -45,6 +44,7 @@ import TourItem from './TourItem';
 import TourOffersItem from './TourOffersItem';
 import WantHelpModal from './WantHelpModal';
 import WatchTour from './WatchTour';
+import CommentTour from './commentTour';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 40 },
@@ -234,10 +234,13 @@ export default function SingleTour() {
                         size="medium"
                         value={data.rating}
                         readOnly
+                        sx={{ color: '#F08125' }}
                         precision={0.1}
                       />
                     </div>
-                    <h1 className="text-[32px] font-bold">{data.title}</h1>
+                    <h1 className="text-[32px] txt-[#212122] font-bold">
+                      {data.title}
+                    </h1>
 
                     <div className="flex items-center gap-[8px]">
                       <LocationOnIcon sx={{ color: '#084FE3' }} />
@@ -247,12 +250,14 @@ export default function SingleTour() {
                   </div>
 
                   <div>
-                    <h1 className="text-[32px] font-bold">
+                    <h1 className="text-[32px] text-[#212122] font-bold">
                       {formatPrice(data.price, locale as LanguageRoutes, true)}
                     </h1>
                     <div className="flex items-center gap-[8px]">
                       <ErrorIcon sx={{ color: '#084FE3' }} />
-                      <p>{t('Без скрытых комиссий')}</p>
+                      <p className="text-[#646465]">
+                        {t('Без скрытых комиссий')}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -277,9 +282,9 @@ export default function SingleTour() {
                       className="flex items-center h-full gap-3 px-4 py-2 rounded-lg bg-[#EFF2F6] shadow-sm"
                     >
                       {IconComponent ? (
-                        <IconComponent className="w-5 h-5" />
+                        <IconComponent className="w-5 h-5 text-[#232325]" />
                       ) : null}
-                      <p className="text-[14px] flex-1 break-words">
+                      <p className="text-[14px] flex-1 break-words text-[#232325]">
                         {info.name}
                       </p>
                     </div>
@@ -343,7 +348,9 @@ export default function SingleTour() {
                 variants={slideIn}
                 className="mt-[60px]"
               >
-                <h1 className="text-[28px] font-bold">{t('Описание отеля')}</h1>
+                <h1 className="text-[28px] font-bold text-[#232325]">
+                  {t('Описание отеля')}
+                </h1>
                 <p className="w-full text-md mt-5 text-[#636363]">
                   {data.hotel_info}
                 </p>
@@ -433,7 +440,7 @@ export default function SingleTour() {
                       onClick={() => tourApi?.scrollPrev()}
                       disabled={!canScrollPrevTour}
                     >
-                      <KeyboardBackspaceIcon />
+                      <KeyboardBackspaceIcon sx={{ color: '#031753' }} />
                     </Button>
                     <Button
                       variant={'outline'}
@@ -441,7 +448,9 @@ export default function SingleTour() {
                       onClick={() => tourApi?.scrollNext()}
                       disabled={!canScrollNextTour}
                     >
-                      <KeyboardBackspaceIcon sx={{ rotate: '180deg' }} />
+                      <KeyboardBackspaceIcon
+                        sx={{ rotate: '180deg', color: '#031753' }}
+                      />
                     </Button>
                   </div>
                 </div>
@@ -561,7 +570,7 @@ export default function SingleTour() {
                 variants={slideIn}
                 className="mt-20"
               >
-                <h1 className="font-bold text-[28px]">
+                <h1 className="font-bold text-[28px] text-[#232325]">
                   {t('Что подают в отеле')}
                 </h1>
                 <p className="w-[50%] max-lg:w-full text-sm text-[#636363] mt-[12px]">
@@ -597,7 +606,7 @@ export default function SingleTour() {
                   viewport={{ once: false, amount: 0.2 }}
                   variants={fadeInUp}
                 >
-                  <h1 className="font-bold text-[28px]">
+                  <h1 className="font-bold text-[28px] text-[#232325]">
                     {t('Важно знать перед поездкой')}
                   </h1>
                 </motion.div>
@@ -621,7 +630,7 @@ export default function SingleTour() {
                       <h1 className="text-[24px] font-bold">
                         {t('ID Турфирмы')}
                       </h1>
-                      <p className="text-sm mt-[10px]">
+                      <p className="text-sm mt-[10px] text-[#EDEEF1]">
                         {t(
                           'Официально зарегистрированная компания в реестре туроператоров',
                         )}
@@ -629,7 +638,7 @@ export default function SingleTour() {
                     </div>
 
                     <div className="flex items-center justify-between gap-2">
-                      <div className="w-[90%] rounded-[8px] p-[10px] bg-linear-to-r from-[#2857bd] to-[#2857bb]">
+                      <div className="w-[90%] rounded-[8px] bg-[#FFFFFF1F] p-[10px] text-[#FFFFFF]">
                         {t('ID')}: {data.travel_agency_id}
                       </div>
 
@@ -665,7 +674,7 @@ export default function SingleTour() {
                     }}
                     className="w-full p-[32px] h-[360px] max-lg:h-full bg-[#FFFFFF] rounded-[20px]"
                   >
-                    <h1 className="font-bold text-[24px]">
+                    <h1 className="font-bold text-[24px] text-[#212122]">
                       {t('Требование по визе')}
                     </h1>
                     <p className="text-sm mt-[10px] text-[#636363]">
@@ -721,78 +730,7 @@ export default function SingleTour() {
           </div>
 
           <div className="mt-10 custom-container bg-[#FFFF] py-10">
-            <div className="w-full h-[229px] max-lg:h-full rounded-[24px] bg-gradient-to-r from-[#ABDAFF] to-[#F5EDC7] py-[32px]">
-              <motion.h1
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: false, amount: 0.2 }}
-                variants={{
-                  hidden: { opacity: 0, x: -60 },
-                  visible: () => ({
-                    opacity: 1,
-                    x: 0,
-                    transition: { delay: 0.5, duration: 0.5 },
-                  }),
-                }}
-                className="text-[24px] font-bold text-center mb-6"
-              >
-                {t('Отзывы наших клиентов')}
-              </motion.h1>
-              {data.ticket_comments?.length > 0 ? (
-                <Carousel
-                  className="w-full mt-4 cursor-pointer px-4"
-                  setApi={setApi}
-                >
-                  <CarouselContent>
-                    {data.ticket_comments?.map((item, key) => (
-                      <CarouselItem
-                        key={item.user.id}
-                        className={
-                          'flex flex-col w-auto basis-1/3 max-lg:basis-1/2 max-md:basis-[70%] shrink-0 font-medium'
-                        }
-                      >
-                        <motion.div
-                          key={key}
-                          custom={key}
-                          initial="hidden"
-                          whileInView="visible"
-                          viewport={{ once: false, amount: 0.2 }}
-                          variants={{
-                            hidden: { opacity: 0, y: 40 },
-                            visible: (i: number) => ({
-                              opacity: 1,
-                              y: 0,
-                              transition: { delay: i * 0.1, duration: 0.5 },
-                            }),
-                          }}
-                        >
-                          <ReviewsItem key={key} data={item} />
-                        </motion.div>
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                </Carousel>
-              ) : (
-                <>
-                  <motion.div
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: false, amount: 0.2 }}
-                    variants={{
-                      hidden: { opacity: 0, y: 40 },
-                      visible: (i: number) => ({
-                        opacity: 1,
-                        y: 0,
-                        transition: { delay: i * 0.1, duration: 0.5 },
-                      }),
-                    }}
-                    className="text-xl font-medium w-full h-full flex justify-center items-center"
-                  >
-                    {t('Пока нет комментариев')}
-                  </motion.div>
-                </>
-              )}
-            </div>
+            <CommentTour data={data} />
             <div className="mt-10">
               <div className="custom-container flex justify-between items-center">
                 <motion.h1
@@ -807,7 +745,7 @@ export default function SingleTour() {
                       transition: { delay: 0.5, duration: 0.5 },
                     }),
                   }}
-                  className="text-3xl text-[#031753] font-semibold"
+                  className="text-3xl text-[#232325] font-semibold"
                 >
                   {t('Откройте новые направления')}
                 </motion.h1>
@@ -823,23 +761,25 @@ export default function SingleTour() {
                       transition: { delay: 0.5, duration: 0.5 },
                     }),
                   }}
-                  className="flex gap-4"
+                  className="flex gap-2"
                 >
                   <Button
                     variant={'outline'}
-                    className="rounded-full w-10 h-10 max-lg:hidden"
+                    className="rounded-xl w-10 h-10 max-lg:hidden bg-[#F8F8F8] border-[#CBD5E0]"
                     onClick={() => api?.scrollPrev()}
                     disabled={!canScrollPrev}
                   >
-                    <KeyboardBackspaceIcon />
+                    <KeyboardBackspaceIcon sx={{ color: '#939BA4' }} />
                   </Button>
                   <Button
                     variant={'outline'}
-                    className="rounded-full w-10 h-10 max-lg:hidden"
+                    className="rounded-xl w-10 h-10 max-lg:hidden border-[#CBD5E0]"
                     onClick={() => api?.scrollNext()}
                     disabled={!canScrollNext}
                   >
-                    <KeyboardBackspaceIcon sx={{ rotate: '180deg' }} />
+                    <KeyboardBackspaceIcon
+                      sx={{ rotate: '180deg', color: '#939BA4' }}
+                    />
                   </Button>
                 </motion.div>
               </div>

@@ -69,7 +69,7 @@ const BlogDetail = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3 }}
-              className="font-semibold text-2xl"
+              className="font-semibold text-2xl text-[#232325]"
             >
               {newsData?.title}
             </motion.p>
@@ -79,7 +79,6 @@ const BlogDetail = () => {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3, delay: 0.1 }}
             >
-              {/* ⚡ Optimized image loading */}
               <Image
                 src={newsData?.image || ''}
                 alt={newsData?.text || ''}
@@ -210,7 +209,7 @@ const BlogDetail = () => {
                           </div>
                         </div>
 
-                        <div className="w-[80%] bg-[#ECF2FF] font-semibold mt-4 mx-auto py-3 mb-3 rounded-4xl text-center text-blue-600 hover:bg-blue-100 transition-colors">
+                        <div className="w-[80%] bg-[#ECF2FF] font-semibold mt-4 mx-auto py-3 mb-3 rounded-4xl text-center text-[#084FE3] hover:bg-blue-100 transition-colors">
                           {t('Узнать больше')}
                         </div>
                       </Link>

@@ -92,7 +92,7 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
           )}
         >
           <FavoriteRoundedIcon
-            sx={{ color: data.is_liked ? '#E03137' : '#000' }}
+            sx={{ color: data.is_liked ? '#E03137' : '#212122' }}
           />
         </Button>
         <div className="h-full aspect-square rounded-3xl w-[40%] relative max-lg:w-full">
@@ -161,11 +161,11 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
               </div>
               <ul className="flex items-center text-[12px] gap-8 text-center">
                 <li className="flex items-center gap-2">
-                  <User color="#1764FC" className="size-5" />
+                  <User color="#084FE3" className="size-5" />
                   {data.passenger_count}
                 </li>
                 <li className="flex items-center gap-2">
-                  <CalendarDays color="#1764FC" className="size-5" />
+                  <CalendarDays color="#084FE3" className="size-5" />
                   {data.duration_days}
                 </li>
               </ul>

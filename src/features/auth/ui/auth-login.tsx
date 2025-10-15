@@ -142,17 +142,19 @@ const AuthLogin = () => {
         defaultValue="phone"
         className="w-[50%] bg-white rounded-3xl h-fit py-5 px-10 absolute bottom-0 top-52 max-md:px-2 max-sm:top-16 max-lg:w-[90%] left-1/2 -translate-x-1/2"
       >
-        <p className="text-xl font-semibold">{t('Profilga kirish')}</p>
+        <p className="text-xl font-semibold text-[#212122]">
+          {t('Profilga kirish')}
+        </p>
         <TabsList className="mt-2 w-full !bg-white h-[50px] !p-0.5 border-2 rounded-xl">
           <TabsTrigger
             value="phone"
-            className="font-medium text-md data-[state=active]:bg-[#EDEEF1] cursor-pointer !shadow-none rounded-lg"
+            className="font-medium text-md data-[state=active]:bg-[#EDEEF1] cursor-pointer !shadow-none rounded-lg text-[#212122]"
           >
             {t('Hомер телефона')}
           </TabsTrigger>
           <TabsTrigger
             value="email"
-            className="font-medium text-md cursor-pointer data-[state=active]:bg-[#EDEEF1] !shadow-none rounded-lg"
+            className="font-medium text-md data-[state=active]:bg-[#EDEEF1] cursor-pointer !shadow-none rounded-lg text-[#212122]"
           >
             {t('Вход по E-mail')}
           </TabsTrigger>
@@ -169,7 +171,7 @@ const AuthLogin = () => {
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <Label className="text-md font-semibold">
+                    <Label className="text-md font-semibold text-[#212122]">
                       {t('Hомер телефона')}
                     </Label>
                     <FormControl>
@@ -181,7 +183,7 @@ const AuthLogin = () => {
                           field.onChange(formatPhone(e.target.value))
                         }
                         maxLength={19}
-                        className="h-[60px] !text-lg rounded-xl"
+                        className="h-[60px] !text-lg rounded-xl text-[#212122] placeholder:text-[#646465]"
                       />
                     </FormControl>
                     <FormMessage />
@@ -193,14 +195,14 @@ const AuthLogin = () => {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <Label className="text-lg font-semibold">
+                    <Label className="text-lg font-semibold text-[#212122]">
                       {t('Parol')}
                     </Label>
                     <FormControl>
                       <Input
                         placeholder={t('Введите пароль (минимум 8 символов)')}
                         {...field}
-                        className="h-[60px] rounded-xl focus:!ring-0 !text-md"
+                        className="h-[60px] rounded-xl focus:!ring-0 !text-md text-[#212122] placeholder:text-[#646465]"
                       />
                     </FormControl>
                     <FormMessage />
@@ -239,14 +241,14 @@ const AuthLogin = () => {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <Label className="text-md font-semibold">
+                    <Label className="text-md font-semibold text-[#212122]">
                       {t('E-mail')}
                     </Label>
                     <FormControl>
                       <Input
                         placeholder={t('Введите ваш E-mail')}
                         {...field}
-                        className="h-[60px] !text-lg rounded-xl"
+                        className="h-[60px] !text-lg rounded-xl text-[#212122] placeholder:text-[#646465]"
                       />
                     </FormControl>
                     <FormMessage />
@@ -258,14 +260,14 @@ const AuthLogin = () => {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <Label className="text-lg font-semibold">
+                    <Label className="text-lg font-semibold text-[#212122]">
                       {t('Parol')}
                     </Label>
                     <FormControl>
                       <Input
                         placeholder={t('Введите пароль (минимум 8 символов)')}
                         {...field}
-                        className="h-[60px] rounded-xl focus:!ring-0 !text-md"
+                        className="h-[60px] rounded-xl focus:!ring-0 !text-md text-[#212122] placeholder:text-[#646465]"
                       />
                     </FormControl>
                     <FormMessage />

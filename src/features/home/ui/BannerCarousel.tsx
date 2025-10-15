@@ -48,7 +48,7 @@ const BannerCarousel = () => {
                     transition={{ duration: 0.8, delay: 0.1 }}
                     className="flex flex-col gap-6 w-96 z-20 absolute left-14 top-1/2 -translate-y-1/2"
                   >
-                    <p className="text-4xl font-semibold">
+                    <p className="text-4xl font-semibold text-[#232325]">
                       {t('Предложение дня: только сегодня!')}
                     </p>
                     <p className="text-[#212122] font-medium">
@@ -56,7 +56,7 @@ const BannerCarousel = () => {
                     </p>
                     <Link
                       href="/selectour"
-                      className="bg-white text-black font-semibold flex gap-4 px-8 py-4 shadow-sm !rounded-4xl w-fit"
+                      className="bg-white text-[#212122] font-semibold flex gap-4 px-8 py-4 shadow-sm !rounded-4xl w-fit"
                     >
                       <p>{t('Смотреть цены')}</p>
                       <EastIcon />

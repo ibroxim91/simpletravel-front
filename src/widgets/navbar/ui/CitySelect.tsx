@@ -115,10 +115,10 @@ const CitySelect = () => {
           onClick={(e) => e.stopPropagation()}
         >
           <div className="relative mb-2">
-            <SearchIcon className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400" />
+            <SearchIcon className="absolute left-2 top-1/2 -translate-y-1/2 text-[#909091]" />
             <Input
               placeholder="Укажите город"
-              className="w-full pl-10 text-black"
+              className="w-full pl-10 text-[#212122] placeholder:text-[#909091]"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -128,7 +128,7 @@ const CitySelect = () => {
             filteredCities.map((cityName) => (
               <div
                 key={cityName}
-                className="p-2 hover:bg-gray-200 rounded-lg text-black items-center cursor-pointer flex justify-between"
+                className="p-2 hover:bg-gray-200 rounded-lg text-[#212122] items-center cursor-pointer flex justify-between"
                 onClick={() => {
                   setSelectedCity(cityName);
                   setStoreWhere(cityName);
@@ -144,7 +144,7 @@ const CitySelect = () => {
               </div>
             ))
           ) : (
-            <div className="p-2 text-black">{t('Не найдено')}</div>
+            <div className="p-2 text-[#212122]">{t('Не найдено')}</div>
           )}
         </div>
       )}

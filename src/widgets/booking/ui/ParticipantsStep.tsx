@@ -12,7 +12,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@/shared/ui/form';
 import { Input } from '@/shared/ui/input';
@@ -199,7 +198,6 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                     type="button"
                     onClick={() => {
                       remove(index);
-                      // ✅ userIds dan ham o'chiramiz
                       setUserIds((prev) => prev.filter((_, i) => i !== index));
                     }}
                     className="flex gap-4 text-white bg-red-500 px-5 py-3 rounded-3xl"
@@ -210,7 +208,7 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                 )}
               </div>
               <div className="flex items-center justify-between max-lg:flex-col max-lg:items-start max-lg:gap-4">
-                <h1 className="font-bold text-xl">
+                <h1 className="font-bold text-xl text-[#212122]">
                   {t('Участник')} {index + 1}
                 </h1>
                 <Select
@@ -258,7 +256,10 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                   }}
                 >
                   <SelectTrigger className="w-60 max-lg:w-full">
-                    <SelectValue placeholder={t('Сохранённые попутчики')} />
+                    <SelectValue
+                      className="text-[#909091]"
+                      placeholder={t('Сохранённые попутчики')}
+                    />
                     <KeyboardArrowDownIcon />
                   </SelectTrigger>
 
@@ -285,13 +286,13 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                         )),
                       )
                     ) : (
-                      <div className="text-center text-gray-500 p-3">
+                      <div className="text-center text-[#909091] p-3">
                         {t('Нет сохранённых участников')}
                       </div>
                     )}
 
                     {isFetchingNextPage && (
-                      <div className="text-center p-2 text-gray-500 text-sm">
+                      <div className="text-center p-2 text-[#909091] text-sm">
                         {t('Загрузка...')}
                       </div>
                     )}
@@ -303,10 +304,12 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                 name={`participants.${index}.gender`}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('Пол')}</FormLabel>
+                    <Label className="!text-[#121212] text-lg">
+                      {t('Пол')}
+                    </Label>
                     <FormControl>
                       <div className="flex items-center gap-8 mt-2 max-sm:flex-col max-sm:items-start">
-                        <label className="flex items-center gap-2 cursor-pointer">
+                        <label className="flex items-center gap-2 cursor-pointer text-[#646465]">
                           <Input
                             type="radio"
                             value="male"
@@ -316,7 +319,7 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                           />
                           {t('Мужчина')}
                         </label>
-                        <label className="flex items-center gap-2 cursor-pointer">
+                        <label className="flex items-center gap-2 cursor-pointer text-[#646465]">
                           <Input
                             type="radio"
                             value="female"
@@ -338,7 +341,7 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                   name={`participants.${index}.firstName`}
                   render={({ field }) => (
                     <FormItem>
-                      <Label className="text-lg font-semibold">
+                      <Label className="text-lg text-[#121212] font-semibold">
                         {t('Имя')}
                       </Label>
                       <FormControl>
@@ -346,7 +349,7 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                           {...field}
                           type="text"
                           placeholder={t('Введите имя')}
-                          className="px-5 h-14 rounded-lg"
+                          className="px-5 h-14 rounded-lg placeholder:text-[#A3A3A3]"
                         />
                       </FormControl>
                       <FormMessage />
@@ -358,7 +361,7 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                   name={`participants.${index}.lastName`}
                   render={({ field }) => (
                     <FormItem>
-                      <Label className="text-lg font-semibold">
+                      <Label className="text-lg font-semibold text-[#121212]">
                         {t('Фамилия')}
                       </Label>
                       <FormControl>
@@ -366,7 +369,7 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                           {...field}
                           type="text"
                           placeholder={t('Введите фамилию')}
-                          className="p-5 rounded-lg h-14"
+                          className="p-5 rounded-lg h-14 placeholder:text-[#A3A3A3]"
                         />
                       </FormControl>
                       <FormMessage />
@@ -380,7 +383,9 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                   name={`participants.${index}.date`}
                   render={({ field }) => (
                     <FormItem>
-                      <Label className="text-lg">{t('Дата рождения')}</Label>
+                      <Label className="text-lg font-semibold text-[#121212]">
+                        {t('Дата рождения')}
+                      </Label>
                       <FormControl>
                         <div>
                           <div className="max-lg:hidden">
@@ -397,7 +402,7 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                                 <button
                                   className={cn(
                                     'w-full justify-start text-left cursor-pointer relative font-normal border-2 h-full border-[#EDEEF1] rounded-md p-[12px]',
-                                    !field.value && 'text-muted-foreground',
+                                    !field.value && 'text-[#A3A3A3]',
                                   )}
                                 >
                                   <CalendarMonthIcon
@@ -406,6 +411,7 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                                       height: '28px',
                                       position: 'absolute',
                                       right: 10,
+                                      color: '#121212',
                                     }}
                                   />
                                   {field.value
@@ -505,7 +511,7 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                   name={`participants.${index}.phone`}
                   render={({ field }) => (
                     <FormItem>
-                      <Label className="text-lg font-semibold">
+                      <Label className="text-lg font-semibold text-[#121212]">
                         {t('Телефон номер')}
                       </Label>
                       <FormControl>
@@ -674,13 +680,13 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                 });
                 setUserIds((prev) => [...prev, undefined]);
               }}
-              className="flex items-center gap-2 bg-white border px-6 py-3 rounded-full cursor-pointer"
+              className="flex items-center gap-2 bg-white text-[#031753] border border-[#DFDFDF] px-6 py-3 rounded-full cursor-pointer"
             >
               <Plus /> {t('Новый участник')}
             </button>
             <button
               type="submit"
-              className="bg-[#084FE3] text-white px-10 py-4 rounded-full cursor-pointer"
+              className="bg-[#1764FC] text-white px-14 py-4 rounded-full cursor-pointer"
             >
               {t('Следующий')}
             </button>

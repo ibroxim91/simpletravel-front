@@ -80,8 +80,8 @@ const BlogHeader = () => {
               className={`cursor-pointer flex-none text-center font-semibold py-2 px-6 rounded-lg min-w-[100px] transition 
                 ${
                   active === String('')
-                    ? 'bg-white text-black font-medium'
-                    : 'bg-white/20 text-white'
+                    ? 'bg-white text-[#212122] font-medium'
+                    : 'bg-[#FFFFFF29] text-[#EDEEF1]'
                 }`}
             >
               <p className="font-semibold">{t(`Все`)}</p>
@@ -93,8 +93,8 @@ const BlogHeader = () => {
                 className={`cursor-pointer flex-none text-center font-semibold py-2 px-6 rounded-lg min-w-[100px] transition 
                 ${
                   active === String(item.id)
-                    ? 'bg-white text-black font-medium'
-                    : 'bg-white/20 text-white'
+                    ? 'bg-white text-[#212122] font-medium'
+                    : 'bg-[#FFFFFF29] text-[#EDEEF1]'
                 }`}
               >
                 <p className="font-semibold">{item.name}</p>

@@ -114,8 +114,8 @@ const Navbar = () => {
                     className={clsx(
                       'h-full xl:text-lg flex items-center font-medium text-md',
                       pathname === href
-                        ? 'text-blue-600 border-b border-b-blue-600 underline-offset-4'
-                        : 'text-black hover:text-blue-600',
+                        ? 'text-[#084FE3] border-b-2 border-[#084FE3] underline-offset-4'
+                        : 'text-[#212122] hover:text-[#084FE3]',
                     )}
                   >
                     <Link href={href}>{t(label)}</Link>
@@ -136,7 +136,7 @@ const Navbar = () => {
                   }}
                 >
                   <FavoriteIcon
-                    sx={{ color: 'black', width: '24px', height: '24px' }}
+                    sx={{ color: '#212122', width: '24px', height: '24px' }}
                   />
                 </IconButton>
               </Link>
@@ -146,7 +146,11 @@ const Navbar = () => {
                   <Button
                     variant="contained"
                     size="large"
-                    sx={{ borderRadius: '34px', gap: '8px' }}
+                    sx={{
+                      borderRadius: '34px',
+                      gap: '8px',
+                      background: '#084FE3',
+                    }}
                   >
                     <PersonIcon
                       sx={{ color: 'white', width: '24px', height: '24px' }}
@@ -159,7 +163,11 @@ const Navbar = () => {
                   <Button
                     variant="contained"
                     size="large"
-                    sx={{ borderRadius: '34px', gap: '8px' }}
+                    sx={{
+                      borderRadius: '34px',
+                      gap: '8px',
+                      background: '#084FE3',
+                    }}
                   >
                     <PersonIcon
                       sx={{ color: 'white', width: '24px', height: '24px' }}

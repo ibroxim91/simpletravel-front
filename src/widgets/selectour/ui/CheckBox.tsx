@@ -46,7 +46,7 @@ function CheckboxFilter<T extends string | string[] | null>({
           }
         }}
       />
-      <Label className="text-gray-700 text-md cursor-pointer" htmlFor={label}>
+      <Label className="text-[#373739] text-md cursor-pointer" htmlFor={label}>
         {label}
       </Label>
     </label>

@@ -99,10 +99,10 @@ const PopulardestinationsMboile = () => {
               href="/selectour"
               className="bg-[#ECF2FF] w-fit py-3 px-5 rounded-4xl flex gap-4"
             >
-              <p className="text-blue-600 font-semibold">
+              <p className="text-[#084FE3] font-semibold">
                 {t('Забронировать')}
               </p>
-              <ArrowRightAltIcon className="text-blue-600" />
+              <ArrowRightAltIcon className="text-[#084FE3]" />
             </Link>
           </div>
           <div className="w-full h-[80%] max-sm:h-[70%] max-md:h[100%] max-sm:top-96 overflow-hidden absolute left-0 bottom-0 top-64">

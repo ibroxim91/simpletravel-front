@@ -78,7 +78,7 @@ const MobileNavbar = ({ setOpen, open }: Props) => {
         </div>
       </div>
       <div className="flex gap-2 items-start mt-4 custom-container justify-start h-full flex-col">
-        <p className="text-xl font-semibold">{t('Меню')}</p>
+        <p className="text-xl text-[#212122] font-semibold">{t('Меню')}</p>
         {links.map(({ href, label }) => (
           <Link
             href={href}
@@ -87,8 +87,8 @@ const MobileNavbar = ({ setOpen, open }: Props) => {
             className={clsx(
               'w-full py-4 px-4 rounded-2xl sticky z-30',
               pathname === href
-                ? 'bg-blue-500 text-white shadow-sm'
-                : 'bg-[#F8F8F8] text-black shadow-sm',
+                ? 'bg-[#084FE3] text-[#FFFFFF] shadow-sm'
+                : 'bg-[#F8F8F8] text-[#212122] shadow-sm',
             )}
           >
             {t(label)}
@@ -96,10 +96,10 @@ const MobileNavbar = ({ setOpen, open }: Props) => {
         ))}
         <Link
           href={'mailto:Tourex@gmail.com'}
-          className="flex gap-2 text-black items-center"
+          className="flex gap-2 text-[#212122] items-center"
         >
           <EmailIcon sx={{ color: '#084FE3', width: '26px', height: '26px' }} />
-          <p className="text-sm">Tourex@gmail.com</p>
+          <p className="text-sm text-[#212122]">Tourex@gmail.com</p>
         </Link>
         <Link
           href={'tel:+998902222922'}
@@ -108,7 +108,7 @@ const MobileNavbar = ({ setOpen, open }: Props) => {
           <LocalPhoneIcon
             sx={{ color: '#084FE3', width: '26px', height: '26px' }}
           />
-          <p className="text-sm">90 222 29 22</p>
+          <p className="text-sm text-[#212122]">90 222 29 22</p>
         </Link>
       </div>
     </Drawer>

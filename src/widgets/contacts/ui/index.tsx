@@ -155,7 +155,7 @@ export default function Contacts() {
                           <Input
                             {...field}
                             placeholder={t('Введите Имя')}
-                            className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
+                            className="h-[60px] px-4 font-medium !text-lg rounded-xl text-[#212122] placeholder:text-[#646465]"
                           />
                         </FormControl>
                         <FormMessage />
@@ -179,7 +179,7 @@ export default function Contacts() {
                               field.onChange(formatPhone(e.target.value))
                             }
                             maxLength={19}
-                            className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
+                            className="h-[60px] px-4 font-medium !text-lg rounded-xl text-[#212122] placeholder:text-[#646465]"
                           />
                         </FormControl>
                         <FormMessage />

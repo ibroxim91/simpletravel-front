@@ -133,7 +133,9 @@ const WantHelpModal = ({
 
               {!loading && !success && !error && (
                 <>
-                  <p className="text-3xl">{t('Нужна помощь?')}</p>
+                  <p className="text-3xl text-[#121212]">
+                    {t('Нужна помощь?')}
+                  </p>
                   <DialogClose asChild>
                     <Button
                       variant={'outline'}
@@ -142,7 +144,7 @@ const WantHelpModal = ({
                         setLoading(false);
                         form.reset();
                       }}
-                      className="rounded-full p-6 h-12 w-12"
+                      className="rounded-full p-6 h-12 w-12 text-[#121212]"
                     >
                       <CloseIcon sx={{ width: 26, height: 26 }} />
                     </Button>
@@ -228,7 +230,7 @@ const WantHelpModal = ({
                             <Input
                               {...field}
                               placeholder={t('Введите имя')}
-                              className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
+                              className="h-[60px] px-4 font-medium !text-lg rounded-xl text-[#121212] placeholder:text-[#646465]"
                             />
                           </FormControl>
                           <FormMessage />
@@ -252,7 +254,7 @@ const WantHelpModal = ({
                                 field.onChange(formatPhone(e.target.value))
                               }
                               maxLength={19}
-                              className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
+                              className="h-[60px] px-4 font-medium !text-lg rounded-xl text-[#121212]"
                             />
                           </FormControl>
                           <FormMessage />
@@ -262,7 +264,7 @@ const WantHelpModal = ({
                     <div className="flex gap-4 items-center">
                       <Button
                         type="submit"
-                        className="px-10 py-8 rounded-4xl text-lg font-medium cursor-pointer"
+                        className="px-14 py-8 rounded-4xl text-lg font-medium cursor-pointer bg-[#1764FC]"
                       >
                         {isPending ? (
                           <LoaderCircle className="animate-spin" />
@@ -311,7 +313,9 @@ const WantHelpModal = ({
       >
         {!success && !error && !loading && (
           <div className="flex justify-between items-center p-4">
-            <p className="text-2xl font-semibold">{t('Нужна помощь?')}</p>
+            <p className="text-2xl font-semibold text-[#121212]">
+              {t('Нужна помощь?')}
+            </p>
             <Button
               variant="outline"
               onClick={() => {
@@ -323,7 +327,7 @@ const WantHelpModal = ({
               }}
               className="rounded-full h-12 w-12"
             >
-              <CloseIcon sx={{ width: 26, height: 26 }} />
+              <CloseIcon sx={{ width: 26, height: 26, color: '#121212' }} />
             </Button>
           </div>
         )}
@@ -414,7 +418,7 @@ const WantHelpModal = ({
                           <Input
                             {...field}
                             placeholder={t('Введите название вашей компании')}
-                            className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
+                            className="h-[60px] px-4 font-medium !text-lg rounded-xl text-[#121212] placeholder:text-[#A3A3A3]"
                           />
                         </FormControl>
                         <FormMessage />
@@ -433,7 +437,7 @@ const WantHelpModal = ({
                           <Input
                             {...field}
                             placeholder={t('Введите ваш номер телефона')}
-                            className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
+                            className="h-[60px] px-4 font-medium !text-lg rounded-xl text-[#121212] placeholder:text-[#A3A3A3]"
                           />
                         </FormControl>
                         <FormMessage />
@@ -441,10 +445,10 @@ const WantHelpModal = ({
                     )}
                   />
                 </div>
-                <div className="flex flex-col gap-4 items-center">
+                <div className="flex flex-col gap-4 items-center mb-4">
                   <Button
                     type="submit"
-                    className="px-10 py-8 rounded-4xl w-full text-lg font-medium cursor-pointer"
+                    className="px-10 py-8 rounded-4xl w-full text-lg font-medium cursor-pointer bg-[#1764FC]"
                   >
                     {t('Отправить')}
                   </Button>

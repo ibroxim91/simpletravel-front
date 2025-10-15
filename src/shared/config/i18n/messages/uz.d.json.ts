@@ -338,6 +338,7 @@ declare const messages: {
   "Добавьте своего первого попутчика": "Birga rejalashtirish uchun birinchi hamrohingizni kiriting",
   "Profilga kirish": "Profilga kirish",
   "Kirish": "Kirish",
+  "Пока нет бронирования": "Hozircha bandlov yo‘q",
   "Kutimoqda": "Kutimoqda",
   "Tasdiqlanmoqda": "Tasdiqlanmoqda",
   "Bekor qilingan": "Bekor qilingan",

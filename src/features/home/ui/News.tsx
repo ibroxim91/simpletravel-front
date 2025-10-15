@@ -31,7 +31,7 @@ const News = () => {
         <p className="text-3xl text-[#031753] font-semibold">{t('Новости')}</p>
         <Link
           href={'/blogs'}
-          className="cursor-pointer font-semibold text-blue-600 max-lg:hidden"
+          className="cursor-pointer font-semibold text-[#1764FC] max-lg:hidden"
         >
           {t('Больше новостей')}
         </Link>
@@ -112,7 +112,7 @@ const News = () => {
                       transition={{ duration: 0.5, delay: idx * 0.25 }}
                       className="flex px-8"
                     >
-                      <button className="bg-[#ECF2FF] font-semibold mt-4 w-full py-3 rounded-4xl text-center text-blue-600 hover:bg-blue-100 transition-colors">
+                      <button className="bg-[#ECF2FF] font-semibold mt-4 w-full py-3 rounded-4xl text-center text-[#084FE3] hover:bg-blue-100 transition-colors">
                         {t('Узнать больше')}
                       </button>
                     </motion.div>

@@ -173,8 +173,8 @@ export default function ServicesStep({
   return (
     <div>
       <div className="w-full bg-[#FFFFFF] p-[20px] rounded-[20px] relative">
-        <h1 className="text-[20px] font-bold">{t('Услуги')}</h1>
-        <hr className="h-[2px] my-[24px] bg-[#EDEEF1]" />
+        <h1 className="text-[20px] font-bold text-[#212122]">{t('Услуги')}</h1>
+        <hr className="h-[2px] my-[24px] bg-[#DFDFDF]" />
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -183,7 +183,7 @@ export default function ServicesStep({
               name={`excursions`}
               render={() => (
                 <FormItem>
-                  <Label className="text-xl font-medium">
+                  <Label className="text-xl font-medium text-[#121212]">
                     {t('Экскурсии')}
                   </Label>
                   <FormControl>
@@ -227,7 +227,7 @@ export default function ServicesStep({
             />
 
             <div>
-              <Label className="text-xl font-medium">
+              <Label className="text-xl font-medium text-[#121212]">
                 {t('Дополнительные услуги')}
               </Label>
               <div className="mt-[8px] grid grid-cols-2 gap-[16px] max-lg:grid-cols-1">
@@ -272,7 +272,7 @@ export default function ServicesStep({
         </button>
         <button
           onClick={form.handleSubmit(onSubmit)}
-          className="bg-[#084FE3] text-white py-4 cursor-pointer font-medium px-20 rounded-full mt-[20px]"
+          className="bg-[#1764FC] text-white py-4 cursor-pointer font-medium px-20 rounded-full mt-[20px]"
         >
           {isPending ? (
             <LoaderCircle className="animate-spin" />

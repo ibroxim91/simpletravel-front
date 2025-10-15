@@ -159,7 +159,9 @@ export default function ImageSwiper({
               onClick={() => setOpenWatch(true)}
             >
               <AspectRatioIcon />
-              <p className="max-lg:hidden">{t('Полный обзор')}</p>
+              <p className="max-lg:hidden text-[#FFFFFF]">
+                {t('Полный обзор')}
+              </p>
             </div>
 
             <div

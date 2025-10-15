@@ -27,7 +27,10 @@ const ServiceTab = ({ faqs }: { faqs: FaqData }) => {
               },
             }}
           >
-            <Typography component="span" sx={{ fontWeight: 600 }}>
+            <Typography
+              component="span"
+              sx={{ fontWeight: 600, color: '#212122' }}
+            >
               {e.title}
             </Typography>
           </AccordionSummary>

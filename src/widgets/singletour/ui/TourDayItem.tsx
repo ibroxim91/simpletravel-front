@@ -37,10 +37,12 @@ export default function TourDayItem({ isLast, isFirst, data }: Props) {
         </div>
 
         <div>
-          <h1 className="text-2xl font-semibold">{data.title}</h1>
+          <h1 className="text-2xl font-semibold text-[#232325]">
+            {data.title}
+          </h1>
           <ul className="flex list-disc list-inside items-center gap-[16px] mt-[16px] text-sm text-[#636363] max-lg:flex-col max-lg:items-start">
             {data.ticket_itinerary_destinations.map((e) => (
-              <li className="marker:text-[#084FE3]" key={e.name}>
+              <li className="marker:text-[#084FE3] text-[#636363]" key={e.name}>
                 {e.name}
               </li>
             ))}

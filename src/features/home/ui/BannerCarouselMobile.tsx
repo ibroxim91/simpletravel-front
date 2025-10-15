@@ -40,7 +40,7 @@ const BannerCarouselMobile = () => {
                 </div>
 
                 <div className="flex flex-col gap-3 w-[90%] z-20 absolute bottom-20 max-md:bottom-5 px-4 py-1">
-                  <p className="text-3xl font-semibold leading-snug text-black">
+                  <p className="text-3xl font-semibold leading-snug text-[#232325]">
                     {t('Предложение дня: только сегодня!')}
                   </p>
                   <p className="text-lg text-[#212122] leading-5 font-medium">
@@ -49,10 +49,12 @@ const BannerCarouselMobile = () => {
 
                   <Link
                     href={'/selectour'}
-                    className="bg-white text-black flex items-center gap-3 px-5 py-3 shadow-md rounded-full w-fit font-semibold"
+                    className="bg-white text-[#212122] flex items-center gap-3 px-5 py-3 shadow-md rounded-full w-fit font-semibold"
                     aria-label="Смотреть цены"
                   >
-                    <span className="text-sm">{t('Смотреть цены')}</span>
+                    <span className="text-sm text-[#212122]">
+                      {t('Смотреть цены')}
+                    </span>
                     <EastIcon fontSize="small" />
                   </Link>
                 </div>

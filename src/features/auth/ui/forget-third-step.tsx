@@ -89,7 +89,9 @@ const ForgetThirdStep = () => {
 
   return (
     <div className="w-[50%] bg-white rounded-3xl h-fit py-5 px-10 absolute bottom-0 top-52 max-md:px-2 max-sm:top-16 max-lg:w-[90%] left-1/2 -translate-x-1/2">
-      <p className="text-xl font-semibold">{t('Изменить пароль')}</p>
+      <p className="text-xl font-semibold text-[#212122]">
+        {t('Изменить пароль')}
+      </p>
       <p className="mt-2 text-md w-full break-words text-[#646465]">
         {t('Измените пароль, чтобы обеспечить безопасность вашего аккаунта')}
       </p>
@@ -100,14 +102,14 @@ const ForgetThirdStep = () => {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <Label className="text-lg font-semibold">
+                <Label className="text-lg font-semibold text-[#212122]">
                   {t('Новый пароль')}
                 </Label>
                 <FormControl>
                   <Input
                     placeholder={t('Введите пароль (минимум 8 символов)')}
                     {...field}
-                    className="h-[60px] rounded-xl focus:!ring-0 !text-md"
+                    className="h-[60px] rounded-xl focus:!ring-0 !text-md text-[#212122] placeholder:text-[#646465]"
                   />
                 </FormControl>
                 <FormMessage />
@@ -120,14 +122,14 @@ const ForgetThirdStep = () => {
             name="confirmPassword"
             render={({ field }) => (
               <FormItem>
-                <Label className="text-lg font-semibold">
+                <Label className="text-lg font-semibold text-[#212122]">
                   {t('Подтвердите пароль')}
                 </Label>
                 <FormControl>
                   <Input
                     placeholder={t('Повторите пароль')}
                     {...field}
-                    className="h-[60px] rounded-xl focus:!ring-0 !text-md"
+                    className="h-[60px] rounded-xl focus:!ring-0 !text-md text-[#212122] placeholder:text-[#646465]"
                   />
                 </FormControl>
                 <FormMessage />

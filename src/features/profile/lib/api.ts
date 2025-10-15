@@ -119,14 +119,12 @@ interface GetOrderId {
     destination: string;
     departure_date: string;
     arrival_time: string;
-    participant: [
-      {
-        id: number;
-        first_name: string;
-        last_name: string;
-        gender: 'male' | 'female';
-      },
-    ];
+    participant: {
+      id: number;
+      first_name: string;
+      last_name: string;
+      gender: 'male' | 'female';
+    }[];
     ticket: {
       id: number;
       title: string;
@@ -135,19 +133,15 @@ interface GetOrderId {
     };
     tariff: string;
     transport: string;
-    extra_service: [
-      {
-        id: number;
-        name: string;
-      },
-    ];
-    extra_paid_service: [
-      {
-        id: number;
-        name: string;
-        price: number;
-      },
-    ];
+    extra_service: {
+      id: number;
+      name: string;
+    }[];
+    extra_paid_service: {
+      id: number;
+      name: string;
+      price: number;
+    }[];
     total_price: number;
     order_status: string;
   };

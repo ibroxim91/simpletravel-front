@@ -74,7 +74,7 @@ const SearchTours = () => {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-white text-4xl font-semibold"
+              className="text-[#FFFFFF] text-4xl font-semibold"
             >
               {t('Предложение дня: только сегодня!')}
             </motion.p>
@@ -82,7 +82,7 @@ const SearchTours = () => {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-gray-300 text-xl"
+              className="text-[#ECF2FF] text-xl"
             >
               {t('Лучшие направления по самым выгодным ценам')}
             </motion.p>
@@ -93,7 +93,7 @@ const SearchTours = () => {
             >
               <Link
                 href={'/selectour'}
-                className="bg-white mt-5 font-semibold text-black flex gap-4 px-8 py-4 shadow-sm !rounded-4xl w-fit"
+                className="bg-white mt-5 font-semibold text-[#212122] flex gap-4 px-8 py-4 shadow-sm !rounded-4xl w-fit"
               >
                 <p>{t('Смотреть цены')}</p>
                 <EastIcon />
@@ -107,7 +107,7 @@ const SearchTours = () => {
             <button
               onClick={() => setActive('tours')}
               className={`flex items-center justify-center gap-2 px-4 py-2 rounded-4xl font-semibold cursor-pointer transition
-                ${active === 'tours' ? 'bg-blue-600 text-white' : 'text-black'}`}
+                ${active === 'tours' ? 'bg-[#084FE3] text-white' : 'text-black'}`}
             >
               <LuggageIcon />
               <p>{t('Туры')}</p>
@@ -116,7 +116,7 @@ const SearchTours = () => {
             <button
               onClick={() => setActive('hotel')}
               className={`flex items-center justify-center gap-2 px-4 py-2 rounded-4xl font-semibold cursor-pointer transition
-                ${active === 'hotel' ? 'bg-blue-600 text-white' : 'text-black'}`}
+                ${active === 'hotel' ? 'bg-[#084FE3] text-white' : 'text-black'}`}
             >
               <HotelIcon />
               <p>{t('Отели')}</p>

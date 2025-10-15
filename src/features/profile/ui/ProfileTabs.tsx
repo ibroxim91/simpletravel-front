@@ -12,7 +12,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@/shared/ui/form';
 import { Input } from '@/shared/ui/input';
@@ -238,31 +237,31 @@ const ProfileTabs = () => {
             <TabsList className="!flex !flex-col w-[350px] bg-[#FFFFFF] px-2 h-full py-4 gap-3 rounded-3xl max-lg:w-full">
               <TabsTrigger
                 value="profile"
-                className="!w-full !h-[50px] py-4 data-[state=active]:bg-[#EDEEF1] cursor-pointer text-lg !items-start !justify-start px-4 rounded-xl !shadow-none"
+                className="!w-full !h-[50px] text-[#212122] py-4 data-[state=active]:bg-[#EDEEF1] cursor-pointer text-lg !items-start !justify-start px-4 rounded-xl !shadow-none"
               >
                 {t('Профиль')}
               </TabsTrigger>
               <TabsTrigger
                 value="reservations"
-                className="!w-full !h-[50px] py-4 data-[state=active]:bg-[#EDEEF1] cursor-pointer text-lg !items-start !justify-start px-4 rounded-xl !shadow-none"
+                className="!w-full !h-[50px] py-4 text-[#212122] data-[state=active]:bg-[#EDEEF1] cursor-pointer text-lg !items-start !justify-start px-4 rounded-xl !shadow-none"
               >
                 {t('Мои бронирования')}
               </TabsTrigger>
               <TabsTrigger
                 value="travelers"
-                className="!w-full !h-[50px] py-4 data-[state=active]:bg-[#EDEEF1] cursor-pointer text-lg !items-start !justify-start px-4 rounded-xl !shadow-none"
+                className="!w-full !h-[50px] py-4 text-[#212122] data-[state=active]:bg-[#EDEEF1] cursor-pointer text-lg !items-start !justify-start px-4 rounded-xl !shadow-none"
               >
                 {t('Мои попутчики')}
               </TabsTrigger>
               <TabsTrigger
                 value="settings"
-                className="!w-full !h-[50px] py-4 data-[state=active]:bg-[#EDEEF1] cursor-pointer text-lg !items-start !justify-start px-4 rounded-xl !shadow-none"
+                className="!w-full !h-[50px] py-4 text-[#212122] data-[state=active]:bg-[#EDEEF1] cursor-pointer text-lg !items-start !justify-start px-4 rounded-xl !shadow-none"
               >
                 {t('Настройки')}
               </TabsTrigger>
               <TabsTrigger
                 value="support"
-                className="!w-full !h-[50px] py-4 data-[state=active]:bg-[#EDEEF1] cursor-pointer text-lg !items-start !justify-start px-4 rounded-xl !shadow-none"
+                className="!w-full !h-[50px] py-4 text-[#212122] data-[state=active]:bg-[#EDEEF1] cursor-pointer text-lg !items-start !justify-start px-4 rounded-xl !shadow-none"
               >
                 {t('Служба поддержки')}
               </TabsTrigger>
@@ -306,7 +305,7 @@ const ProfileTabs = () => {
                               </AvatarFallback>
                             </Avatar>
 
-                            <p className="font-semibold text-lg">
+                            <p className="font-semibold text-lg text-[#050B08]">
                               {user
                                 ? user?.data.data.first_name +
                                   ' ' +
@@ -377,12 +376,14 @@ const ProfileTabs = () => {
                                 name="firstName"
                                 render={({ field }) => (
                                   <FormItem>
-                                    <FormLabel>{t('Имя')}</FormLabel>
+                                    <Label className="text-[#212122] text-lg">
+                                      {t('Имя')}
+                                    </Label>
                                     <FormControl>
                                       <Input
                                         disabled={!edit}
                                         placeholder={t('Введите имя')}
-                                        className="h-14 rounded-2xl !text-md"
+                                        className="h-14 rounded-2xl !text-md placeholder:text-[#646465]"
                                         {...field}
                                       />
                                     </FormControl>
@@ -395,12 +396,14 @@ const ProfileTabs = () => {
                                 name="lastName"
                                 render={({ field }) => (
                                   <FormItem>
-                                    <FormLabel>{t('Фамилия')}</FormLabel>
+                                    <Label className="text-[#212122] text-lg">
+                                      {t('Фамилия')}
+                                    </Label>
                                     <FormControl>
                                       <Input
                                         disabled={!edit}
                                         placeholder={t('Введите фамилию')}
-                                        className="h-14 !text-md rounded-2xl"
+                                        className="h-14 !text-md rounded-2xl placeholder:text-[#646465]"
                                         {...field}
                                       />
                                     </FormControl>
@@ -423,7 +426,7 @@ const ProfileTabs = () => {
                                     {t('Отмена')}
                                   </Button>
                                   <Button
-                                    className="h-12 rounded-3xl px-8 cursor-pointer text-md"
+                                    className="h-12 rounded-3xl px-8 cursor-pointer text-md bg-[#084FE3] hover:bg-[#084FE3]"
                                     onClick={form.handleSubmit(onSubmit)}
                                   >
                                     {isPending ? (
@@ -435,7 +438,7 @@ const ProfileTabs = () => {
                                 </div>
                               ) : (
                                 <Button
-                                  className="h-12 rounded-3xl px-8 cursor-pointer text-md max-lg:w-full"
+                                  className="h-12 rounded-3xl px-8 cursor-pointer text-md max-lg:w-full bg-[#084FE3] hover:bg-[#084FE3"
                                   onClick={() => setEdit(true)}
                                 >
                                   {t('Изменение')}
@@ -446,10 +449,10 @@ const ProfileTabs = () => {
                         </Form>
                       </div>
                       <div className="w-full bg-white rounded-2xl flex flex-col px-4 py-4 gap-4">
-                        <p className="text-xl font-semibold">
+                        <p className="text-xl font-semibold text-[#212122]">
                           {t('Контактные данные')}
                         </p>
-                        <hr className="h-[2px] bg-[#EDEEF1]" />
+                        <hr className="h-[2px] bg-[#DFDFDF]" />
                         <Form {...formPhone}>
                           <form
                             onSubmit={formPhone.handleSubmit(editPhone)}
@@ -461,7 +464,7 @@ const ProfileTabs = () => {
                               render={({ field }) => (
                                 <FormItem>
                                   <div className="flex justify-between w-full gap-1">
-                                    <Label className="text-lg font-semibold">
+                                    <Label className="text-lg font-semibold text-[#212122]">
                                       {t('Номер телефона')}
                                     </Label>
                                     {editPhoneState ? (
@@ -550,7 +553,7 @@ const ProfileTabs = () => {
                               render={({ field }) => (
                                 <FormItem>
                                   <div className="flex justify-between w-full gap-1">
-                                    <Label className="text-lg font-semibold">
+                                    <Label className="text-lg font-semibold text-[#212122]">
                                       {t('Электронная почта')}
                                     </Label>
                                     {editEmailState ? (
@@ -618,7 +621,7 @@ const ProfileTabs = () => {
                                     <Input
                                       disabled={!editEmailState}
                                       placeholder={t('Введите ваш E-mail')}
-                                      className="h-14 rounded-2xl !text-md"
+                                      className="h-14 rounded-2xl !text-md placeholder:text-[#646465]"
                                       {...field}
                                     />
                                   </FormControl>

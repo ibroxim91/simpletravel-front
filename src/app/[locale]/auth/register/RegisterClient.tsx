@@ -9,7 +9,7 @@ const RegisterClient = () => {
   return (
     <div className="h-full">
       <Auth />
-      <div className="absolute max-lg:bottom-20 lg:bottom-5 w-full flex justify-center">
+      <div className="absolute max-lg:bottom-20 lg:bottom-5 w-full flex justify-center text-[#212122]">
         <p>{t('2025 © Все права защищены')}</p>
       </div>
     </div>

@@ -12,6 +12,7 @@ import {
 } from '@/shared/ui/select';
 import ArrowDropUpOutlinedIcon from '@mui/icons-material/ArrowDropUpOutlined';
 import PublicIcon from '@mui/icons-material/Public';
+import clsx from 'clsx';
 import { useTranslations } from 'next-intl';
 import Image, { StaticImageData } from 'next/image';
 import { useParams, usePathname, useRouter } from 'next/navigation';
@@ -81,6 +82,9 @@ export function ChangeLang() {
               <SelectItem
                 key={lang.code}
                 value={lang.code}
+                color={
+                  lang.code === locale ? 'text-[#084FE3]' : 'text-[#212122]'
+                }
                 onClick={() => changeLocale(lang.code)}
                 className="flex gap-2 items-center cursor-pointer"
               >
@@ -90,7 +94,14 @@ export function ChangeLang() {
                   width={24}
                   height={24}
                 />
-                <p className="font-medium text-sm">{t(lang.label)}</p>
+                <p
+                  className={clsx(
+                    'font-semibold text-sm',
+                    lang.code === locale ? 'text-[#084FE3]' : 'text-[#212122]',
+                  )}
+                >
+                  {t(lang.label)}
+                </p>
               </SelectItem>
             ))}
           </SelectGroup>

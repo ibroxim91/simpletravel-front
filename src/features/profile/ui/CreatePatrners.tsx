@@ -10,7 +10,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@/shared/ui/form';
 import { Input } from '@/shared/ui/input';
@@ -120,14 +119,16 @@ const CreatePatrners = ({
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="bg-white p-5 rounded-2xl relative space-y-6">
             <div className="flex items-center justify-between max-lg:flex-col max-lg:items-start max-lg:gap-4">
-              <h1 className="font-bold text-xl">{t('Участник')}</h1>
+              <h1 className="font-bold text-xl text-[#212122]">
+                {t('Участник')}
+              </h1>
             </div>
             <FormField
               control={form.control}
               name={`gender`}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('Пол')}</FormLabel>
+                  <Label className="text-lg text-[#212122]">{t('Пол')}</Label>
                   <FormControl>
                     <div className="flex items-center gap-8 mt-2 max-sm:flex-col max-sm:items-start">
                       <label className="flex items-center gap-2 cursor-pointer">
@@ -138,7 +139,7 @@ const CreatePatrners = ({
                           onChange={field.onChange}
                           className="w-6 h-6 accent-[#084FE3]"
                         />
-                        {t('Мужчина')}
+                        <p className="text-[#646465]">{t('Мужчина')}</p>
                       </label>
                       <label className="flex items-center gap-2 cursor-pointer">
                         <Input
@@ -148,7 +149,7 @@ const CreatePatrners = ({
                           onChange={field.onChange}
                           className="w-6 h-6 accent-[#084FE3]"
                         />
-                        {t('Женщина')}
+                        <p className="text-[#646465]">{t('Женщина')}</p>
                       </label>
                     </div>
                   </FormControl>
@@ -162,13 +163,15 @@ const CreatePatrners = ({
                 name={`firstName`}
                 render={({ field }) => (
                   <FormItem>
-                    <Label className="text-lg font-semibold">{t('Имя')}</Label>
+                    <Label className="text-lg font-semibold text-[#212122]">
+                      {t('Имя')}
+                    </Label>
                     <FormControl>
                       <Input
                         {...field}
                         type="text"
                         placeholder={t('Введите имя')}
-                        className="px-5 h-14 rounded-lg"
+                        className="px-5 h-14 rounded-lg text-[#212122] placeholder:text-[#909091]"
                       />
                     </FormControl>
                     <FormMessage />
@@ -180,7 +183,7 @@ const CreatePatrners = ({
                 name={`lastName`}
                 render={({ field }) => (
                   <FormItem>
-                    <Label className="text-lg font-semibold">
+                    <Label className="text-lg font-semibold text-[#212122]">
                       {t('Фамилия')}
                     </Label>
                     <FormControl>
@@ -188,7 +191,7 @@ const CreatePatrners = ({
                         {...field}
                         type="text"
                         placeholder={t('Введите фамилию')}
-                        className="p-5 rounded-lg h-14"
+                        className="p-5 rounded-lg h-14 text-[#212122] placeholder:text-[#909091]"
                       />
                     </FormControl>
                     <FormMessage />
@@ -202,7 +205,9 @@ const CreatePatrners = ({
                 name={`date`}
                 render={({ field }) => (
                   <FormItem>
-                    <Label className="text-lg">{t('Время возвращения')}</Label>
+                    <Label className="text-lg text-[#212122]">
+                      {t('Дата рождения')}
+                    </Label>
                     <FormControl>
                       <div>
                         <div className="max-lg:hidden">
@@ -211,13 +216,14 @@ const CreatePatrners = ({
                               <button
                                 className={cn(
                                   'w-full justify-start text-left cursor-pointer relative font-normal border-2 h-full border-[#EDEEF1] rounded-md p-[12px]',
-                                  !field.value && 'text-muted-foreground',
+                                  !field.value && 'text-[#909091]',
                                 )}
                               >
                                 <CalendarMonthIcon
                                   sx={{
                                     width: '28px',
                                     height: '28px',
+                                    color: '#212122',
                                     position: 'absolute',
                                     right: 10,
                                   }}
@@ -317,7 +323,7 @@ const CreatePatrners = ({
                 name={`phone`}
                 render={({ field }) => (
                   <FormItem>
-                    <Label className="text-lg font-semibold">
+                    <Label className="text-lg font-semibold text-[#212122]">
                       {t('Телефон номер')}
                     </Label>
                     <FormControl>
@@ -329,7 +335,7 @@ const CreatePatrners = ({
                         }
                         maxLength={19}
                         placeholder={t('Введите номер')}
-                        className="p-5 rounded-lg h-14"
+                        className="p-5 rounded-lg h-14 text-[#212122] placeholder:text-[#909091]"
                       />
                     </FormControl>
                     <FormMessage />

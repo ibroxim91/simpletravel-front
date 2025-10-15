@@ -15,6 +15,7 @@ import {
 import { Banknote, EyeIcon, Loader2, Plus } from 'lucide-react';
 import * as React from 'react';
 
+import Badge from '@/assets/Badge.png';
 import Click from '@/assets/Click.png';
 import { useRouter } from '@/shared/config/i18n/navigation';
 import { LanguageRoutes } from '@/shared/config/i18n/types';
@@ -306,7 +307,9 @@ const ReservationsTabs = ({
     return (
       <div className="w-full bg-white rounded-3xl">
         <div className="flex items-center px-4 py-4 justify-between">
-          <p className="text-xl font-semibold">{t('Последние бронирования')}</p>
+          <p className="text-xl font-semibold text-[#051613]">
+            {t('Последние бронирования')}
+          </p>
         </div>
         <div className="flex items-center justify-center py-20">
           <Loader2 className="w-8 h-8 animate-spin text-[#084FE3]" />
@@ -318,9 +321,11 @@ const ReservationsTabs = ({
   return (
     <div className="w-full bg-white rounded-3xl">
       <div className="flex items-center px-4 py-4 justify-between">
-        <p className="text-xl font-semibold">{t('Последние бронирования')}</p>
+        <p className="text-xl font-semibold text-[#051613]">
+          {t('Последние бронирования')}
+        </p>
         <Button
-          className="text-white text-md font-semibold cursor-pointer"
+          className="text-white bg-[#084FE3] hover:bg-[#084FE3] text-md font-semibold cursor-pointer"
           onClick={() => route.push('/selectour')}
         >
           <Plus />
@@ -375,9 +380,14 @@ const ReservationsTabs = ({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-24 text-center text-[#212122]"
                 >
-                  {t('Не найдено')}
+                  <div className="w-full h-[200px] flex flex-col gap-2 justify-center items-center">
+                    <Image src={Badge} alt="badge" width={100} height={100} />
+                    <p className="text-2xl font-semibold text-[#212122] mt-2">
+                      {t('Пока нет бронирования')}
+                    </p>
+                  </div>
                 </TableCell>
               </TableRow>
             )}

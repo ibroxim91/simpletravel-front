@@ -71,68 +71,81 @@ const Footer = () => {
         <div className="grid grid-cols-4 font-medium max-lg:grid-cols-3 max-md:grid-cols-2 max-sm:grid-cols-1 max-lg:gap-10 mt-10">
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
-              <p className="text-ring text-sm">{t('Служба поддержки')}</p>
-              <p className="text-white font-semibold">+998 71 000 00 00</p>
+              <p className="text-[#D3D3D3] text-sm">{t('Служба поддержки')}</p>
+              <p className="text-[#FFFFFF] text-lg font-semibold">
+                +998 71 000 00 00
+              </p>
             </div>
             <div className="flex flex-col gap-1">
-              <p className="text-ring text-sm">{t('Общие вопросы')}</p>
-              <p className="text-white font-semibold">office@Simple travel</p>
+              <p className="text-[#D3D3D3] text-sm">{t('Общие вопросы')}</p>
+              <p className="text-[#FFFFFF] text-lg font-semibold">
+                office@Simple travel
+              </p>
             </div>
             <div className="flex flex-col gap-1">
-              <p className="text-ring text-sm">{t('Адрес')}</p>
-              <p className="text-white font-semibold">
+              <p className="text-[#D3D3D3] text-sm">{t('Адрес')}</p>
+              <p className="text-[#FFFFFF] text-lg font-semibold">
                 {t('Тошкент шахри, Юнусобод тумани')}
               </p>
             </div>
           </div>
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
-              <p className="text-white font-semibold">{t('Страница')}</p>
+              <p className="text-[#FFFFFF] text-lg font-semibold">
+                {t('Страница')}
+              </p>
             </div>
             <div className="flex flex-col gap-1">
-              <Link href={'/'} className="text-ring text-sm w-fit">
+              <Link href={'/'} className="text-[#D3D3D3] text-sm w-fit">
                 {t('Главная')}
               </Link>
             </div>
             <div className="flex flex-col gap-1">
-              <Link href={'/selectour'} className="text-ring text-sm w-fit">
+              <Link
+                href={'/selectour'}
+                className="text-[#D3D3D3] text-sm w-fit"
+              >
                 {t('Подобрать тур')}
               </Link>
             </div>
             <div className="flex flex-col gap-1">
-              <Link href={'/blogs'} className="text-ring text-sm w-fit">
+              <Link href={'/blogs'} className="text-[#D3D3D3] text-sm w-fit">
                 {t('Блоги')}
               </Link>
             </div>
           </div>
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
-              <p className="text-white font-semibold">{t('О сервисе')}</p>
+              <p className="text-[#FFFFFF] text-lg font-semibold">
+                {t('О сервисе')}
+              </p>
             </div>
             <div className="flex flex-col gap-1">
-              <p className="text-ring text-sm">{t('О нас')}</p>
+              <p className="text-[#D3D3D3] text-sm">{t('О нас')}</p>
             </div>
             <div className="flex flex-col gap-1">
-              <p className="text-ring text-sm">{t('Услуги')}</p>
+              <p className="text-[#D3D3D3] text-sm">{t('Услуги')}</p>
             </div>
             <div className="flex flex-col gap-1">
-              <p className="text-ring text-sm">{t('Публичная оферта')}</p>
+              <p className="text-[#D3D3D3] text-sm">{t('Публичная оферта')}</p>
             </div>
             <div className="flex flex-col gap-1">
-              <p className="text-ring text-sm">{t('Оферта для юрлиц')}</p>
+              <p className="text-[#D3D3D3] text-sm">{t('Оферта для юрлиц')}</p>
             </div>
           </div>
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
-              <p className="text-white font-semibold">{t('Помощь')}</p>
+              <p className="text-[#FFFFFF] text-lg font-semibold">
+                {t('Помощь')}
+              </p>
             </div>
             <div className="flex flex-col gap-1">
-              <p className="text-ring text-sm">
+              <p className="text-[#D3D3D3] text-sm">
                 {t('Инструкция пользователя')}
               </p>
             </div>
             <div className="flex flex-col gap-1">
-              <p className="text-ring text-sm">
+              <p className="text-[#D3D3D3] text-sm">
                 {t('Политика конфиденциальности')}
               </p>
             </div>
@@ -167,7 +180,7 @@ const Footer = () => {
             </IconButton>
           </Link>
         </div>
-        <p className="mt-10 text-white font-medium">
+        <p className="mt-10 text-white font-medium text-sm">
           {t(
             '«simpletravel» Подробные сведения, политика конфиденциальности и пользовательское соглашение размещены в разделе «Документы и файлы»',
           )}

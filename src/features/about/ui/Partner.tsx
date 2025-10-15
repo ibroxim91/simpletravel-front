@@ -72,10 +72,10 @@ const Partner = () => {
         variants={containerVariants}
       >
         <MotionDiv className="flex flex-col gap-5" variants={fadeUpVariants}>
-          <p className="w-full lg:w-[50%] font-bold text-4xl text-[#212122]">
+          <p className="w-full lg:w-[50%] font-bold text-4xl text-[#232325]">
             {t('Мы организуем лучшие туры, какие только возможны')}
           </p>
-          <p className="w-full lg:w-[70%] text-[#646465] text-md font-medium">
+          <p className="w-full lg:w-[70%] text-[#636363] text-md font-medium">
             {t('Мы заботимся о каждой детали вашего путешествия')}
           </p>
         </MotionDiv>
@@ -98,7 +98,7 @@ const Partner = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="flex flex-col gap-2">
-                  <p className="text-xl text-[#031753] font-semibold">
+                  <p className="text-xl text-[#212122] font-semibold">
                     {t(card.title)}
                   </p>
                   <p className="text-md text-[#646465] font-medium">

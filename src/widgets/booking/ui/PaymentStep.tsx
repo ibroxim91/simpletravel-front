@@ -106,10 +106,10 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
   return (
     <div className="w-full">
       <div className="w-full bg-[#FFFFFF] p-[20px] rounded-[20px] relative">
-        <p className="text-2xl font-bold">{t('Оплата')}</p>
-        <hr className="h-[2px] my-[24px] bg-[#EDEEF1] " />
+        <p className="text-2xl font-bold text-[#212122]">{t('Оплата')}</p>
+        <hr className="h-[2px] my-[24px] bg-[#DFDFDF] " />
         <div className="flex my-5 justify-between flex-col items-start gap-2 bg-[#EDEEF180] p-[20px] rounded-[20px] border-2 border-[#EDEEF180]">
-          <h1 className="text-2xl font-bold">
+          <h1 className="text-2xl font-bold text-[#212122]">
             {store.total_price &&
               formatPrice(store.total_price, locale as LanguageRoutes, true)}
           </h1>
@@ -159,7 +159,7 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
                   quality={100}
                 />
               </div>
-              <p className="text-xl font-bold">{t('Payme')}</p>
+              <p className="text-xl font-bold text-[#212122]">{t('Payme')}</p>
             </div>
             <input
               type="radio"
@@ -184,7 +184,7 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
                   quality={100}
                 />
               </div>
-              <p className="text-xl font-bold">Click</p>
+              <p className="text-xl font-bold text-[#212122]">Click</p>
             </div>
             <input
               type="radio"
@@ -210,7 +210,7 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
     ${
       paymentTypes === null
         ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-        : 'bg-[#084FE3] text-white cursor-pointer hover:bg-[#063bc2]'
+        : 'bg-[#1764FC] text-white cursor-pointer hover:bg-[#1764FC]'
     }`}
         >
           {t('Перейти к оплате')}
@@ -232,7 +232,9 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
 
       <div className="w-full bg-[#FFFFFF] p-[20px] rounded-[20px] mt-5">
         <div className="flex items-center justify-between max-lg:flex-col max-lg:gap-4 max-lg:items-start">
-          <h1 className="text-2xl font-bold">{t('Подробности заказа')}</h1>
+          <h1 className="text-2xl font-bold text-[#212122]">
+            {t('Подробности заказа')}
+          </h1>
           <button
             onClick={() => downloadPdf({ lang: 'uz', order_id: orderId! })}
             className="flex items-center gap-[10px] cursor-pointer px-[15px] py-[10px] border-2 rounded-full border-[#DFDFDF] max-lg:w-full justify-center hover:bg-gray-50 transition-colors"
@@ -244,70 +246,77 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
           </button>
         </div>
 
-        <h1 className="mt-5 text-lg font-bold">{t('Дата')}</h1>
+        <h1 className="mt-5 text-lg font-bold text-[#212122]">{t('Дата')}</h1>
         <div className="grid grid-cols-2 w-full my-2 bg-[#EDEEF1] px-[8px] py-[5px] rounded-[8px] text-[#646465]">
           <p className="text-md">{t('Откуда')}</p>
-          <p className="!text-black break-words text-end">{where}</p>
+          <p className="break-words text-end !text-[#212122]">{where}</p>
         </div>
 
         <div className="grid grid-cols-2 w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465]">
           <p className="text-md">{t('Куда')}</p>
-          <p className="!text-black break-words text-end">{whereTo}</p>
+          <p className="text-[#212122] break-words text-end">{whereTo}</p>
         </div>
 
         <div className="grid grid-cols-2 items-center justify-between w-full my-2 bg-[#EDEEF1] px-[8px] py-[5px] rounded-[8px] text-[#646465]">
           <p className="text-md">{t('Время вылета')}</p>
-          <p className="!text-black break-words text-end max-md:px-5">
+          <p className="text-[#212122] break-words text-end max-md:px-5">
             {dispatch && formatDate.format(dispatch, 'DD-MM-YYYY')}
           </p>
         </div>
 
         <div className="grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465]">
           <p className="text-md">{t('Время возвращения')}</p>
-          <p className="!text-black text-end break-words max-md:px-5">
+          <p className="text-[#212122] text-end break-words max-md:px-5">
             {returned && formatDate.format(returned, 'DD-MM-YYYY')}
           </p>
         </div>
 
-        <h1 className="mt-5 text-lg font-bold">{t('Мои попутчики')}</h1>
+        <h1 className="mt-5 text-lg font-bold text-[#212122]">
+          {t('Мои попутчики')}
+        </h1>
         {user.map((e, index) => (
-          <div
-            key={index}
-            className={`grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465] 
-      ${index % 2 === 0 ? 'bg-[#EDEEF1]' : 'bg-white'}`}
-          >
-            <p>
-              {t('Мои попутчики')} {index + 1}
-            </p>
-            <p className="!text-black text-end break-words">
-              {e.firstName} {e.lastName}
-            </p>
-          </div>
+          <>
+            <div
+              key={index}
+              className={`grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465] 
+              ${index % 2 === 0 ? 'bg-[#EDEEF1]' : 'bg-white'}`}
+            >
+              <p>
+                {t('Мои попутчики')} {index + 1}
+              </p>
+              <p className="text-[#212122] text-end break-words">
+                {e.firstName} {e.lastName}
+              </p>
+            </div>
+            <div className="grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465]">
+              <p className="text-md">{t('Дата рождения')}</p>
+              <p className="!text-black text-end break-words max-md:px-5">
+                {e.birthDate && formatDate.format(e.birthDate, 'DD-MM-YYYY')}
+              </p>
+            </div>
+          </>
         ))}
 
-        <div className="grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465]">
-          <p className="text-md">{t('Время возвращения')}</p>
-          <p className="!text-black text-end break-words max-md:px-5">
-            {returned && formatDate.format(returned, 'DD-MM-YYYY')}
-          </p>
-        </div>
-
-        <h1 className="mt-5 text-lg font-bold">{t('Турпакет')}</h1>
+        <h1 className="mt-5 text-lg font-bold text-[#212122]">
+          {t('Турпакет')}
+        </h1>
         <div className="grid grid-cols-2 items-center justify-between w-full my-2 bg-[#EDEEF1] px-[8px] py-[5px] rounded-[8px] text-[#646465]">
           <p className="text-md">{t('Отель')}</p>
-          <p className="!text-black text-end break-words">{data?.data.title}</p>
+          <p className="text-[#212122] text-end break-words">
+            {data?.data.title}
+          </p>
         </div>
 
         <div className="grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465]">
           <p className="text-md">{t('Локация')}</p>
-          <p className="!text-black text-end break-words">
+          <p className="text-[#212122] text-end break-words">
             {data?.data.destination}
           </p>
         </div>
 
         <div className="grid grid-cols-2 items-center justify-between w-full my-2 bg-[#EDEEF1] px-[8px] py-[5px] rounded-[8px] text-[#646465]">
           <p className="text-md">{t('Рейтинг')}</p>
-          <p className="!text-black text-end break-words">
+          <p className="text-[#212122] text-end break-words">
             {data?.data.rating} {t('звёзды')}
           </p>
         </div>
@@ -315,7 +324,7 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
         <div className="grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465]">
           <p className="text-md break-words">{t('Характеристики')}</p>
           {data?.data.ticket_amenities.slice(0, 1).map((e) => (
-            <p className="!text-black text-end break-words" key={e.name}>
+            <p className="text-[#212122] text-end break-words" key={e.name}>
               {e.name}...
             </p>
           ))}
@@ -323,17 +332,19 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
 
         <div className="grid grid-cols-2 items-center justify-between w-full my-2 bg-[#EDEEF1] px-[8px] py-[5px] rounded-[8px] text-[#646465]">
           <p className="text-md">{t('Тип пакета')}</p>
-          <p className="!text-black text-end break-words">{tariff.name}</p>
+          <p className="text-[#212122] text-end break-words">{tariff.name}</p>
         </div>
 
         <div className="grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465]">
           <p className="text-md">{t('Транспорт')}</p>
-          <p className="!text-black text-end break-words">{transport}</p>
+          <p className="text-[#212122] text-end break-words">{transport}</p>
         </div>
 
         {store.paidService.length > 0 && (
           <>
-            <h1 className="mt-5 text-lg font-bold">{t('Услуги')}</h1>
+            <h1 className="mt-5 text-lg font-bold text-[#212122]">
+              {t('Услуги')}
+            </h1>
             {store.paidService.map((e, i) => (
               <div
                 key={e.id || i}
@@ -342,7 +353,7 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
                 }`}
               >
                 <p className="text-md">{e.name}</p>
-                <p className="!text-black text-end break-words">
+                <p className="text-[#212122] text-end break-words">
                   {formatPrice(e.price, locale as LanguageRoutes, true)}
                 </p>
               </div>
@@ -351,7 +362,7 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
         )}
         {store.paidService.length > 0 && (
           <>
-            <h1 className="mt-5 text-lg font-bold">
+            <h1 className="mt-5 text-lg font-bold text-[#212122]">
               {t('Дополнительные услуги')}
             </h1>
             {store.tours_category.map((e, i) => (
@@ -361,7 +372,7 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
                   i % 2 === 0 ? 'bg-[#EDEEF1]' : 'bg-white'
                 }`}
               >
-                <p className="text-md">{e.name}</p>
+                <p className="text-md text-[#212122]">{e.name}</p>
                 {/* <p className="!text-black text-end break-words">
               {formatPrice('1450000', locale as LanguageRoutes, true)}
               </p> */}

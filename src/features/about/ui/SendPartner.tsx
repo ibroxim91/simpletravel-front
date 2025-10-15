@@ -147,7 +147,7 @@ const SendPartner = () => {
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <p className="text-3xl w-[80%] max-lg:w-full text-[#031753] font-semibold">
+            <p className="text-3xl w-[80%] max-lg:w-full text-[#232325] font-semibold">
               {t('Сотрудничаем с лидерами Узбекистана')}
             </p>
             <p className="text-[#636363] text-lg font-medium max-lg:w-full">
@@ -163,7 +163,7 @@ const SendPartner = () => {
               }}
             >
               <DialogTrigger asChild>
-                <Button className="w-fit cursor-pointer mt-2 rounded-3xl py-6 px-6 text-md max-lg:hidden">
+                <Button className="w-fit cursor-pointer mt-2 rounded-3xl py-6 px-6 text-md max-lg:hidden bg-[#1764FC] hover:bg-[#1764FC]">
                   {t('Стать партнёром')}
                 </Button>
               </DialogTrigger>
@@ -180,7 +180,9 @@ const SendPartner = () => {
                       success && 'justify-center',
                     )}
                   >
-                    {isPending && <p className="text-3xl">{t('Отправка')}</p>}
+                    {isPending && (
+                      <p className="text-3xl text-[#121212]">{t('Отправка')}</p>
+                    )}
 
                     {success && (
                       <Button
@@ -196,16 +198,21 @@ const SendPartner = () => {
                         color="#E03137"
                         className="bg-[#E03137] h-14 w-14 rounded-2xl hover:bg-[#E03137]"
                       >
-                        <CloseIcon sx={{ width: 32, height: 32 }} />
+                        <CloseIcon
+                          sx={{ width: 32, height: 32, color: '#121212' }}
+                        />
                       </Button>
                     )}
 
                     {!isPending && !success && !error && (
                       <>
-                        <p className="text-3xl">{t('Стать партнёром')}</p>
+                        <p className="text-3xl text-[#121212]">
+                          {t('Стать партнёром')}
+                        </p>
                         <DialogClose asChild>
                           <Button
                             variant={'outline'}
+                            color="#121212"
                             onClick={() => {
                               setSuccess(false);
                               form.reset();
@@ -299,7 +306,7 @@ const SendPartner = () => {
                                     placeholder={t(
                                       'Введите название вашей компании',
                                     )}
-                                    className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
+                                    className="h-[60px] px-4 font-normal !text-lg rounded-xl text-[#212122] placeholder:text-[#646465]"
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -318,7 +325,7 @@ const SendPartner = () => {
                                   <Input
                                     {...field}
                                     placeholder={t('Город, улица, дом')}
-                                    className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
+                                    className="h-[60px] px-4 font-normal !text-lg rounded-xl text-[#212122] placeholder:text-[#646465]"
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -462,7 +469,7 @@ const SendPartner = () => {
                                     <Input
                                       {...field}
                                       placeholder="example@mail.com"
-                                      className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
+                                      className="h-[60px] px-4 font-normal !text-lg rounded-xl text-[#212122] placeholder:text-[#646465]"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -488,7 +495,7 @@ const SendPartner = () => {
                                         )
                                       }
                                       maxLength={19}
-                                      className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
+                                      className="h-[60px] px-4 font-normal !text-lg rounded-xl text-[#212122] placeholder:text-[#646465]"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -509,7 +516,7 @@ const SendPartner = () => {
                                     <Input
                                       {...field}
                                       placeholder="https://example.com"
-                                      className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
+                                      className="h-[60px] px-4 font-normal !text-lg rounded-xl text-[#212122] placeholder:text-[#646465]"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -528,7 +535,7 @@ const SendPartner = () => {
                                     <Input
                                       {...field}
                                       placeholder="https://example.com"
-                                      className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
+                                      className="h-[60px] px-4 font-normal !text-lg rounded-xl text-[#212122] placeholder:text-[#646465]"
                                     />
                                   </FormControl>
                                   <FormMessage />
@@ -539,7 +546,7 @@ const SendPartner = () => {
                           <div className="flex gap-4 items-center">
                             <Button
                               type="submit"
-                              className="px-10 py-8 rounded-4xl text-lg font-medium cursor-pointer"
+                              className="px-10 py-8 rounded-4xl text-lg font-medium cursor-pointer bg-[#1764FC]"
                             >
                               {t('Отправить')}
                             </Button>
@@ -634,7 +641,7 @@ const SendPartner = () => {
             ))}
           </div>
           <Button
-            className="w-full cursor-pointer mt-10 rounded-3xl py-6 px-6 text-md lg:hidden"
+            className="w-full cursor-pointer mt-10 rounded-3xl py-6 px-6 text-md lg:hidden bg-[#1764FC] hover:bg-[#1764FC]"
             onClick={() => setOpenDrawer(true)}
           >
             {t('Стать партнёром')}
@@ -669,9 +676,12 @@ const SendPartner = () => {
       >
         {!success && !error && !isPending && (
           <div className="flex justify-between items-center p-4">
-            <p className="text-2xl font-semibold">{t('Стать партнёром')}</p>
+            <p className="text-2xl font-semibold text-[#212122]">
+              {t('Стать партнёром')}
+            </p>
             <Button
               variant="outline"
+              color="#212122"
               onClick={() => {
                 setSuccess(false);
                 setError(null);
@@ -768,7 +778,7 @@ const SendPartner = () => {
                         <Input
                           {...field}
                           placeholder={t('Введите название вашей компании')}
-                          className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
+                          className="h-[60px] px-4 font-normal !text-lg rounded-xl text-[#212122] placeholder:text-[#646465]"
                         />
                       </FormControl>
                       <FormMessage />
@@ -787,7 +797,7 @@ const SendPartner = () => {
                         <Input
                           {...field}
                           placeholder={t('Город, улица, дом')}
-                          className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
+                          className="h-[60px] px-4 font-normal !text-lg rounded-xl text-[#212122] placeholder:text-[#646465]"
                         />
                       </FormControl>
                       <FormMessage />
@@ -913,7 +923,7 @@ const SendPartner = () => {
                         <Input
                           {...field}
                           placeholder="example@mail.com"
-                          className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
+                          className="h-[60px] px-4 font-normal !text-lg rounded-xl text-[#212122] placeholder:text-[#646465]"
                         />
                       </FormControl>
                       <FormMessage />
@@ -937,7 +947,7 @@ const SendPartner = () => {
                             field.onChange(formatPhone(e.target.value))
                           }
                           maxLength={19}
-                          className="h-[60px] !text-lg rounded-xl"
+                          className="h-[60px] !text-lg rounded-xl font-normal text-[#212122] placeholder:text-[#646465]"
                         />
                       </FormControl>
                       <FormMessage />
@@ -956,7 +966,7 @@ const SendPartner = () => {
                         <Input
                           {...field}
                           placeholder="https://example.com"
-                          className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
+                          className="h-[60px] px-4 font-normal !text-lg rounded-xl text-[#212122] placeholder:text-[#646465]"
                         />
                       </FormControl>
                       <FormMessage />
@@ -975,7 +985,7 @@ const SendPartner = () => {
                         <Input
                           {...field}
                           placeholder="https://example.com"
-                          className="h-[60px] px-4 font-medium !text-lg rounded-xl text-black"
+                          className="h-[60px] px-4 font-normal !text-lg rounded-xl text-[#212122] placeholder:text-[#646465]"
                         />
                       </FormControl>
                       <FormMessage />
@@ -985,7 +995,7 @@ const SendPartner = () => {
                 <div className="flex flex-col gap-4 items-center">
                   <Button
                     type="submit"
-                    className="px-10 py-8 rounded-4xl w-full text-lg font-medium cursor-pointer"
+                    className="px-10 py-8 rounded-4xl w-full text-lg font-medium cursor-pointer bg-[#1764FC] hover:bg-[#1764FC]"
                   >
                     {t('Отправить')}
                   </Button>

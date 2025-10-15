@@ -96,7 +96,9 @@ const AuthEditPassword = () => {
         className="object-center w-full h-[300px] max-lg:h-[100px] rounded-3xl"
       />
       <div className="w-[50%] bg-white rounded-3xl h-fit py-5 px-10 absolute bottom-0 top-48 max-md:px-2 max-lg:top-14 max-lg:w-[90%] left-1/2 -translate-x-1/2">
-        <p className="text-xl font-semibold">{t('Изменить пароль')}</p>
+        <p className="text-xl font-semibold text-[#212122]">
+          {t('Изменить пароль')}
+        </p>
         <p className="mt-2 text-md w-full break-words text-[#646465]">
           {t('Измените пароль, чтобы обеспечить безопасность вашего аккаунта')}
         </p>
@@ -110,14 +112,14 @@ const AuthEditPassword = () => {
               name="oldPassword"
               render={({ field }) => (
                 <FormItem>
-                  <Label className="text-lg font-semibold">
+                  <Label className="text-lg font-semibold text-[#212122]">
                     {t('Текущий пароль')}
                   </Label>
                   <FormControl>
                     <Input
                       placeholder={t('Введите старый пароль')}
                       {...field}
-                      className="h-[60px] rounded-xl focus:!ring-0 !text-md"
+                      className="h-[60px] rounded-xl focus:!ring-0 !text-md text-[#212122] placeholder:text-[#646465]"
                     />
                   </FormControl>
                   <FormMessage />
@@ -130,14 +132,14 @@ const AuthEditPassword = () => {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <Label className="text-lg font-semibold">
+                  <Label className="text-lg font-semibold text-[#212122]">
                     {t('Новый пароль')}
                   </Label>
                   <FormControl>
                     <Input
                       placeholder={t('Введите пароль (минимум 8 символов)')}
                       {...field}
-                      className="h-[60px] rounded-xl focus:!ring-0 !text-md"
+                      className="h-[60px] rounded-xl focus:!ring-0 !text-md text-[#212122] placeholder:text-[#646465]"
                     />
                   </FormControl>
                   <FormMessage />
@@ -149,26 +151,28 @@ const AuthEditPassword = () => {
               name="confirmPassword"
               render={({ field }) => (
                 <FormItem>
-                  <Label className="text-lg font-semibold">
+                  <Label className="text-lg font-semibold text-[#212122]">
                     {t('Подтвердите пароль')}
                   </Label>
                   <FormControl>
                     <Input
                       placeholder={t('Повторите пароль')}
                       {...field}
-                      className="h-[60px] rounded-xl focus:!ring-0 !text-md"
+                      className="h-[60px] rounded-xl focus:!ring-0 !text-md text-[#212122] placeholder:text-[#646465]"
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Link
-              href={'/auth/forget-password'}
-              className="text-[#084FE3] font-medium"
-            >
-              {t('Забыл пароль')}
-            </Link>
+            <div className="flex justify-end items-center">
+              <Link
+                href={'/auth/forget-password'}
+                className="text-[#084FE3] font-medium"
+              >
+                {t('Забыл пароль')}
+              </Link>
+            </div>
             <Button
               type="submit"
               disabled={isPending}
@@ -183,7 +187,7 @@ const AuthEditPassword = () => {
           </form>
         </Form>
       </div>
-      <div className="absolute max-lg:bottom-20 lg:bottom-5 w-full flex justify-center">
+      <div className="absolute max-lg:bottom-20 lg:bottom-5 w-full flex justify-center text-[#212122]">
         <p>{t('2025 © Все права защищены')}</p>
       </div>
     </div>

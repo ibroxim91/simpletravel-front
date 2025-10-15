@@ -104,7 +104,7 @@ const HotTours = () => {
               disabled={!canScrollPrev}
               aria-label="Scroll to previous item"
             >
-              <KeyboardBackspaceIcon />
+              <KeyboardBackspaceIcon sx={{ color: '#031753' }} />
             </Button>
             <Button
               variant={'outline'}
@@ -113,7 +113,9 @@ const HotTours = () => {
               disabled={!canScrollNext}
               aria-label="Scroll to next item"
             >
-              <KeyboardBackspaceIcon sx={{ rotate: '180deg' }} />
+              <KeyboardBackspaceIcon
+                sx={{ rotate: '180deg', color: '#031753' }}
+              />
             </Button>
           </div>
         </div>
@@ -180,16 +182,19 @@ const HotTours = () => {
                       >
                         <Rating
                           name="read-only"
-                          size="small"
+                          size="medium"
                           value={e.rating}
                           readOnly
+                          sx={{ color: '#F08125' }}
                           precision={0.1}
                         />
                         <p className="text-xl font-semibold text-[#031753]">
                           {e.title}
                         </p>
-                        <p className="text-md text-blue-950">{e.destination}</p>
-                        <p className="mt-2 text-blue-600 font-semibold">
+                        <p className="text-md text-[#031753]">
+                          {e.destination}
+                        </p>
+                        <p className="mt-2 text-[#084FE3] font-semibold text-lg">
                           {formatPrice(e.price, locale as LanguageRoutes, true)}
                         </p>
                       </motion.div>
@@ -215,7 +220,7 @@ const HotTours = () => {
               disabled={!hotScrollPrev}
               aria-label="Scroll hot tours to previous item"
             >
-              <KeyboardBackspaceIcon />
+              <KeyboardBackspaceIcon sx={{ color: '#031753' }} />
             </Button>
             <Button
               variant={'outline'}
@@ -224,7 +229,9 @@ const HotTours = () => {
               disabled={!hotScrollNext}
               aria-label="Scroll hot tours to next item"
             >
-              <KeyboardBackspaceIcon sx={{ rotate: '180deg' }} />
+              <KeyboardBackspaceIcon
+                sx={{ rotate: '180deg', color: '#031753' }}
+              />
             </Button>
           </div>
         </div>
@@ -294,16 +301,19 @@ const HotTours = () => {
                       >
                         <Rating
                           name="read-only"
-                          size="small"
+                          size="medium"
                           value={e.rating}
                           readOnly
+                          sx={{ color: '#F08125' }}
                           precision={0.1}
                         />
                         <p className="text-xl font-semibold text-[#031753]">
                           {e.title}
                         </p>
-                        <p className="text-md text-blue-950">{e.destination}</p>
-                        <p className="mt-2 text-blue-600 font-semibold">
+                        <p className="text-md text-[#031753]">
+                          {e.destination}
+                        </p>
+                        <p className="mt-2 text-[#084FE3] font-semibold text-lg">
                           {formatPrice(e.price, locale as LanguageRoutes, true)}
                         </p>
                       </motion.div>
@@ -354,10 +364,10 @@ const HotTours = () => {
                     href="/selectour"
                     className="bg-[#ECF2FF] w-fit py-3 px-10 rounded-4xl flex gap-4"
                   >
-                    <p className="text-blue-600 font-semibold">
+                    <p className="text-[#084FE3] font-semibold">
                       {t('Узнать больше')}
                     </p>
-                    <ArrowRightAltIcon className="text-blue-600" />
+                    <ArrowRightAltIcon className="text-[#084FE3]" />
                   </Link>
                 </motion.div>
               </div>
@@ -408,10 +418,10 @@ const HotTours = () => {
                 href="/selectour"
                 className="bg-[#ECF2FF] w-fit py-3 px-5 rounded-4xl flex gap-4"
               >
-                <p className="text-blue-600 font-semibold">
+                <p className="text-[#084FE3] font-semibold">
                   {t('Узнать больше')}
                 </p>
-                <ArrowRightAltIcon className="text-blue-600" />
+                <ArrowRightAltIcon className="text-[#084FE3]" />
               </Link>
             </div>
             <div

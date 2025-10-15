@@ -20,7 +20,7 @@ export default function HotelInfoItem({ title, name, img }: Props) {
 
       <div className="flex flex-col w-fit h-full justify-end max-lg:justify-start">
         <p className="text-[#031753] text-xl w-full font-bold">{name}</p>
-        <h1 className="text-md w-full">{title}</h1>
+        <h1 className="text-[#031753] text-md w-full">{title}</h1>
       </div>
     </>
   );

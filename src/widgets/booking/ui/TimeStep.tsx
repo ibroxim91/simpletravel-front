@@ -84,7 +84,7 @@ export default function TimeStep({ onNext, data }: Props) {
     <div className="relative">
       <div className="bg-[#FFFFFF] p-[20px] rounded-[20px]">
         <h1 className="font-semibold text-[#212122] text-xl">{t('Дата')}</h1>
-        <hr className="h-[2px] my-[24px] bg-[#EDEEF1]" />
+        <hr className="h-[2px] my-[24px] bg-[#DFDFDF]" />
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div className="grid grid-cols-2 w-full gap-4 items-start max-lg:grid-cols-1">
@@ -93,20 +93,23 @@ export default function TimeStep({ onNext, data }: Props) {
                 name="where"
                 render={({ field }) => (
                   <FormItem>
-                    <Label className="text-lg">{t('Откуда')}</Label>
+                    <Label className="text-lg text-[#121212]">
+                      {t('Откуда')}
+                    </Label>
                     <FormControl>
                       <div className="flex items-center gap-[16px] relative">
                         <Input
                           placeholder={t('Откуда')}
                           {...field}
                           disabled
-                          className=" w-full h-full border-2 border-[#EDEEF1] justify-between p-[15px] rounded-md"
+                          className=" w-full h-full border-2 border-[#EDEEF1] justify-between p-[15px] rounded-md placeholder:text-[#A3A3A3] text-[#121212]"
                         />
                         <LocationOnIcon
                           sx={{
                             position: 'absolute',
                             width: '28px',
                             right: 10,
+                            color: '#121212',
                             height: '28px',
                           }}
                         />
@@ -124,19 +127,22 @@ export default function TimeStep({ onNext, data }: Props) {
                 name="whereTo"
                 render={({ field }) => (
                   <FormItem>
-                    <Label className="text-lg">{t('Куда')}</Label>
+                    <Label className="text-lg text-[#121212]">
+                      {t('Куда')}
+                    </Label>
                     <FormControl>
                       <div className="flex items-center gap-[16px] relative">
                         <Input
                           disabled
                           placeholder={t('Куда')}
                           {...field}
-                          className=" w-full h-full border-2 border-[#EDEEF1] justify-between p-[15px] rounded-md"
+                          className=" w-full h-full border-2 border-[#EDEEF1] justify-between p-[15px] rounded-md placeholder:text-[#A3A3A3] text-[#121212]"
                         />
                         <FlightIcon
                           sx={{
                             width: '28px',
                             height: '28px',
+                            color: '#121212',
                             position: 'absolute',
                             right: 10,
                           }}
@@ -157,7 +163,9 @@ export default function TimeStep({ onNext, data }: Props) {
                 name="dispatch"
                 render={({ field }) => (
                   <FormItem>
-                    <Label className="text-lg">{t('Дата отправления')}</Label>
+                    <Label className="text-lg text-[#121212]">
+                      {t('Дата отправления')}
+                    </Label>
                     <FormControl>
                       <div>
                         <div className="max-lg:hidden">
@@ -237,7 +245,7 @@ export default function TimeStep({ onNext, data }: Props) {
                           >
                             <div className="flex flex-col gap-4 w-full font-medium">
                               <div className="flex items-center justify-between">
-                                <p className="text-lg font-semibold">
+                                <p className="text-lg font-semibold text-[#121212]">
                                   {t('Дата отправления')}
                                 </p>
                                 <Button
@@ -278,7 +286,9 @@ export default function TimeStep({ onNext, data }: Props) {
                 name="returned"
                 render={({ field }) => (
                   <FormItem>
-                    <Label className="text-lg">{t('Время возвращения')}</Label>
+                    <Label className="text-lg text-[#121212]">
+                      {t('Время возвращения')}
+                    </Label>
                     <FormControl>
                       <div>
                         <div className="max-lg:hidden">

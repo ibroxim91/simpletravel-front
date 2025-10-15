@@ -23,14 +23,14 @@ export default function Reviews({
         </Avatar>
         <div className="bg-white flex absolute bottom-1 left-1/2 -translate-x-1/2 font-semibold z-10 px-3 gap-2 items-center rounded-2xl py-1">
           <Star color="#DAB72A" fill="#DAB72A" width={14} height={14} />
-          <p className="text-[14px]">{data.rating}</p>
+          <p className="text-[14px] text-[#232325]">{data.rating}</p>
         </div>
       </div>
       <div>
-        <h1 className="font-bold text-[#031753] text-[18px] max-[465px]:text-center">
+        <h1 className="font-bold text-[#232325] text-[18px] max-[465px]:text-center">
           {data.user.username}
         </h1>
-        <p className="text-[14px] text-[#636363]">{data.text}</p>
+        <p className="text-[14px] text-[#232325]">{data.text}</p>
       </div>
     </div>
   );

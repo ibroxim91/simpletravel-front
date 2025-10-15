@@ -9,6 +9,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import SearchIcon from '@mui/icons-material/Search';
 import Drawer from '@mui/material/Drawer';
 import { useQuery } from '@tanstack/react-query';
+import clsx from 'clsx';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -103,14 +104,16 @@ const CitySelectMobile = () => {
       >
         <div className="flex flex-col gap-4 w-full font-medium">
           <div className="flex items-center justify-between">
-            <p className="text-lg font-semibold">{t('Выберите город')}</p>
+            <p className="text-lg text-[#121212] font-semibold">
+              {t('Выберите город')}
+            </p>
           </div>
           <div className="relative">
             <Input
               placeholder={t('Укажите город')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 text-black"
+              className="w-full pl-10 text-[#121212] placeholder:text-[#909091]"
               onClick={(e) => e.stopPropagation()}
               onFocus={(e) => e.stopPropagation()}
             />
@@ -120,16 +123,23 @@ const CitySelectMobile = () => {
                 top: '50%',
                 left: '12px',
                 transform: 'translateY(-50%)',
-                color: 'gray',
+                color: '#909091',
               }}
             />
           </div>
-          <div className="flex flex-col gap-2 overflow-y-auto max-h-[60vh]">
+          <div
+            className={clsx(
+              'flex overflow-y-auto max-h-[60vh] h-screen',
+              filteredCities.length > 0
+                ? 'flex-col gap-2'
+                : 'justify-center items-center',
+            )}
+          >
             {filteredCities.length > 0 ? (
               filteredCities.map((cityName) => (
                 <div
                   key={cityName}
-                  className="p-2 hover:bg-gray-200 text-black items-center cursor-pointer flex justify-between"
+                  className="p-2 hover:bg-gray-200 text-[#121212] items-center cursor-pointer flex justify-between"
                   onClick={() => {
                     setSelectedCity(cityName);
                     setStoreWhere(cityName);
@@ -144,7 +154,7 @@ const CitySelectMobile = () => {
                 </div>
               ))
             ) : (
-              <div className="p-2 text-black">{t('Не найдено')}</div>
+              <div className="p-2 text-[#121212] m-auto">{t('Не найдено')}</div>
             )}
           </div>
         </div>

@@ -58,7 +58,7 @@ const FaqTabs = () => {
 
   return (
     <div className="custom-container mt-5">
-      <p className="text-3xl text-[#001452] font-semibold">
+      <p className="text-3xl text-[#031753] font-semibold">
         {t('Ответы на вопросы')}
       </p>
 
@@ -83,14 +83,14 @@ const FaqTabs = () => {
                 <TabsTrigger
                   key={e.name}
                   value={e.name}
-                  className="w-full justify-start text-center cursor-pointer text-md font-semibold data-[state=active]:bg-[#EDEEF1] p-4 rounded-xl data-[state=active]:shadow-sm"
+                  className="w-full text-[#212122] justify-start text-center cursor-pointer text-md font-semibold data-[state=active]:bg-[#EDEEF1] p-4 rounded-xl data-[state=active]:shadow-sm"
                 >
                   {e.name}
                 </TabsTrigger>
               ))}
               <TabsTrigger
                 value="support"
-                className="w-full justify-start text-center text-md font-semibold data-[state=active]:bg-[#EDEEF1] p-4 rounded-xl data-[state=active]:shadow-sm"
+                className="w-full text-[#212122] justify-start text-center text-md font-semibold data-[state=active]:bg-[#EDEEF1] p-4 rounded-xl data-[state=active]:shadow-sm"
               >
                 {t('Служба поддержки')}
               </TabsTrigger>

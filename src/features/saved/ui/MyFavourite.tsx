@@ -187,7 +187,7 @@ const MyFavourite = () => {
                       className="w-full aspect-square relative group overflow-hidden rounded-3xl shadow-lg"
                     >
                       <Image
-                        src={BASE_URL + e.ticket.ticket_images.image}
+                        src={BASE_URL + e.ticket.ticket_images}
                         alt={e.ticket.title}
                         fill
                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
@@ -221,17 +221,18 @@ const MyFavourite = () => {
                     <div className="mt-4">
                       <Rating
                         name="read-only"
-                        size="small"
+                        size="medium"
+                        sx={{ color: '#F08125' }}
                         value={e.ticket.rating}
                         readOnly
                       />
                       <p className="text-xl font-semibold text-[#031753]">
                         {e.ticket.title}
                       </p>
-                      <p className="text-sm text-blue-950">
+                      <p className="text-sm text-[#031753]">
                         {e.ticket.destination}
                       </p>
-                      <p className="mt-2 text-blue-600 font-semibold">
+                      <p className="mt-2 text-[#084FE3] font-semibold">
                         {formatPrice(
                           e.ticket.price,
                           locale as LanguageRoutes,
@@ -288,7 +289,7 @@ const MyFavourite = () => {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: false, amount: 0.1 }}
-            className="text-3xl font-semibold text-[#031753]"
+            className="text-3xl font-semibold text-[#0E0B0E]"
           >
             {t('Тут ничего нет')}...
           </motion.p>
@@ -302,7 +303,6 @@ const MyFavourite = () => {
             {t('Выберите понравивщися тур')}
           </motion.p>
 
-          {/* uchta info kartochka */}
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -371,7 +371,7 @@ const MyFavourite = () => {
                   onClick={() => hot?.scrollPrev()}
                   disabled={!hotScrollPrev}
                 >
-                  <KeyboardBackspaceIcon />
+                  <KeyboardBackspaceIcon sx={{ color: '#084FE3' }} />
                 </Button>
                 <Button
                   variant={'outline'}
@@ -379,7 +379,9 @@ const MyFavourite = () => {
                   onClick={() => hot?.scrollNext()}
                   disabled={!hotScrollNext}
                 >
-                  <KeyboardBackspaceIcon sx={{ rotate: '180deg' }} />
+                  <KeyboardBackspaceIcon
+                    sx={{ rotate: '180deg', color: '#084FE3' }}
+                  />
                 </Button>
               </div>
             </div>
@@ -447,18 +449,19 @@ const MyFavourite = () => {
                           >
                             <Rating
                               name="read-only"
-                              size="small"
+                              size="medium"
                               value={e.rating}
                               readOnly
+                              sx={{ color: '#F08125' }}
                               precision={0.1}
                             />
                             <p className="text-xl font-semibold text-[#031753]">
                               {e.title}
                             </p>
-                            <p className="text-md text-blue-950">
+                            <p className="text-md text-[#031753]">
                               {e.destination}
                             </p>
-                            <p className="mt-2 text-blue-600 font-semibold">
+                            <p className="mt-2 text-[#084FE3] font-semibold">
                               {formatPrice(
                                 e.price,
                                 locale as LanguageRoutes,

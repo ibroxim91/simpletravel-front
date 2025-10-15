@@ -30,7 +30,7 @@ import Drawer from '@mui/material/Drawer';
 import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, SearchIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
@@ -52,7 +52,7 @@ const Player = dynamic(
 
 export default function Selectour() {
   const t = useTranslations();
-  const [priceRange, setPriceRange] = useState<number[]>([2500000, 100000000]);
+  const [priceRange, setPriceRange] = useState<number[] | []>([]);
   const {
     destinations,
     durationDays,
@@ -282,7 +282,9 @@ export default function Selectour() {
           }}
           className="w-[40%] p-5 rounded-2xl bg-white h-max max-lg:hidden"
         >
-          <h2 className="text-lg font-semibold">{t('Фильтры')}</h2>
+          <h2 className="text-lg font-semibold text-[#212122]">
+            {t('Фильтры')}
+          </h2>
           <hr className="my-3 border-[#DFDFDF]" />
 
           <FilterSection title={t('Стоимость')}>
@@ -291,31 +293,42 @@ export default function Selectour() {
               min={2500000}
               max={100000000}
               value={priceRange}
+              className="placeholder:!text-[#909091] !text-[#909091]"
               onChange={(v) => setPriceRange(v as number[])}
             />
             <div className="flex justify-between mt-3 border border-[#DFDFDF] rounded-xl p-3">
               <input
                 type="text"
                 value={formatPrice(priceRange[0])}
+                placeholder="2 500 000"
                 onChange={(e) => handleInputChange(e.target.value, 0)}
-                className="w-1/2 border-none outline-none text-gray-600"
+                className={clsx(
+                  'w-1/2 border-none outline-none',
+                  priceRange[0] ? 'text-[#212122]' : 'text-[#909091]',
+                )}
               />
               <input
                 type="text"
                 value={formatPrice(priceRange[1])}
                 onChange={(e) => handleInputChange(e.target.value, 1)}
-                className="w-1/2 border-none outline-none text-right text-gray-600"
+                className={clsx(
+                  'w-1/2 border-none outline-none text-right',
+                  priceRange[1] ? 'text-[#212122]' : 'text-[#909091]',
+                )}
               />
             </div>
           </FilterSection>
 
           <FilterSection title={t('Название отеля')}>
-            <input
-              type="text"
-              placeholder={t('Название отеля')}
-              onChange={(e) => setHotelName(e.target.value)}
-              className="w-full border rounded-xl px-3 py-2 outline-none"
-            />
+            <div className="relative">
+              <input
+                type="text"
+                placeholder={t('Название отеля')}
+                onChange={(e) => setHotelName(e.target.value)}
+                className="w-full border rounded-xl px-10 py-2 outline-none placeholder:text-[#909091] text-[#212122]"
+              />
+              <SearchIcon className="absolute left-2 top-1/2 -translate-y-1/2 text-[#909091]" />
+            </div>
           </FilterSection>
 
           <FilterSection title={t('Условия въезда')}>
@@ -473,7 +486,9 @@ export default function Selectour() {
             className="bg-white shadow-sm flex items-center justify-between px-4 py-4 rounded-xl"
             onClick={() => setFilter(true)}
           >
-            <p className="font-semibold text-lg">{t('Филтры')}</p>
+            <p className="font-semibold text-lg text-[#212122]">
+              {t('Филтры')}
+            </p>
             <FilterListIcon />
           </div>
           <Drawer
@@ -492,7 +507,9 @@ export default function Selectour() {
             }}
           >
             <div className="mb-5 flex items-center justify-between sticky">
-              <h2 className="text-lg font-semibold">{t('Фильтры')}</h2>
+              <h2 className="text-lg font-semibold text-[#121212]">
+                {t('Фильтры')}
+              </h2>
               <Button
                 variant={'outline'}
                 className="rounded-full h-[40px] w-[40px] cursor-pointer"
@@ -676,7 +693,7 @@ export default function Selectour() {
             </FilterSection>
             <div className="sticky bottom-0 w-full left-0">
               <button
-                className="bg-blue-600 rounded-3xl p-3 w-full text-white cursor-pointer font-semibold"
+                className="bg-[#1764FC] rounded-3xl p-3 w-full text-white cursor-pointer font-semibold"
                 onClick={() => {
                   setFilter(false);
                 }}
@@ -776,7 +793,7 @@ export default function Selectour() {
                         src={loaderAnimation}
                         style={{ height: '240px', width: '240px' }}
                       />
-                      <p className="text-2xl font-semibold">
+                      <p className="text-2xl font-semibold text-[#121212]">
                         {t('Не найдено')}
                       </p>
                     </motion.div>

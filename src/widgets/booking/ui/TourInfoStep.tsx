@@ -42,8 +42,10 @@ export default function TourInfoStep({ onNext, onPrev, data }: Props) {
   return (
     <div>
       <div className="w-full bg-[#FFFFFF] p-[20px] rounded-[20px] relative">
-        <h1 className="text-[20px] font-bold">{t('Турпакет')}</h1>
-        <hr className="h-[2px] my-[24px] bg-[#EDEEF1]" />
+        <h1 className="text-[20px] font-bold text-[#212122]">
+          {t('Турпакет')}
+        </h1>
+        <hr className="h-[2px] my-[24px] bg-[#DFDFDF]" />
 
         <div className="flex items-center gap-[20px] my-[20px] max-lg:flex-col max-lg:items-start">
           <div className="relative rounded-2xl aspect-square w-48 cursor-pointer max-lg:w-full">
@@ -63,6 +65,7 @@ export default function TourInfoStep({ onNext, onPrev, data }: Props) {
                 size="medium"
                 value={data?.data.rating}
                 readOnly
+                sx={{ color: '#F08125' }}
                 precision={0.1}
               />
             </div>
@@ -89,7 +92,7 @@ export default function TourInfoStep({ onNext, onPrev, data }: Props) {
           </div>
         </div>
 
-        <label className="text-xl font-semibold">
+        <label className="text-xl font-semibold text-[#121212]">
           {t('Выберите категорию')}
         </label>
 
@@ -138,7 +141,9 @@ export default function TourInfoStep({ onNext, onPrev, data }: Props) {
           })}
         </div>
 
-        <p className="text-xl font-semibold mt-5">{t('Транспорт')}</p>
+        <p className="text-xl font-semibold mt-5 text-[#121212]">
+          {t('Транспорт')}
+        </p>
         <div className="mt-[8px] grid grid-cols-2 justify-between gap-[16px] max-md:grid-cols-1">
           {data?.data.transports.map((opt) => {
             const inputId = `selectTransport-${opt.name}`;
@@ -204,7 +209,7 @@ export default function TourInfoStep({ onNext, onPrev, data }: Props) {
             setAdditional(selected);
             setStoreTransport(transport);
           }}
-          className="bg-[#084FE3] text-white py-4 font-medium px-20 left-0 cursor-pointer rounded-full mt-[20px]"
+          className="bg-[#1764FC] text-white py-4 font-medium px-20 left-0 cursor-pointer rounded-full mt-[20px]"
         >
           {t('Следующий')}
         </button>

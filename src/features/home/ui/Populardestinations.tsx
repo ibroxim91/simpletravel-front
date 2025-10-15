@@ -54,10 +54,12 @@ const Populardestinations = () => {
   return (
     <div className="custom-container mt-10 max-lg:hidden">
       <div className="flex justify-between items-center">
-        <p className="text-2xl font-semibold">{t('Популярные направления')}</p>
+        <p className="text-3xl font-semibold text-[#031753]">
+          {t('Популярные направления')}
+        </p>
         <Link
           href="/selectour"
-          className="cursor-pointer text-blue-600 font-semibold"
+          className="cursor-pointer text-[#1764FC] font-semibold text-lg"
         >
           {t('Больше акций')}
         </Link>
@@ -350,10 +352,10 @@ const Populardestinations = () => {
                     href="/selectour"
                     className="bg-[#ECF2FF] w-fit py-4 px-10 rounded-4xl flex gap-4 shadow-md"
                   >
-                    <p className="text-blue-600 font-semibold">
+                    <p className="text-[#084FE3] font-semibold">
                       {t('Забронировать')}
                     </p>
-                    <ArrowRightAltIcon className="text-blue-600" />
+                    <ArrowRightAltIcon className="text-[#084FE3]" />
                   </Link>
                 </motion.div>
               </motion.div>

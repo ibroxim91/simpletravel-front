@@ -168,8 +168,10 @@ const TwoStep = ({ setStep }: Props) => {
 
   return (
     <div className="w-[50%] bg-white rounded-3xl h-fit py-5 px-10 absolute bottom-0 top-52 max-md:px-2 max-sm:top-16 max-lg:w-[90%] left-1/2 -translate-x-1/2">
-      <p className="text-xl font-semibold">{t('Код аутентификации')}</p>
-      <p className="mt-4 text-lg w-[70%] max-lg:w-full max-[340px]:break-words">
+      <p className="text-xl font-semibold text-[#212122]">
+        {t('Код аутентификации')}
+      </p>
+      <p className="mt-4 text-lg w-[70%] max-lg:w-full max-[340px]:break-words text-[#646465]">
         {t('Введите 5-значный код, который мы только что отправили на')}{' '}
         {phone ? (
           <span className="text-[#3E7FFF]">{formatPhone(phone)}</span>

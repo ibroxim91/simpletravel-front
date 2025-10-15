@@ -13,6 +13,7 @@ import DoneIcon from '@mui/icons-material/Done';
 import RemoveIcon from '@mui/icons-material/Remove';
 import SearchIcon from '@mui/icons-material/Search';
 import { useQuery } from '@tanstack/react-query';
+import clsx from 'clsx';
 
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
@@ -24,7 +25,6 @@ const FilterHotel = () => {
   const [openCity, setOpenCity] = useState(false);
   const [ageOpen, setAgeOpen] = useState(false);
   const [dataOpen, setDataOpen] = useState(false);
-  const [search, setSearch] = useState('');
   const [selectedWhere, setSelectedWhere] = useState('');
   const [searchWhere, setSearchWhere] = useState('');
   const [fromDate, setFromDate] = useState<Date | undefined>();
@@ -61,7 +61,7 @@ const FilterHotel = () => {
   }, [ticket]);
 
   const filteredCities = cities.filter((c) =>
-    c.toLowerCase().includes(search.toLowerCase()),
+    c.toLowerCase().includes(searchWhere.toLowerCase()),
   );
 
   useEffect(() => {
@@ -109,14 +109,16 @@ const FilterHotel = () => {
         <div
           onClick={() => {
             setOpenCity(!openCity);
-            setSearch('');
+            setSearchWhere('');
           }}
           className="cursor-pointer flex flex-col gap-2"
         >
-          <Label className="font-semibold text-md ">{t('Направления')}</Label>
+          <Label className="font-semibold text-md text-[#121212]">
+            {t('Направления')}
+          </Label>
           <div className="relative">
             <Input
-              className="h-[60px] text-md placeholder:text-md"
+              className="h-[60px] text-md placeholder:text-md placeholder:text-[#A3A3A3]"
               placeholder={t('Страна, курорт')}
               value={searchWhere || selectedWhere}
               onChange={(e) => {
@@ -153,12 +155,12 @@ const FilterHotel = () => {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="relative mb-2">
-              <SearchIcon className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400" />
+              <SearchIcon className="absolute left-2 top-1/2 -translate-y-1/2 text-[#909091]" />
               <Input
                 placeholder={t('Укажите город')}
                 value={searchWhere}
                 onChange={(e) => setSearchWhere(e.target.value)}
-                className="w-full pl-10 text-black"
+                className="w-full pl-10 text-black placeholder:text-[#909091]"
                 onClick={(e) => e.stopPropagation()}
                 onFocus={(e) => e.stopPropagation()}
               />
@@ -168,7 +170,7 @@ const FilterHotel = () => {
               filteredCities.map((cityName) => (
                 <div
                   key={cityName}
-                  className="p-2 hover:bg-gray-200 rounded-lg text-black items-center cursor-pointer flex justify-between"
+                  className="p-2 hover:bg-gray-200 rounded-lg text-[#212122] items-center cursor-pointer flex justify-between"
                   onClick={() => {
                     setSelectedWhere(cityName);
                     setSearchWhere(cityName);
@@ -182,7 +184,9 @@ const FilterHotel = () => {
                 </div>
               ))
             ) : (
-              <div className="p-2 text-black">{t('Не найдено')}</div>
+              <div className="p-2 text-[#212122] text-center">
+                {t('Не найдено')}
+              </div>
             )}
           </div>
         )}
@@ -195,12 +199,12 @@ const FilterHotel = () => {
           }}
           className="cursor-pointer flex flex-col gap-2"
         >
-          <Label className="font-semibold text-md">
+          <Label className="font-semibold text-md text-[#121212]">
             {t('Дата отправления')}
           </Label>
           <div className="relative">
             <Input
-              className="h-[60px] text-md placeholder:text-md"
+              className="h-[60px] text-md placeholder:text-md placeholder:text-[#A3A3A3]"
               placeholder={t('Когда')}
               value={selectData}
               readOnly
@@ -208,7 +212,7 @@ const FilterHotel = () => {
             <CalendarMonthIcon
               sx={{
                 position: 'absolute',
-                color: 'black',
+                color: '#121212',
                 top: '50%',
                 right: '10px',
                 transform: 'translateY(-50%)',
@@ -249,8 +253,8 @@ const FilterHotel = () => {
                 value={
                   fromDate ? formatDate.format(fromDate, 'DD/MM/YYYY') : ''
                 }
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full text-black h-[50px]"
+                onChange={(e) => setSearchWhere(e.target.value)}
+                className="w-full text-black h-[50px] placeholder:text-[#121212]"
                 onClick={(e) => e.stopPropagation()}
                 onFocus={(e) => e.stopPropagation()}
               />
@@ -262,8 +266,11 @@ const FilterHotel = () => {
                 placeholder={t('Выезд')}
                 value={toDate ? formatDate.format(toDate, 'DD/MM/YYYY') : ''}
                 disabled={fromDate === undefined}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full text-black h-[50px]"
+                onChange={(e) => setSearchWhere(e.target.value)}
+                className={clsx(
+                  'w-full text-black h-[50px]',
+                  formatDate ? 'text-[#121212]' : 'text-[#A3A3A3]',
+                )}
                 onClick={(e) => e.stopPropagation()}
                 onFocus={(e) => e.stopPropagation()}
               />
@@ -277,13 +284,14 @@ const FilterHotel = () => {
                   setFromDate(val?.from);
                   setToDate(val?.to);
                 }}
+                className="text-[#212122]"
                 showOutsideDays={false}
                 numberOfMonths={2}
               />
             </div>
             <div className="grid grid-cols-2 mt-5 gap-2">
               <button
-                className="bg-blue-500/40 rounded-3xl p-3 text-blue-600 cursor-pointer"
+                className="bg-[#ECF2FF] rounded-3xl p-3 text-[#084FE3] cursor-pointer"
                 onClick={() => {
                   setDataOpen(false);
                   setFromDate(undefined);
@@ -295,7 +303,7 @@ const FilterHotel = () => {
                 {t('Отмена')}
               </button>
               <button
-                className="bg-blue-600 rounded-3xl text-white"
+                className="bg-[#1764FC] rounded-3xl text-[#FFFFFF]"
                 onClick={() => {
                   setDataOpen(false);
                   if (fromDate && toDate) {
@@ -321,10 +329,12 @@ const FilterHotel = () => {
           }}
           className="cursor-pointer flex flex-col gap-2"
         >
-          <Label className="font-semibold text-md">{t('Туристы')}</Label>
+          <Label className="font-semibold text-md text-[#121212]">
+            {t('Туристы')}
+          </Label>
           <div className="relative">
             <Input
-              className="h-[60px] text-md placeholder:text-md"
+              className="h-[60px] text-md placeholder:text-md placeholder:text-[#A3A3A3]"
               placeholder={t('Вызрослых')}
               value={selectAge === 0 ? '' : selectAge}
               readOnly
@@ -359,8 +369,10 @@ const FilterHotel = () => {
           >
             <div className="flex justify-between">
               <Label className="flex flex-col gap-0 items-start">
-                <p className="font-semibold text-lg">{t('Вызрослых')}</p>
-                <p className="text-ring text-sm">{t('старше 13 лет')}</p>
+                <p className="font-semibold text-lg text-[#212122]">
+                  {t('Вызрослых')}
+                </p>
+                <p className="text-sm text-[#909091]">{t('старше 13 лет')}</p>
               </Label>
               <div className="grid grid-cols-3 border justify-center items-center rounded-lg w-48">
                 <Button
@@ -370,11 +382,11 @@ const FilterHotel = () => {
                     setAdults((prev) => (prev > 0 ? prev - 1 : prev));
                   }}
                 >
-                  <RemoveIcon className="text-blue-600" />
+                  <RemoveIcon className="text-[#084FE3]" />
                 </Button>
                 <Button
                   variant={'ghost'}
-                  className="rounded-none border-r-2 h-full border-l-2 text-lg"
+                  className="rounded-none border-r-2 h-full border-l-2 text-lg text-[#212122]"
                 >
                   {adults}
                 </Button>
@@ -385,14 +397,16 @@ const FilterHotel = () => {
                     setAdults((prev) => prev + 1);
                   }}
                 >
-                  <AddIcon className="text-blue-600" />
+                  <AddIcon className="text-[#084FE3]" />
                 </Button>
               </div>
             </div>
             <div className="flex justify-between mt-5">
               <Label className="flex flex-col gap-0 items-start">
-                <p className="font-semibold text-lg">{t('Дети')}</p>
-                <p className="text-ring text-sm">{t('до 13 лет')}</p>
+                <p className="font-semibold text-lg text-[#212122]">
+                  {t('Дети')}
+                </p>
+                <p className="text-sm text-[#909091]">{t('до 13 лет')}</p>
               </Label>
               <div className="grid grid-cols-3 border justify-center items-center rounded-lg w-48">
                 <Button
@@ -402,11 +416,11 @@ const FilterHotel = () => {
                     setChildren((prev) => (prev > 0 ? prev - 1 : prev))
                   }
                 >
-                  <RemoveIcon className="text-blue-600" />
+                  <RemoveIcon className="text-[#084FE3]" />
                 </Button>
                 <Button
                   variant={'ghost'}
-                  className="rounded-none border-r-2 h-full border-l-2 text-lg"
+                  className="rounded-none border-r-2 h-full border-l-2 text-lg text-[#212122]"
                 >
                   {children}
                 </Button>
@@ -417,7 +431,7 @@ const FilterHotel = () => {
                     setChildren((prev) => prev + 1);
                   }}
                 >
-                  <AddIcon className="text-blue-600" />
+                  <AddIcon className="text-[#084FE3]" />
                 </Button>
               </div>
             </div>
@@ -428,7 +442,7 @@ const FilterHotel = () => {
       <div className="flex flex-col gap-2">
         <div className="h-[25px]" />
         <Button
-          className="bg-blue-600 text-lg text-white h-[60px] flex items-center justify-center rounded-4xl text-center font-semibold cursor-pointer"
+          className="bg-[#1764FC] hover:bg-[#1764FC] text-lg text-white h-[60px] flex items-center justify-center rounded-4xl text-center font-semibold cursor-pointer"
           onClick={saveFilter}
         >
           <p>{t('Искать туры')}</p>

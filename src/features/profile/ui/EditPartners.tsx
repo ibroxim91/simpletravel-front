@@ -10,7 +10,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@/shared/ui/form';
 import { Input } from '@/shared/ui/input';
@@ -23,7 +22,7 @@ import Drawer from '@mui/material/Drawer';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
-import { TrashIcon, UserIcon } from 'lucide-react';
+import { LoaderCircle, TrashIcon, UserIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
@@ -97,7 +96,7 @@ const EditPartners = ({
     }
   }, [oneParticipant, id, form]);
 
-  const { mutate: edit } = useMutation({
+  const { mutate: edit, isPending } = useMutation({
     mutationFn: ({ formData }: { formData: FormData }) => {
       return User_Api.editParticipant({ formData, id: id! });
     },
@@ -171,14 +170,16 @@ const EditPartners = ({
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="bg-white p-5 rounded-2xl relative space-y-6">
             <div className="flex items-center justify-between max-lg:flex-col max-lg:items-start max-lg:gap-4">
-              <h1 className="font-bold text-xl">{t('Участник')}</h1>
+              <h1 className="font-bold text-xl text-[#212122]">
+                {t('Участник')}
+              </h1>
             </div>
             <FormField
               control={form.control}
               name={`gender`}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('Пол')}</FormLabel>
+                  <Label className="text-lg text-[#212122]">{t('Пол')}</Label>
                   <FormControl>
                     <div className="flex items-center gap-8 mt-2 max-sm:flex-col max-sm:items-start">
                       <label className="flex items-center gap-2 cursor-pointer">
@@ -189,7 +190,7 @@ const EditPartners = ({
                           onChange={field.onChange}
                           className="w-6 h-6 accent-[#084FE3]"
                         />
-                        {t('Мужчина')}
+                        <p className="text-[#646465]">{t('Мужчина')}</p>
                       </label>
                       <label className="flex items-center gap-2 cursor-pointer">
                         <Input
@@ -199,7 +200,7 @@ const EditPartners = ({
                           onChange={field.onChange}
                           className="w-6 h-6 accent-[#084FE3]"
                         />
-                        {t('Женщина')}
+                        <p className="text-[#646465]">{t('Женщина')}</p>
                       </label>
                     </div>
                   </FormControl>
@@ -213,13 +214,15 @@ const EditPartners = ({
                 name={`firstName`}
                 render={({ field }) => (
                   <FormItem>
-                    <Label className="text-lg font-semibold">{t('Имя')}</Label>
+                    <Label className="text-lg font-semibold text-[#212122]">
+                      {t('Имя')}
+                    </Label>
                     <FormControl>
                       <Input
                         {...field}
                         type="text"
                         placeholder={t('Введите имя')}
-                        className="px-5 h-14 rounded-lg"
+                        className="px-5 h-14 rounded-lg text-[#212122] placeholder:text-[#909091]"
                       />
                     </FormControl>
                     <FormMessage />
@@ -231,7 +234,7 @@ const EditPartners = ({
                 name={`lastName`}
                 render={({ field }) => (
                   <FormItem>
-                    <Label className="text-lg font-semibold">
+                    <Label className="text-lg font-semibold text-[#212122]">
                       {t('Фамилия')}
                     </Label>
                     <FormControl>
@@ -239,7 +242,7 @@ const EditPartners = ({
                         {...field}
                         type="text"
                         placeholder={t('Введите фамилию')}
-                        className="p-5 rounded-lg h-14"
+                        className="p-5 rounded-lg h-14 text-[#212122] placeholder:text-[#909091]"
                       />
                     </FormControl>
                     <FormMessage />
@@ -253,7 +256,9 @@ const EditPartners = ({
                 name={`date`}
                 render={({ field }) => (
                   <FormItem>
-                    <Label className="text-lg">{t('Время возвращения')}</Label>
+                    <Label className="text-lg text-[#212122]">
+                      {t('Дата рождения')}
+                    </Label>
                     <FormControl>
                       <div>
                         <div className="max-lg:hidden">
@@ -262,13 +267,14 @@ const EditPartners = ({
                               <button
                                 className={cn(
                                   'w-full justify-start text-left cursor-pointer relative font-normal border-2 h-full border-[#EDEEF1] rounded-md p-[12px]',
-                                  !field.value && 'text-muted-foreground',
+                                  !field.value && 'text-[#909091]',
                                 )}
                               >
                                 <CalendarMonthIcon
                                   sx={{
                                     width: '28px',
                                     height: '28px',
+                                    color: '#212122',
                                     position: 'absolute',
                                     right: 10,
                                   }}
@@ -368,7 +374,7 @@ const EditPartners = ({
                 name={`phone`}
                 render={({ field }) => (
                   <FormItem>
-                    <Label className="text-lg font-semibold">
+                    <Label className="text-lg font-semibold text-[#212122]">
                       {t('Телефон номер')}
                     </Label>
                     <FormControl>
@@ -380,7 +386,7 @@ const EditPartners = ({
                         }
                         maxLength={19}
                         placeholder={t('Введите номер')}
-                        className="p-5 rounded-lg h-14"
+                        className="p-5 rounded-lg h-14 text-[#212122] placeholder:text-[#909091]"
                       />
                     </FormControl>
                     <FormMessage />
@@ -515,10 +521,7 @@ const EditPartners = ({
           <div className="flex gap-2 max-lg:grid max-lg:grid-cols-2 mt-5 sticky bottom-0">
             <button
               type="button"
-              onClick={() => {
-                setAdded(false);
-                setId(undefined);
-              }}
+              onClick={() => setAdded(false)}
               className="bg-[#FFFFFF] border shadow-nonde border-[#DFDFDF] text-[#031753] hover:bg-[#FFFFFF] px-14 py-3 max-lg:px-0 rounded-full cursor-pointer"
             >
               {t('Отмена')}
@@ -528,7 +531,11 @@ const EditPartners = ({
               onClick={form.handleSubmit(onSubmit)}
               className="bg-[#1764FC] border shadow-nonde text-white border-[#DFDFDF] hover:bg-[#1764FC] px-14 py-3 max-lg:px-0 rounded-full cursor-pointer"
             >
-              {t('Сохранить')}
+              {isPending ? (
+                <LoaderCircle className="animate-spin" />
+              ) : (
+                t('Сохранить')
+              )}
             </button>
           </div>
         </form>
