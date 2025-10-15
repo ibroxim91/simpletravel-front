@@ -100,19 +100,21 @@ const BlogDetail = () => {
                 </div>
 
                 {newsData && newsData?.post_tags?.length > 0 && (
-                  <div className="flex items-center gap-2 text-[#212122] max-md:text-[12px]">
+                  <div className="flex items-start gap-2 text-[#212122]">
                     <PinIcon
-                      className="rotate-45"
+                      className="rotate-45 flex-shrink-0"
                       width={24}
                       height={24}
                       fill="#084FE3"
                       color="#084FE3"
                     />
-                    {newsData.post_tags.map((e) => (
-                      <p className="max-lg:hidden" key={e.id}>
-                        #{e.name}
-                      </p>
-                    ))}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {newsData.post_tags.map((e) => (
+                        <p className="w-fit break-words" key={e.id}>
+                          #{e.name}
+                        </p>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>
