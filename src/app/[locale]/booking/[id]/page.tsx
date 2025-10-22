@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { Suspense } from 'react';
 import BookingClient from './BookingClient';
 
 type Props = {
@@ -190,7 +191,9 @@ export default async function BookingPage({ params }: Props) {
 
       <main>
         <h1 className="sr-only">{title}</h1>
-        <BookingClient />
+        <Suspense>
+          <BookingClient />
+        </Suspense>
       </main>
     </>
   );

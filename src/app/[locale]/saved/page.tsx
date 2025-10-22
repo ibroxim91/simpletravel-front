@@ -172,7 +172,7 @@ export default async function SavedPage({ params }: Props) {
   };
 
   return (
-    <Suspense>
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(savedSchema) }}
@@ -186,9 +186,11 @@ export default async function SavedPage({ params }: Props) {
         <h1 className="sr-only">{h1Text}</h1>
 
         <section aria-label={ariaLabels.section}>
-          <SavedClient />
+          <Suspense>
+            <SavedClient />
+          </Suspense>
         </section>
       </main>
-    </Suspense>
+    </>
   );
 }

@@ -1,5 +1,3 @@
-'use client';
-
 import FaqTabs from '@/features/faq/ui/FaqTabs';
 import HeadresFaq from '@/features/faq/ui/HeadresFaq';
 

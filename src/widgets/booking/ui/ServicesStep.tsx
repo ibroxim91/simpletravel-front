@@ -145,7 +145,11 @@ export default function ServicesStep({
       (acc, service) => acc + service.price,
       0,
     );
-    const total_price = basePrice + paidServicesTotal;
+    const total_price =
+      basePrice +
+      paidServicesTotal +
+      store.tariff.price +
+      store.transport.price;
     setTotalPrice(total_price);
     if (
       store.returned &&
@@ -162,8 +166,8 @@ export default function ServicesStep({
         extra_paid_service: store.excursions,
         extra_service: servicesIds,
         participant: userIds,
-        tariff: store.tariff.name,
-        transport: store.transport,
+        tariff: store.tariff.tariff.name,
+        transport: store.transport.transport.name,
         ticket: Number(id),
         total_price: total_price,
       });

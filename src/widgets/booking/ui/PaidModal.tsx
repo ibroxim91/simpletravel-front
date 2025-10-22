@@ -1,3 +1,5 @@
+'use client';
+
 import loaderAnimation from '@/assets/lottie/Travel.json';
 import { useRouter } from '@/shared/config/i18n/navigation';
 import { Button } from '@/shared/ui/button';
@@ -10,14 +12,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/shared/ui/dialog';
-import { Player } from '@lottiefiles/react-lottie-player';
 import CloseIcon from '@mui/icons-material/Close';
 import DoneIcon from '@mui/icons-material/Done';
 import Drawer from '@mui/material/Drawer';
 import clsx from 'clsx';
 import { useTranslations } from 'next-intl';
+import dynamic from 'next/dynamic';
 import { Dispatch, SetStateAction } from 'react';
 import formStore from '../lib/hook';
+const Player = dynamic(
+  () => import('@lottiefiles/react-lottie-player').then((mod) => mod.Player),
+  { ssr: false },
+);
 
 interface Props {
   onClose: () => void;

@@ -40,6 +40,8 @@ const TICKETORDER = '/api/v1/ticketorder/';
 const PAYMENTS = '/api/v1/payments_link/';
 const DONWLOAD_PDF = '/api/v1/get-order-pdf/';
 
+const SEND_COMMENT = '/api/v1/ticket-comment/';
+
 export {
   BASE_URL,
   DONWLOAD_PDF,
@@ -71,6 +73,7 @@ export {
   PHONE_SENDOTP,
   PHONE_SET_PASSWORD,
   SAVE_TICKETS,
+  SEND_COMMENT,
   SEND_PARTNER,
   SEND_SUPPORT,
   TICKETORDER,

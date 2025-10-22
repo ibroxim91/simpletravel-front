@@ -1,3 +1,5 @@
+'use client';
+
 import { Link } from '@/shared/config/i18n/navigation';
 import formatDate from '@/shared/lib/formatDate';
 import { Badge } from '@/shared/ui/badge';

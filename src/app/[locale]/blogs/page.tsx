@@ -170,7 +170,7 @@ export default async function Blogs({ params }: Props) {
         : 'Travel and Tourism Blog';
 
   return (
-    <Suspense>
+    <>
       {/* Structured Data */}
       <script
         type="application/ld+json"
@@ -187,8 +187,10 @@ export default async function Blogs({ params }: Props) {
 
       <main>
         <h1 className="sr-only">{h1Text}</h1>
-        <BlogsClient />
+        <Suspense>
+          <BlogsClient />
+        </Suspense>
       </main>
-    </Suspense>
+    </>
   );
 }

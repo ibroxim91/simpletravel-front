@@ -89,7 +89,7 @@ export default async function ForgetPassword({ params }: Props) {
         : 'Password Recovery';
 
   return (
-    <Suspense>
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -99,8 +99,10 @@ export default async function ForgetPassword({ params }: Props) {
 
       <main className="h-full">
         <h1 className="sr-only">{h1Text}</h1>
-        <ForgetPasswordClient />
+        <Suspense>
+          <ForgetPasswordClient />
+        </Suspense>
       </main>
-    </Suspense>
+    </>
   );
 }

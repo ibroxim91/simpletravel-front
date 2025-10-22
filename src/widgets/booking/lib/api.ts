@@ -26,13 +26,19 @@ export interface Get_Info {
     ];
     tariff: [
       {
-        name: string;
+        tariff: {
+          name: string;
+        };
+        price: number;
       },
     ];
     transports: [
       {
-        name: string;
-        icon_name: string;
+        transport: {
+          name: string;
+          icon_name: string;
+        };
+        price: number;
       },
     ];
     extra_service: [

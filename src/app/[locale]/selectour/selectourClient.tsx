@@ -1,5 +1,3 @@
-'use client';
-
 import Selectour from '@/widgets/selectour/ui';
 
 const SelectourClient = () => {

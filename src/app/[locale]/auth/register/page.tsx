@@ -89,7 +89,7 @@ export default async function Register({ params }: Props) {
         : 'Registration';
 
   return (
-    <Suspense>
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -99,8 +99,10 @@ export default async function Register({ params }: Props) {
 
       <main className="h-full">
         <h1 className="sr-only">{h1Text}</h1>
-        <RegisterClient />
+        <Suspense>
+          <RegisterClient />
+        </Suspense>
       </main>
-    </Suspense>
+    </>
   );
 }

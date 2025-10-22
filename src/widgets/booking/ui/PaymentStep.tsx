@@ -332,12 +332,16 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
 
         <div className="grid grid-cols-2 items-center justify-between w-full my-2 bg-[#EDEEF1] px-[8px] py-[5px] rounded-[8px] text-[#646465]">
           <p className="text-md">{t('Тип пакета')}</p>
-          <p className="text-[#212122] text-end break-words">{tariff.name}</p>
+          <p className="text-[#212122] text-end break-words">
+            {tariff.tariff.name}
+          </p>
         </div>
 
         <div className="grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465]">
           <p className="text-md">{t('Транспорт')}</p>
-          <p className="text-[#212122] text-end break-words">{transport}</p>
+          <p className="text-[#212122] text-end break-words">
+            {transport.transport.name}
+          </p>
         </div>
 
         {store.paidService.length > 0 && (

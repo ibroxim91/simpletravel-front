@@ -84,7 +84,7 @@ export default async function Login({ params }: Props) {
         : 'Login to Account';
 
   return (
-    <Suspense>
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -94,8 +94,10 @@ export default async function Login({ params }: Props) {
 
       <main className="h-[850px]">
         <h1 className="sr-only">{h1Text}</h1>
-        <LoginClient />
+        <Suspense>
+          <LoginClient />
+        </Suspense>
       </main>
-    </Suspense>
+    </>
   );
 }

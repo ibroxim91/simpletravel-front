@@ -208,7 +208,7 @@ export default async function Faq({ params }: Props) {
         : 'Frequently Asked Questions';
 
   return (
-    <Suspense>
+    <>
       {/* SEO Structured Data */}
       <script
         type="application/ld+json"
@@ -225,8 +225,10 @@ export default async function Faq({ params }: Props) {
 
       <main>
         <h1 className="sr-only">{h1Text}</h1>
-        <FaqClient />
+        <Suspense>
+          <FaqClient />
+        </Suspense>
       </main>
-    </Suspense>
+    </>
   );
 }

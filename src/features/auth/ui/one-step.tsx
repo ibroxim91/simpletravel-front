@@ -1,3 +1,5 @@
+'use client';
+
 import { Link } from '@/shared/config/i18n/navigation';
 import formatPhone from '@/shared/lib/formatPhone';
 import onlyNumber from '@/shared/lib/onlyNember';

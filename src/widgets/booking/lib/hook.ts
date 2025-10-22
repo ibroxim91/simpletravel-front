@@ -22,7 +22,13 @@ type Store = {
     id: number;
     name: string;
   }[];
-  transport: string | null;
+  transport: {
+    transport: {
+      name: string;
+      icon_name: string;
+    };
+    price: number;
+  };
   additional: string | null;
   excursions: number[];
   excursionsPrice: number | null;
@@ -38,7 +44,10 @@ type Store = {
     name: string;
   }[];
   tariff: {
-    name: string;
+    tariff: {
+      name: string;
+    };
+    price: number;
   };
   total_price: number | null;
 
@@ -52,8 +61,19 @@ type Store = {
   updateUser: (index: number, user: Partial<User>) => void;
   removeUser: (index: number) => void;
   setToursCategory: (services: { id: number; name: string }[]) => void;
-  setTransport: (id: string | null) => void;
-  setTarif: (tariff: { name: string }) => void;
+  setTransport: (opt: {
+    transport: {
+      name: string;
+      icon_name: string;
+    };
+    price: number;
+  }) => void;
+  setTarif: (opt: {
+    tariff: {
+      name: string;
+    };
+    price: number;
+  }) => void;
   setAdditional: (id: string | null) => void;
   setExcursions: (ids: number[]) => void;
   setExcursionsPrice: (price: number | null) => void;
@@ -76,12 +96,18 @@ const initialState = {
   returned: null,
   user: [],
   tours_category: [] as { id: number; name: string }[],
-  transport: null,
+  transport: {
+    transport: {
+      name: '',
+      icon_name: '',
+    },
+    price: 0,
+  },
   additional: null,
   excursions: [] as number[],
   paidService: [] as { id: number; price: number; name: string }[],
   service: [] as { id: number; name: string }[],
-  tariff: { name: '' },
+  tariff: { tariff: { name: '' }, price: 0 },
   excursionsPrice: null,
   total_price: null,
 };
@@ -109,7 +135,7 @@ const formStore = create<Store>((set) => ({
       user: state.user.filter((_, i) => i !== index),
     })),
   setToursCategory: (services) => set({ tours_category: services }),
-  setTransport: (id) => set({ transport: id }),
+  setTransport: (transport) => set({ transport }),
   setAdditional: (id) => set({ additional: id }),
   setExcursions: (ids) => set({ excursions: ids }),
   reset: () => set(initialState),

@@ -1,5 +1,3 @@
-'use client';
-
 import AuthEditPassword from '@/features/auth/ui/auth-edit-password';
 
 const EditPasswordClient = () => {

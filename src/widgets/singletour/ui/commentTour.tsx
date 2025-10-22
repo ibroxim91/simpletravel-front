@@ -1,17 +1,36 @@
 import { Carousel, CarouselContent, CarouselItem } from '@/shared/ui/carousel';
 import Rating from '@mui/material/Rating';
+import { useMutation } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Plus, Send, XIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
+import { toast } from 'sonner';
+import { TicketsDetailAPi } from '../lib/api';
 import { ToursDetailData } from '../lib/data';
 import ReviewsItem from './ReviewsItem';
 
 const CommentTour = ({ data }: { data: ToursDetailData }) => {
   const t = useTranslations();
   const [showForm, setShowForm] = useState(false);
-  const [rating, setRating] = useState(0);
-  const [comment, setComment] = useState('');
+  const [rating, setRating] = useState<number>(0);
+  const [comment, setComment] = useState<string>('');
+  const { mutate } = useMutation({
+    mutationFn: (body: { text: string; rating: number; ticket: number }) =>
+      TicketsDetailAPi.sendCommet(body),
+    onSuccess: () => {
+      toast.success('Fikr bildirganiz uchun rahmat', {
+        position: 'top-center',
+        richColors: true,
+      });
+    },
+    onError: () => {
+      toast.error('Xatolik yuz berdi', {
+        position: 'top-center',
+        richColors: true,
+      });
+    },
+  });
 
   return (
     <div className="w-full h-full relative max-lg:h-full rounded-[24px] bg-gradient-to-r from-[#ABDAFF] to-[#F5EDC7] py-[32px]">
@@ -123,6 +142,13 @@ const CommentTour = ({ data }: { data: ToursDetailData }) => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 disabled={!rating || !comment.trim()}
+                onClick={() => {
+                  mutate({
+                    rating: rating,
+                    text: comment,
+                    ticket: data.id,
+                  });
+                }}
                 className="w-full bg-gradient-to-r cursor-pointer from-[#084FE3] to-[#0A6EFF] text-white py-5 rounded-xl font-bold text-lg hover:shadow-2xl transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
               >
                 <Send size={24} />

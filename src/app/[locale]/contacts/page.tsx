@@ -69,10 +69,12 @@ export async function generateMetadata({
 }
 export default function Page() {
   return (
-    <Suspense>
+    <>
       <div className="bg-[#EDEEF1] min-h-screen">
-        <ContactClient />
+        <Suspense>
+          <ContactClient />
+        </Suspense>
       </div>
-    </Suspense>
+    </>
   );
 }

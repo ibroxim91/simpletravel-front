@@ -1,3 +1,5 @@
+'use client';
+
 import Banner from '@/assets/Auth_Banner.png';
 import { saveRefToken, saveToken } from '@/shared/config/api/saveToke';
 import { Link, useRouter } from '@/shared/config/i18n/navigation';

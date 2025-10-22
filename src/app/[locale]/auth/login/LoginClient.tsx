@@ -1,8 +1,6 @@
-'use client';
-
+import AuthLogin from '@/features/auth/ui/auth-login';
 import { useTranslations } from 'next-intl';
 
-import AuthLogin from '@/features/auth/ui/auth-login';
 const LoginClient = () => {
   const t = useTranslations();
   return (

@@ -1,5 +1,3 @@
-'use client';
-
 import SingleTour from '@/widgets/singletour/ui';
 
 const SingleTourClient = () => {

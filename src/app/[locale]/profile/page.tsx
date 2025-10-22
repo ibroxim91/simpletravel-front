@@ -162,7 +162,7 @@ const Profile = () => {
         : 'User Profile';
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <>
       {/* Structured Data for SEO */}
       <script
         type="application/ld+json"
@@ -175,9 +175,11 @@ const Profile = () => {
 
       <main>
         <h1 className="sr-only">{h1Text}</h1>
-        <ProfileClient />
+        <Suspense>
+          <ProfileClient />
+        </Suspense>
       </main>
-    </Suspense>
+    </>
   );
 };
 

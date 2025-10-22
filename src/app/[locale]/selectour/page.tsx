@@ -171,7 +171,7 @@ export default async function Page({ params }: Props) {
   };
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <>
       {/* 🧩 Structured Data */}
       <script
         type="application/ld+json"
@@ -186,9 +186,11 @@ export default async function Page({ params }: Props) {
         <h1 className="sr-only">{h1Text}</h1>
 
         <section aria-label={ariaLabels.section}>
-          <SelectourClient />
+          <Suspense>
+            <SelectourClient />
+          </Suspense>
         </section>
       </main>
-    </Suspense>
+    </>
   );
 }

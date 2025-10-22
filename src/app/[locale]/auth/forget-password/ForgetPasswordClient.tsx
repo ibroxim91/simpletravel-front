@@ -1,5 +1,3 @@
-'use client';
-
 import AuthForgetPassword from '@/features/auth/ui/auth-forget-password';
 import { useTranslations } from 'next-intl';
 

@@ -1,5 +1,3 @@
-'use client';
-
 import Header from '@/features/about/ui/Header';
 import Partner from '@/features/about/ui/Partner';
 import Sertificat from '@/features/about/ui/Sertificat';

@@ -1,3 +1,5 @@
+import { LanguageRoutes } from '@/shared/config/i18n/types';
+import { formatPrice } from '@/shared/lib/formatPrice';
 import { Input } from '@/shared/ui/input';
 import AirplaneTicketIcon from '@mui/icons-material/AirplaneTicket';
 import LocalTaxiIcon from '@mui/icons-material/LocalTaxi';
@@ -7,6 +9,7 @@ import Rating from '@mui/material/Rating';
 import clsx from 'clsx';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
+import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Get_Info } from '../lib/api';
 import formStore from '../lib/hook';
@@ -19,8 +22,21 @@ type Props = {
 
 export default function TourInfoStep({ onNext, onPrev, data }: Props) {
   const t = useTranslations();
+  const { locale } = useParams();
   const [selected, setSelected] = useState<string | null>(null);
-  const [transport, setTransport] = useState<string | null>(null);
+  const [transport, setTransport] = useState<{
+    transport: {
+      name: string;
+      icon_name: string;
+    };
+    price: number;
+  }>({
+    price: 0,
+    transport: {
+      icon_name: '',
+      name: '',
+    },
+  });
 
   const {
     additional,
@@ -98,13 +114,13 @@ export default function TourInfoStep({ onNext, onPrev, data }: Props) {
 
         <div className="mt-[8px] grid grid-cols-2 justify-between gap-[16px] max-md:grid-cols-1">
           {data?.data.tariff.map((opt) => {
-            const inputId = `selectComfort-${opt.name}`;
-            const isChecked = selected === opt.name;
+            const inputId = `selectComfort-${opt.tariff.name}`;
+            const isChecked = selected === opt.tariff.name;
             return (
               <div
-                key={opt.name}
+                key={opt.tariff.name}
                 onClick={() => {
-                  setSelected(opt.name);
+                  setSelected(opt.tariff.name);
                   setTarif(opt);
                 }}
                 className={`flex w-full justify-between items-center py-[17px] px-[20px] cursor-pointer border rounded-xl bg-[#EDEEF180] border-[#EDEEF1]`}
@@ -120,20 +136,30 @@ export default function TourInfoStep({ onNext, onPrev, data }: Props) {
                       height: '30px',
                     }}
                   />
-                  <p
-                    className={clsx(
-                      isChecked ? 'text-[#084FE3]' : 'text-[#212122]',
-                    )}
-                  >
-                    {opt.name}
-                  </p>
+                  <div className="flex flex-col">
+                    <p
+                      className={clsx(
+                        isChecked ? 'text-[#084FE3]' : 'text-[#212122]',
+                      )}
+                    >
+                      {opt.tariff.name}
+                    </p>
+                    <p
+                      className={clsx(
+                        'text-sm',
+                        isChecked ? 'text-[#084FE3]' : 'text-[#212122]',
+                      )}
+                    >
+                      {formatPrice(opt.price, locale as LanguageRoutes, true)}
+                    </p>
+                  </div>
                 </label>
                 <Input
                   type="radio"
                   id={inputId}
                   name="selectComfort"
                   checked={isChecked}
-                  onChange={() => setSelected(opt.name)}
+                  onChange={() => setSelected(opt.tariff.name)}
                   className="w-6 h-6 accent-[#084FE3]"
                 />
               </div>
@@ -146,19 +172,19 @@ export default function TourInfoStep({ onNext, onPrev, data }: Props) {
         </p>
         <div className="mt-[8px] grid grid-cols-2 justify-between gap-[16px] max-md:grid-cols-1">
           {data?.data.transports.map((opt) => {
-            const inputId = `selectTransport-${opt.name}`;
-            const isChecked = transport === opt.name;
+            const inputId = `selectTransport-${opt.transport.name}`;
+            const isChecked = transport.transport.name === opt.transport.name;
             return (
               <div
-                key={opt.name}
-                onClick={() => setTransport(opt.name)}
+                key={opt.transport.name}
+                onClick={() => setTransport(opt)}
                 className={`flex w-full justify-between items-center py-[17px] px-[20px] cursor-pointer border rounded-xl bg-[#EDEEF180] border-[#EDEEF1]`}
               >
                 <label
                   htmlFor={inputId}
                   className="flex items-center mr-[20px] gap-[10px] cursor-pointer"
                 >
-                  {opt.icon_name === 'avia' ? (
+                  {opt.transport.icon_name === 'avia' ? (
                     <AirplaneTicketIcon
                       sx={{
                         color: isChecked ? '#084FE3' : '#212122',
@@ -175,20 +201,30 @@ export default function TourInfoStep({ onNext, onPrev, data }: Props) {
                       }}
                     />
                   )}
-                  <p
-                    className={clsx(
-                      isChecked ? 'text-[#084FE3]' : 'text-[#212122]',
-                    )}
-                  >
-                    {opt.name}
-                  </p>
+                  <div className="flex flex-col">
+                    <p
+                      className={clsx(
+                        isChecked ? 'text-[#084FE3]' : 'text-[#212122]',
+                      )}
+                    >
+                      {opt.transport.name}
+                    </p>
+                    <p
+                      className={clsx(
+                        'text-sm',
+                        isChecked ? 'text-[#084FE3]' : 'text-[#212122]',
+                      )}
+                    >
+                      {formatPrice(opt.price, locale as LanguageRoutes, true)}
+                    </p>
+                  </div>
                 </label>
                 <Input
                   type="radio"
                   id={inputId}
                   name="selectTransport"
                   checked={isChecked}
-                  onChange={() => setTransport(opt.name)}
+                  onChange={() => setTransport(opt)}
                   className="w-6 h-6 accent-[#084FE3]"
                 />
               </div>

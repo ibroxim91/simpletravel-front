@@ -1,5 +1,6 @@
 import { News_Api } from '@/features/blogs/lib/api';
 import { Metadata } from 'next';
+import { Suspense } from 'react';
 import BlogDetailClient from './BlogDetailClient';
 
 type Props = {
@@ -164,7 +165,9 @@ export default async function BlogDetailPage({ params }: Props) {
 
       <main>
         <h1 className="sr-only">{title}</h1>
-        <BlogDetailClient />
+        <Suspense>
+          <BlogDetailClient />
+        </Suspense>
       </main>
     </>
   );

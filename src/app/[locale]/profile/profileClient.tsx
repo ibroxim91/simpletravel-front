@@ -3,7 +3,7 @@ import ProfileTabs from '@/features/profile/ui/ProfileTabs';
 import Welcome from '@/features/profile/ui/welcome';
 import { getToken } from '@/shared/config/api/saveToke';
 import { useRouter } from '@/shared/config/i18n/navigation';
-import { Suspense, useEffect } from 'react';
+import { useEffect } from 'react';
 
 const ProfileClient = () => {
   const router = useRouter();
@@ -18,12 +18,10 @@ const ProfileClient = () => {
   if (!token) return null;
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <div className="flex flex-col gap-10 mb-10 overflow-hidden">
-        <Welcome />
-        <ProfileTabs />
-      </div>
-    </Suspense>
+    <div className="flex flex-col gap-10 mb-10 overflow-hidden">
+      <Welcome />
+      <ProfileTabs />
+    </div>
   );
 };
 

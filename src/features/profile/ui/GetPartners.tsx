@@ -1,3 +1,4 @@
+'use client';
 import Badge from '@/assets/Badge.png';
 import { useRouter } from '@/shared/config/i18n/navigation';
 import { Avatar, AvatarFallback } from '@/shared/ui/avatar';

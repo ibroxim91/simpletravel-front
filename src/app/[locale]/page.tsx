@@ -6,7 +6,6 @@ import Populardestinations from '@/features/home/ui/Populardestinations';
 import PopulardestinationsMboile from '@/features/home/ui/PopulardestinationsMboile';
 import SearchTours from '@/features/home/ui/SearchTours';
 import type { Metadata } from 'next';
-import { Suspense } from 'react';
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -234,7 +233,7 @@ export default async function Home({ params }: Props) {
         : 'Tours and Travel - Find the Perfect Vacation';
 
   return (
-    <Suspense>
+    <>
       {/* Structured Data */}
       <script
         type="application/ld+json"
@@ -290,6 +289,6 @@ export default async function Home({ params }: Props) {
           </div>
         </div>
       </main>
-    </Suspense>
+    </>
   );
 }

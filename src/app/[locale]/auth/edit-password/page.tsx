@@ -89,7 +89,7 @@ export default async function EditPassword({ params }: Props) {
         : 'Change Password';
 
   return (
-    <Suspense>
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -99,8 +99,10 @@ export default async function EditPassword({ params }: Props) {
 
       <main className="h-full">
         <h1 className="sr-only">{h1Text}</h1>
-        <EditPasswordClient />
+        <Suspense>
+          <EditPasswordClient />
+        </Suspense>
       </main>
-    </Suspense>
+    </>
   );
 }
