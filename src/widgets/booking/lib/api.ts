@@ -10,6 +10,8 @@ export interface Get_Info {
   status: boolean;
   data: {
     departure: string;
+    min_person: number;
+    max_person: number;
     destination: string;
     price: number;
     departure_date: string;

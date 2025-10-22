@@ -60,11 +60,14 @@ export default function ServicesStep({
   const {
     excursions,
     setExcursions,
+    user,
     tours_category,
     setToursCategory,
     setPaidService,
     setTotalPrice,
   } = formStore();
+
+  console.log(user);
 
   const form = useForm<z.infer<typeof ServicesForm>>();
 
@@ -145,11 +148,13 @@ export default function ServicesStep({
       (acc, service) => acc + service.price,
       0,
     );
+    const userPrice = basePrice * user.length;
+
     const total_price =
-      basePrice +
       paidServicesTotal +
       store.tariff.price +
-      store.transport.price;
+      store.transport.price +
+      userPrice;
     setTotalPrice(total_price);
     if (
       store.returned &&

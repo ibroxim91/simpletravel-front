@@ -46,9 +46,16 @@ type PassportType = File | { id: number; image: string };
 type Props = {
   onNext: () => void;
   onPrev: () => void;
+  minPerson: number;
+  maxPerson: number;
 };
 
-export default function ParticipantsStep({ onNext, onPrev }: Props) {
+export default function ParticipantsStep({
+  onNext,
+  onPrev,
+  minPerson,
+  maxPerson,
+}: Props) {
   const t = useTranslations();
   const [previewOpen, setPreviewOpen] = useState(false);
   const [openCalendar, setOpenCalendar] = useState<Record<number, boolean>>({});
@@ -111,7 +118,13 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
   });
   const queryClient = useQueryClient();
 
+  console.log(minPerson);
   async function onSubmit(values: z.infer<typeof ParticipantsForm>) {
+    if (fields.length < minPerson) {
+      toast.error(`Kamida ${minPerson} ta ishtirokchi kerak`);
+      return;
+    }
+
     const createPromises = [];
 
     for (let index = 0; index < values.participants.length; index++) {
@@ -130,6 +143,7 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
         });
         continue;
       }
+
       const formData = new FormData();
       formData.append('gender', participant.gender);
       formData.append('first_name', participant.firstName);
@@ -670,6 +684,10 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
             <button
               type="button"
               onClick={() => {
+                if (fields.length >= maxPerson) {
+                  toast.error(`Maksimal ishtirokchilar soni ${maxPerson} ta`);
+                  return;
+                }
                 append({
                   gender: 'male',
                   firstName: '',
@@ -680,13 +698,21 @@ export default function ParticipantsStep({ onNext, onPrev }: Props) {
                 });
                 setUserIds((prev) => [...prev, undefined]);
               }}
-              className="flex items-center gap-2 bg-white text-[#031753] border border-[#DFDFDF] px-6 py-3 rounded-full cursor-pointer"
+              className={cn(
+                'flex items-center gap-2 bg-white text-[#031753] border border-[#DFDFDF] px-6 py-3 rounded-full cursor-pointer',
+                fields.length >= maxPerson && 'opacity-50 cursor-not-allowed',
+              )}
+              disabled={fields.length >= maxPerson}
             >
               <Plus /> {t('Новый участник')}
             </button>
             <button
               type="submit"
-              className="bg-[#1764FC] text-white px-14 py-4 rounded-full cursor-pointer"
+              disabled={fields.length < minPerson}
+              className={cn(
+                'bg-[#1764FC] text-white px-14 py-4 rounded-full cursor-pointer',
+                fields.length < minPerson && 'opacity-50 cursor-not-allowed',
+              )}
             >
               {t('Следующий')}
             </button>

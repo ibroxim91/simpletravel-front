@@ -29,7 +29,7 @@ export default function Booking() {
   const [orderId, setOrderId] = useState<number>();
   const route = useRouter();
   const { id } = useParams();
-  const { reset } = formStore();
+  const { reset, clearUser } = formStore();
   const tabSteps: Record<string, number> = {
     time: 1,
     participants: 2,
@@ -498,16 +498,20 @@ export default function Booking() {
                     variants={variants}
                     transition={{ duration: 0.5 }}
                   >
-                    <ParticipantsStep
-                      onNext={() => {
-                        setActiveTab('package');
-                        setStep(tabSteps['package']);
-                      }}
-                      onPrev={() => {
-                        setActiveTab('time');
-                        setStep(tabSteps['time']);
-                      }}
-                    />
+                    {data && (
+                      <ParticipantsStep
+                        minPerson={data.data.min_person}
+                        maxPerson={data.data.max_person}
+                        onNext={() => {
+                          setActiveTab('package');
+                          setStep(tabSteps['package']);
+                        }}
+                        onPrev={() => {
+                          setActiveTab('time');
+                          setStep(tabSteps['time']);
+                        }}
+                      />
+                    )}
                   </motion.div>
                 )}
 
@@ -529,6 +533,7 @@ export default function Booking() {
                       onPrev={() => {
                         setActiveTab('participants');
                         setStep(tabSteps['participants']);
+                        clearUser();
                       }}
                     />
                   </motion.div>

@@ -60,6 +60,7 @@ type Store = {
   addUser: (user: User) => void;
   updateUser: (index: number, user: Partial<User>) => void;
   removeUser: (index: number) => void;
+  clearUser: () => void;
   setToursCategory: (services: { id: number; name: string }[]) => void;
   setTransport: (opt: {
     transport: {
@@ -138,6 +139,7 @@ const formStore = create<Store>((set) => ({
   setTransport: (transport) => set({ transport }),
   setAdditional: (id) => set({ additional: id }),
   setExcursions: (ids) => set({ excursions: ids }),
+  clearUser: () => set({ user: [] }),
   reset: () => set(initialState),
 }));
 
