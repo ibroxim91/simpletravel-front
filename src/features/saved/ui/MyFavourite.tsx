@@ -197,7 +197,7 @@ const MyFavourite = () => {
                           <Badge
                             key={b.id}
                             variant="destructive"
-                            className={`bg-${b.color}-500 text-sm px-4 py-1 rounded-4xl font-semibold`}
+                            className={`bg-[${b.color}] text-sm px-4 py-1 rounded-4xl font-semibold`}
                           >
                             {b.name}
                           </Badge>
@@ -432,7 +432,7 @@ const MyFavourite = () => {
                                 <Badge
                                   key={e.id}
                                   variant="default"
-                                  className={`bg-${e.color}-500 text-sm px-4 py-1 rounded-4xl font-semibold`}
+                                  className={`bg-[${e.color}] text-sm px-4 py-1 rounded-4xl font-semibold`}
                                 >
                                   {e.name}
                                 </Badge>
