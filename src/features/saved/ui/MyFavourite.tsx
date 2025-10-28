@@ -198,6 +198,7 @@ const MyFavourite = () => {
                             key={b.id}
                             variant="destructive"
                             className={`bg-[${b.color}] text-sm px-4 py-1 rounded-4xl font-semibold`}
+                            style={{ background: b.color }}
                           >
                             {b.name}
                           </Badge>
@@ -433,6 +434,7 @@ const MyFavourite = () => {
                                   key={e.id}
                                   variant="default"
                                   className={`bg-[${e.color}] text-sm px-4 py-1 rounded-4xl font-semibold`}
+                                  style={{ background: e.color }}
                                 >
                                   {e.name}
                                 </Badge>

@@ -112,6 +112,7 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
                 key={e.id}
                 variant="default"
                 className={`bg-[${e.color}] text-sm px-4 py-1 rounded-4xl font-semibold`}
+                style={{ background: e.color }}
               >
                 {e.name}
               </Badge>

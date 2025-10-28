@@ -123,9 +123,9 @@ const BlogDetail = () => {
             </motion.div>
 
             <div className="mt-10 max-md:mt-5">
+              <p className="text-[#212122] text-lg">{newsData?.text}</p>
               {newsData?.post_images?.map((item, idx) => (
                 <div key={item.image}>
-                  <p className="text-[#212122] text-lg">{item.text}</p>
                   <Image
                     src={item.image}
                     alt={item.text}
@@ -136,6 +136,7 @@ const BlogDetail = () => {
                     loading={idx > 0 ? 'lazy' : undefined}
                     className="w-full h-full object-contain mt-5 rounded-3xl"
                   />
+                  <p className="text-[#212122] text-lg mt-5">{item.text}</p>
                 </div>
               ))}
             </div>
