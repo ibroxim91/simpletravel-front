@@ -105,7 +105,7 @@ const FilterHotelMobile = () => {
   };
 
   return (
-    <div className="mt-20 bg-white shadow-sm py-4 gap-4 w-full rounded-3xl grid grid-cols-1 items-center px-10 min-lg:hidden font-medium">
+    <div className="mt-10 bg-white shadow-sm py-4 gap-4 w-full rounded-3xl grid grid-cols-1 items-center px-10 min-lg:hidden font-medium">
       <div className="relative flex gap-2 h-full ">
         <div
           onClick={() => setWhereMobile(!whereMobile)}

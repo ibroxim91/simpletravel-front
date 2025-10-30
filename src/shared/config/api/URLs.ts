@@ -42,6 +42,12 @@ const DONWLOAD_PDF = '/api/v1/get-order-pdf/';
 
 const SEND_COMMENT = '/api/v1/ticket-comment/';
 
+const GET_BANNER = '/api/v1/banner/';
+
+const GET_CONTACT = '/api/v1/dashboard/dashboard-site-settings/';
+const GET_HELP_PAGE = '/api/v1/dashboard/dashboard-site-help-page/';
+const GET_OFFERTA = '/api/v1/dashboard/dashboard-site-offerta/';
+
 export {
   BASE_URL,
   DONWLOAD_PDF,
@@ -55,8 +61,12 @@ export {
   EMAIL_SET_PASSWORD,
   ENDP_POSTS,
   FAQ,
+  GET_BANNER,
   GET_BLOGS,
+  GET_CONTACT,
+  GET_HELP_PAGE,
   GET_ME,
+  GET_OFFERTA,
   GET_SAVED,
   GET_TAGS,
   GET_TICKETS,

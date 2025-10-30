@@ -353,6 +353,8 @@ declare const messages: {
   "Tugallangan": "Tugallangan",
   "Ba'tafsil": "Ba'tafsil",
   "To'lash": "To'lash",
-  "Ko'rsatilmoqda": "Ko'rsatilmoqda"
+  "Ko'rsatilmoqda": "Ko'rsatilmoqda",
+  "Banner yuklashda xatolik yuz berdi": "Banner yuklashda xatolik yuz berdi",
+  "Qayta urinish": "Qayta urinish"
 };
 export default messages;

@@ -2,7 +2,10 @@
 
 import Logo from '@/assets/navLogo.png';
 import { User_Api } from '@/features/profile/lib/api';
+import { useWelcomeStore } from '@/features/profile/lib/hook';
 import { Link, usePathname } from '@/shared/config/i18n/navigation';
+import formatPhone from '@/shared/lib/formatPhone';
+import { getContact } from '@/widgets/footer/lib/api';
 import EmailIcon from '@mui/icons-material/Email';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import HomeIcon from '@mui/icons-material/Home';
@@ -16,7 +19,7 @@ import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ChangeLang } from './ChangeLang';
 import CitySelect from './CitySelect';
 import CitySelectMobile from './CitySelectMobile';
@@ -24,12 +27,19 @@ import MobileNavbar from './MobileNavbar';
 
 const Navbar = () => {
   const pathname = usePathname();
+  const { setOpenModal } = useWelcomeStore();
   const t = useTranslations();
   const [openMobie, setOpenMobile] = useState(false);
   const { data: user } = useQuery({
     queryKey: ['get_me'],
     queryFn: () => User_Api.getMe(),
   });
+
+  useEffect(() => {
+    if (user && (!user.data.data.first_name || !user.data.data.last_name)) {
+      setOpenModal(true);
+    }
+  }, [user, setOpenModal]);
 
   const links = [
     { href: '/', label: 'Главная' },
@@ -62,35 +72,49 @@ const Navbar = () => {
     },
   ];
 
+  const { data: contact } = useQuery({
+    queryKey: ['get_contact'],
+    queryFn: () => getContact(),
+    select(data) {
+      return data.data.data.results;
+    },
+  });
+
   return (
     <>
       <section className="sticky w-full top-0 z-50">
-        <div className="bg-[#031753] p-2 relative">
+        <div className="bg-[#084FE3] p-2 relative">
           <div className="flex custom-container justify-between items-center">
             <CitySelect />
             <CitySelectMobile />
             <div className="flex gap-4 items-center font-medium">
               <ChangeLang />
               <div className="w-[1px] h-[60%] bg-white max-lg:hidden" />
-              <Link
-                href={'mailto:Tourex@gmail.com'}
-                className="flex gap-2 text-white items-center max-lg:hidden"
-              >
-                <EmailIcon
-                  sx={{ color: 'white', width: '24px', height: '24px' }}
-                />
-                <p className="text-sm">Tourex@gmail.com</p>
-              </Link>
+              {contact && contact[0].email && (
+                <Link
+                  href={`mailto:${contact[0].email}`}
+                  className="flex gap-2 text-white items-center max-lg:hidden"
+                >
+                  <EmailIcon
+                    sx={{ color: 'white', width: '24px', height: '24px' }}
+                  />
+                  <p className="text-sm">{contact[0].email}</p>
+                </Link>
+              )}
               <div className="w-[1px] h-[60%] bg-white max-lg:hidden" />
-              <Link
-                href={'tel:+998902222922'}
-                className="flex gap-2 text-white items-center max-lg:hidden"
-              >
-                <LocalPhoneIcon
-                  sx={{ color: 'white', width: '24px', height: '24px' }}
-                />
-                <p className="text-sm">90 222 29 22</p>
-              </Link>
+              {contact && contact[0].main_phone && (
+                <Link
+                  href={`tel:+${contact[0].main_phone}`}
+                  className="flex gap-2 text-white items-center max-lg:hidden"
+                >
+                  <LocalPhoneIcon
+                    sx={{ color: 'white', width: '24px', height: '24px' }}
+                  />
+                  <p className="text-sm">
+                    {formatPhone(contact[0].main_phone)}
+                  </p>
+                </Link>
+              )}
             </div>
           </div>
         </div>

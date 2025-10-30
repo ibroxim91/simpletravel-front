@@ -48,6 +48,7 @@ export interface TickectAllResults {
 
 export interface TickectAllFilter {
   departure?: string;
+  featured_tickets?: boolean;
   departure_date?: string;
   departure_time?: string;
   destination?: string;

@@ -28,4 +28,33 @@ const sections = [
   },
 ];
 
+export interface GetContactData {
+  status: boolean;
+  data: {
+    links: {
+      previous: string;
+      next: string;
+    };
+    total_items: number;
+    total_pages: number;
+    page_size: number;
+    current_page: number;
+    results: {
+      id: number;
+      address: string;
+      latitude: string;
+      longitude: string;
+      telegram: string;
+      telegram_chat: string;
+      instagram: string;
+      facebook: string;
+      twitter: string;
+      email: string;
+      linkedin: string;
+      main_phone: string;
+      other_phone: string;
+    }[];
+  };
+}
+
 export { sections };

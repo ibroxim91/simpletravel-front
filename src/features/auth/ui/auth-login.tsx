@@ -130,7 +130,7 @@ const AuthLogin = () => {
     });
   }
   return (
-    <div className="custom-container mt-2 relative">
+    <div className="custom-container mt-2 relative h-[880px]">
       <Image
         src={Banner}
         alt="banner"
@@ -304,7 +304,10 @@ const AuthLogin = () => {
             {t("Ro'yxatdan o'tish")}
           </Link>
         </p>
-      </Tabs>
+      </Tabs>{' '}
+      <div className="absolute max-lg:bottom-20 lg:bottom-5 w-full flex justify-center text-[#212122]">
+        <p>{t('2025 © Все права защищены')}</p>
+      </div>
     </div>
   );
 };

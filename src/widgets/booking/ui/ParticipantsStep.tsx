@@ -118,7 +118,6 @@ export default function ParticipantsStep({
   });
   const queryClient = useQueryClient();
 
-  console.log(minPerson);
   async function onSubmit(values: z.infer<typeof ParticipantsForm>) {
     if (fields.length < minPerson) {
       toast.error(`Kamida ${minPerson} ta ishtirokchi kerak`);

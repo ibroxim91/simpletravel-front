@@ -1,8 +1,9 @@
+import Welcome from '@/features/profile/ui/welcome';
 import { sfPro } from '@/shared/config/fonts';
 import { routing } from '@/shared/config/i18n/routing';
 import QueryProvider from '@/shared/config/react-query/QueryProvider';
 import { ThemeProvider } from '@/shared/config/theme-provider';
-import { PRODUCT_INFO } from '@/shared/constants/data';
+import { getPageSeo } from '@/shared/lib/getPageSeo';
 import { Toaster } from '@/shared/ui/sonner';
 import ConditionalFooter from '@/widgets/footer/ui/ConditionalFooter';
 import Navbar from '@/widgets/navbar/ui';
@@ -14,31 +15,40 @@ import Script from 'next/script';
 import { ReactNode } from 'react';
 import '../globals.css';
 
-export const metadata: Metadata = {
-  title: PRODUCT_INFO.name,
-  description: PRODUCT_INFO.desc,
-  keywords: PRODUCT_INFO.keyword,
-  icons: {
-    icon: '/Logo.svg',
-    shortcut: '/Logo.svg',
-    apple: '/Logo_blue.png',
-  },
-  openGraph: {
-    title: PRODUCT_INFO.name,
-    description: PRODUCT_INFO.desc,
-    url: 'https://simple-travel-blond.vercel.app/',
-    siteName: PRODUCT_INFO.name,
-    images: [
-      {
-        url: 'https://simple-travel-blond.vercel.app/Logo_blue.png',
-        width: 1200,
-        height: 630,
-        alt: PRODUCT_INFO.name,
-      },
-    ],
-    type: 'website',
-  },
-};
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  const seo = await getPageSeo('/', locale);
+
+  return {
+    title: seo.title,
+    description: seo.description,
+    keywords: seo.keywords,
+    icons: {
+      icon: [{ url: '/favicon.ico', type: 'image/x-icon' }],
+    },
+    openGraph: {
+      title: seo.ogTitle,
+      description: seo.ogDescription,
+      images: [
+        {
+          url: seo.ogImage!,
+          width: 1200,
+          height: 630,
+          alt: seo.ogTitle,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: seo.ogTitle,
+      description: seo.ogDescription,
+      images: [seo.ogImage!],
+    },
+    alternates: {
+      canonical: `${process.env.NEXT_PUBLIC_SITE_URL}/${locale}`,
+    },
+  };
+}
 
 type Props = {
   children: ReactNode;
@@ -56,13 +66,12 @@ export default async function RootLayout({ children, params }: Props) {
     notFound();
   }
 
-  // Enable static rendering
   setRequestLocale(locale);
 
   return (
     <html lang={locale} suppressHydrationWarning>
       <body
-        className={`${sfPro.className} !font-stretch-100% antialiased min-h-screen flex flex-col relative`}
+        className={`${sfPro.className} antialiased min-h-screen flex flex-col relative`}
       >
         <NextIntlClientProvider locale={locale}>
           <ThemeProvider
@@ -73,6 +82,7 @@ export default async function RootLayout({ children, params }: Props) {
           >
             <QueryProvider>
               <Navbar />
+              <Welcome />
               <main className="flex-1">{children}</main>
               <ConditionalFooter />
               <Toaster richColors />

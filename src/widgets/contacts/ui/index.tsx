@@ -22,6 +22,7 @@ import {
 } from '@/shared/ui/form';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
+import { getContact } from '@/widgets/footer/lib/api';
 import { zodResolver } from '@hookform/resolvers/zod';
 import CallEndIcon from '@mui/icons-material/CallEnd';
 import CloseIcon from '@mui/icons-material/Close';
@@ -36,7 +37,7 @@ import XIcon from '@mui/icons-material/X';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Drawer from '@mui/material/Drawer';
 import { Map, Placemark, YMaps } from '@pbe/react-yandex-maps';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
@@ -99,6 +100,14 @@ export default function Contacts() {
       phone_number: onlyNumber(values.phone),
     });
   }
+
+  const { data } = useQuery({
+    queryKey: ['get_contact'],
+    queryFn: () => getContact(),
+    select(data) {
+      return data.data.data.results;
+    },
+  });
 
   // const MAP_EMBED_SRC =
   //   'https://maps.google.com/maps?q=Simple%20Travel%20Company&t=&z=13&ie=UTF8&iwloc=&output=embed';
@@ -221,7 +230,7 @@ export default function Contacts() {
                 {t('Адрес')}:
               </div>
 
-              <p>{t('Алмазарский р-н, Камарнисо, 13')}</p>
+              <p className="w-[70%] text-right">{data && data[0].address}</p>
             </div>
             <hr className="border-[#FFFFFF29]" />
             <div className="flex items-center justify-between my-5">
@@ -229,25 +238,50 @@ export default function Contacts() {
                 <CallEndIcon />
                 {t('Телефон')}:
               </div>
-              <p>5990</p>
+              <p>{data && formatPhone(data[0].main_phone)}</p>
             </div>
 
             <div className="flex items-center gap-4 my-5 max-[400px]:flex-col max-[400px]:items-start">
-              <div className="p-[10px] rounded-full border-2 cursor-pointer border-[#FFFFFF29]">
-                <LinkedInIcon />
-              </div>
-              <div className="p-[10px] rounded-full border-2 cursor-pointer border-[#FFFFFF29]">
-                <XIcon />
-              </div>
-              <div className="p-[10px] rounded-full border-2 cursor-pointer border-[#FFFFFF29]">
-                <InstagramIcon />
-              </div>
-              <div className="p-[10px] rounded-full border-2 cursor-pointer border-[#FFFFFF29]">
-                <FacebookIcon />
-              </div>
-              <div className="p-[10px] rounded-full border-2 cursor-pointer border-[#FFFFFF29]">
-                <TelegramIcon />
-              </div>
+              {data && data[0].telegram && (
+                <Link
+                  href={data[0].telegram}
+                  className="p-[10px] rounded-full border-2 cursor-pointer border-[#FFFFFF29]"
+                >
+                  <TelegramIcon />
+                </Link>
+              )}
+              {data && data[0].linkedin && (
+                <Link
+                  href={data[0].linkedin}
+                  className="p-[10px] rounded-full border-2 cursor-pointer border-[#FFFFFF29]"
+                >
+                  <LinkedInIcon />
+                </Link>
+              )}
+              {data && data[0].twitter && (
+                <Link
+                  href={data[0].twitter}
+                  className="p-[10px] rounded-full border-2 cursor-pointer border-[#FFFFFF29]"
+                >
+                  <XIcon />
+                </Link>
+              )}
+              {data && data[0].instagram && (
+                <Link
+                  href={data[0].instagram}
+                  className="p-[10px] rounded-full border-2 cursor-pointer border-[#FFFFFF29]"
+                >
+                  <InstagramIcon />
+                </Link>
+              )}
+              {data && data[0].facebook && (
+                <Link
+                  href={data[0].facebook}
+                  className="p-[10px] rounded-full border-2 cursor-pointer border-[#FFFFFF29]"
+                >
+                  <FacebookIcon />
+                </Link>
+              )}
             </div>
           </motion.div>
         </div>
@@ -256,23 +290,31 @@ export default function Contacts() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.7 }}
         >
-          <YMaps query={{ lang: 'ru_RU' }}>
-            <Map
-              defaultState={{ center: [41.370693, 69.209772], zoom: 20 }}
-              width="100%"
-              height="100%"
-            >
-              <Placemark
-                geometry={[41.370693, 69.209772]}
-                options={{
-                  iconLayout: 'default#image',
-                  iconImageHref: '/LogoMark.png',
-                  iconImageSize: [105, 70],
-                  iconImageOffset: [-20, -20],
+          {data && (
+            <YMaps query={{ lang: 'ru_RU' }}>
+              <Map
+                defaultState={{
+                  center: [Number(data[0].latitude), Number(data[0].longitude)],
+                  zoom: 20,
                 }}
-              />
-            </Map>
-          </YMaps>
+                width="100%"
+                height="100%"
+              >
+                <Placemark
+                  geometry={[
+                    Number(data[0].latitude),
+                    Number(data[0].longitude),
+                  ]}
+                  options={{
+                    iconLayout: 'default#image',
+                    iconImageHref: '/LogoMark.png',
+                    iconImageSize: [105, 70],
+                    iconImageOffset: [-20, -20],
+                  }}
+                />
+              </Map>
+            </YMaps>
+          )}
         </motion.div>
       </div>
 

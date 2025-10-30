@@ -34,10 +34,11 @@ const FaqTabs = () => {
   useEffect(() => {
     if (data && data.length > 0) {
       setActiveTab(data[0].name);
+    } else {
+      setActiveTab('support');
     }
   }, [data]);
 
-  // Skeleton komponenti
   const Skeleton = () => (
     <div className="flex gap-6 mt-5">
       <div className="flex flex-col w-80 max-lg:w-full gap-4 p-4 bg-white shadow-md rounded-2xl">

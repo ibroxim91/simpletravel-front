@@ -67,8 +67,6 @@ export default function ServicesStep({
     setTotalPrice,
   } = formStore();
 
-  console.log(user);
-
   const form = useForm<z.infer<typeof ServicesForm>>();
 
   const store = formStore();

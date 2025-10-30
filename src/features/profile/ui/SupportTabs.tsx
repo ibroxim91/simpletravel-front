@@ -2,11 +2,16 @@ import { Link } from '@/shared/config/i18n/navigation';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 import TelegramIcon from '@mui/icons-material/Telegram';
+import { useTranslations } from 'next-intl';
 
 const SupportTabs = () => {
+  const t = useTranslations();
+
   return (
     <div className="bg-white px-4 py-6 rounded-3xl w-full shadow-sm">
-      <p className="text-xl text-[#212122] font-semibold">Служба поддержки</p>
+      <p className="text-xl text-[#212122] font-semibold">
+        {t('Служба поддержки')}
+      </p>
       <div className="bg-[#DFDFDF] w-full h-[2px] mt-5" />
       <Link
         href={'https://web.telegram.org/a/#-1001169511702'}

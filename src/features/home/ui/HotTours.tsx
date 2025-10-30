@@ -1,6 +1,5 @@
 'use client';
 
-import ShoreCrop from '@/assets/Airpods.png';
 import BannerCircle from '@/assets/hotBanner.png';
 import BannerCircleMobile from '@/assets/hotBannerMobile.png';
 import { BASE_URL } from '@/shared/config/api/URLs';
@@ -26,6 +25,7 @@ import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { getBanner } from '../lib/api';
 
 const HotTours = () => {
   const t = useTranslations();
@@ -52,6 +52,17 @@ const HotTours = () => {
           rating: 3.5,
         },
       }),
+  });
+  const {
+    data: banner,
+    isLoading: bannerLoad,
+    isError: bannerError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ['get_banner4'],
+    queryFn: () => getBanner({ page: 1, page_size: 99, position: 'banner4' }),
+    select: (data) => data.data.data,
   });
 
   const [api, setApi] = useState<CarouselApi>();
@@ -331,125 +342,168 @@ const HotTours = () => {
           </Carousel>
         </div>
       )}
-      <div className="custom-container mt-10 max-lg:hidden">
-        <div className="w-full h-[300px] mt-20 relative flex rounded-4xl">
-          <div className="h-[300px] w-full overflow-hidden relative">
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: false, amount: 0.3 }}
-              transition={{ duration: 0.8 }}
-              className="w-[70%] h-[300px] z-10 absolute left-0 bottom-0 font-medium"
-            >
-              <Image
-                src={BannerCircle}
-                alt="circle"
-                className="w-full h-full"
-              />
-              <div className="absolute top-0 justify-center h-full left-10 flex flex-col gap-4">
-                <motion.p
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.2 }}
-                  className="text-3xl text-[#031753] font-semibold w-96"
-                >
-                  {t('С Simple Travel ваши поездки ещё проще')}
-                </motion.p>
-                <motion.p
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.4 }}
-                  className="text-mmd text-[#031753]"
-                >
-                  {t('Поддержка 24/7, страховка и дополнительные возможности')}
-                </motion.p>
-                <motion.div
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.6 }}
-                >
-                  <Link
-                    href="/selectour"
-                    className="bg-[#ECF2FF] w-fit py-3 px-10 rounded-4xl flex gap-4"
-                  >
-                    <p className="text-[#084FE3] font-semibold">
-                      {t('Узнать больше')}
-                    </p>
-                    <ArrowRightAltIcon className="text-[#084FE3]" />
-                  </Link>
-                </motion.div>
-              </div>
-            </motion.div>
-            <div
-              className="w-[40%] h-full overflow-hidden absolute right-0 bottom-0 rounded-4xl"
-              style={{
-                background: 'linear-gradient(180deg, #66BCFF 0%, #35DED5 100%)',
-              }}
-            />
-          </div>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, x: 50 }}
-            whileInView={{ opacity: 1, scale: 1, x: 0 }}
-            viewport={{ once: false, amount: 0.3 }}
-            transition={{ duration: 1 }}
-            className="w-[40%] h-[350px] absolute right-0 bottom-0"
+      {bannerLoad ? (
+        <div className="mt-10 custom-container h-[300px]">
+          <Skeleton className="w-full h-full" />
+        </div>
+      ) : bannerError ? (
+        <div className="custom-container mt-10 max-lg:hidden text-center py-10">
+          <p className="text-lg font-medium text-red-600">
+            {t('Ошибка при загрузке баннера')}
+          </p>
+          <p className="text-sm text-gray-500 mt-2">
+            {(error as Error)?.message || t('Попробуйте еще раз')}
+          </p>
+          <Button
+            onClick={() => refetch()}
+            className="mt-4 bg-blue-600 hover:bg-blue-700 text-white rounded-full"
           >
-            <Image
-              src={ShoreCrop}
-              width={372}
-              height={320}
-              quality={100}
-              alt="ShoreCrop"
-              className="w-full h-full object-contain right-0 z-10 absolute top-0"
-            />
-          </motion.div>
+            {t('Обновить')}
+          </Button>
         </div>
-      </div>
-      <div className="custom-container mt-10 lg:hidden font-medium">
-        <div className="w-full h-[800px] mt-10 relative overflow-hidden flex rounded-4xl">
-          <div className="h-[800px] w-full overflow-hidden relative">
-            <div className="w-[100%] h-[50%] max-sm:h-[60%] z-10 absolute left-0 top-0">
-              <Image
-                src={BannerCircleMobile}
-                alt="circle"
-                className="w-full h-full"
-              />
+      ) : (
+        <>
+          {banner && (
+            <div className="custom-container mt-10 max-lg:hidden">
+              <Carousel opts={{ loop: true, align: 'start' }}>
+                <CarouselContent>
+                  {banner?.results.map((e) => (
+                    <CarouselItem className="basis-full" key={e.id}>
+                      <div className="w-full h-[300px] relative flex rounded-4xl">
+                        <div className="h-[300px] w-full overflow-hidden relative">
+                          <motion.div
+                            initial={{ opacity: 0, x: -50 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            viewport={{ once: false, amount: 0.3 }}
+                            transition={{ duration: 0.8 }}
+                            className="w-[70%] h-[300px] z-10 absolute left-0 bottom-0 font-medium"
+                          >
+                            <Image
+                              src={BannerCircle}
+                              alt="circle"
+                              className="w-full h-full"
+                            />
+                            <div className="absolute top-0 justify-center h-full left-10 flex flex-col gap-4">
+                              <motion.p
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.8, delay: 0.2 }}
+                                className="text-3xl text-[#031753] font-semibold w-96"
+                              >
+                                {e.title}
+                              </motion.p>
+                              <motion.p
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.8, delay: 0.4 }}
+                                className="text-mmd text-[#031753]"
+                              >
+                                {e.description}
+                              </motion.p>
+                              <motion.div
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.8, delay: 0.6 }}
+                              >
+                                <Link
+                                  href={e.link}
+                                  className="bg-[#ECF2FF] w-fit py-3 px-10 rounded-4xl flex gap-4"
+                                >
+                                  <p className="text-[#084FE3] font-semibold">
+                                    {t('Узнать больше')}
+                                  </p>
+                                  <ArrowRightAltIcon className="text-[#084FE3]" />
+                                </Link>
+                              </motion.div>
+                            </div>
+                          </motion.div>
+                          <div
+                            className="w-[40%] h-full overflow-hidden absolute right-0 bottom-0 rounded-4xl"
+                            style={{
+                              background:
+                                'linear-gradient(180deg, #66BCFF 0%, #35DED5 100%)',
+                            }}
+                          />
+                        </div>
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.9, x: 50 }}
+                          whileInView={{ opacity: 1, scale: 1, x: 0 }}
+                          viewport={{ once: false, amount: 0.3 }}
+                          transition={{ duration: 1 }}
+                          className="w-[40%] h-[350px] absolute right-0 bottom-0"
+                        >
+                          <Image
+                            src={e.image}
+                            width={372}
+                            height={320}
+                            quality={100}
+                            alt="ShoreCrop"
+                            className="w-full h-full object-contain right-0 z-10 absolute top-0"
+                          />
+                        </motion.div>
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+              </Carousel>
             </div>
-            <div className="absolute z-12 top-10 h-full left-4 flex flex-col gap-4">
-              <p className="text-4xl text-[#031753] font-semibold  w-[90%]">
-                {t('С Simple Travel ваши поездки ещё проще')}
-              </p>
-              <p className="text-2xl text-[#031753]  w-[95%]">
-                {t('Поддержка 24/7, страховка и дополнительные возможности')}
-              </p>
-              <Link
-                href="/selectour"
-                className="bg-[#ECF2FF] w-fit py-3 px-5 rounded-4xl flex gap-4"
-              >
-                <p className="text-[#084FE3] font-semibold">
-                  {t('Узнать больше')}
-                </p>
-                <ArrowRightAltIcon className="text-[#084FE3]" />
-              </Link>
-            </div>
-            <div
-              className="w-full h-[60%] max-sm:h-[50%] overflow-hidden absolute left-0 bottom-0"
-              style={{
-                background: 'linear-gradient(180deg, #66BCFF 0%, #35DED5 100%)',
-              }}
-            >
-              <Image
-                src={ShoreCrop}
-                width={372}
-                height={320}
-                quality={100}
-                alt="ShoreCrop"
-                className="w-full h-[100%] absolute z-10 object-fill "
-              />
-            </div>
-          </div>
+          )}
+        </>
+      )}
+      {banner && (
+        <div className="custom-container mt-10 lg:hidden font-medium">
+          <Carousel opts={{ loop: true, align: 'start' }}>
+            <CarouselContent>
+              {banner?.results.map((e) => (
+                <CarouselItem key={e.id}>
+                  <div className="h-[800px] w-full overflow-hidden relative rounded-4xl">
+                    <div className="w-full h-[50%] max-sm:h-[60%] absolute left-0 top-0 z-10">
+                      <Image
+                        src={BannerCircleMobile}
+                        alt="circle"
+                        className="w-full h-full"
+                      />
+                    </div>
+                    <div className="absolute z-20 top-10 left-4 flex flex-col gap-4">
+                      <p className="text-4xl text-[#031753] font-semibold w-[90%]">
+                        {e.title}
+                      </p>
+                      <p className="text-2xl text-[#031753] w-[95%]">
+                        {e.description}
+                      </p>
+                      <Link
+                        href={e.link}
+                        className="bg-[#ECF2FF] w-fit py-3 px-5 rounded-4xl flex gap-4"
+                      >
+                        <p className="text-[#084FE3] font-semibold">
+                          {t('Узнать больше')}
+                        </p>
+                        <ArrowRightAltIcon className="text-[#084FE3]" />
+                      </Link>
+                    </div>
+                    <div
+                      className="w-full h-[60%] max-sm:h-[50%] overflow-hidden absolute left-0 bottom-0 rounded-b-4xl"
+                      style={{
+                        background:
+                          'linear-gradient(180deg, #66BCFF 0%, #35DED5 100%)',
+                      }}
+                    >
+                      <Image
+                        src={e.image}
+                        width={372}
+                        height={320}
+                        quality={100}
+                        alt="banner"
+                        className="w-full h-full absolute z-10 object-cover"
+                      />
+                    </div>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
         </div>
-      </div>
+      )}
     </>
   );
 };
