@@ -49,7 +49,7 @@ export interface Get_Info {
         name: string;
       },
     ];
-    extra_paid_service: [
+    paid_extra_service: [
       {
         id: number;
         price: number;

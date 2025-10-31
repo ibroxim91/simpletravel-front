@@ -86,7 +86,7 @@ export default function ServicesStep({
         : [...prev, id];
       setExcursions(updated);
 
-      const selectedExcursionData = data?.data.extra_paid_service
+      const selectedExcursionData = data?.data.paid_extra_service
         .filter((service) => updated.includes(service.id))
         .map((service) => ({
           id: service.id,
@@ -195,7 +195,7 @@ export default function ServicesStep({
                   </Label>
                   <FormControl>
                     <div className="mt-4 grid grid-cols-2 justify-between gap-[16px] my-5 max-lg:grid-cols-1">
-                      {data?.data.extra_paid_service.map((opt) => {
+                      {data?.data.paid_extra_service.map((opt) => {
                         const isChecked = selectedExcursions.includes(opt.id);
                         return (
                           <div
