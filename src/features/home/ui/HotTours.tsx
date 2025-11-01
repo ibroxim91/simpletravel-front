@@ -98,124 +98,130 @@ const HotTours = () => {
 
   return (
     <>
-      <div className="custom-container mt-20">
-        <div className="flex justify-between items-center">
-          <Link
-            href="/selectour"
-            prefetch
-            className="text-3xl text-[#031753] font-semibold"
-          >
-            {t('Увидеть без визы')}
-          </Link>
-          <div className="flex gap-4">
-            <Button
-              variant={'outline'}
-              className="rounded-full w-10 h-10 max-lg:hidden"
-              onClick={() => api?.scrollPrev()}
-              disabled={!canScrollPrev}
-              aria-label="Scroll to previous item"
+      {ticket && ticket.data.results.tickets.length > 0 && (
+        <div className="custom-container mt-20">
+          <div className="flex justify-between items-center">
+            <Link
+              href="/selectour"
+              prefetch
+              className="text-3xl text-[#031753] font-semibold"
             >
-              <KeyboardBackspaceIcon sx={{ color: '#031753' }} />
-            </Button>
-            <Button
-              variant={'outline'}
-              className="rounded-full w-10 h-10 max-lg:hidden"
-              onClick={() => api?.scrollNext()}
-              disabled={!canScrollNext}
-              aria-label="Scroll to next item"
-            >
-              <KeyboardBackspaceIcon
-                sx={{ rotate: '180deg', color: '#031753' }}
-              />
-            </Button>
+              {t('Увидеть без визы')}
+            </Link>
+            <div className="flex gap-4">
+              <Button
+                variant={'outline'}
+                className="rounded-full w-10 h-10 max-lg:hidden"
+                onClick={() => api?.scrollPrev()}
+                disabled={!canScrollPrev}
+                aria-label="Scroll to previous item"
+              >
+                <KeyboardBackspaceIcon sx={{ color: '#031753' }} />
+              </Button>
+              <Button
+                variant={'outline'}
+                className="rounded-full w-10 h-10 max-lg:hidden"
+                onClick={() => api?.scrollNext()}
+                disabled={!canScrollNext}
+                aria-label="Scroll to next item"
+              >
+                <KeyboardBackspaceIcon
+                  sx={{ rotate: '180deg', color: '#031753' }}
+                />
+              </Button>
+            </div>
           </div>
+          <Carousel className="w-full mt-4 cursor-pointer" setApi={setApi}>
+            <CarouselContent>
+              {isLoading
+                ? Array.from({ length: 4 }).map((_, idx) => (
+                    <CarouselItem
+                      key={idx}
+                      className="flex flex-col w-auto basis-1/4 max-lg:basis-1/3 max-md:basis-[70%] shrink-0"
+                    >
+                      <div className="w-full aspect-square relative overflow-hidden rounded-3xl shadow-lg">
+                        <Skeleton className="w-full h-full" />
+                      </div>
+                      <div className="mt-4 space-y-2">
+                        <Skeleton className="h-4 w-24" />
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-4 w-20" />
+                      </div>
+                    </CarouselItem>
+                  ))
+                : ticket?.data.results.tickets.map((e, idx) => (
+                    <CarouselItem
+                      key={idx}
+                      className="flex flex-col w-auto basis-1/4 max-lg:basis-1/3 max-md:basis-[70%] shrink-0 font-medium"
+                    >
+                      <Link href={`/selectour/${e.id}`} prefetch={true}>
+                        <motion.div
+                          initial={{ opacity: 0, y: 40, scale: 0.95 }}
+                          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                          viewport={{ once: false, amount: 0.1 }}
+                          transition={{
+                            duration: 0.6,
+                            delay: idx * 0.15,
+                            ease: 'easeOut',
+                          }}
+                          className="w-full aspect-square relative group overflow-hidden rounded-3xl shadow-lg"
+                        >
+                          <Image
+                            src={BASE_URL + e.ticket_images}
+                            alt={e.title}
+                            fill
+                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                          />
+                          <div className="flex flex-col absolute top-2 left-4 gap-2 z-20">
+                            {e.badge.map((e) => (
+                              <Badge
+                                key={e.id}
+                                variant="default"
+                                className={`bg-[${e.color}] text-sm px-4 py-1 rounded-4xl font-semibold`}
+                                style={{ background: e.color }}
+                              >
+                                {e.name}
+                              </Badge>
+                            ))}
+                          </div>
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10" />
+                        </motion.div>
+                        <motion.div
+                          initial={{ opacity: 0, y: 20 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: false, amount: 0.1 }}
+                          transition={{ duration: 0.6, delay: idx * 0.2 }}
+                          className="mt-4"
+                        >
+                          <Rating
+                            name="read-only"
+                            size="medium"
+                            value={e.rating}
+                            readOnly
+                            sx={{ color: '#F08125' }}
+                            precision={0.1}
+                          />
+                          <p className="text-xl font-semibold text-[#031753]">
+                            {e.title}
+                          </p>
+                          <p className="text-md text-[#031753]">
+                            {e.destination}
+                          </p>
+                          <p className="mt-2 text-[#084FE3] font-semibold text-lg">
+                            {formatPrice(
+                              e.price,
+                              locale as LanguageRoutes,
+                              true,
+                            )}
+                          </p>
+                        </motion.div>
+                      </Link>
+                    </CarouselItem>
+                  ))}
+            </CarouselContent>
+          </Carousel>
         </div>
-        <Carousel className="w-full mt-4 cursor-pointer" setApi={setApi}>
-          <CarouselContent>
-            {isLoading
-              ? Array.from({ length: 4 }).map((_, idx) => (
-                  <CarouselItem
-                    key={idx}
-                    className="flex flex-col w-auto basis-1/4 max-lg:basis-1/3 max-md:basis-[70%] shrink-0"
-                  >
-                    <div className="w-full aspect-square relative overflow-hidden rounded-3xl shadow-lg">
-                      <Skeleton className="w-full h-full" />
-                    </div>
-                    <div className="mt-4 space-y-2">
-                      <Skeleton className="h-4 w-24" />
-                      <Skeleton className="h-4 w-32" />
-                      <Skeleton className="h-4 w-20" />
-                    </div>
-                  </CarouselItem>
-                ))
-              : ticket?.data.results.tickets.map((e, idx) => (
-                  <CarouselItem
-                    key={idx}
-                    className="flex flex-col w-auto basis-1/4 max-lg:basis-1/3 max-md:basis-[70%] shrink-0 font-medium"
-                  >
-                    <Link href={`/selectour/${e.id}`} prefetch={true}>
-                      <motion.div
-                        initial={{ opacity: 0, y: 40, scale: 0.95 }}
-                        whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                        viewport={{ once: false, amount: 0.1 }}
-                        transition={{
-                          duration: 0.6,
-                          delay: idx * 0.15,
-                          ease: 'easeOut',
-                        }}
-                        className="w-full aspect-square relative group overflow-hidden rounded-3xl shadow-lg"
-                      >
-                        <Image
-                          src={BASE_URL + e.ticket_images}
-                          alt={e.title}
-                          fill
-                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                        />
-                        <div className="flex flex-col absolute top-2 left-4 gap-2 z-20">
-                          {e.badge.map((e) => (
-                            <Badge
-                              key={e.id}
-                              variant="default"
-                              className={`bg-[${e.color}] text-sm px-4 py-1 rounded-4xl font-semibold`}
-                              style={{ background: e.color }}
-                            >
-                              {e.name}
-                            </Badge>
-                          ))}
-                        </div>
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10" />
-                      </motion.div>
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: false, amount: 0.1 }}
-                        transition={{ duration: 0.6, delay: idx * 0.2 }}
-                        className="mt-4"
-                      >
-                        <Rating
-                          name="read-only"
-                          size="medium"
-                          value={e.rating}
-                          readOnly
-                          sx={{ color: '#F08125' }}
-                          precision={0.1}
-                        />
-                        <p className="text-xl font-semibold text-[#031753]">
-                          {e.title}
-                        </p>
-                        <p className="text-md text-[#031753]">
-                          {e.destination}
-                        </p>
-                        <p className="mt-2 text-[#084FE3] font-semibold text-lg">
-                          {formatPrice(e.price, locale as LanguageRoutes, true)}
-                        </p>
-                      </motion.div>
-                    </Link>
-                  </CarouselItem>
-                ))}
-          </CarouselContent>
-        </Carousel>
-      </div>
+      )}
       {hotTicket && hotTicket?.data.results.tickets.length > 0 && (
         <div className="custom-container mt-20">
           <div className="flex justify-between items-center">

@@ -176,6 +176,7 @@ export default function ServicesStep({
       });
     }
   }
+  console.log(data);
 
   return (
     <div>
@@ -185,87 +186,92 @@ export default function ServicesStep({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <FormField
-              control={form.control}
-              name={`excursions`}
-              render={() => (
-                <FormItem>
-                  <Label className="text-xl font-medium text-[#121212]">
-                    {t('Экскурсии')}
-                  </Label>
-                  <FormControl>
-                    <div className="mt-4 grid grid-cols-2 justify-between gap-[16px] my-5 max-lg:grid-cols-1">
-                      {data?.data.paid_extra_service.map((opt) => {
-                        const isChecked = selectedExcursions.includes(opt.id);
-                        return (
-                          <div
-                            key={opt.id}
-                            onClick={() => toggleExcursion(opt.id)}
-                            className={`flex w-full justify-between items-center py-[17px] px-[20px] cursor-pointer border border-[#EDEEF1] rounded-[12px] bg-[#EDEEF180]`}
-                          >
-                            <p
-                              className={clsx(
-                                'font-semibold',
-                                isChecked ? 'text-[#084FE3]' : 'text-[#212122]',
-                              )}
+            {data && data.data.paid_extra_service.length > 0 && (
+              <FormField
+                control={form.control}
+                name={`excursions`}
+                render={() => (
+                  <FormItem>
+                    <Label className="text-xl font-medium text-[#121212]">
+                      {t('Экскурсии')}
+                    </Label>
+                    <FormControl>
+                      <div className="mt-4 grid grid-cols-2 justify-between gap-[16px] my-5 max-lg:grid-cols-1">
+                        {data?.data.paid_extra_service.map((opt) => {
+                          const isChecked = selectedExcursions.includes(opt.id);
+                          return (
+                            <div
+                              key={opt.id}
+                              onClick={() => toggleExcursion(opt.id)}
+                              className={`flex w-full justify-between items-center py-[17px] px-[20px] cursor-pointer border border-[#EDEEF1] rounded-[12px] bg-[#EDEEF180]`}
                             >
-                              {opt.name}{' '}
-                              {formatPrice(
-                                opt.price,
-                                locale as LanguageRoutes,
-                                true,
-                              )}
-                            </p>
-                            <Input
-                              type="checkbox"
-                              name={t('selectComfort')}
-                              checked={isChecked}
-                              onChange={() => toggleExcursion(opt.id)}
-                              className="w-4 h-4 accent-[#084FE3] rounded-full"
-                            />
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div>
-              <Label className="text-xl font-medium text-[#121212]">
-                {t('Дополнительные услуги')}
-              </Label>
-              <div className="mt-[8px] grid grid-cols-2 gap-[16px] max-lg:grid-cols-1">
-                {data?.data.extra_service.map((opt) => {
-                  const isChecked = selectedServices.includes(opt.id);
-                  return (
-                    <div
-                      key={opt.id}
-                      onClick={() => toggleService(opt.name, opt.id)}
-                      className="flex justify-between items-center py-[17px] px-[20px] border border-[#EDEEF1] rounded-[12px] bg-[#EDEEF180] cursor-pointer"
-                    >
-                      <p
-                        className={clsx(
-                          'font-semibold',
-                          isChecked ? 'text-[#084FE3]' : 'text-[#212122]',
-                        )}
+                              <p
+                                className={clsx(
+                                  'font-semibold',
+                                  isChecked
+                                    ? 'text-[#084FE3]'
+                                    : 'text-[#212122]',
+                                )}
+                              >
+                                {opt.name}{' '}
+                                {formatPrice(
+                                  opt.price,
+                                  locale as LanguageRoutes,
+                                  true,
+                                )}
+                              </p>
+                              <Input
+                                type="checkbox"
+                                name={t('selectComfort')}
+                                checked={isChecked}
+                                onChange={() => toggleExcursion(opt.id)}
+                                className="w-4 h-4 accent-[#084FE3] rounded-full"
+                              />
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+            {data && data.data.extra_service.length > 0 && (
+              <div>
+                <Label className="text-xl font-medium text-[#121212]">
+                  {t('Дополнительные услуги')}
+                </Label>
+                <div className="mt-[8px] grid grid-cols-2 gap-[16px] max-lg:grid-cols-1">
+                  {data?.data.extra_service.map((opt) => {
+                    const isChecked = selectedServices.includes(opt.id);
+                    return (
+                      <div
+                        key={opt.id}
+                        onClick={() => toggleService(opt.name, opt.id)}
+                        className="flex justify-between items-center py-[17px] px-[20px] border border-[#EDEEF1] rounded-[12px] bg-[#EDEEF180] cursor-pointer"
                       >
-                        {opt.name}
-                      </p>
-                      <Switch
-                        checked={isChecked}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleService(opt.name, opt.id);
-                        }}
-                      />
-                    </div>
-                  );
-                })}
+                        <p
+                          className={clsx(
+                            'font-semibold',
+                            isChecked ? 'text-[#084FE3]' : 'text-[#212122]',
+                          )}
+                        >
+                          {opt.name}
+                        </p>
+                        <Switch
+                          checked={isChecked}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleService(opt.name, opt.id);
+                          }}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            )}
           </form>
         </Form>
       </div>

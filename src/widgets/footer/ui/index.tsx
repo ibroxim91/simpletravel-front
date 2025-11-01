@@ -3,7 +3,7 @@
 import Logo from '@/assets/LogoWhite.png';
 import { getOfferta } from '@/features/legal-offerta/lib/api';
 import { getHelpPage } from '@/features/privacy-policy/lib/api';
-import { Link } from '@/shared/config/i18n/navigation';
+import { Link, usePathname } from '@/shared/config/i18n/navigation';
 import formatPhone from '@/shared/lib/formatPhone';
 import FacebookOutlinedIcon from '@mui/icons-material/FacebookOutlined';
 import InstagramIcon from '@mui/icons-material/Instagram';
@@ -16,8 +16,16 @@ import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { getContact } from '../lib/api';
 
+const authRoutes = [
+  '/auth/edit-password',
+  '/auth/forget-password',
+  '/auth/register',
+  '/auth/login',
+];
+
 const Footer = () => {
   const t = useTranslations();
+  const pathname = usePathname();
   const { data } = useQuery({
     queryKey: ['get_contact'],
     queryFn: () => getContact(),
@@ -57,6 +65,10 @@ const Footer = () => {
       return data.data.data.results;
     },
   });
+
+  if (authRoutes.includes(pathname)) {
+    return null;
+  }
 
   return (
     <section className="py-8 bg-[#084FE3] rounded-t-4xl max-lg:mb-16">

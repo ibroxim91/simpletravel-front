@@ -539,14 +539,17 @@ export default function Booking() {
                       data={data}
                       onNext={() => {
                         if (
-                          (data && data.data.extra_service.length === 0) ||
-                          (data && data.data.extra_service.length === 0)
+                          data &&
+                          data.data.extra_service.length === 0 &&
+                          data &&
+                          data.data.paid_extra_service.length === 0
                         ) {
                           setActiveTab('payment');
+                          setStep(tabSteps['payment']);
                         } else {
                           setActiveTab('services');
+                          setStep(tabSteps['services']);
                         }
-                        setStep(tabSteps['services']);
                       }}
                       onPrev={() => {
                         setActiveTab('participants');

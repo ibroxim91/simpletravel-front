@@ -85,18 +85,14 @@ export default function TourInfoStep({
       (data?.data.paid_extra_service &&
         data.data.paid_extra_service.length > 0);
 
-    if (hasExtra) {
-      onNext();
-      return;
-    }
-
     const basePrice = data?.data.price || 0;
     const userPrice = basePrice * (user?.length || 0);
     const total_price = tariff.price + transport.price + userPrice;
 
     setTotalPrice(total_price);
+    console.log(!hasExtra);
 
-    if (returned && dispatch && id && total_price) {
+    if (returned && dispatch && id && total_price && !hasExtra) {
       mutate({
         departure: where,
         arrival_time: formatDate.format(returned, 'YYYY-MM-DD'),
@@ -111,7 +107,7 @@ export default function TourInfoStep({
         total_price,
       });
     } else {
-      toast.error(t("Ma'lumotlar to‘liq emas"));
+      onNext();
     }
   };
 

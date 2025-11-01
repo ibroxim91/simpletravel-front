@@ -172,9 +172,9 @@ export default function TimeStep({ onNext, data }: Props) {
                           <Popover open={open} onOpenChange={setOpen}>
                             <PopoverTrigger asChild>
                               <button
+                                disabled
                                 className={cn(
-                                  'w-full justify-start text-left cursor-pointer relative font-normal border-2 h-full border-[#EDEEF1] rounded-md p-[12px]',
-                                  !field.value && 'text-muted-foreground',
+                                  'w-full justify-start text-left relative font-normal border-2 h-full border-[#EDEEF1] rounded-md p-[12px]',
                                 )}
                               >
                                 <CalendarMonthIcon
@@ -185,9 +185,14 @@ export default function TimeStep({ onNext, data }: Props) {
                                     right: 10,
                                   }}
                                 />
-                                {field.value
-                                  ? formatDate.format(field.value, 'DD.MM.YYYY')
-                                  : t('Когда')}
+                                <p className="text-muted-foreground">
+                                  {field.value
+                                    ? formatDate.format(
+                                        field.value,
+                                        'DD.MM.YYYY',
+                                      )
+                                    : t('Когда')}
+                                </p>
                               </button>
                             </PopoverTrigger>
                             <PopoverContent
@@ -210,9 +215,9 @@ export default function TimeStep({ onNext, data }: Props) {
                         </div>
                         <div className="lg:hidden">
                           <button
+                            disabled
                             className={cn(
                               'w-full justify-start text-left cursor-pointer relative font-normal border-2 h-[56px] border-[#EDEEF1] rounded-md p-[12px]',
-                              !field.value && 'text-muted-foreground',
                             )}
                             onClick={() => setOpenWhereMobile(true)}
                           >
@@ -224,9 +229,11 @@ export default function TimeStep({ onNext, data }: Props) {
                                 right: 10,
                               }}
                             />
-                            {field.value
-                              ? formatDate.format(field.value, 'DD.MM.YYYY')
-                              : t('Когда')}
+                            <p className="text-muted-foreground">
+                              {field.value
+                                ? formatDate.format(field.value, 'DD.MM.YYYY')
+                                : t('Когда')}
+                            </p>
                           </button>
                           <Drawer
                             anchor="bottom"
@@ -298,6 +305,7 @@ export default function TimeStep({ onNext, data }: Props) {
                           >
                             <PopoverTrigger asChild>
                               <button
+                                disabled
                                 className={cn(
                                   'w-full justify-start text-left relative font-normal border-2 h-full border-[#EDEEF1] rounded-md p-[12px]',
                                   !field.value && 'text-muted-foreground',
@@ -310,10 +318,15 @@ export default function TimeStep({ onNext, data }: Props) {
                                     position: 'absolute',
                                     right: 10,
                                   }}
-                                />
-                                {field.value
-                                  ? formatDate.format(field.value, 'DD.MM.YYYY')
-                                  : t('Когда')}
+                                />{' '}
+                                <p className="text-muted-foreground">
+                                  {field.value
+                                    ? formatDate.format(
+                                        field.value,
+                                        'DD.MM.YYYY',
+                                      )
+                                    : t('Когда')}
+                                </p>
                               </button>
                             </PopoverTrigger>
                             <PopoverContent
