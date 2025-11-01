@@ -43,19 +43,15 @@ export interface Get_Info {
         price: number;
       },
     ];
-    extra_service: [
-      {
-        id: number;
-        name: string;
-      },
-    ];
-    paid_extra_service: [
-      {
-        id: number;
-        price: number;
-        name: string;
-      },
-    ];
+    extra_service: {
+      id: number;
+      name: string;
+    }[];
+    paid_extra_service: {
+      id: number;
+      price: number;
+      name: string;
+    }[];
   };
 }
 

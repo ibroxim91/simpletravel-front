@@ -1,4 +1,7 @@
+'use client';
+
 import { LanguageRoutes } from '@/shared/config/i18n/types';
+import formatDate from '@/shared/lib/formatDate';
 import { formatPrice } from '@/shared/lib/formatPrice';
 import { Input } from '@/shared/ui/input';
 import AirplaneTicketIcon from '@mui/icons-material/AirplaneTicket';
@@ -6,54 +9,110 @@ import LocalTaxiIcon from '@mui/icons-material/LocalTaxi';
 import StarIcon from '@mui/icons-material/Star';
 import WhereToVoteIcon from '@mui/icons-material/WhereToVote';
 import Rating from '@mui/material/Rating';
+import { useMutation } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Get_Info } from '../lib/api';
+import { toast } from 'sonner';
+import { Get_Info, Ticketorder_Api } from '../lib/api';
 import formStore from '../lib/hook';
 
 type Props = {
   onNext: () => void;
-  data: Get_Info | undefined;
   onPrev: () => void;
+  data: Get_Info | undefined;
+  setOrderId: React.Dispatch<React.SetStateAction<number | undefined>>;
 };
 
-export default function TourInfoStep({ onNext, onPrev, data }: Props) {
+export default function TourInfoStep({
+  onNext,
+  onPrev,
+  data,
+  setOrderId,
+}: Props) {
   const t = useTranslations();
-  const { locale } = useParams();
+  const { locale, id } = useParams();
   const [selected, setSelected] = useState<string | null>(null);
   const [transport, setTransport] = useState<{
-    transport: {
-      name: string;
-      icon_name: string;
-    };
+    transport: { name: string; icon_name: string };
     price: number;
   }>({
     price: 0,
-    transport: {
-      icon_name: '',
-      name: '',
-    },
+    transport: { icon_name: '', name: '' },
   });
 
   const {
     additional,
     setAdditional,
     setTarif,
-    transport: storeTranpsort,
+    transport: storeTransport,
     setTransport: setStoreTransport,
+    user,
+    where,
+    whereTo,
+    returned,
+    dispatch,
+    tariff,
+    setTotalPrice,
   } = formStore();
 
   useEffect(() => {
-    if (additional) {
-      setSelected(additional);
+    if (additional) setSelected(additional);
+    if (storeTransport) setTransport(storeTransport);
+  }, [additional, storeTransport]);
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: (body: any) => Ticketorder_Api.ticketorder_create(body),
+    onSuccess: (res) => {
+      setOrderId(res.data.data.id);
+      onNext();
+      toast.success(t('Tur muvaffaqiyatli bron qilindi'));
+    },
+    onError: () => {
+      toast.error(t('Xatolik yuz berdi'));
+    },
+  });
+
+  const handleNext = () => {
+    setAdditional(selected);
+    setStoreTransport(transport);
+
+    const hasExtra =
+      (data?.data.extra_service && data.data.extra_service.length > 0) ||
+      (data?.data.paid_extra_service &&
+        data.data.paid_extra_service.length > 0);
+
+    if (hasExtra) {
+      onNext();
+      return;
     }
-    if (storeTranpsort) {
-      setTransport(storeTranpsort);
+
+    const basePrice = data?.data.price || 0;
+    const userPrice = basePrice * (user?.length || 0);
+    const total_price = tariff.price + transport.price + userPrice;
+
+    setTotalPrice(total_price);
+
+    if (returned && dispatch && id && total_price) {
+      mutate({
+        departure: where,
+        arrival_time: formatDate.format(returned, 'YYYY-MM-DD'),
+        departure_date: formatDate.format(dispatch, 'YYYY-MM-DD'),
+        destination: whereTo,
+        extra_paid_service: [],
+        extra_service: [],
+        participant: user.map((u) => u.userId),
+        tariff: tariff.tariff.name,
+        transport: transport.transport.name,
+        ticket: Number(id),
+        total_price,
+      });
+    } else {
+      toast.error(t("Ma'lumotlar to‘liq emas"));
     }
-  }, [additional, storeTranpsort]);
+  };
 
   return (
     <div>
@@ -232,22 +291,20 @@ export default function TourInfoStep({ onNext, onPrev, data }: Props) {
           })}
         </div>
       </div>
+
       <div className="flex justify-between max-lg:flex-col">
         <button
           onClick={onPrev}
-          className="bg-gray-200 border shadow-sm border-[#D3D3D3] text-gray-800 hover:bg-gray-300 py-4 font-medium px-20 left-0 cursor-pointer rounded-full mt-[20px]"
+          className="bg-gray-200 border shadow-sm border-[#D3D3D3] text-gray-800 hover:bg-gray-300 py-4 font-medium px-20 rounded-full mt-[20px]"
         >
           {t('Назад')}
         </button>
         <button
-          onClick={() => {
-            onNext();
-            setAdditional(selected);
-            setStoreTransport(transport);
-          }}
-          className="bg-[#1764FC] text-white py-4 font-medium px-20 left-0 cursor-pointer rounded-full mt-[20px]"
+          onClick={handleNext}
+          disabled={isPending}
+          className="bg-[#1764FC] text-white py-4 font-medium px-20 rounded-full mt-[20px]"
         >
-          {t('Следующий')}
+          {isPending ? t('Yuklanmoqda...') : t('Следующий')}
         </button>
       </div>
     </div>

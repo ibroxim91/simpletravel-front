@@ -316,89 +316,99 @@ export default function Booking() {
                   </svg>
                 </div>
               </TabsTrigger>
-
-              <TabsTrigger
-                value="services"
-                className={clsx(
-                  'w-full relative justify-between text-center cursor-pointer text-md font-semibold data-[state=active]:bg-[#084FE3] data-[state=active]:text-[#FFFF] p-4 rounded-xl data-[state=active]:shadow-sm',
-                  step < 4
-                    ? 'bg-white text-[#084FE3]'
-                    : 'bg-[#EDEEF180] text-[#084FE3]',
-                )}
-              >
-                <div className="flex gap-4">
-                  <SettingsIcon sx={{ width: '28px', height: '28px' }} />
-                  <p
-                    className={clsx(
-                      'text-lg',
-                      step < 4
-                        ? 'text-[#000]'
-                        : step === 4
-                          ? 'text-[#FFFF]'
-                          : 'text-[#000]',
-                    )}
-                  >
-                    {t('Услуги')}
-                  </p>
-                </div>
-                <div className="flex flex-col items-center justify-center absolute right-5 bottom-0">
-                  <svg
-                    width="2"
-                    height="30"
-                    viewBox="0 0 2 30"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M1 0V30"
-                      stroke={
-                        step < 4 ? '#909091' : step === 4 ? '#FFFF' : '#084FE3'
-                      }
-                      strokeWidth="3"
-                      strokeDasharray="10 10"
-                    />
-                  </svg>
-                  <div
-                    className={clsx(
-                      'border w-6 h-6 rounded-full flex justify-center items-center',
-                      step < 4
-                        ? 'border-gray-400'
-                        : step === 4
-                          ? 'border-white'
-                          : 'border-[#084FE3]',
-                    )}
-                  >
-                    {step >= 4 && (
-                      <div
-                        className={clsx(
-                          'w-3 h-3 rounded-full',
-                          step < 4
-                            ? 'bg-gray-400'
-                            : step === 4
-                              ? 'bg-white'
-                              : 'bg-[#084FE3]',
-                        )}
-                      />
-                    )}
+              {((data && data.data.extra_service.length !== 0) ||
+                (data && data.data.paid_extra_service.length !== 0)) && (
+                <TabsTrigger
+                  value="services"
+                  className={clsx(
+                    'w-full relative justify-between text-center cursor-pointer text-md font-semibold data-[state=active]:bg-[#084FE3] data-[state=active]:text-[#FFFF] p-4 rounded-xl data-[state=active]:shadow-sm',
+                    step < 4
+                      ? 'bg-white text-[#084FE3]'
+                      : 'bg-[#EDEEF180] text-[#084FE3]',
+                  )}
+                >
+                  <div className="flex gap-4">
+                    <SettingsIcon sx={{ width: '28px', height: '28px' }} />
+                    <p
+                      className={clsx(
+                        'text-lg',
+                        step < 4
+                          ? 'text-[#000]'
+                          : step === 4
+                            ? 'text-[#FFFF]'
+                            : 'text-[#000]',
+                      )}
+                    >
+                      {t('Услуги')}
+                    </p>
                   </div>
-                  <svg
-                    width="2"
-                    height="30"
-                    viewBox="0 0 2 30"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M1 0V30"
-                      stroke={
-                        step < 4 ? '#909091' : step === 4 ? '#FFFF' : '#084FE3'
-                      }
-                      strokeWidth="3"
-                      strokeDasharray="10 10"
-                    />
-                  </svg>
-                </div>
-              </TabsTrigger>
+                  <div className="flex flex-col items-center justify-center absolute right-5 bottom-0">
+                    <svg
+                      width="2"
+                      height="30"
+                      viewBox="0 0 2 30"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M1 0V30"
+                        stroke={
+                          step < 4
+                            ? '#909091'
+                            : step === 4
+                              ? '#FFFF'
+                              : '#084FE3'
+                        }
+                        strokeWidth="3"
+                        strokeDasharray="10 10"
+                      />
+                    </svg>
+                    <div
+                      className={clsx(
+                        'border w-6 h-6 rounded-full flex justify-center items-center',
+                        step < 4
+                          ? 'border-gray-400'
+                          : step === 4
+                            ? 'border-white'
+                            : 'border-[#084FE3]',
+                      )}
+                    >
+                      {step >= 4 && (
+                        <div
+                          className={clsx(
+                            'w-3 h-3 rounded-full',
+                            step < 4
+                              ? 'bg-gray-400'
+                              : step === 4
+                                ? 'bg-white'
+                                : 'bg-[#084FE3]',
+                          )}
+                        />
+                      )}
+                    </div>
+                    <svg
+                      width="2"
+                      height="30"
+                      viewBox="0 0 2 30"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M1 0V30"
+                        stroke={
+                          step < 4
+                            ? '#909091'
+                            : step === 4
+                              ? '#FFFF'
+                              : '#084FE3'
+                        }
+                        strokeWidth="3"
+                        strokeDasharray="10 10"
+                      />
+                    </svg>
+                  </div>
+                </TabsTrigger>
+              )}
 
               <TabsTrigger
                 value="payment"
@@ -525,9 +535,17 @@ export default function Booking() {
                     transition={{ duration: 0.5 }}
                   >
                     <TourInfoStep
+                      setOrderId={setOrderId}
                       data={data}
                       onNext={() => {
-                        setActiveTab('services');
+                        if (
+                          (data && data.data.extra_service.length === 0) ||
+                          (data && data.data.extra_service.length === 0)
+                        ) {
+                          setActiveTab('payment');
+                        } else {
+                          setActiveTab('services');
+                        }
                         setStep(tabSteps['services']);
                       }}
                       onPrev={() => {
@@ -538,29 +556,33 @@ export default function Booking() {
                     />
                   </motion.div>
                 )}
-
-                {activeTab === 'services' && (
-                  <motion.div
-                    key="tours"
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                    variants={variants}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <ServicesStep
-                      data={data}
-                      setOrderId={setOrderId}
-                      onNext={() => {
-                        setActiveTab('payment');
-                        setStep(tabSteps['payment']);
-                      }}
-                      onPrev={() => {
-                        setActiveTab('package');
-                        setStep(tabSteps['package']);
-                      }}
-                    />
-                  </motion.div>
+                {((data && data.data.extra_service) ||
+                  data?.data.paid_extra_service) && (
+                  <>
+                    {activeTab === 'services' && (
+                      <motion.div
+                        key="tours"
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        variants={variants}
+                        transition={{ duration: 0.5 }}
+                      >
+                        <ServicesStep
+                          data={data}
+                          setOrderId={setOrderId}
+                          onNext={() => {
+                            setActiveTab('payment');
+                            setStep(tabSteps['payment']);
+                          }}
+                          onPrev={() => {
+                            setActiveTab('package');
+                            setStep(tabSteps['package']);
+                          }}
+                        />
+                      </motion.div>
+                    )}
+                  </>
                 )}
 
                 {activeTab === 'payment' && (
