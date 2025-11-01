@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: seo.description,
     keywords: seo.keywords,
     icons: {
-      icon: [{ url: '/favicon.ico', type: 'image/x-icon' }],
+      icon: [{ url: '/Logos.svg' }],
     },
     openGraph: {
       title: seo.ogTitle,

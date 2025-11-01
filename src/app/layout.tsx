@@ -11,16 +11,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: PRODUCT_INFO.name,
     description: PRODUCT_INFO.desc,
-    url: 'https://simple-travel-blond.vercel.app/',
     siteName: PRODUCT_INFO.name,
-    images: [
-      {
-        url: 'https://simple-travel-blond.vercel.app/Logo_blue.png',
-        width: 1200,
-        height: 630,
-        alt: PRODUCT_INFO.name,
-      },
-    ],
     type: 'website',
   },
 };
