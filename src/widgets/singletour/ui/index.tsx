@@ -421,55 +421,56 @@ export default function SingleTour() {
                   </motion.div>
                 </div>
               </motion.div>
-
-              <motion.div
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: false, amount: 0.2 }}
-                variants={slideIn}
-                className="custom-container mt-20"
-              >
-                <div className="flex justify-between items-center">
-                  <p className="text-3xl text-[#031753] font-semibold">
-                    {t('Что включено в стоимость тура')}
-                  </p>
-                  <div className="flex gap-4">
-                    <Button
-                      variant={'outline'}
-                      className="rounded-full w-10 h-10 max-lg:hidden"
-                      onClick={() => tourApi?.scrollPrev()}
-                      disabled={!canScrollPrevTour}
-                    >
-                      <KeyboardBackspaceIcon sx={{ color: '#031753' }} />
-                    </Button>
-                    <Button
-                      variant={'outline'}
-                      className="rounded-full w-10 h-10 max-lg:hidden"
-                      onClick={() => tourApi?.scrollNext()}
-                      disabled={!canScrollNextTour}
-                    >
-                      <KeyboardBackspaceIcon
-                        sx={{ rotate: '180deg', color: '#031753' }}
-                      />
-                    </Button>
-                  </div>
-                </div>
-                <Carousel
-                  className="w-full mt-4 cursor-pointer"
-                  setApi={setTourApi}
+              {data.ticket_included_services.length > 0 && (
+                <motion.div
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: false, amount: 0.2 }}
+                  variants={slideIn}
+                  className="custom-container mt-20"
                 >
-                  <CarouselContent>
-                    {data.ticket_included_services?.map((item, key) => (
-                      <CarouselItem
-                        key={key}
-                        className="flex flex-col w-auto basis-1/5 max-xl:basis-1/3 max-lg:basis-1/2 max-md:basis-[60%] shrink-0 font-medium"
+                  <div className="flex justify-between items-center">
+                    <p className="text-3xl text-[#031753] font-semibold">
+                      {t('Что включено в стоимость тура')}
+                    </p>
+                    <div className="flex gap-4">
+                      <Button
+                        variant={'outline'}
+                        className="rounded-full w-10 h-10 max-lg:hidden"
+                        onClick={() => tourApi?.scrollPrev()}
+                        disabled={!canScrollPrevTour}
                       >
-                        <TourItem key={`${item}-${key}`} data={item} />
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                </Carousel>
-              </motion.div>
+                        <KeyboardBackspaceIcon sx={{ color: '#031753' }} />
+                      </Button>
+                      <Button
+                        variant={'outline'}
+                        className="rounded-full w-10 h-10 max-lg:hidden"
+                        onClick={() => tourApi?.scrollNext()}
+                        disabled={!canScrollNextTour}
+                      >
+                        <KeyboardBackspaceIcon
+                          sx={{ rotate: '180deg', color: '#031753' }}
+                        />
+                      </Button>
+                    </div>
+                  </div>
+                  <Carousel
+                    className="w-full mt-4 cursor-pointer"
+                    setApi={setTourApi}
+                  >
+                    <CarouselContent>
+                      {data.ticket_included_services?.map((item, key) => (
+                        <CarouselItem
+                          key={key}
+                          className="flex flex-col w-auto basis-1/5 max-xl:basis-1/3 max-lg:basis-1/2 max-md:basis-[60%] shrink-0 font-medium"
+                        >
+                          <TourItem key={`${item}-${key}`} data={item} />
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                  </Carousel>
+                </motion.div>
+              )}
             </div>
           </div>
 
@@ -731,72 +732,77 @@ export default function SingleTour() {
 
           <div className="mt-10 custom-container bg-[#FFFF] py-10">
             <CommentTour data={data} />
-            <div className="mt-10">
-              <div className="custom-container flex justify-between items-center">
-                <motion.h1
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: false, amount: 0.2 }}
-                  variants={{
-                    hidden: { opacity: 0, x: -60 },
-                    visible: () => ({
-                      opacity: 1,
-                      x: 0,
-                      transition: { delay: 0.5, duration: 0.5 },
-                    }),
-                  }}
-                  className="text-3xl text-[#232325] font-semibold"
-                >
-                  {t('Откройте новые направления')}
-                </motion.h1>
-                <motion.div
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: false, amount: 0.2 }}
-                  variants={{
-                    hidden: { opacity: 0, x: 60 },
-                    visible: () => ({
-                      opacity: 1,
-                      x: 0,
-                      transition: { delay: 0.5, duration: 0.5 },
-                    }),
-                  }}
-                  className="flex gap-2"
-                >
-                  <Button
-                    variant={'outline'}
-                    className="rounded-xl w-10 h-10 max-lg:hidden bg-[#F8F8F8] border-[#CBD5E0]"
-                    onClick={() => api?.scrollPrev()}
-                    disabled={!canScrollPrev}
+            {hotTicket && hotTicket.data.results.tickets.length > 0 && (
+              <div className="mt-10">
+                <div className="custom-container flex justify-between items-center">
+                  <motion.h1
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: false, amount: 0.2 }}
+                    variants={{
+                      hidden: { opacity: 0, x: -60 },
+                      visible: () => ({
+                        opacity: 1,
+                        x: 0,
+                        transition: { delay: 0.5, duration: 0.5 },
+                      }),
+                    }}
+                    className="text-3xl text-[#232325] font-semibold"
                   >
-                    <KeyboardBackspaceIcon sx={{ color: '#939BA4' }} />
-                  </Button>
-                  <Button
-                    variant={'outline'}
-                    className="rounded-xl w-10 h-10 max-lg:hidden border-[#CBD5E0]"
-                    onClick={() => api?.scrollNext()}
-                    disabled={!canScrollNext}
+                    {t('Откройте новые направления')}
+                  </motion.h1>
+                  <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: false, amount: 0.2 }}
+                    variants={{
+                      hidden: { opacity: 0, x: 60 },
+                      visible: () => ({
+                        opacity: 1,
+                        x: 0,
+                        transition: { delay: 0.5, duration: 0.5 },
+                      }),
+                    }}
+                    className="flex gap-2"
                   >
-                    <KeyboardBackspaceIcon
-                      sx={{ rotate: '180deg', color: '#939BA4' }}
-                    />
-                  </Button>
-                </motion.div>
+                    <Button
+                      variant={'outline'}
+                      className="rounded-xl w-10 h-10 max-lg:hidden bg-[#F8F8F8] border-[#CBD5E0]"
+                      onClick={() => api?.scrollPrev()}
+                      disabled={!canScrollPrev}
+                    >
+                      <KeyboardBackspaceIcon sx={{ color: '#939BA4' }} />
+                    </Button>
+                    <Button
+                      variant={'outline'}
+                      className="rounded-xl w-10 h-10 max-lg:hidden border-[#CBD5E0]"
+                      onClick={() => api?.scrollNext()}
+                      disabled={!canScrollNext}
+                    >
+                      <KeyboardBackspaceIcon
+                        sx={{ rotate: '180deg', color: '#939BA4' }}
+                      />
+                    </Button>
+                  </motion.div>
+                </div>
+                <Carousel
+                  className="w-full mt-4 cursor-pointer"
+                  setApi={setApi}
+                >
+                  <CarouselContent>
+                    {hotTicket &&
+                      hotTicket.data.results.tickets?.map((item, key) => (
+                        <CarouselItem
+                          key={key}
+                          className="basis-1/4 max-lg:basis-1/2 max-md:basis-[80%]"
+                        >
+                          <TourOffersItem data={item} />
+                        </CarouselItem>
+                      ))}
+                  </CarouselContent>
+                </Carousel>
               </div>
-              <Carousel className="w-full mt-4 cursor-pointer" setApi={setApi}>
-                <CarouselContent>
-                  {hotTicket &&
-                    hotTicket.data.results.tickets?.map((item, key) => (
-                      <CarouselItem
-                        key={key}
-                        className="basis-1/4 max-lg:basis-1/2 max-md:basis-[80%]"
-                      >
-                        <TourOffersItem data={item} />
-                      </CarouselItem>
-                    ))}
-                </CarouselContent>
-              </Carousel>
-            </div>
+            )}
           </div>
         </>
       )}

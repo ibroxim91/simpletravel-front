@@ -127,7 +127,7 @@ declare const messages: {
   "tour_found_other_general": "Найдено {{count}} туров",
   "План путешествия": "Sayohat rejasi",
   "Каждый день — новые впечатления": "Har kuni — yangi taassurotlar",
-  "Что подают в отеле": "Mehmonxonada taqdim etiladigan xizmatlar",
+  "Что подают в отеле": "Mehmonxonada nima beriladi",
   "Важно знать перед поездкой": "Safardan oldin bilish muhim",
   "ID Турфирмы": "Turfirmaga oid ID",
   "Официально зарегистрированная компания в реестре туроператоров": "Rasmiy ro‘yxatdan o‘tgan turoperator kompaniya",
