@@ -16,7 +16,7 @@ import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { Get_Info, Ticketorder_Api } from '../lib/api';
+import { Create_Ticketorder, Get_Info, Ticketorder_Api } from '../lib/api';
 import formStore from '../lib/hook';
 
 type Props = {
@@ -64,7 +64,8 @@ export default function TourInfoStep({
   }, [additional, storeTransport]);
 
   const { mutate, isPending } = useMutation({
-    mutationFn: (body: any) => Ticketorder_Api.ticketorder_create(body),
+    mutationFn: (body: Create_Ticketorder) =>
+      Ticketorder_Api.ticketorder_create(body),
     onSuccess: (res) => {
       setOrderId(res.data.data.id);
       onNext();
