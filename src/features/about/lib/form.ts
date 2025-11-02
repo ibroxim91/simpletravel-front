@@ -21,9 +21,7 @@ const senPartners = z.object({
   website: z.string().min(1, {
     message: 'Majburiy maydon',
   }),
-  instagram: z.string().min(1, {
-    message: 'Majburiy maydon',
-  }),
+  instagram: z.string().optional(),
 });
 
 export default senPartners;

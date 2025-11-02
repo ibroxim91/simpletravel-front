@@ -59,9 +59,33 @@ export default function TourInfoStep({
   } = formStore();
 
   useEffect(() => {
+    // Agar store'da oldingi tanlovlar bo'lsa, ularni yuklaymiz
     if (additional) setSelected(additional);
     if (storeTransport) setTransport(storeTransport);
-  }, [additional, storeTransport]);
+
+    // Agar hali hech narsa tanlanmagan bo'lsa, default birinchi elementni tanlaymiz
+    if (data?.data) {
+      if (!additional && data.data.tariff.length > 0) {
+        const firstTariff = data.data.tariff[0];
+        setSelected(firstTariff.tariff.name);
+        setTarif(firstTariff);
+      }
+      if (
+        (!storeTransport || !storeTransport.transport?.name) &&
+        data.data.transports.length > 0
+      ) {
+        const firstTransport = data.data.transports[0];
+        setTransport({
+          price: firstTransport.price,
+          transport: firstTransport.transport,
+        });
+        setStoreTransport({
+          price: firstTransport.price,
+          transport: firstTransport.transport,
+        });
+      }
+    }
+  }, [additional, storeTransport, data]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: (body: Create_Ticketorder) =>

@@ -111,7 +111,7 @@ const OneStep = ({ setStep }: Props) => {
       className="w-[50%] bg-white rounded-3xl h-fit py-5 px-10 absolute bottom-0 top-52 max-md:px-2 max-sm:top-16 max-lg:w-[90%] left-1/2 -translate-x-1/2"
     >
       <p className="text-xl font-semibold text-[#212122]">
-        {t('Вход в аккаунт')}
+        {t("Ro'yxatdan o'tish")}
       </p>
       <TabsList className="mt-2 w-full !bg-white h-[50px] !p-0.5 border-2 rounded-xl">
         <TabsTrigger
