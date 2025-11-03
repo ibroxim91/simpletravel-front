@@ -2,8 +2,7 @@ version: "3.9"
 
 services:
   simple-travel-frontend:
-    image: simple-travel-frontend:latest
-    build: .
+    image: username/simple-travel-frontend:latest
     ports:
       - "3000:3000"
     env_file:
