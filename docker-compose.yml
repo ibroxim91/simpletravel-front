@@ -1,0 +1,12 @@
+version: "3.9"
+
+services:
+  frontend:
+    image: simple-travel-frontend:latest
+    build: .
+    ports:
+      - "3000:3000"
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure

@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  simple-travel-frontend:
+    image: simple-travel-frontend:latest
+    build: .
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    secrets:
+      - api_key
+    volumes:
+      - frontend_logs:/app/logs
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+
+
+
+volumes:
+  frontend_logs:
