@@ -1,6 +1,8 @@
 import type { NextConfig } from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
 
+const apiHost = process.env.NEXT_PUBLIC_IMAGE_API_HOST;
+
 const nextConfig: NextConfig = {
   // Docker uchun standalone output
   output: 'standalone',
@@ -12,6 +14,12 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'simple-travel.felixits.uz',
+        port: '',
+        pathname: '/resources/**',
+      },
+      {
+        protocol: 'https',
+        hostname: apiHost!,
         port: '',
         pathname: '/resources/**',
       },
