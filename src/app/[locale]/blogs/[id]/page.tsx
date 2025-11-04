@@ -7,21 +7,19 @@ type Props = {
   params: Promise<{ locale: string; id: string }>;
 };
 
-// 🧠 SEO metadata
+// 🔥 Dynamic SEO metadata
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, id } = await params;
 
   try {
-    // 🔍 Blog ma’lumotini olish (SEO uchun sarlavha, rasm va h.k.)
+    // API dan blog ma'lumotini olish
     const res = await News_Api.getNewsDetail({ id: Number(id) });
     const blog = res?.data?.data;
 
     const title = blog?.slug || 'Blog';
     const description =
       blog?.title || blog?.text || 'Sayohat va turizm haqidagi blog maqolasi';
-    const image = blog?.image
-      ? `${process.env.NEXT_PUBLIC_API_URL}${blog.image}`
-      : '/og-blog-detail.jpg';
+    const ogImage = blog?.image && `${blog.image}`;
 
     const siteName =
       locale === 'uz'
@@ -42,7 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         siteName,
         images: [
           {
-            url: image,
+            url: ogImage,
             width: 1200,
             height: 630,
             alt: title,
@@ -53,7 +51,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         card: 'summary_large_image',
         title,
         description,
-        images: [image],
+        images: [ogImage],
       },
       alternates: {
         canonical: `${process.env.NEXT_PUBLIC_SITE_URL}/${locale}/blogs/${id}`,
@@ -64,20 +62,37 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         },
       },
     };
-  } catch {
+  } catch (error) {
+    // API ishlamasa fallback
     return {
       title: 'Blog tafsilotlari | Turlar sayti',
       description: 'Sayohat va turizm haqidagi blog maqolasi tafsilotlari.',
+      openGraph: {
+        title: 'Blog tafsilotlari',
+        description: 'Sayohat va turizm haqidagi blog maqolasi tafsilotlari.',
+        images: [
+          {
+            url: `${process.env.NEXT_PUBLIC_SITE_URL}/og-blog-detail.jpg`,
+            width: 1200,
+            height: 630,
+            alt: 'Blog tafsilotlari',
+          },
+        ],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: 'Blog tafsilotlari',
+        description: 'Sayohat va turizm haqidagi blog maqolasi tafsilotlari.',
+        images: [`${process.env.NEXT_PUBLIC_SITE_URL}/og-blog-detail.jpg`],
+      },
     };
   }
 }
 
 export default async function BlogDetailPage() {
   return (
-    <>
-      <Suspense>
-        <BlogDetailClient />
-      </Suspense>
-    </>
+    <Suspense>
+      <BlogDetailClient />
+    </Suspense>
   );
 }
