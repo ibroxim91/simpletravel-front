@@ -24,9 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ogDescription:
       tour?.destination ||
       'Откройте для себя лучшие туры с Simple Travel и наслаждайтесь надежным отдыхом.',
-    ogImage: tour?.ticket_images
-      ? BASE_URL + tour.ticket_images // string
-      : 'https://simpletravel.uz/resources/media/site_settings/navLogo.png',
+    ogImage: tour?.ticket_images && BASE_URL + tour.ticket_images[0].image, // string
   };
 
   return {
