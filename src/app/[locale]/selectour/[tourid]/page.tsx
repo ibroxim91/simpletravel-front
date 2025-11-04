@@ -1,4 +1,3 @@
-import { BASE_URL } from '@/shared/config/api/URLs';
 import { TicketsDetailAPi } from '@/widgets/singletour/lib/api';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
@@ -24,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ogDescription:
       tour?.destination ||
       'Откройте для себя лучшие туры с Simple Travel и наслаждайтесь надежным отдыхом.',
-    ogImage: tour?.ticket_images && BASE_URL + tour.ticket_images[0].image, // string
+    ogImage: tour?.ticket_images && tour.ticket_images[0].image, // string
   };
 
   return {
