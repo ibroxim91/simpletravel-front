@@ -83,16 +83,18 @@ const OneStep = ({ setStep }: Props) => {
     onSuccess() {
       setStep(2);
     },
-    onError(error: AxiosError<{ data: { email: string } }>) {
+    onError(error: AxiosError<{ data: { email: string; detail: string } }>) {
       toast.error(t('Xatolik yuz berdi'), {
         icon: null,
-        description: error.response?.data.data.email,
+        description:
+          error.response?.data.data.email || error.response?.data.data.detail,
         position: 'bottom-right',
       });
     },
   });
 
   function onSubmitEmail(values: z.infer<typeof emailFormSchema>) {
+    setPhone(undefined);
     setEmail(values.email);
     emailMutate({
       email: values.email,
@@ -101,6 +103,7 @@ const OneStep = ({ setStep }: Props) => {
 
   function onSubmitPhone(values: z.infer<typeof phoneFormSchema>) {
     setPhone(onlyNumber(values.phone));
+    setEmail(undefined);
     phoneMutate({
       phone: onlyNumber(values.phone),
     });
