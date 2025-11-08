@@ -104,7 +104,6 @@ export async function getDynamicPageSeo(
     });
 
     if (!res.ok) {
-      console.warn(`⚠️ Dynamic SEO API error: ${res.status} ${res.statusText}`);
       return DEFAULT_META;
     }
 
@@ -136,7 +135,6 @@ export async function getDynamicPageSeo(
         DEFAULT_META.ogImage,
     };
   } catch (error) {
-    console.error('❌ Failed to fetch dynamic SEO data:', error);
     return DEFAULT_META;
   }
 }
@@ -177,7 +175,6 @@ export async function getStaticPageSeo(
       ogImage: data?.og_image || DEFAULT_META.ogImage,
     };
   } catch (error) {
-    console.error('❌ Failed to fetch SEO data:', error);
     return DEFAULT_META;
   }
 }
