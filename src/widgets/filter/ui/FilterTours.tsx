@@ -17,13 +17,14 @@ import SearchIcon from '@mui/icons-material/Search';
 import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { DateRange } from 'react-day-picker';
 
 const FilterTours = () => {
   const t = useTranslations();
   const route = useRouter();
-
+  const searchParams = useSearchParams();
   const [openCity, setOpenCity] = useState(false);
   const [ageOpen, setAgeOpen] = useState(false);
   const [where, setWhere] = useState(false);
@@ -78,8 +79,6 @@ const FilterTours = () => {
   );
 
   useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search);
-
     const departure = searchParams.get('departure');
     const destination = searchParams.get('destination');
     const dateFrom = searchParams.get('dateFrom');
@@ -87,26 +86,13 @@ const FilterTours = () => {
     const adultsParam = searchParams.get('adults');
     const childrenParam = searchParams.get('children');
 
-    if (departure) {
-      setSearch(departure);
-      setSelectedCity(departure);
-    }
-    if (destination) {
-      setSearchWhere(destination);
-      setSelectedWhere(destination);
-    }
-    if (dateFrom) setFromDate(new Date(dateFrom));
-    if (dateTo) setToDate(new Date(dateTo));
-    if (adultsParam) setAdults(parseInt(adultsParam));
-    if (childrenParam) setChildren(parseInt(childrenParam));
-
-    if (dateFrom && dateTo) {
-      setRange({ from: new Date(dateFrom), to: new Date(dateTo) });
-      setSelectData(
-        `${formatDate.format(new Date(dateFrom), 'DD/MM/YYYY')} - ${formatDate.format(new Date(dateTo), 'DD/MM/YYYY')}`,
-      );
-    }
-  }, []);
+    setSearch(departure || '');
+    setSearchWhere(destination || '');
+    setFromDate(dateFrom ? new Date(dateFrom) : undefined);
+    setToDate(dateTo ? new Date(dateTo) : undefined);
+    setAdults(adultsParam ? parseInt(adultsParam) : 0);
+    setChildren(childrenParam ? parseInt(childrenParam) : 0);
+  }, [searchParams]);
 
   const saveFilter = () => {
     const params = new URLSearchParams();
