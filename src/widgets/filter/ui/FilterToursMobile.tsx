@@ -17,18 +17,20 @@ import SearchIcon from '@mui/icons-material/Search';
 import Drawer from '@mui/material/Drawer';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { DateRange } from 'react-day-picker';
 
 const FilterToursMobile = () => {
   const t = useTranslations();
   const route = useRouter();
+  const searchParams = useSearchParams();
   const [openCityMobile, setOpenCityMobile] = useState(false);
   const [ageOpen, setAgeOpen] = useState(false);
-  const [dataOpenMobile, setDataOpenMobile] = useState(false);
   const [whereMobile, setWhereMobile] = useState(false);
-  const [selectAge, setSelectAge] = useState<number>(0);
+  const [dataOpenMobile, setDataOpenMobile] = useState(false);
   const [search, setSearch] = useState('');
+  const [selectAge, setSelectAge] = useState<number>(0);
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedWhere, setSelectedWhere] = useState('');
   const [searchWhere, setSearchWhere] = useState('');
@@ -36,8 +38,8 @@ const FilterToursMobile = () => {
   const [toDate, setToDate] = useState<Date | undefined>();
   const [selectData, setSelectData] = useState<string>('');
   const [adults, setAdults] = useState<number>(0);
-  const [range, setRange] = useState<DateRange | undefined>();
   const [children, setChildren] = useState<number>(0);
+  const [range, setRange] = useState<DateRange | undefined>();
   const [cities, setCities] = useState<string[] | []>([]);
   const [citiesWhere, setCitiesWhere] = useState<string[] | []>([]);
 
@@ -45,10 +47,7 @@ const FilterToursMobile = () => {
     queryKey: ['ticket_all'],
     queryFn: () =>
       Ticket_Api.GetAllTickets({
-        params: {
-          page: 1,
-          page_size: 8,
-        },
+        params: { page: 1, page_size: 8 },
       }),
   });
 
@@ -63,7 +62,9 @@ const FilterToursMobile = () => {
 
       const uniqueCitiesWhere = Array.from(
         new Set(
-          ticket.data.results.tickets.slice(0, 8).map((e) => e.destination),
+          ticket.data.results.top_destinations
+            .slice(0, 8)
+            .map((e) => e.destination),
         ),
       );
       setCitiesWhere(uniqueCitiesWhere);
@@ -73,14 +74,11 @@ const FilterToursMobile = () => {
   const filteredCities = cities.filter((c) =>
     c.toLowerCase().includes(search.toLowerCase()),
   );
-
   const filteredCitiesWhere = citiesWhere.filter((c) =>
     c.toLowerCase().includes(searchWhere.toLowerCase()),
   );
 
   useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search);
-
     const departure = searchParams.get('departure');
     const destination = searchParams.get('destination');
     const dateFrom = searchParams.get('dateFrom');
@@ -88,26 +86,13 @@ const FilterToursMobile = () => {
     const adultsParam = searchParams.get('adults');
     const childrenParam = searchParams.get('children');
 
-    if (departure) {
-      setSearch(departure);
-      setSelectedCity(departure);
-    }
-    if (destination) {
-      setSearchWhere(destination);
-      setSelectedWhere(destination);
-    }
-    if (dateFrom) setFromDate(new Date(dateFrom));
-    if (dateTo) setToDate(new Date(dateTo));
-    if (adultsParam) setAdults(parseInt(adultsParam));
-    if (childrenParam) setChildren(parseInt(childrenParam));
-
-    if (dateFrom && dateTo) {
-      setRange({ from: new Date(dateFrom), to: new Date(dateTo) });
-      setSelectData(
-        `${formatDate.format(new Date(dateFrom), 'DD/MM/YYYY')} - ${formatDate.format(new Date(dateTo), 'DD/MM/YYYY')}`,
-      );
-    }
-  }, []);
+    setSearch(departure || '');
+    setSearchWhere(destination || '');
+    setFromDate(dateFrom ? new Date(dateFrom) : undefined);
+    setToDate(dateTo ? new Date(dateTo) : undefined);
+    setAdults(adultsParam ? parseInt(adultsParam) : 0);
+    setChildren(childrenParam ? parseInt(childrenParam) : 0);
+  }, [searchParams]);
 
   const saveFilter = () => {
     const params = new URLSearchParams();

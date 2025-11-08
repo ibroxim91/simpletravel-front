@@ -11,7 +11,7 @@ import Drawer from '@mui/material/Drawer';
 import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 const CitySelectMobile = () => {
@@ -23,6 +23,7 @@ const CitySelectMobile = () => {
   const { where, setStoreWhere } = useFilterToursStore();
   const [citiesWhere, setCitiesWhere] = useState<string[]>([]);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const { data: ticket } = useQuery({
     queryKey: ['ticket_all'],
@@ -34,6 +35,7 @@ const CitySelectMobile = () => {
         },
       }),
   });
+
   useEffect(() => {
     if (ticket) {
       const uniqueCities = Array.from(
@@ -52,22 +54,37 @@ const CitySelectMobile = () => {
           c.toLowerCase().includes(search.toLowerCase()),
         );
 
+  // Handle URL params and store
   useEffect(() => {
-    if (where) {
-      setSelectedCity(where);
-    }
-  }, [where]);
+    const destinationParam = searchParams.get('destination') || '';
+    const cityToDisplay = where || destinationParam;
+    setSelectedCity(cityToDisplay);
+  }, [searchParams, where]);
 
-  useEffect(() => {
-    if (search.trim()) {
-      const handler = setTimeout(() => {
-        setStoreWhere(search);
-        router.push('/selectour');
-        setOpenCity(false);
-      }, 1000);
-      return () => clearTimeout(handler);
+  // Handle selecting a city
+  const handleCitySelect = (cityName: string) => {
+    if (cityName === 'all') {
+      setSelectedCity('');
+      setSearch('');
+      setStoreWhere('');
+
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete('destination');
+      params.set('page', '1');
+
+      router.push(`/selectour?${params.toString()}`);
+    } else {
+      setSelectedCity(cityName);
+      setStoreWhere(cityName);
+
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('destination', cityName);
+      params.set('page', '1');
+
+      router.push(`/selectour?${params.toString()}`);
     }
-  }, [search, setStoreWhere, router]);
+    setOpenCity(false);
+  };
 
   return (
     <div
@@ -127,6 +144,7 @@ const CitySelectMobile = () => {
               }}
             />
           </div>
+
           <div
             className={clsx(
               'flex overflow-y-auto max-h-[60vh] h-screen',
@@ -135,17 +153,24 @@ const CitySelectMobile = () => {
                 : 'justify-center items-center',
             )}
           >
+            {/* "Barchasi" */}
+            <div
+              key="all"
+              className="p-2 hover:bg-gray-200 text-[#121212] items-center cursor-pointer flex justify-between"
+              onClick={() => handleCitySelect('all')}
+            >
+              {'Barchasi'}
+              {selectedCity === '' && (
+                <DoneIcon sx={{ width: '14px', height: '14px' }} />
+              )}
+            </div>
+
             {filteredCities.length > 0 ? (
               filteredCities.map((cityName) => (
                 <div
                   key={cityName}
                   className="p-2 hover:bg-gray-200 text-[#121212] items-center cursor-pointer flex justify-between"
-                  onClick={() => {
-                    setSelectedCity(cityName);
-                    setStoreWhere(cityName);
-                    router.push('/selectour');
-                    setOpenCity(false);
-                  }}
+                  onClick={() => handleCitySelect(cityName)}
                 >
                   {cityName}
                   {cityName === selectedCity && (

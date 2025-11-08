@@ -19,7 +19,7 @@ import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { ChangeLang } from './ChangeLang';
 import CitySelect from './CitySelect';
 import CitySelectMobile from './CitySelectMobile';
@@ -85,8 +85,12 @@ const Navbar = () => {
       <section className="sticky w-full top-0 z-50">
         <div className="bg-[#084FE3] p-2 relative">
           <div className="flex custom-container justify-between items-center">
-            <CitySelect />
-            <CitySelectMobile />
+            <Suspense>
+              <CitySelect />
+            </Suspense>
+            <Suspense>
+              <CitySelectMobile />
+            </Suspense>
             <div className="flex gap-4 items-center font-medium">
               <ChangeLang />
               <div className="w-[1px] h-[60%] bg-white max-lg:hidden" />

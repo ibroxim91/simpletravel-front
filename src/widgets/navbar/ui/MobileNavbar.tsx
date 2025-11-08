@@ -10,7 +10,7 @@ import IconButton from '@mui/material/IconButton';
 import clsx from 'clsx';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, Suspense } from 'react';
 import { ChangeLang } from './ChangeLang';
 import CitySelect from './CitySelect';
 import CitySelectMobile from './CitySelectMobile';
@@ -44,8 +44,12 @@ const MobileNavbar = ({ setOpen, open }: Props) => {
       <div className="w-screen" />
       <div className="bg-[#031753] p-2 relative">
         <div className="flex custom-container px-0 justify-between">
-          <CitySelect />
-          <CitySelectMobile />
+          <Suspense>
+            <CitySelect />
+          </Suspense>
+          <Suspense>
+            <CitySelectMobile />
+          </Suspense>
           <div className="flex gap-4 items-center">
             <ChangeLang />
           </div>
