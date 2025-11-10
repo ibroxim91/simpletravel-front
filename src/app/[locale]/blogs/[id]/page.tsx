@@ -1,93 +1,110 @@
 import { Metadata } from 'next';
+import { Locale } from 'next-intl';
 import { Suspense } from 'react';
 import BlogDetailClient from './BlogDetailClient';
 
-// ✅ Har doim dynamic render
-export const dynamic = 'force-dynamic';
-
-// ✅ Har doim cache'ni o‘chirib qo‘yish
-export const fetchCache = 'force-no-store';
+export const dynamic = 'force-dynamic'; // ✅ Har doim dynamic
+export const fetchCache = 'force-no-store'; // ✅ Har doim cache yo‘q
 export const revalidate = 0;
 
 type Props = {
-  params: { locale: string; id: string };
+  params: { locale: Locale; id: string };
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, id } = params;
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    'https://simple-travel-blond.vercel.app';
 
   try {
-    // ✅ cache yo‘q, har safar yangi ma’lumot
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/api/v1/news/${id}`,
-      { cache: 'no-store' },
+      {
+        cache: 'no-store',
+      },
     );
-
     const data = await res.json();
     const blog = data?.data;
 
-    const title = blog?.title || 'Blog tafsilotlari';
-    const description =
+    const seoTitle = blog?.title || 'Blog tafsilotlari';
+    const seoDescription =
       blog?.text || 'Sayohat va turizm haqidagi blog maqolasi tafsilotlari.';
     const ogImage = blog?.image
-      ? `${process.env.NEXT_PUBLIC_SITE_URL}${blog.image}`
-      : `${process.env.NEXT_PUBLIC_SITE_URL}/og-blog-detail.jpg`;
+      ? blog.image.startsWith('http')
+        ? blog.image
+        : `${siteUrl}${blog.image}`
+      : `${siteUrl}/og-blog-detail.jpg`;
 
-    const siteName =
-      locale === 'uz'
-        ? 'Turlar sayti'
-        : locale === 'ru'
-          ? 'Сайт туров'
-          : 'Tours Site';
+    const canonicalUrl = `${siteUrl}/${locale}/blogs/${id}`;
 
     return {
-      metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL!),
-      title: `${title} | ${siteName}`,
-      description,
+      title: seoTitle,
+      description: seoDescription,
+      alternates: { canonical: canonicalUrl },
       openGraph: {
-        title,
-        description,
-        url: `${process.env.NEXT_PUBLIC_SITE_URL}/${locale}/blogs/${id}`,
+        title: seoTitle,
+        description: seoDescription,
+        url: canonicalUrl,
         type: 'article',
         locale,
-        siteName,
+        siteName: 'Simple Travel',
         images: [
           {
             url: ogImage,
             width: 1200,
             height: 630,
-            alt: title,
+            alt: seoTitle,
           },
         ],
       },
       twitter: {
         card: 'summary_large_image',
-        title,
-        description,
+        title: seoTitle,
+        description: seoDescription,
         images: [ogImage],
       },
     };
   } catch (error) {
+    console.error('generateMetadata error:', error);
+
+    // fallback SEO
+    const fallbackTitle = 'Blog tafsilotlari | Simple Travel';
+    const fallbackDescription =
+      'Sayohat va turizm haqidagi blog maqolasi tafsilotlari.';
+    const canonicalUrl = `${siteUrl}/${locale}/blogs/${id}`;
+
     return {
-      title: 'Blog tafsilotlari | Turlar sayti',
-      description: 'Sayohat va turizm haqidagi blog maqolasi tafsilotlari.',
+      title: fallbackTitle,
+      description: fallbackDescription,
+      alternates: { canonical: canonicalUrl },
       openGraph: {
-        title: 'Blog tafsilotlari',
-        description: 'Sayohat va turizm haqidagi blog maqolasi tafsilotlari.',
+        title: fallbackTitle,
+        description: fallbackDescription,
+        url: canonicalUrl,
+        type: 'article',
+        locale,
+        siteName: 'Simple Travel',
         images: [
           {
-            url: `${process.env.NEXT_PUBLIC_SITE_URL}/og-blog-detail.jpg`,
+            url: `${siteUrl}/og-blog-detail.jpg`,
             width: 1200,
             height: 630,
-            alt: 'Blog tafsilotlari',
+            alt: fallbackTitle,
           },
         ],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: fallbackTitle,
+        description: fallbackDescription,
+        images: [`${siteUrl}/og-blog-detail.jpg`],
       },
     };
   }
 }
 
-export default async function BlogDetailPage() {
+export default async function BlogDetailPage({ params }: Props) {
   return (
     <Suspense>
       <BlogDetailClient />
