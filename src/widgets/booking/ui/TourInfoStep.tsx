@@ -114,7 +114,6 @@ export default function TourInfoStep({
     const total_price = tariff.price + transport.price + userPrice;
 
     setTotalPrice(total_price);
-    console.log(!hasExtra);
 
     if (returned && dispatch && id && total_price && !hasExtra) {
       mutate({

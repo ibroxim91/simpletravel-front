@@ -30,8 +30,6 @@ export async function getPageSeo(locale: string = 'uz'): Promise<SeoData> {
     // ✅ Slug parametrini qo'shing
     const url = `${BASE_URL}/api/v1/dashboard/dashboard-site-seo/`;
 
-    console.log("🔍 SEO API so'rovi:", url); // Debug uchun
-
     const res = await fetch(url, {
       cache: 'no-store',
       headers: {
@@ -40,15 +38,11 @@ export async function getPageSeo(locale: string = 'uz'): Promise<SeoData> {
       },
     });
 
-    console.log('📊 Response status:', res.status); // Debug uchun
-
     if (!res.ok) {
-      console.warn(`⚠️ SEO API xatolik: ${res.status}`);
       return DEFAULT_META;
     }
 
     const responseData = await res.json();
-    console.log('📦 API javob:', responseData); // Debug uchun
 
     // ✅ Response strukturasini tekshiring
     const data =
@@ -56,7 +50,6 @@ export async function getPageSeo(locale: string = 'uz'): Promise<SeoData> {
 
     // ✅ Agar data bo'sh bo'lsa, default qaytarish
     if (!data || Object.keys(data).length === 0) {
-      console.warn('⚠️ SEO data topilmadi, default ishlatilmoqda');
       return DEFAULT_META;
     }
 
@@ -72,8 +65,7 @@ export async function getPageSeo(locale: string = 'uz'): Promise<SeoData> {
         data?.og_description || data?.description || DEFAULT_META.ogDescription,
       ogImage: data?.og_image || DEFAULT_META.ogImage,
     };
-  } catch (error) {
-    console.error("❌ SEO ma'lumotlarini yuklashda xatolik:", error);
+  } catch {
     return DEFAULT_META;
   }
 }

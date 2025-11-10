@@ -79,8 +79,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         images: [`${process.env.NEXT_PUBLIC_SITE_URL}/og-privacy-policy.jpg`],
       },
     };
-  } catch (error) {
-    console.error('generateMetadata privacy-policy error:', error);
+  } catch {
     const fallback = getFallbackMeta(locale);
     return {
       title: fallback.title,

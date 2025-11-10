@@ -93,8 +93,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         images: [`${BASE_URL}/resources/media/site_settings/navLogo.png`],
       },
     };
-  } catch (error) {
-    console.error('generateMetadata error:', error);
+  } catch {
     return {
       title: fallback.title,
       description: fallback.description,

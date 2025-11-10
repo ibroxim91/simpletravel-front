@@ -17,11 +17,16 @@ import { News_Api } from '../lib/api';
 
 const BlogDetail = () => {
   const t = useTranslations();
-  const { id } = useParams();
+  const { id: slug } = useParams();
+  const idFromSlug = Array.isArray(slug)
+    ? Number(slug[slug.length - 1].split('-').pop())
+    : slug
+      ? Number(slug.split('-').pop())
+      : undefined;
 
   const { data: news, isLoading } = useQuery({
-    queryKey: ['detail_news', id],
-    queryFn: () => News_Api.getNewsDetail({ id: Number(id) }),
+    queryKey: ['detail_news', idFromSlug],
+    queryFn: () => News_Api.getNewsDetail({ id: Number(idFromSlug) }),
   });
 
   const { data, isLoading: isLoadingNews } = useQuery({

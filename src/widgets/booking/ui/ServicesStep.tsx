@@ -176,7 +176,6 @@ export default function ServicesStep({
       });
     }
   }
-  console.log(data);
 
   return (
     <div>

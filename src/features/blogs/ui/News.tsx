@@ -95,7 +95,7 @@ const News = () => {
               transition={{ duration: 0.4, delay: idx * 0.1 }}
             >
               <Link
-                href={`/blogs/${item.id}`}
+                href={`/blogs/${item.slug}`}
                 className="w-ful"
                 prefetch={true}
               >

@@ -83,8 +83,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         images: [seo.ogImage],
       },
     };
-  } catch (error) {
-    console.error('generateMetadata user-agreement error:', error);
+  } catch {
     return {
       title: fallback.title,
       description: fallback.description,

@@ -60,9 +60,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         images: [ogImage],
       },
     };
-  } catch (error) {
-    console.error('generateMetadata error:', error);
-
+  } catch {
     // fallback SEO
     const fallbackTitle = 'Simple Travel – Sayohatlar va turlar';
     const fallbackDescription =
@@ -99,7 +97,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function SingleTourPage({ params }: Props) {
+export default async function SingleTourPage() {
   return (
     <Suspense>
       <SingleTourClient />

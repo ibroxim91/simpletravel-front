@@ -74,8 +74,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         images: [`${BASE_URL}/resources/media/site_settings/navLogo.png`],
       },
     };
-  } catch (error) {
-    console.error('Metadata fetch error:', error);
+  } catch {
     const meta = getMetadataByLocale(locale);
     return {
       title: meta.title,
@@ -96,6 +95,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default function LegalOffertaPage({ params }: Props) {
+export default function LegalOffertaPage() {
   return <LegalOffertaUi type="legal_entity" />;
 }
