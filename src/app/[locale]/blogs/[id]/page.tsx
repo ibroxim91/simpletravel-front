@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const seoDescription =
       tour?.text ||
       'Eng yaxshi sayohatlar, mashhur yo‘nalishlar va issiq turlar Simple Travel’da!';
-    const canonicalUrl = `${siteUrl}/${locale}/news/${id}`;
+    const canonicalUrl = `${siteUrl}/${locale}/blogs/${id}`;
 
     return {
       title: seoTitle,
@@ -63,7 +63,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const fallbackTitle = 'Simple Travel – Sayohatlar va turlar';
     const fallbackDescription =
       'Eng yaxshi sayohatlar, mashhur yo‘nalishlar va issiq turlar Simple Travel’da!';
-    const canonicalUrl = `${siteUrl}/${locale}/news/${id}`;
+    const canonicalUrl = `${siteUrl}/${locale}/blogs/${id}`;
 
     return {
       title: fallbackTitle,
