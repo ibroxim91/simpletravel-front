@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const seoDescription =
       tour?.destination ||
       'Eng yaxshi sayohatlar, mashhur yo‘nalishlar va issiq turlar Simple Travel’da!';
-    const canonicalUrl = `${siteUrl}/${locale}/tours/${tourid}`;
+    const canonicalUrl = `${siteUrl}/${locale}/selectour/${tourid}`;
 
     return {
       title: seoTitle,
