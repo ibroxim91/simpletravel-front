@@ -22,15 +22,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const res = await News_Api.getNewsDetail({ id: Number(id) });
     const tour = res?.data?.data;
 
-    const ogImage = tour?.image?.[0]?.startsWith('http')
+    const ogImage = tour.image.startsWith('http')
       ? tour.image
       : `${siteUrl}${tour.image || '/Logo_blue.png'}`;
 
-    const seoTitle = tour?.slug || 'Simple Travel – Sayohatlar va turlar';
+    const seoTitle = tour.slug || 'Simple Travel – Sayohatlar va turlar';
     const seoDescription =
-      tour?.text ||
+      tour.text ||
       'Eng yaxshi sayohatlar, mashhur yo‘nalishlar va issiq turlar Simple Travel’da!';
-    const canonicalUrl = `${siteUrl}/${locale}/blogs/${id}`;
+    const canonicalUrl = `${siteUrl}/${locale}/blogs/${tour.slug}`;
 
     return {
       title: seoTitle,
