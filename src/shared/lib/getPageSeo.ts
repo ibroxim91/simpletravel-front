@@ -11,9 +11,8 @@ export interface SeoData {
 }
 
 const DEFAULT_META: SeoData = {
-  title: 'Sayohatlar va Turlar | Eng yaxshi narxlarda',
-  description:
-    "Ta'til uchun ideal turni toping. Issiq turlar, mashhur yo'nalishlar, turizm yangiliklari.",
+  title: 'Simple Travel',
+  description: 'Simple Travel',
   keywords: [
     'turlar',
     'sayohatlar',
@@ -21,30 +20,45 @@ const DEFAULT_META: SeoData = {
     'issiq turlar',
     "mashhur yo'nalishlar",
   ],
-  ogTitle: 'Sayohatlar va Turlar',
-  ogDescription: 'Eng yaxshi turlar va sayohatlar',
+  ogTitle: 'Simple Travel',
+  ogDescription: 'Simple Travels',
   ogImage: '/Logo_blue.png',
 };
 
-export async function getPageSeo(
-  slug: string,
-  locale: string = 'uz',
-): Promise<SeoData> {
+export async function getPageSeo(locale: string = 'uz'): Promise<SeoData> {
   try {
+    // ✅ Slug parametrini qo'shing
     const url = `${BASE_URL}/api/v1/dashboard/dashboard-site-seo/`;
 
+    console.log("🔍 SEO API so'rovi:", url); // Debug uchun
+
     const res = await fetch(url, {
-      cache: 'no-store', // har safar serverdan oladi
+      cache: 'no-store',
       headers: {
         'Content-Type': 'application/json',
         'Accept-Language': locale,
       },
     });
 
-    if (!res.ok) return DEFAULT_META;
+    console.log('📊 Response status:', res.status); // Debug uchun
+
+    if (!res.ok) {
+      console.warn(`⚠️ SEO API xatolik: ${res.status}`);
+      return DEFAULT_META;
+    }
 
     const responseData = await res.json();
-    const data = responseData.data?.results?.[0] || responseData;
+    console.log('📦 API javob:', responseData); // Debug uchun
+
+    // ✅ Response strukturasini tekshiring
+    const data =
+      responseData.data?.results?.[0] || responseData.data || responseData;
+
+    // ✅ Agar data bo'sh bo'lsa, default qaytarish
+    if (!data || Object.keys(data).length === 0) {
+      console.warn('⚠️ SEO data topilmadi, default ishlatilmoqda');
+      return DEFAULT_META;
+    }
 
     return {
       title: data?.title || DEFAULT_META.title,
@@ -59,7 +73,7 @@ export async function getPageSeo(
       ogImage: data?.og_image || DEFAULT_META.ogImage,
     };
   } catch (error) {
-    console.error('❌ Failed to fetch SEO data:', error);
+    console.error("❌ SEO ma'lumotlarini yuklashda xatolik:", error);
     return DEFAULT_META;
   }
 }

@@ -18,7 +18,7 @@ export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
-  const seo = await getPageSeo('/', locale);
+  const seo = await getPageSeo(locale);
 
   return {
     title: seo.title,
