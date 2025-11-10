@@ -4,16 +4,16 @@ import { Locale } from 'next-intl';
 import { Suspense } from 'react';
 import BlogDetailClient from './BlogDetailClient';
 
-export const dynamic = 'force-dynamic'; // ✅ Har doim dynamic
-export const fetchCache = 'force-no-store'; // ✅ Har doim cache yo‘q
+export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
 export const revalidate = 0;
 
 type Props = {
-  params: { locale: Locale; id: string };
+  params: Promise<{ locale: Locale; id: string }>; // Promise qo'shish
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale, id } = params;
+  const { locale, id } = await params; // await qo'shish
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL ||
     'https://simple-travel-blond.vercel.app';
@@ -22,15 +22,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const res = await News_Api.getNewsDetail({ id: Number(id) });
     const tour = res?.data?.data;
 
-    const ogImage = tour.image.startsWith('http')
+    if (!tour) {
+      throw new Error('Tour not found');
+    }
+
+    const ogImage = tour.image?.startsWith('http')
       ? tour.image
       : `${siteUrl}${tour.image || '/Logo_blue.png'}`;
 
-    const seoTitle = tour.slug || 'Simple Travel – Sayohatlar va turlar';
+    const seoTitle =
+      tour.title || tour.slug || 'Simple Travel – Sayohatlar va turlar';
     const seoDescription =
-      tour.text ||
-      'Eng yaxshi sayohatlar, mashhur yo‘nalishlar va issiq turlar Simple Travel’da!';
-    const canonicalUrl = `${siteUrl}/${locale}/blogs/${tour.slug}`;
+      tour.text?.substring(0, 160) ||
+      "Eng yaxshi sayohatlar, mashhur yo'nalishlar va issiq turlar Simple Travel'da!";
+
+    // ID ishlatish, slug emas
+    const canonicalUrl = `${siteUrl}/${locale}/blogs/${id}`;
 
     return {
       title: seoTitle,
@@ -40,7 +47,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         title: seoTitle,
         description: seoDescription,
         url: canonicalUrl,
-        type: 'website',
+        type: 'article', // website o'rniga article
         locale,
         siteName: 'Simple Travel',
         images: [
@@ -59,10 +66,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         images: [ogImage],
       },
     };
-  } catch {
+  } catch (error) {
+    console.error('Metadata generation error:', error);
+
     const fallbackTitle = 'Simple Travel – Sayohatlar va turlar';
     const fallbackDescription =
-      'Eng yaxshi sayohatlar, mashhur yo‘nalishlar va issiq turlar Simple Travel’da!';
+      "Eng yaxshi sayohatlar, mashhur yo'nalishlar va issiq turlar Simple Travel'da!";
     const canonicalUrl = `${siteUrl}/${locale}/blogs/${id}`;
 
     return {
@@ -95,9 +104,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function BlogDetailPage() {
+export default async function BlogDetailPage({ params }: Props) {
+  const { locale, id } = await params; // await qo'shish
+
   return (
-    <Suspense>
+    <Suspense fallback={<div>Loading...</div>}>
       <BlogDetailClient />
     </Suspense>
   );

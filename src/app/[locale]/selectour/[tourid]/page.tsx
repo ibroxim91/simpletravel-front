@@ -9,11 +9,11 @@ export const fetchCache = 'force-no-store';
 export const revalidate = 0;
 
 type Props = {
-  params: { tourid: string; locale: Locale };
+  params: Promise<{ locale: Locale; tourid: string }>; // Promise qo'shish
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { tourid, locale } = params;
+  const { tourid, locale } = await params;
 
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL ||
