@@ -14,13 +14,20 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { tourid, locale } = await params;
+  const idFromSlug = Array.isArray(tourid)
+    ? Number(tourid[tourid.length - 1].split('-').pop())
+    : tourid
+      ? Number(tourid.split('-').pop())
+      : undefined;
 
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL ||
     'https://simple-travel-blond.vercel.app';
 
   try {
-    const res = await TicketsDetailAPi.getTicketsDetail({ id: Number(tourid) });
+    const res = await TicketsDetailAPi.getTicketsDetail({
+      id: Number(idFromSlug),
+    });
     const tour = res?.data?.data;
 
     const ogImage = tour?.ticket_images?.[0]?.image?.startsWith('http')
