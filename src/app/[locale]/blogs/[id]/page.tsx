@@ -9,17 +9,22 @@ export const fetchCache = 'force-no-store';
 export const revalidate = 0;
 
 type Props = {
-  params: Promise<{ locale: Locale; id: string }>; // Promise qo'shish
+  params: Promise<{ locale: Locale; id: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale, id } = await params; // await qo'shish
+  const { locale, id } = await params;
+  const idFromSlug = Array.isArray(id)
+    ? Number(id[id.length - 1].split('-').pop())
+    : id
+      ? Number(id.split('-').pop())
+      : undefined;
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL ||
     'https://simple-travel-blond.vercel.app';
 
   try {
-    const res = await News_Api.getNewsDetail({ id: Number(id) });
+    const res = await News_Api.getNewsDetail({ id: Number(idFromSlug) });
     const tour = res?.data?.data;
 
     if (!tour) {
@@ -33,10 +38,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const seoTitle =
       tour.title || tour.slug || 'Simple Travel – Sayohatlar va turlar';
     const seoDescription =
-      tour.text?.substring(0, 160) ||
+      tour.text ||
       "Eng yaxshi sayohatlar, mashhur yo'nalishlar va issiq turlar Simple Travel'da!";
 
-    // ID ishlatish, slug emas
     const canonicalUrl = `${siteUrl}/${locale}/blogs/${id}`;
 
     return {
@@ -104,11 +108,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function BlogDetailPage({ params }: Props) {
-  const { locale, id } = await params; // await qo'shish
-
+export default async function BlogDetailPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense>
       <BlogDetailClient />
     </Suspense>
   );
