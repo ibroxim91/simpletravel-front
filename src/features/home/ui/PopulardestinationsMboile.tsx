@@ -73,7 +73,7 @@ const PopulardestinationsMboile = () => {
               className="basis-1/2 max-sm:basis-1/1 h-[200px] font-medium"
             >
               <Link
-                href={`/selectour/${e.id}`}
+                href={`/selectour/${e.slug}`}
                 prefetch={true}
                 className="rounded-3xl w-full relative h-full"
               >

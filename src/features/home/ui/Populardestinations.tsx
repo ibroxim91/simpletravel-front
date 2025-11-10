@@ -108,7 +108,7 @@ const Populardestinations = () => {
           >
             {ticket && ticket[0] && (
               <Link
-                href={`/selectour/${ticket[0].id}`}
+                href={`/selectour/${ticket[0].slug}`}
                 className="block relative w-full h-full"
                 prefetch={true}
               >
@@ -154,7 +154,7 @@ const Populardestinations = () => {
               >
                 {ticket && ticket[1] && (
                   <Link
-                    href={`/selectour/${ticket[1].id}`}
+                    href={`/selectour/${ticket[1].slug}`}
                     prefetch={true}
                     className="block relative w-full h-full"
                   >
@@ -197,7 +197,7 @@ const Populardestinations = () => {
               >
                 {ticket && ticket[2] && (
                   <Link
-                    href={`/selectour/${ticket[2].id}`}
+                    href={`/selectour/${ticket[2].slug}`}
                     prefetch={true}
                     className="block relative w-full h-full"
                   >
@@ -241,7 +241,7 @@ const Populardestinations = () => {
               >
                 {ticket && ticket[3] && (
                   <Link
-                    href={`/selectour/${ticket[3].id}`}
+                    href={`/selectour/${ticket[3].slug}`}
                     prefetch={true}
                     className="block relative w-full h-full"
                   >
@@ -284,7 +284,7 @@ const Populardestinations = () => {
               >
                 {ticket && ticket[4] && (
                   <Link
-                    href={`/selectour/${ticket[4].id}`}
+                    href={`/selectour/${ticket[4].slug}`}
                     prefetch={true}
                     className="block relative w-full h-full"
                   >

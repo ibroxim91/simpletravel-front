@@ -68,7 +68,7 @@ const News = () => {
                       className="flex flex-col w-auto basis-1/3 max-lg:basis-1/2 max-md:basis-[80%] shrink-0"
                     >
                       <Link
-                        href={`/blogs/${e.id}`}
+                        href={`/blogs/${e.slug}`}
                         className="w-full"
                         prefetch={true}
                       >

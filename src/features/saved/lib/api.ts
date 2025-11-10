@@ -19,6 +19,7 @@ interface Get_Saved {
         id: number;
         departure_date: string;
         destination: string;
+        slug: string;
         duration_days: number;
         is_liked: boolean;
         passenger_count: number;

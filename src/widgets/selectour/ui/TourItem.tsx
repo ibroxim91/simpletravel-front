@@ -58,7 +58,7 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
   });
 
   return (
-    <Link href={`/selectour/${data.id}`} prefetch={true}>
+    <Link href={`/selectour/${data.slug}`} prefetch={true}>
       <motion.div
         initial={{ opacity: 0, x: 30 }}
         whileInView={{ opacity: 1, x: 0 }}

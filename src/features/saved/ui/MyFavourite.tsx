@@ -183,7 +183,7 @@ const MyFavourite = () => {
                     className="flex flex-col w-auto"
                   >
                     <Link
-                      href={`/selectour/${e.ticket.id}`}
+                      href={`/selectour/${e.ticket.slug}`}
                       className="w-full aspect-square relative group overflow-hidden rounded-3xl shadow-lg"
                     >
                       <Image
@@ -410,7 +410,7 @@ const MyFavourite = () => {
                         key={idx}
                         className="flex flex-col w-auto basis-1/4 max-lg:basis-1/3 max-md:basis-[70%] shrink-0 font-medium"
                       >
-                        <Link href={`/selectour/${e.id}`}>
+                        <Link href={`/selectour/${e.slug}`}>
                           <motion.div
                             initial={{ opacity: 0, y: 40, scale: 0.95 }}
                             whileInView={{ opacity: 1, y: 0, scale: 1 }}

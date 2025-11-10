@@ -32,6 +32,7 @@ export interface TickectAll {
 export interface TickectAllResults {
   id: number;
   title: string;
+  slug: string;
   price: number;
   departure_date: string;
   departure: string;

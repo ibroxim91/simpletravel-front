@@ -64,9 +64,15 @@ export default function SingleTour() {
   const t = useTranslations();
   const route = useRouter();
   const { tourid, locale } = useParams();
+  const idFromSlug = Array.isArray(tourid)
+    ? Number(tourid[tourid.length - 1].split('-').pop())
+    : tourid
+      ? Number(tourid.split('-').pop())
+      : undefined;
   const { data, isLoading } = useQuery({
-    queryKey: ['tickets_detail', tourid],
-    queryFn: () => TicketsDetailAPi.getTicketsDetail({ id: Number(tourid) }),
+    queryKey: ['tickets_detail', idFromSlug],
+    queryFn: () =>
+      TicketsDetailAPi.getTicketsDetail({ id: Number(idFromSlug) }),
     select(data) {
       return data.data.data;
     },
