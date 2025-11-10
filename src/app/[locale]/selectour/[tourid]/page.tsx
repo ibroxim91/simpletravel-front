@@ -67,7 +67,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const fallbackTitle = 'Simple Travel – Sayohatlar va turlar';
     const fallbackDescription =
       'Eng yaxshi sayohatlar, mashhur yo‘nalishlar va issiq turlar Simple Travel’da!';
-    const canonicalUrl = `${siteUrl}/${locale}/tours/${tourid}`;
+    const canonicalUrl = `${siteUrl}/${locale}/selectour/${tourid}`;
 
     return {
       title: fallbackTitle,
