@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 import ContactClient from './contactClient';
+export const dynamic = 'force-dynamic';
 
 const getMetadataByLocale = (locale: string) => {
   switch (locale) {

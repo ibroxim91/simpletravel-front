@@ -1,25 +1,37 @@
-import { News_Api } from '@/features/blogs/lib/api';
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 import BlogDetailClient from './BlogDetailClient';
 
+// ✅ Har doim dynamic render
+export const dynamic = 'force-dynamic';
+
+// ✅ Har doim cache'ni o‘chirib qo‘yish
+export const fetchCache = 'force-no-store';
+export const revalidate = 0;
+
 type Props = {
-  params: Promise<{ locale: string; id: string }>;
+  params: { locale: string; id: string };
 };
 
-// 🔥 Dynamic SEO metadata
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale, id } = await params;
+  const { locale, id } = params;
 
   try {
-    // API dan blog ma'lumotini olish
-    const res = await News_Api.getNewsDetail({ id: Number(id) });
-    const blog = res?.data?.data;
+    // ✅ cache yo‘q, har safar yangi ma’lumot
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/news/${id}`,
+      { cache: 'no-store' },
+    );
 
-    const title = blog?.slug || 'Blog';
+    const data = await res.json();
+    const blog = data?.data;
+
+    const title = blog?.title || 'Blog tafsilotlari';
     const description =
-      blog?.title || blog?.text || 'Sayohat va turizm haqidagi blog maqolasi';
-    const ogImage = blog?.image && `${blog.image}`;
+      blog?.text || 'Sayohat va turizm haqidagi blog maqolasi tafsilotlari.';
+    const ogImage = blog?.image
+      ? `${process.env.NEXT_PUBLIC_SITE_URL}${blog.image}`
+      : `${process.env.NEXT_PUBLIC_SITE_URL}/og-blog-detail.jpg`;
 
     const siteName =
       locale === 'uz'
@@ -29,6 +41,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           : 'Tours Site';
 
     return {
+      metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL!),
       title: `${title} | ${siteName}`,
       description,
       openGraph: {
@@ -53,17 +66,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         description,
         images: [ogImage],
       },
-      alternates: {
-        canonical: `${process.env.NEXT_PUBLIC_SITE_URL}/${locale}/blogs/${id}`,
-        languages: {
-          uz: `${process.env.NEXT_PUBLIC_SITE_URL}/uz/blogs/${id}`,
-          ru: `${process.env.NEXT_PUBLIC_SITE_URL}/ru/blogs/${id}`,
-          en: `${process.env.NEXT_PUBLIC_SITE_URL}/en/blogs/${id}`,
-        },
-      },
     };
   } catch (error) {
-    // API ishlamasa fallback
     return {
       title: 'Blog tafsilotlari | Turlar sayti',
       description: 'Sayohat va turizm haqidagi blog maqolasi tafsilotlari.',
@@ -78,12 +82,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             alt: 'Blog tafsilotlari',
           },
         ],
-      },
-      twitter: {
-        card: 'summary_large_image',
-        title: 'Blog tafsilotlari',
-        description: 'Sayohat va turizm haqidagi blog maqolasi tafsilotlari.',
-        images: [`${process.env.NEXT_PUBLIC_SITE_URL}/og-blog-detail.jpg`],
       },
     };
   }

@@ -4,54 +4,99 @@ import { Locale } from 'next-intl';
 import { Suspense } from 'react';
 import SingleTourClient from './singleTourClient';
 
+export const dynamic = 'force-dynamic'; // ✅ dynamic SEO
+export const fetchCache = 'force-no-store';
+export const revalidate = 0;
+
 type Props = {
-  params: Promise<{ tourid: string; locale: Locale }>;
+  params: { tourid: string; locale: Locale };
 };
 
-// Dynamic SEO
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { tourid, locale } = await params;
+  const { tourid, locale } = params;
 
-  // API dan ma'lumotni olamiz
-  const res = await TicketsDetailAPi.getTicketsDetail({ id: Number(tourid) });
-  const tour = res.data.data; // API structure ga qarab o'zgartiring
-  const seo = {
-    title: tour?.title || 'Тур Simple Travel',
-    description:
-      tour?.destination ||
-      'Откройте для себя лучшие туры с Simple Travel и наслаждайтесь надежным отдыхом.',
-    ogTitle: tour?.title || 'Тур Simple Travel',
-    ogDescription:
-      tour?.destination ||
-      'Откройте для себя лучшие туры с Simple Travel и наслаждайтесь надежным отдыхом.',
-    ogImage: tour?.ticket_images && tour.ticket_images[0].image, // string
-  };
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    'https://simple-travel-blond.vercel.app';
 
-  return {
-    title: seo.title,
-    description: seo.description,
-    openGraph: {
-      title: seo.ogTitle,
-      description: seo.ogDescription,
-      images: [
-        {
-          url: seo.ogImage,
-          width: 1200,
-          height: 630,
-          alt: seo.ogTitle,
-        },
-      ],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: seo.ogTitle,
-      description: seo.ogDescription,
-      images: [seo.ogImage],
-    },
-    alternates: {
-      canonical: `${process.env.NEXT_PUBLIC_SITE_URL}/${locale}`,
-    },
-  };
+  try {
+    const res = await TicketsDetailAPi.getTicketsDetail({ id: Number(tourid) });
+    const tour = res?.data?.data;
+
+    const ogImage = tour?.ticket_images?.[0]?.image?.startsWith('http')
+      ? tour.ticket_images[0].image
+      : `${siteUrl}${tour.ticket_images?.[0]?.image || '/Logo_blue.png'}`;
+
+    const seoTitle = tour?.title || 'Simple Travel – Sayohatlar va turlar';
+    const seoDescription =
+      tour?.destination ||
+      'Eng yaxshi sayohatlar, mashhur yo‘nalishlar va issiq turlar Simple Travel’da!';
+    const canonicalUrl = `${siteUrl}/${locale}/tours/${tourid}`;
+
+    return {
+      title: seoTitle,
+      description: seoDescription,
+      alternates: { canonical: canonicalUrl },
+      openGraph: {
+        title: seoTitle,
+        description: seoDescription,
+        url: canonicalUrl,
+        type: 'website',
+        locale,
+        siteName: 'Simple Travel',
+        images: [
+          {
+            url: ogImage,
+            width: 1200,
+            height: 630,
+            alt: seoTitle,
+          },
+        ],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: seoTitle,
+        description: seoDescription,
+        images: [ogImage],
+      },
+    };
+  } catch (error) {
+    console.error('generateMetadata error:', error);
+
+    // fallback SEO
+    const fallbackTitle = 'Simple Travel – Sayohatlar va turlar';
+    const fallbackDescription =
+      'Eng yaxshi sayohatlar, mashhur yo‘nalishlar va issiq turlar Simple Travel’da!';
+    const canonicalUrl = `${siteUrl}/${locale}/tours/${tourid}`;
+
+    return {
+      title: fallbackTitle,
+      description: fallbackDescription,
+      alternates: { canonical: canonicalUrl },
+      openGraph: {
+        title: fallbackTitle,
+        description: fallbackDescription,
+        url: canonicalUrl,
+        type: 'website',
+        locale,
+        siteName: 'Simple Travel',
+        images: [
+          {
+            url: `${siteUrl}/Logo_blue.png`,
+            width: 1200,
+            height: 630,
+            alt: fallbackTitle,
+          },
+        ],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: fallbackTitle,
+        description: fallbackDescription,
+        images: [`${siteUrl}/Logo_blue.png`],
+      },
+    };
+  }
 }
 
 export default async function SingleTourPage({ params }: Props) {

@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 import EditPasswordClient from './EditPasswordClient';
+export const dynamic = 'force-dynamic';
 
 type Props = {
   params: Promise<{ locale: string }>;

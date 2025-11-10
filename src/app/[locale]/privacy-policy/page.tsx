@@ -2,11 +2,16 @@ import { getHelpPage } from '@/features/privacy-policy/lib/api';
 import HelpPage from '@/features/privacy-policy/ui/HelpPage';
 import type { Metadata } from 'next';
 
+// ✅ Har doim dinamik qilish
+export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
+export const revalidate = 0;
+
 type Props = {
   params: { locale: string };
 };
 
-// Tilga qarab fallback title/description
+// 🌍 Tilga qarab fallback title/description
 const getFallbackMeta = (locale: string) => {
   switch (locale) {
     case 'uz':
@@ -30,17 +35,22 @@ const getFallbackMeta = (locale: string) => {
   }
 };
 
-// Dynamic SEO
+// ⚡ Dynamic SEO metadata
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = params;
 
   try {
-    const res = await getHelpPage({ page_type: 'privacy_policy' });
-    const page = res.data.data.results?.[0];
+    // ✅ cache: 'no-store' bilan fetch qilamiz
+    const res = await getHelpPage({
+      page_type: 'privacy_policy',
+    });
+    const page = res?.data?.data?.results?.[0];
+
+    const fallback = getFallbackMeta(locale);
 
     const seo = {
-      title: page?.title || getFallbackMeta(locale).title,
-      description: page?.title || getFallbackMeta(locale).description,
+      title: page?.title || fallback.title,
+      description: page?.title || fallback.description,
     };
 
     return {
@@ -49,14 +59,28 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       openGraph: {
         title: seo.title,
         description: seo.description,
+        url: `${process.env.NEXT_PUBLIC_SITE_URL}/${locale}/privacy-policy`,
+        type: 'article',
+        locale,
+        siteName: 'Simple Travel',
+        images: [
+          {
+            url: `${process.env.NEXT_PUBLIC_SITE_URL}/og-privacy-policy.jpg`,
+            width: 1200,
+            height: 630,
+            alt: seo.title,
+          },
+        ],
       },
       twitter: {
         card: 'summary_large_image',
         title: seo.title,
         description: seo.description,
+        images: [`${process.env.NEXT_PUBLIC_SITE_URL}/og-privacy-policy.jpg`],
       },
     };
   } catch (error) {
+    console.error('generateMetadata privacy-policy error:', error);
     const fallback = getFallbackMeta(locale);
     return {
       title: fallback.title,

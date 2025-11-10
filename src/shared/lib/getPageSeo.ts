@@ -1,3 +1,4 @@
+// shared/lib/getPageSeo.ts
 import { BASE_URL } from '../config/api/URLs';
 
 export interface SeoData {
@@ -22,12 +23,9 @@ const DEFAULT_META: SeoData = {
   ],
   ogTitle: 'Sayohatlar va Turlar',
   ogDescription: 'Eng yaxshi turlar va sayohatlar',
-  ogImage: '/Logo_blue.png', //
+  ogImage: '/Logo_blue.png',
 };
 
-/**
- * SEO ma'lumotlarini API dan olish
- */
 export async function getPageSeo(
   slug: string,
   locale: string = 'uz',
@@ -36,10 +34,10 @@ export async function getPageSeo(
     const url = `${BASE_URL}/api/v1/dashboard/dashboard-site-seo/`;
 
     const res = await fetch(url, {
-      cache: 'no-store',
+      cache: 'no-store', // har safar serverdan oladi
       headers: {
         'Content-Type': 'application/json',
-        'Accept-Language': locale, // 👈 Tilni yuboramiz
+        'Accept-Language': locale,
       },
     });
 

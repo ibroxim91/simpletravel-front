@@ -1,70 +1,107 @@
-import { getOfferta } from '@/features/legal-offerta/lib/api';
 import LegalOffertaUi from '@/features/legal-offerta/ui/LegalOffertaUi';
 import { BASE_URL } from '@/shared/config/api/URLs';
 import type { Metadata } from 'next';
+
+export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
+export const revalidate = 0;
 
 type Props = {
   params: { locale: string; type: 'individual' | 'legal_entity' };
 };
 
-// Tilga qarab SEO meta
-const getMetadataByLocale = (locale: string, dataTitle?: string) => {
+const getFallbackMeta = (locale: string, type: string) => {
+  const isIndividual = type === 'individual';
+
   switch (locale) {
     case 'uz':
       return {
-        title: dataTitle || 'Shaxsiy taklif | Simple Travel',
-        description:
-          'Simple Travel shaxsiy yoki yuridik shaxslar uchun takliflar va shartlar bilan tanishing.',
+        title: isIndividual
+          ? 'Jismoniy shaxslar uchun taklif | Simple Travel'
+          : 'Yuridik shaxslar uchun taklif | Simple Travel',
+        description: isIndividual
+          ? 'Simple Travel jismoniy shaxslar uchun takliflar va shartlar bilan tanishing.'
+          : 'Simple Travel yuridik shaxslar uchun takliflar va shartlar bilan tanishing.',
       };
     case 'ru':
       return {
-        title: dataTitle || 'Публичная оферта | Simple Travel',
-        description:
-          'Ознакомьтесь с предложениями и условиями Simple Travel для физических и юридических лиц.',
+        title: isIndividual
+          ? 'Публичная оферта (Физические лица) | Simple Travel'
+          : 'Публичная оферта (Юридические лица) | Simple Travel',
+        description: isIndividual
+          ? 'Ознакомьтесь с публичной офертой Simple Travel для физических лиц.'
+          : 'Ознакомьтесь с публичной офертой Simple Travel для юридических лиц.',
       };
     default:
       return {
-        title: dataTitle || 'Public Offer | Simple Travel',
-        description:
-          'Check Simple Travel offers and terms for individuals and legal entities.',
+        title: isIndividual
+          ? 'Public Offer (Individuals) | Simple Travel'
+          : 'Public Offer (Legal Entities) | Simple Travel',
+        description: isIndividual
+          ? 'Explore Simple Travel’s public offer and terms for individuals.'
+          : 'Explore Simple Travel’s public offer and terms for legal entities.',
       };
   }
 };
 
-// Dynamic SEO: API dan ma'lumot kelganda title dan foydalanish
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, type } = params;
+  const fallback = getFallbackMeta(locale, type);
 
-  // API chaqirish
-  const res = await getOfferta({ person_type: 'individual' });
-  const data = res.data.data.results[0];
+  try {
+    const res = await fetch(
+      `${BASE_URL}/api/v1/dashboard/help-page-offerta/?person_type=${type}`,
+      {
+        cache: 'no-store',
+      },
+    );
 
-  const meta = getMetadataByLocale(locale, data?.title);
+    if (!res.ok) throw new Error('Failed to fetch offer page');
 
-  return {
-    title: meta.title,
-    description: meta.description,
-    openGraph: {
-      title: meta.title,
-      description: meta.description,
-      images: [
-        {
-          url: `${BASE_URL}/resources/media/site_settings/navLogo.png`,
-          width: 1200,
-          height: 630,
-          alt: meta.title,
-        },
-      ],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: meta.title,
-      description: meta.description,
-      images: [`${BASE_URL}/resources/media/site_settings/navLogo.png`],
-    },
-  };
+    const json = await res.json();
+    const data = json?.data?.results?.[0];
+
+    const titleFromApi = data?.title?.trim();
+    const seo = {
+      title: titleFromApi || fallback.title,
+      description: fallback.description,
+    };
+
+    return {
+      title: seo.title,
+      description: seo.description,
+      openGraph: {
+        title: seo.title,
+        description: seo.description,
+        type: 'article',
+        siteName: 'Simple Travel',
+        locale,
+        url: `${process.env.NEXT_PUBLIC_SITE_URL}/${locale}/legal-offerta/${type}`,
+        images: [
+          {
+            url: `${BASE_URL}/resources/media/site_settings/navLogo.png`,
+            width: 1200,
+            height: 630,
+            alt: seo.title,
+          },
+        ],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: seo.title,
+        description: seo.description,
+        images: [`${BASE_URL}/resources/media/site_settings/navLogo.png`],
+      },
+    };
+  } catch (error) {
+    console.error('generateMetadata error:', error);
+    return {
+      title: fallback.title,
+      description: fallback.description,
+    };
+  }
 }
 
-export default function PublicOfferPage() {
-  return <LegalOffertaUi type={'individual'} />;
+export default function PublicOfferPage({ params }: Props) {
+  return <LegalOffertaUi type={params.type} />;
 }

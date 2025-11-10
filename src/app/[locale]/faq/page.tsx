@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 import FaqClient from './faqClient';
+export const dynamic = 'force-dynamic';
 
 const getMetadataByLocale = (locale: string) => {
   switch (locale) {

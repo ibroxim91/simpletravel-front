@@ -1,6 +1,7 @@
 import Auth from '@/features/auth/ui/auth';
 import { Metadata } from 'next';
 import { useTranslations } from 'next-intl';
+export const dynamic = 'force-dynamic';
 
 type Props = {
   params: Promise<{ locale: string }>;

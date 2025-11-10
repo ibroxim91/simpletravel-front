@@ -14,6 +14,7 @@ import { notFound } from 'next/navigation';
 import Script from 'next/script';
 import { ReactNode } from 'react';
 import '../globals.css';
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
