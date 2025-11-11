@@ -21,6 +21,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import Rating from '@mui/material/Rating';
 import { useQuery } from '@tanstack/react-query';
+import clsx from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import * as LucideIcons from 'lucide-react';
 import { Copy, Hourglass, Scroll } from 'lucide-react';
@@ -360,7 +361,13 @@ export default function SingleTour() {
                 <p className="w-full text-md mt-5 text-[#636363]">
                   {data.hotel_info}
                 </p>
-                <div className="flex items-center gap-[20px] mt-[24px] max-lg:flex-col max-lg:w-full">
+                <div
+                  className={clsx(
+                    'grid gap-[20px] max-lg:grid-cols-1 max-lg:w-full',
+                    data.languages.length > 0 ? 'grid-cols-4' : 'grid-cols-3',
+                    data.hotel_info.length > 0 ? 'mt-5' : 'mt-0',
+                  )}
+                >
                   <motion.div
                     key={index}
                     custom={index}
@@ -369,7 +376,7 @@ export default function SingleTour() {
                     viewport={{ once: false, amount: 0.2 }}
                     variants={slideIn}
                     whileHover={{ scale: 1.05 }}
-                    className="w-[350px] max-lg:w-full h-[200px] max-lg:h-auto cursor-pointer flex flex-col max-lg:flex-row-reverse justify-between p-[20px] bg-[#EDEEF140] border border-[#EDEEF1] shadow-md rounded-[20px] relative"
+                    className="w-full max-lg:w-full h-[200px] max-lg:h-auto cursor-pointer flex flex-col max-lg:flex-row-reverse justify-between p-[20px] bg-[#EDEEF140] border border-[#EDEEF1] shadow-md rounded-[20px] relative"
                   >
                     <HotelInfoItem
                       img={Hotel1}
@@ -385,7 +392,7 @@ export default function SingleTour() {
                     viewport={{ once: false, amount: 0.2 }}
                     variants={slideIn}
                     whileHover={{ scale: 1.05 }}
-                    className="w-[350px] max-lg:w-full h-[200px] max-lg:h-auto cursor-pointer flex flex-col max-lg:flex-row-reverse justify-between p-[20px] bg-[#EDEEF140] border border-[#EDEEF1] shadow-md rounded-[20px] relative"
+                    className="w-full max-lg:w-full h-[200px] max-lg:h-auto cursor-pointer flex flex-col max-lg:flex-row-reverse justify-between p-[20px] bg-[#EDEEF140] border border-[#EDEEF1] shadow-md rounded-[20px] relative"
                   >
                     <HotelInfoItem
                       img={Hotel2}
@@ -401,7 +408,7 @@ export default function SingleTour() {
                     viewport={{ once: false, amount: 0.2 }}
                     variants={slideIn}
                     whileHover={{ scale: 1.05 }}
-                    className="w-[350px] max-lg:w-full h-[200px] max-lg:h-auto cursor-pointer flex flex-col max-lg:flex-row-reverse justify-between p-[20px] bg-[#EDEEF140] border border-[#EDEEF1] shadow-md rounded-[20px] relative"
+                    className="w-full max-lg:w-full h-[200px] max-lg:h-auto cursor-pointer flex flex-col max-lg:flex-row-reverse justify-between p-[20px] bg-[#EDEEF140] border border-[#EDEEF1] shadow-md rounded-[20px] relative"
                   >
                     <HotelInfoItem
                       img={Hotel3}
@@ -409,22 +416,24 @@ export default function SingleTour() {
                       name={`${data.passenger_count} ${t('человек')}`}
                     />
                   </motion.div>
-                  <motion.div
-                    key={index}
-                    custom={index}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: false, amount: 0.2 }}
-                    variants={slideIn}
-                    whileHover={{ scale: 1.05 }}
-                    className="w-[350px] max-lg:w-full h-[200px] max-lg:h-auto cursor-pointer flex flex-col max-lg:flex-row-reverse justify-between p-[20px] bg-[#EDEEF140] border border-[#EDEEF1] shadow-md rounded-[20px] relative"
-                  >
-                    <HotelInfoItem
-                      img={Hotel4}
-                      title={t(`Языки`)}
-                      name={data.languages}
-                    />
-                  </motion.div>
+                  {data.languages.length > 0 && (
+                    <motion.div
+                      key={index}
+                      custom={index}
+                      initial="hidden"
+                      whileInView="visible"
+                      viewport={{ once: false, amount: 0.2 }}
+                      variants={slideIn}
+                      whileHover={{ scale: 1.05 }}
+                      className="w-full max-lg:w-full h-[200px] max-lg:h-auto cursor-pointer flex flex-col max-lg:flex-row-reverse justify-between p-[20px] bg-[#EDEEF140] border border-[#EDEEF1] shadow-md rounded-[20px] relative"
+                    >
+                      <HotelInfoItem
+                        img={Hotel4}
+                        title={t(`Языки`)}
+                        name={data.languages}
+                      />
+                    </motion.div>
+                  )}
                 </div>
               </motion.div>
               {data.ticket_included_services.length > 0 && (
@@ -569,42 +578,43 @@ export default function SingleTour() {
                   </Carousel>
                 )}
               </div>
+              {data.ticket_hotel_meals.length > 0 && (
+                <motion.div
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: false, amount: 0.2 }}
+                  variants={slideIn}
+                  className="mt-20"
+                >
+                  <h1 className="font-bold text-[28px] text-[#232325]">
+                    {t('Что подают в отеле')}
+                  </h1>
+                  <p className="w-[50%] max-lg:w-full text-sm text-[#636363] mt-[12px]">
+                    {data.hotel_meals}
+                  </p>
 
-              <motion.div
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: false, amount: 0.2 }}
-                variants={slideIn}
-                className="mt-20"
-              >
-                <h1 className="font-bold text-[28px] text-[#232325]">
-                  {t('Что подают в отеле')}
-                </h1>
-                <p className="w-[50%] max-lg:w-full text-sm text-[#636363] mt-[12px]">
-                  {data.hotel_meals}
-                </p>
-
-                <div className="w-full flex items-center mt-10 gap-[18px]">
-                  <Carousel
-                    opts={{
-                      align: 'start',
-                      loop: true,
-                    }}
-                    className="w-full"
-                  >
-                    <CarouselContent className="-ml-4">
-                      {data.ticket_hotel_meals?.map((item, index) => (
-                        <CarouselItem
-                          key={index}
-                          className="flex flex-col w-auto basis-1/5 max-xl:basis-1/3 max-lg:basis-1/3 max-md:basis-[50%] max-[420px]:!basis-[70%] shrink-0 font-medium"
-                        >
-                          <TourFoodItem food={item} />
-                        </CarouselItem>
-                      ))}
-                    </CarouselContent>
-                  </Carousel>
-                </div>
-              </motion.div>
+                  <div className="w-full flex items-center mt-10 gap-[18px]">
+                    <Carousel
+                      opts={{
+                        align: 'start',
+                        loop: true,
+                      }}
+                      className="w-full"
+                    >
+                      <CarouselContent className="-ml-4">
+                        {data.ticket_hotel_meals?.map((item, index) => (
+                          <CarouselItem
+                            key={index}
+                            className="flex flex-col w-auto basis-1/5 max-xl:basis-1/3 max-lg:basis-1/3 max-md:basis-[50%] max-[420px]:!basis-[70%] shrink-0 font-medium"
+                          >
+                            <TourFoodItem food={item} />
+                          </CarouselItem>
+                        ))}
+                      </CarouselContent>
+                    </Carousel>
+                  </div>
+                </motion.div>
+              )}
 
               <div className="mt-10">
                 <motion.div

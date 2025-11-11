@@ -149,6 +149,7 @@ export interface ToursDetailData {
       image: string;
     },
   ];
+  allow_comment: boolean;
   ticket_amenities: [{ icon_name: string; name: string }];
   ticket_included_services: [
     {

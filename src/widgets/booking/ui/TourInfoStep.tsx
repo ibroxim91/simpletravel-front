@@ -204,63 +204,67 @@ export default function TourInfoStep({
             </div>
           </div>
         </div>
-
-        <p className="text-xl font-semibold mt-5 text-[#121212]">
-          {t('Транспорт')}
-        </p>
-        <div className="mt-[8px] grid grid-cols-2 justify-between gap-[16px] max-md:grid-cols-1">
-          {data?.data.transports.map((opt) => {
-            const inputId = `selectTransport-${opt.transport.name}`;
-            const isChecked = transport.transport?.name === opt.transport.name;
-            return (
-              <div
-                key={opt.transport.name}
-                onClick={() => setTransport(opt)}
-                className={`flex w-full justify-between items-center py-[17px] px-[20px] cursor-pointer border rounded-xl bg-[#EDEEF180] border-[#EDEEF1]`}
-              >
-                <label
-                  htmlFor={inputId}
-                  className="flex items-center mr-[20px] gap-[10px] cursor-pointer"
-                >
-                  {opt.transport.icon_name === 'avia' ? (
-                    <AirplaneTicketIcon
-                      sx={{
-                        color: isChecked ? '#084FE3' : '#212122',
-                        width: '30px',
-                        height: '30px',
-                      }}
-                    />
-                  ) : (
-                    <LocalTaxiIcon
-                      sx={{
-                        color: isChecked ? '#084FE3' : '#212122',
-                        width: '30px',
-                        height: '30px',
-                      }}
-                    />
-                  )}
-                  <div className="flex flex-col">
-                    <p
-                      className={clsx(
-                        isChecked ? 'text-[#084FE3]' : 'text-[#212122]',
-                      )}
+        {data && data.data.transports.length > 0 && (
+          <>
+            <p className="text-xl font-semibold mt-5 text-[#121212]">
+              {t('Транспорт')}
+            </p>
+            <div className="mt-[8px] grid grid-cols-2 justify-between gap-[16px] max-md:grid-cols-1">
+              {data?.data.transports.map((opt) => {
+                const inputId = `selectTransport-${opt.transport.name}`;
+                const isChecked =
+                  transport.transport?.name === opt.transport.name;
+                return (
+                  <div
+                    key={opt.transport.name}
+                    onClick={() => setTransport(opt)}
+                    className={`flex w-full justify-between items-center py-[17px] px-[20px] cursor-pointer border rounded-xl bg-[#EDEEF180] border-[#EDEEF1]`}
+                  >
+                    <label
+                      htmlFor={inputId}
+                      className="flex items-center mr-[20px] gap-[10px] cursor-pointer"
                     >
-                      {opt.transport.name}
-                    </p>
+                      {opt.transport.icon_name === 'avia' ? (
+                        <AirplaneTicketIcon
+                          sx={{
+                            color: isChecked ? '#084FE3' : '#212122',
+                            width: '30px',
+                            height: '30px',
+                          }}
+                        />
+                      ) : (
+                        <LocalTaxiIcon
+                          sx={{
+                            color: isChecked ? '#084FE3' : '#212122',
+                            width: '30px',
+                            height: '30px',
+                          }}
+                        />
+                      )}
+                      <div className="flex flex-col">
+                        <p
+                          className={clsx(
+                            isChecked ? 'text-[#084FE3]' : 'text-[#212122]',
+                          )}
+                        >
+                          {opt.transport.name}
+                        </p>
+                      </div>
+                    </label>
+                    <Input
+                      type="radio"
+                      id={inputId}
+                      name="selectTransport"
+                      checked={isChecked}
+                      onChange={() => setTransport(opt)}
+                      className="w-6 h-6 accent-[#084FE3]"
+                    />
                   </div>
-                </label>
-                <Input
-                  type="radio"
-                  id={inputId}
-                  name="selectTransport"
-                  checked={isChecked}
-                  onChange={() => setTransport(opt)}
-                  className="w-6 h-6 accent-[#084FE3]"
-                />
-              </div>
-            );
-          })}
-        </div>
+                );
+              })}
+            </div>
+          </>
+        )}
       </div>
 
       <div className="flex justify-between max-lg:flex-col">

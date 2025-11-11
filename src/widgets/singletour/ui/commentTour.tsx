@@ -63,16 +63,30 @@ const CommentTour = ({ data }: { data: ToursDetailData }) => {
           }),
         }}
         onClick={() => setShowForm(!showForm)}
-        className="bg-white/40 backdrop-blur-sm flex rounded-2xl items-center cursor-pointer text-[#232325] py-2 px-4 m-auto mb-10 gap-2 shadow-xl border border-white/50"
+        disabled={!data.allow_comment}
+        className={`flex items-center gap-2 py-2 px-4 m-auto mb-10 rounded-2xl border shadow-xl
+    ${
+      data.allow_comment
+        ? 'bg-white/40 backdrop-blur-sm cursor-pointer text-[#232325] hover:bg-white/60 hover:shadow-2xl border-white/50'
+        : 'bg-gray-200 cursor-pointer text-gray-400 border-gray-300 opacity-70 shadow-inner'
+    }`}
       >
         {showForm ? (
           <>
-            <XIcon className="size-5 text-[#232325]" />
+            <XIcon
+              className={`size-5 ${
+                data.allow_comment ? 'text-[#232325]' : 'text-gray-400'
+              }`}
+            />
             {t('Bekor qilish')}
           </>
         ) : (
           <>
-            <Plus className="size-5 text-[#232325] " />
+            <Plus
+              className={`size-5 ${
+                data.allow_comment ? 'text-[#232325]' : 'text-gray-400'
+              }`}
+            />
             {t('Izoh qoldirish')}
           </>
         )}
