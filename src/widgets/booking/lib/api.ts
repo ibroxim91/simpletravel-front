@@ -52,6 +52,7 @@ export interface Get_Info {
       price: number;
       name: string;
     }[];
+    hotel_rating: string;
   };
 }
 
@@ -62,8 +63,8 @@ export interface Create_Ticketorder {
   arrival_time: string;
   participant: number[];
   ticket: number;
-  tariff: string;
-  transport: string;
+  tariff?: string;
+  transport?: string;
   extra_service: number[];
   extra_paid_service: number[];
   total_price: number;

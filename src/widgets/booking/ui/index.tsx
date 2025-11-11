@@ -255,7 +255,7 @@ export default function Booking() {
                           : 'text-[#000]',
                     )}
                   >
-                    {t('Отели')}
+                    {t('Турпакет')}
                   </p>
                 </div>
                 <div className="flex flex-col items-center justify-center absolute right-5 bottom-0">

@@ -1,8 +1,6 @@
 'use client';
 
-import { LanguageRoutes } from '@/shared/config/i18n/types';
 import formatDate from '@/shared/lib/formatDate';
-import { formatPrice } from '@/shared/lib/formatPrice';
 import { Input } from '@/shared/ui/input';
 import AirplaneTicketIcon from '@mui/icons-material/AirplaneTicket';
 import LocalTaxiIcon from '@mui/icons-material/LocalTaxi';
@@ -33,21 +31,16 @@ export default function TourInfoStep({
   setOrderId,
 }: Props) {
   const t = useTranslations();
-  const { locale, id } = useParams();
-  const [selected, setSelected] = useState<string | null>(null);
+  const { id } = useParams();
   const [transport, setTransport] = useState<{
-    transport: { name: string; icon_name: string };
+    transport: { name: string; icon_name: string } | null;
     price: number;
   }>({
     price: 0,
-    transport: { icon_name: '', name: '' },
+    transport: null,
   });
 
   const {
-    additional,
-    setAdditional,
-    setTarif,
-    transport: storeTransport,
     setTransport: setStoreTransport,
     user,
     where,
@@ -59,33 +52,23 @@ export default function TourInfoStep({
   } = formStore();
 
   useEffect(() => {
-    // Agar store'da oldingi tanlovlar bo'lsa, ularni yuklaymiz
-    if (additional) setSelected(additional);
-    if (storeTransport) setTransport(storeTransport);
-
-    // Agar hali hech narsa tanlanmagan bo'lsa, default birinchi elementni tanlaymiz
-    if (data?.data) {
-      if (!additional && data.data.tariff.length > 0) {
-        const firstTariff = data.data.tariff[0];
-        setSelected(firstTariff.tariff.name);
-        setTarif(firstTariff);
-      }
-      if (
-        (!storeTransport || !storeTransport.transport?.name) &&
-        data.data.transports.length > 0
-      ) {
-        const firstTransport = data.data.transports[0];
-        setTransport({
-          price: firstTransport.price,
-          transport: firstTransport.transport,
-        });
-        setStoreTransport({
-          price: firstTransport.price,
-          transport: firstTransport.transport,
-        });
-      }
+    if (
+      data?.data.transports &&
+      data.data.transports.length > 0 &&
+      !transport.transport
+    ) {
+      const firstTransport = data.data.transports[0];
+      const defaultTransport = {
+        price: firstTransport.price,
+        transport: {
+          icon_name: firstTransport.transport.icon_name,
+          name: firstTransport.transport.name,
+        },
+      };
+      setTransport(defaultTransport);
+      setStoreTransport(defaultTransport);
     }
-  }, [additional, storeTransport, data]);
+  }, [data, transport.transport, setStoreTransport]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: (body: Create_Ticketorder) =>
@@ -101,8 +84,15 @@ export default function TourInfoStep({
   });
 
   const handleNext = () => {
-    setAdditional(selected);
-    setStoreTransport(transport);
+    if (transport && transport.transport) {
+      setStoreTransport({
+        price: transport.price,
+        transport: {
+          icon_name: transport.transport?.icon_name,
+          name: transport.transport?.name,
+        },
+      });
+    }
 
     const hasExtra =
       (data?.data.extra_service && data.data.extra_service.length > 0) ||
@@ -111,7 +101,7 @@ export default function TourInfoStep({
 
     const basePrice = data?.data.price || 0;
     const userPrice = basePrice * (user?.length || 0);
-    const total_price = tariff.price + transport.price + userPrice;
+    const total_price = userPrice;
 
     setTotalPrice(total_price);
 
@@ -125,7 +115,7 @@ export default function TourInfoStep({
         extra_service: [],
         participant: user.map((u) => u.userId),
         tariff: tariff.tariff.name,
-        transport: transport.transport.name,
+        transport: transport.transport?.name,
         ticket: Number(id),
         total_price,
       });
@@ -188,62 +178,31 @@ export default function TourInfoStep({
         </div>
 
         <label className="text-xl font-semibold text-[#121212]">
-          {t('Выберите категорию')}
+          {t('Звезда гостиницы')}
         </label>
 
         <div className="mt-[8px] grid grid-cols-2 justify-between gap-[16px] max-md:grid-cols-1">
-          {data?.data.tariff.map((opt) => {
-            const inputId = `selectComfort-${opt.tariff.name}`;
-            const isChecked = selected === opt.tariff.name;
-            return (
-              <div
-                key={opt.tariff.name}
-                onClick={() => {
-                  setSelected(opt.tariff.name);
-                  setTarif(opt);
+          <div
+            className={`flex w-full justify-between items-center py-[17px] px-[20px] cursor-pointer border rounded-xl bg-[#EDEEF180] border-[#EDEEF1]`}
+          >
+            <label className="flex items-center mr-[70px] gap-[10px] cursor-pointer">
+              <StarIcon
+                sx={{
+                  color: '#084FE3',
+                  width: '30px',
+                  height: '30px',
                 }}
-                className={`flex w-full justify-between items-center py-[17px] px-[20px] cursor-pointer border rounded-xl bg-[#EDEEF180] border-[#EDEEF1]`}
-              >
-                <label
-                  htmlFor={inputId}
-                  className="flex items-center mr-[70px] gap-[10px] cursor-pointer"
-                >
-                  <StarIcon
-                    sx={{
-                      color: isChecked ? '#084FE3' : '#212122',
-                      width: '30px',
-                      height: '30px',
-                    }}
-                  />
-                  <div className="flex flex-col">
-                    <p
-                      className={clsx(
-                        isChecked ? 'text-[#084FE3]' : 'text-[#212122]',
-                      )}
-                    >
-                      {opt.tariff.name}
-                    </p>
-                    <p
-                      className={clsx(
-                        'text-sm',
-                        isChecked ? 'text-[#084FE3]' : 'text-[#212122]',
-                      )}
-                    >
-                      {formatPrice(opt.price, locale as LanguageRoutes, true)}
-                    </p>
-                  </div>
-                </label>
-                <Input
-                  type="radio"
-                  id={inputId}
-                  name="selectComfort"
-                  checked={isChecked}
-                  onChange={() => setSelected(opt.tariff.name)}
-                  className="w-6 h-6 accent-[#084FE3]"
-                />
+              />
+              <div className="flex flex-col">
+                <p className={clsx('text-[#084FE3]')}>
+                  {data?.data.hotel_rating} {t('yulduzli')}
+                </p>
               </div>
-            );
-          })}
+            </label>
+            <div className="w-6 h-6 border border-[#084FE3] flex justify-center items-center rounded-full">
+              <div className="bg-[#084FE3] w-3.5 h-3.5 rounded-full" />
+            </div>
+          </div>
         </div>
 
         <p className="text-xl font-semibold mt-5 text-[#121212]">
@@ -252,7 +211,7 @@ export default function TourInfoStep({
         <div className="mt-[8px] grid grid-cols-2 justify-between gap-[16px] max-md:grid-cols-1">
           {data?.data.transports.map((opt) => {
             const inputId = `selectTransport-${opt.transport.name}`;
-            const isChecked = transport.transport.name === opt.transport.name;
+            const isChecked = transport.transport?.name === opt.transport.name;
             return (
               <div
                 key={opt.transport.name}
@@ -287,14 +246,6 @@ export default function TourInfoStep({
                       )}
                     >
                       {opt.transport.name}
-                    </p>
-                    <p
-                      className={clsx(
-                        'text-sm',
-                        isChecked ? 'text-[#084FE3]' : 'text-[#212122]',
-                      )}
-                    >
-                      {formatPrice(opt.price, locale as LanguageRoutes, true)}
                     </p>
                   </div>
                 </label>
