@@ -198,4 +198,12 @@ export interface ToursDetailData {
     },
   ];
   is_liked: boolean;
+  ticket_hotel: [
+    {
+      id: number;
+      name: string;
+      meal_plan: 'full_board' | 'breakfast' | 'all_inclusive' | 'half_board';
+      rating: number;
+    },
+  ];
 }

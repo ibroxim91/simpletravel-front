@@ -2,361 +2,361 @@
 // See: https://next-intl.dev/docs/workflows/typescript#messages-arguments
 
 declare const messages: {
-  "Главная": "Bosh sahifa",
-  "Подобрать тур": "Sayohat tanlash",
-  "О нас": "Biz haqimizda",
-  "Блоги": "Bloglar",
-  "Ответы на вопросы": "Savollarga javoblar",
-  "Контакты": "Aloqa",
-  "Избранное": "Sevimlilar",
-  "Профиль": "Profil",
-  "Войти": "Kirish",
-  "Oʻzbekcha": "Oʻzbekcha",
-  "Русский": "Ruscha",
-  "English": "Inglizcha",
-  "Укажите город": "Shaharni kiriting",
-  "Не найдено": "Hech narsa topilmadi",
-  "Выберите город": "Shaharni tanlang",
-  "Меню": "Menyu",
-  "Откуда": "Qayerdan",
-  "Куда": "Qayerga",
-  "Дата отправления": "Jo‘nash sanasi",
-  "Туристы": "Sayohatchilar",
-  "Страна, курорт": "Mamlakat, kurort",
-  "Когда": "Qachon",
-  "Выезд": "Jo‘nash",
-  "Отмена": "Bekor qilish",
-  "Применять": "Qo‘llash",
-  "Вызрослых": "Kattalar",
-  "старше 13 лет": "13 yoshdan katta",
-  "Дети": "Bolalar",
-  "до 13 лет": "13 yoshgacha",
-  "Искать туры": "Sayohatlarni qidirish",
-  "Предложение дня: только сегодня!": "Kun taklifi: faqat bugun!",
-  "Лучшие направления по самым выгодным ценам": "Eng yaxshi yo‘nalishlar eng qulay narxlarda",
-  "Смотреть цены": "Narxlarni ko‘rish",
-  "Туры": "Turlar",
-  "Отели": "Mehmonxona",
-  "Популярные направления": "Mashhur yo‘nalishlar",
-  "Направления": "Yo‘nalish",
-  "Больше акций": "Boshqa aksiyalar",
-  "чел": "odam",
-  "туров": "tur",
-  "Солнце, пляж, отпуск - всё включено": "Quyosh, plyaj, ta’til - hammasi kiritilgan",
-  "Подбор туров у воды по сниженным ценам": "Suv bo‘yida arzonlashtirilgan turlar. Joylar soni cheklangan",
-  "Забронировать": "Bron qilish",
-  "Увидеть без визы": "Vizasiz ko‘rish",
-  "Горящие туры": "Mashhur turlar",
-  "С Simple Travel ваши поездки ещё проще": "Simple Travel bilan sayohatlaringiz yanada oson",
-  "Поддержка 24/7, страховка и дополнительные возможности": "24/7 qo‘llab-quvvatlash, sug‘urta va qo‘shimcha imkoniyatlar",
-  "Узнать больше": "Batafsil ma’lumot",
-  "Новости": "Yangiliklar",
-  "Больше новостей": "Ko‘proq yangiliklar",
-  "Служба поддержки": "Qo‘llab-quvvatlash xizmati",
-  "Общие вопросы": "Umumiy savollar",
-  "Адрес": "Manzil",
-  "Тошкент шахри, Юнусобод тумани": "Toshkent shahri, Yunusobod tumani",
-  "Страница": "Sahifa",
-  "О сервисе": "Xizmat haqida",
-  "Услуги": "Xizmatlar",
-  "Публичная оферта": "Ommaviy oferta",
-  "Оферта для юрлиц": "Yuridik shaxslar uchun oferta",
-  "Помощь": "Yordam",
-  "Инструкция пользователя": "Foydalanuvchi qo‘llanmasi",
-  "Политика конфиденциальности": "Maxfiylik siyosati",
-  "«simpletravel» Подробные сведения, политика конфиденциальности и пользовательское соглашение размещены в разделе «Документы и файлы»": "«simpletravel» haqida batafsil ma’lumot, maxfiylik siyosati va foydalanuvchi kelishuvi «Hujjatlar va fayllar» bo‘limida joylashtirilgan",
-  "Фильтры": "Filtrlar",
-  "Стоимость": "Narx",
-  "Название отеля": "Mehmonxona nomi",
-  "Условия въезда": "Kirish shartlari",
-  "Без визы": "Vizasiz",
-  "С визой": "Viza bilan",
-  "Продолжительность тура": "Sayohat davomiyligi",
-  "Регионы и курорты": "Hududlar va kurortlar",
-  "Категория отеля": "Mehmonxona toifasi",
-  "5 звезды": "5 yulduz",
-  "4 звезды": "4 yulduz",
-  "3 звезды": "3 yulduz",
-  "Питание": "Ovqatlanish",
-  "Все включено": "Hammasi ichiga kiritilgan",
-  "Завтрак": "Nonushta",
-  "Полупансион": "Yarim pansion",
-  "Пляж": "Plyaj",
-  "Тип отеля": "Mehmonxona turi",
-  "Пляжный": "Plyaj hududida",
-  "Песчано-галечный пляж": "Qumli-shag‘alli plyaj",
-  "Собственный пляж": "Shaxsiy plyaj",
-  "Отель": "Mehmonxona",
-  "Курорт": "Kurort",
-  "Пансионат": "Pansionat",
-  "Водные развлечения": "Suv o‘yin-kulgilari",
-  "Открытый бассейн": "Ochiq basseyn",
-  "Открытый бассейн с подогревом": "Qizdiriladigan ochiq basseyn",
-  "Крытый бассейн": "Yopiq basseyn",
-  "Для детей": "Bolalar uchun",
-  "Детское меню": "Bolalar menyusi",
-  "Детская площадка": "Bolalar maydonchasi",
-  "Детский сад": "Bolalar bog‘chasi",
-  "Дополнительно": "Qo‘shimcha",
-  "Wi-Fi": "Wi-Fi",
-  "Парковка": "Avtoturargoh",
-  "Трансфер": "Transfer",
-  "Филтры": "Filtrlar",
-  "Hайдено": "Topildi",
-  "предложений": "takliflar",
-  "По возрастанию цены": "Narx bo‘yicha o‘sish tartibida",
-  "Все": "Barchasi",
-  "Подешевле": "Arzonroq",
-  "Подороже": "Qimmatroq",
-  "Без скрытых комиссий": "Yashirin komissiyalarsiz",
-  "Нужна помощь?": "Yordam kerakmi?",
-  "Описание отеля": "Mehmonxona tavsifi",
-  "Что включено в стоимость тура": "Tur narxiga nimalar kiritilgan",
-  "Тур страница": "Tur sahifasi",
-  "Полный обзор": "To‘liq sharh",
-  "Тип": "Turi",
-  "Продолжительность": "Davomiyligi",
-  "дня": "kun",
-  "Размер группы": "Guruh hajmi",
-  "человек": "kishi",
-  "Языки": "Tillar",
-  "Найдено": "Topildi",
-  "tour_found_one": "Найден 1 тур по {{where}}",
-  "tour_found_one_general": "Найден 1 общий тур",
-  "tour_found_other": "Найдено {{count}} туров по {{where}}",
-  "tour_found_other_general": "Найдено {{count}} туров",
-  "План путешествия": "Sayohat rejasi",
-  "Каждый день — новые впечатления": "Har kuni — yangi taassurotlar",
-  "Что подают в отеле": "Mehmonxonada nima beriladi",
-  "Важно знать перед поездкой": "Safardan oldin bilish muhim",
-  "ID Турфирмы": "Turfirmaga oid ID",
-  "Официально зарегистрированная компания в реестре туроператоров": "Rasmiy ro‘yxatdan o‘tgan turoperator kompaniya",
-  "ID": "ID",
-  "URL nusxalandi": "URL nusxalandi",
-  "Требование по визе": "Viza talablari",
-  "Мы поможем с оформлением и предоставим список документов": "Biz hujjatlashtirishda yordam beramiz va hujjatlar ro‘yxatini taqdim etamiz",
-  "Срок оформления: 7–10 дней": "Rasmiylashtirish muddati: 7–10 kun",
-  "Необходимые документы: загранпаспорт (действителен минимум 6 месяцев), фото, анкета, медицинская страховка": "Kerakli hujjatlar: xorijiy passport (kamida 6 oy amal qilishi kerak), foto, anketа, tibbiy sug‘urta",
-  "В некоторых странах виза не требуется (уточняйте при бронировании)": "Ba’zi mamlakatlarda viza talab qilinmaydi (bron qilishda aniqlang)",
-  "Отзывы наших клиентов": "Mijozlarimiz fikrlari",
-  "Пока нет комментариев": "Hozircha sharhlar yo‘q",
-  "Откройте новые направления": "Yangi yo‘nalishlarni kashf eting",
-  "Дата": "Sana",
-  "Участники": "Ishtirokchilar",
-  "Оплата": "To‘lov",
-  "Дата рождения": "Tug‘ilgan sanasi",
-  "Bron qo'shish": "Bron qo'shish",
-  "Нет сохранённых участников": "Hech qanday ishtirokchi saqlanmagan",
-  "Время возвращения": "Qaytish vaqti",
-  "Следующий": "Keyingi",
-  "Удалить": "O‘chirish",
-  "Участник": "Ishtirokchi",
-  "Сохранённые попутчики": "Saqlangan hamrohlari",
-  "Пол": "Jins",
-  "Мужчина": "Erkak",
-  "Женщина": "Ayol",
-  "Имя": "Ism",
-  "Введите имя": "Ismni kiriting",
-  "Фамилия": "Familiya",
-  "Введите фамилию": "Familiyani kiriting",
-  "Телефон номер": "Telefon raqami",
-  "Введите номер": "Raqamni kiriting",
-  "Фото/скан паспорта": "Passport fotosi/skani",
-  "Hamroh(lar) muvaffaqiyatli saqlandi": "Hamroh(lar) muvaffaqiyatli saqlandi",
-  "Bron qilish uchun ro'yxatdan o'tishingiz kerak": "Bron qilish uchun ro'yxatdan o'tishingiz kerak",
-  "Drag or select file": "Faylni sudrab keltiring yoki tanlang",
-  "Drop files here or click to": "Fayllarni shu yerga tashlang yoki bosing",
-  "browse": "ko‘rib chiqing",
-  "through your machine": "kompyuteringiz orqali",
-  "Tur muvaffaqiyatli bron qilindi": "Tur muvaffaqiyatli bron qilindi",
-  "Посмотреть": "Ko‘rish",
-  "Назад": "Ortga",
-  "Новый участник": "Yangi ishtirokchi",
-  "Турпакет": "Turpaket",
-  "Звезда гостиницы": "Mehmonxona yulduzi",
-  "yulduzli": "yulduzli",
-  "Выберите категорию": "Kategoriya tanlang",
-  "Транспорт": "Transport",
-  "Экскурсии": "Ekskursiyalar",
-  "selectComfort": "selectComfort",
-  "Дополнительные услуги": "Qo‘shimcha xizmatlar",
-  "Общая сумма": "Umumiy summa",
-  "Способ оплаты": "To‘lov usuli",
-  "Uzum bank": "Uzum bank",
-  "Payme": "Payme",
-  "Перейти к оплате": "To‘lovga o‘tish",
-  "Подробности заказа": "Buyurtma tafsilotlari",
-  "Скачать PDF": "PDF yuklab olish",
-  "Загрузка": "Yuklanmoqda...",
-  "Время вылета": "Parvoz vaqti",
-  "Попутчики": "Hamrohlar",
-  "Локация": "Joylashuv",
-  "Рейтинг": "Reyting",
-  "Характеристики": "Xususiyatlari",
-  "Открытый бассейн, Анимация, Первая линия пляжа": "Ochiq basseyn, Animatsiya, Plyajning birinchi qatori",
-  "звёзды": "yulduzli",
-  "Тип пакета": "Paket turi",
-  "Городская экскурсия": "Shahar ekskursiyasi",
-  "Поездка на пляж": "Plyaj safar",
-  "Ночной тур": "Tungi tur",
-  "Страховка": "Sug‘urta",
-  "Визовая поддержка": "Viza yordami",
-  "Отправка": "Yuborish",
-  "Hamroh muvaffaqiyatli o'chirildi": "Hamroh muvaffaqiyatli o'chirildi",
-  "Стать партнёром": "Hamkor bo‘lish",
-  "Оплата прошла успешно!": "To‘lov muvaffaqiyatli amalga oshirildi!",
-  "Hamroh muvaffaqiyatli qo'shildi": "Hamroh muvaffaqiyatli qo'shildi",
-  "Эксперт свяжется с вами в ближайшее время по номеру": "Mutaxassis tez orada siz bilan telefon orqali bog‘lanadi",
-  "позвонив на него": "shu raqamga qo‘ng‘iroq qilib",
-  "На главную": "Bosh sahifaga",
-  "Hamroh muvaffaqiyatli tahrirlandi": "Hamroh muvaffaqiyatli tahrirlandi",
-  "Hamrohga tegishli rasm muvaffaqiyatli o'chirildi": "Hamrohga tegishli rasm muvaffaqiyatli o'chirildi",
-  "Мои брони": "Mening bronlarim",
-  "Попробовать снова": "Qayta urinib ko‘rish",
-  "Заявка успешно отправлено": "Ariza muvaffaqiyatli yuborildi",
-  "Произошла ошибка при отправке": "Yuborishda xatolik yuz berdi",
-  "Umumiy": "Umumiy",
-  "Вебсайт": "Вебсайт",
-  "Instagram": "Instagram",
-  "Chiqish": "Chiqish",
-  "Hozircha yangiliklar mavjud emas": "Hozircha yangiliklar mavjud emas. Keyinroq qayta urinib ko‘ring",
-  "Xatolik yuz berdi": "Xatolik yuz berdi",
-  "ta tur topildi": "ta tur topildi",
-  "So'rov muvaffaqiyatli jo'natildi": "So'rov muvaffaqiyatli jo'natildi. Tez orada siz bilan bog'lanamiz",
-  "ga tegishli": "ga tegishli",
-  "Hisobingiz yo'qmi": "Hisobingiz yo'qmi?",
-  "Ro'yxatdan o'tish": "Ro'yxatdan o'tish",
-  "Hisobingiz bormi": "Hisobingiz bormi?",
-  "Sms qayta jo'natildi": "Tasdiqlash kodi qayta jo'natildi",
-  "Yangiliklar topilmadi": "Yangiliklar topilmadi",
-  "Majburiy maydon": "Majburiy maydon",
-  "Имя обязательно": "Ism majburiy",
-  "Фамилия обязательна": "Familiya majburiy",
-  "Дата обязательна": "Sana majburiy",
-  "Введите корректный номер телефона": "To‘g‘ri telefon raqamini kiriting",
-  "Хорошо": "Yaxshi",
-  "Parol esdan chiqdimi": "Parol esdan chiqdimi?",
-  "Название компании": "Kompaniya nomi",
-  "Номер телефона": "Telefon raqami",
-  "Введите ваш номер телефона": "Telefon raqamingizni kiriting",
-  "Отправить": "Yuborish",
-  "Я даю согласие на обработку персональных данных": "Shaxsiy ma’lumotlarimni qayta ishlashga roziman",
-  "Откройте для себя новые горизонты": "Yangi ufqlarni kashf eting",
-  "Ваш идеальный отпуск начинается здесь и сейчас": "Sizning ideal ta’tilingiz aynan shu yerda va hozir boshlanadi",
-  "Солнечные рассветы, вечера у моря и приключения": "Quyoshli tonglar, dengiz bo‘yidagi kechalar va butun umr yodingizda qoladigan sarguzashtlar. Biz sizning qulayligingiz va baxtingiz uchun har bir tafsilotni puxta o‘ylab yaratamiz",
-  "Качество отдыха, которому можно доверять": "Ishonchli dam olish sifati",
-  "В Simple Travel мы верим": "Simple Travel’da biz har bir sayohat oson, ilhomlantiruvchi va unutilmas bo‘lishi kerak deb hisoblaymiz. Bizning vazifamiz — sizning orzuyingizdagi sayohatlarni ro‘yobga chiqarish, qulaylik, sarguzasht va madaniyat bilan tanishuvni birlashtirgan maxsus marshrutlar yaratish.",
-  "Основанная на страсти к открытиям": "Kashfiyotlarga bo‘lgan ishtiyoq asosida, Simple Travel oddiy turlardan ko‘proq narsani izlaydiganlar uchun ishonchli hamkorga aylandi. Biz shaxsiylashtirilgan sayohatlarni tashkil etamiz — Alp tog‘laridagi osoyishta dam olishlardan tortib, Yevropaning eng yaxshi shaharlarida unutilmas dam olish kunlarigacha.",
-  "Мы организуем лучшие туры, какие только возможны": "Biz eng yaxshi sayohatlarni tashkil qilamiz",
-  "Максимальная гибкость": "Maksimal moslashuvchanlik",
-  "Вы выбираете — мы адаптируем": "Siz tanlaysiz — biz moslashtiramiz...",
-  "Уникальные впечатления": "Noyob taassurotlar",
-  "От альпийских вершин": "Alp tog‘laridan...",
-  "Полный комфорт": "To‘liq qulaylik",
-  "Мы берём на себя": "Biz o‘z zimmamizga olamiz",
-  "Мы заботимся о каждой детали вашего путешествия": "Biz sizning sayohatingizning har bir tafsilotiga e’tibor qaratamiz — marshrut tanlashdan tortib, mehmonxonalarni bron qilish, ekskursiyalar va qulay transfergacha. Bizning turlarimiz dam olishni unutilmas xotiralarga aylantirish uchun yaratilgan.",
-  "Сотрудничаем с лидерами Узбекистана": "Oʻzbekiston yetakchilari bilan hamkorlik qilamiz",
-  "Мы успешно работаем с крупнейшими компаниями Узбекистана": "Biz Oʻzbekistonning eng yirik kompaniyalari bilan muvaffaqiyatli hamkorlik qilib, ularga ishonchli yechimlar va uzoq muddatli hamkorlikni taklif qilamiz.",
-  "Введите название вашей компании": "Kompaniyangiz nomini kiriting",
-  "Город, улица, дом": "Shahar, ko‘cha, uy",
-  "Свидетельств/Лицензияо": "Guvohnoma/Litsenziya",
-  "Drop files here or click to browse": "Fayllarni bu yerga tashlang yoki ko‘rish uchun bosing",
-  "Выбран файл": "Fayl tanlandi",
-  "Электронная почта": "Elektron pochta",
-  "Instagram / Вебсайт": "Instagram / Vebsayt",
-  "Надёжность, подтверждённая документами": "Hujjatlar bilan tasdiqlangan ishonchlilik",
-  "Каждое наше направление сопровождается официальными лицензиями": "Har bir yo‘nalishimiz rasmiy litsenziya va sertifikatlar bilan tasdiqlangan. Bu siz biz bilan qiladigan har bir sayohat xavfsiz va qonuniyligiga ishonch hosil qilishingiz mumkin degani.",
-  "Соответствие международным стандартам": "Xalqaro standartlarga muvofiqlik",
-  "Пресс-релизы и новости": "Matbuot relizlari va yangiliklar",
-  "Cтраница подробностей": "Tafsilotlar sahifasi",
-  "Личный кабинет": "Shaxsiy kabinet",
-  "Онлайн чат телеграм": "Onlayn telegram chat",
-  "Колл центр": "Qo‘ng‘iroq markazi",
-  "Ответим на все вопросы": "Barcha savollarga javob beramiz",
-  "Введите Имя": "Ismingizni kiriting",
-  "Алмазарский р-н, Камарнисо, 13": "Olmazor tumani, Kamarniso, 13",
-  "Телефон": "Telefon",
-  "Eng kamida 2ta harf bo'lishi kerak": "Eng kamida 2ta harf bo'lishi kerak",
-  "Telefon raqam xato": "Telefon raqam xato",
-  "2025 © Все права защищены": "2025 © Barcha huquqlar himoyalangan.",
-  "Вход в аккаунт": "Akkauntga kirish",
-  "Hомер телефона": "Telefon raqami",
-  "Вход по E-mail": "E-mail orqali kirish",
-  "Введите номер телефона": "Telefon raqamingizni kiriting",
-  "Получить код": "Kod olish",
-  "E-mail": "E-mail",
-  "Введите ваш E-mail": "E-mailingizni kiriting",
-  "Kodni to'liq kiriting": "Kodni to'liq kiriting",
-  "Слишком много попыток": "Urinishlar juda ko‘p",
-  "Вы ввели неверные данные 5 раз": "Siz noto‘g‘ri ma’lumotni 5 marta kiritdingiz. Kirish 30 daqiqaga bloklandi",
-  "Код аутентификации": "Tasdiqlash kodi",
-  "Введите 5-значный код, который мы только что отправили на": "Biz hozirgina yuborgan 4 xonali kodni kiriting",
-  "Отправить код повторно": "Kodni qayta yuborish",
-  "Прислать код повторно через": "Kodni qayta yuborish vaqti:",
-  "Подтвердить": "Tasdiqlash",
-  "Parol va tasdiqlash bir xil bo'lishi kerak": "Parol va tasdiqlash bir xil bo'lishi kerak",
-  "Parolni tasdiqlang": "Parolni tasdiqlang",
-  "Eng kamida 8ta belgi bo'lishi kerak": "Eng kamida 8ta belgi bo'lishi kerak",
-  "Регистрация аккаунта": "Akkaunt ro'yxatdan o'tkazish",
-  "Создайте свой личный кабинет, чтобы управлять бронированиями": "Shaxsiy kabinet yarating, buyurtmalarni boshqaring, sevimlilarni saqlang va Simple Travel'ning barcha imkoniyatlaridan foydalaning",
-  "Придумайте пароль": "Parol o‘ylab toping",
-  "Parol": "Parol",
-  "Введите пароль (минимум 8 символов)": "Parolni kiriting (kamida 8 ta belgi)",
-  "Подтвердите пароль": "Parolni tasdiqlang",
-  "Повторите пароль": "Parolni qaytadan kiriting",
-  "Я согласен с условиями использования и политикой конфиденциальности": "Men foydalanish shartlari va maxfiylik siyosatiga roziman",
-  "Зарегистрироваться": "Ro‘yxatdan o‘tish",
-  "Изменить пароль": "Parolni o‘zgartirish",
-  "Измените пароль, чтобы обеспечить безопасность вашего аккаунта": "Akkauntingiz xavfsizligini ta'minlash uchun parolni o‘zgartiring",
-  "Текущий пароль": "Joriy parol",
-  "Введите старый пароль": "Eski parolni kiriting",
-  "Новый пароль": "Yangi parol",
-  "Забыл пароль": "Parolni unutdim",
-  "Сохранить новый пароль": "Yangi parolni saqlash",
-  "Сохранить": "Saqlash",
-  "Давайте познакомимся!": "Keling, tanishib olaylik!",
-  "Чтобы завершить регистрацию, пожалуйста, укажите ваше имя": "Registratsiyani yakunlash uchun ismingizni kiriting",
-  "Тут ничего нет": "Bu yerda hech narsa yo‘q",
-  "Выберите понравивщися тур": "Sizga yoqqan turni tanlang",
-  "Найдите понравивщися тур на сайте simple travel": "Simple travel saytida o‘zingizga yoqqan turni toping",
-  "Добавьте тур в избранное, нажав кнопку сохранить": "Saqlash tugmasini bosish orqali turni saralanganlarga kiriting",
-  "Зайди в свой профиль и оформите тур": "Profilingizga kiring va sayohatni rasmiylashtiring",
-  "Мои бронирования": "Mening bronlarim",
-  "Мои попутчики": "Hamrohlarim",
-  "Настройки": "Sozlamalar",
-  "Изменить аватар": "Avatarni o‘zgartirish",
-  "Изменение": "O'zgartirish",
-  "Контактные данные": "Kontakt ma’lumotlari",
-  "Последние бронирования": "Oxirgi bronlarim",
-  "Код бронирования": "Bronlar kodi",
-  "Название услуги": "Xizmat nomi",
-  "Место положение": "Joylashuv",
-  "Статус": "Holati",
-  "Действие": "Harakat",
-  "Ko‘rsatilmoqda": "Ko‘rsatish",
-  "от": "dan",
-  "Добавить попутчика": "Hamroh qo'shish",
-  "Пока нет попутчиков": "Hozircha hamrohlar yo‘q",
-  "Добавьте своего первого попутчика": "Birga rejalashtirish uchun birinchi hamrohingizni kiriting",
-  "Profilga kirish": "Profilga kirish",
-  "Kirish": "Kirish",
-  "Izohingizni yozing": "Izohingizni yozing",
-  "Sayohat haqida fikringizni baham ko'ring": "Sayohat haqida fikringizni baham ko'ring...",
-  "Пока нет бронирования": "Hozircha bandlov yo‘q",
-  "Yuborish": "Yuborish",
-  "Izoh qoldirish": "Izoh qoldirish",
-  "Bekor qilish": "Bekor qilish",
-  "Sizning fikringiz": "Sizning fikringiz",
-  "Reytingni tanlang": "Reytingni tanlang",
-  "Kutimoqda": "Kutimoqda",
-  "Tasdiqlanmoqda": "Tasdiqlanmoqda",
-  "Bekor qilingan": "Bekor qilingan",
-  "Tasdiqlangan": "Tasdiqlangan",
-  "Tugallangan": "Tugallangan",
-  "Ba'tafsil": "Ba'tafsil",
-  "To'lash": "To'lash",
-  "Ko'rsatilmoqda": "Ko'rsatilmoqda",
-  "Banner yuklashda xatolik yuz berdi": "Banner yuklashda xatolik yuz berdi",
-  "Qayta urinish": "Qayta urinish"
+  Главная: 'Bosh sahifa';
+  'Подобрать тур': 'Sayohat tanlash';
+  'О нас': 'Biz haqimizda';
+  Блоги: 'Bloglar';
+  'Ответы на вопросы': 'Savollarga javoblar';
+  Контакты: 'Aloqa';
+  Избранное: 'Sevimlilar';
+  Профиль: 'Profil';
+  Войти: 'Kirish';
+  Oʻzbekcha: 'Oʻzbekcha';
+  Русский: 'Ruscha';
+  English: 'Inglizcha';
+  'Укажите город': 'Shaharni kiriting';
+  'Не найдено': 'Hech narsa topilmadi';
+  'Выберите город': 'Shaharni tanlang';
+  Меню: 'Menyu';
+  Откуда: 'Qayerdan';
+  Куда: 'Qayerga';
+  'Дата отправления': 'Jo‘nash sanasi';
+  Туристы: 'Sayohatchilar';
+  'Страна, курорт': 'Mamlakat, kurort';
+  Когда: 'Qachon';
+  Выезд: 'Jo‘nash';
+  Отмена: 'Bekor qilish';
+  Применять: 'Qo‘llash';
+  Вызрослых: 'Kattalar';
+  'старше 13 лет': '13 yoshdan katta';
+  Дети: 'Bolalar';
+  'до 13 лет': '13 yoshgacha';
+  'Искать туры': 'Sayohatlarni qidirish';
+  'Предложение дня: только сегодня!': 'Kun taklifi: faqat bugun!';
+  'Лучшие направления по самым выгодным ценам': 'Eng yaxshi yo‘nalishlar eng qulay narxlarda';
+  'Смотреть цены': 'Narxlarni ko‘rish';
+  Туры: 'Turlar';
+  Отели: 'Mehmonxona';
+  'Популярные направления': 'Mashhur yo‘nalishlar';
+  Направления: 'Yo‘nalish';
+  'Больше акций': 'Boshqa aksiyalar';
+  чел: 'odam';
+  туров: 'tur';
+  'Солнце, пляж, отпуск - всё включено': 'Quyosh, plyaj, ta’til - hammasi kiritilgan';
+  'Подбор туров у воды по сниженным ценам': 'Suv bo‘yida arzonlashtirilgan turlar. Joylar soni cheklangan';
+  Забронировать: 'Bron qilish';
+  'Увидеть без визы': 'Vizasiz ko‘rish';
+  'Горящие туры': 'Mashhur turlar';
+  'С Simple Travel ваши поездки ещё проще': 'Simple Travel bilan sayohatlaringiz yanada oson';
+  'Поддержка 24/7, страховка и дополнительные возможности': '24/7 qo‘llab-quvvatlash, sug‘urta va qo‘shimcha imkoniyatlar';
+  'Узнать больше': 'Batafsil ma’lumot';
+  Новости: 'Yangiliklar';
+  'Больше новостей': 'Ko‘proq yangiliklar';
+  'Служба поддержки': 'Qo‘llab-quvvatlash xizmati';
+  'Общие вопросы': 'Umumiy savollar';
+  Адрес: 'Manzil';
+  'Тошкент шахри, Юнусобод тумани': 'Toshkent shahri, Yunusobod tumani';
+  Страница: 'Sahifa';
+  'О сервисе': 'Xizmat haqida';
+  Услуги: 'Xizmatlar';
+  'Публичная оферта': 'Ommaviy oferta';
+  'Оферта для юрлиц': 'Yuridik shaxslar uchun oferta';
+  Помощь: 'Yordam';
+  'Инструкция пользователя': 'Foydalanuvchi qo‘llanmasi';
+  'Политика конфиденциальности': 'Maxfiylik siyosati';
+  '«simpletravel» Подробные сведения, политика конфиденциальности и пользовательское соглашение размещены в разделе «Документы и файлы»': '«simpletravel» haqida batafsil ma’lumot, maxfiylik siyosati va foydalanuvchi kelishuvi «Hujjatlar va fayllar» bo‘limida joylashtirilgan';
+  Фильтры: 'Filtrlar';
+  Стоимость: 'Narx';
+  'Название отеля': 'Mehmonxona nomi';
+  'Условия въезда': 'Kirish shartlari';
+  'Без визы': 'Vizasiz';
+  'С визой': 'Viza bilan';
+  'Продолжительность тура': 'Sayohat davomiyligi';
+  'Регионы и курорты': 'Hududlar va kurortlar';
+  'Категория отеля': 'Mehmonxona toifasi';
+  '5 звезды': '5 yulduz';
+  '4 звезды': '4 yulduz';
+  '3 звезды': '3 yulduz';
+  Питание: 'Ovqatlanish';
+  'Все включено': 'Hammasi ichiga kiritilgan';
+  Завтрак: 'Nonushta';
+  Полупансион: 'Yarim pansion';
+  Пляж: 'Plyaj';
+  'Тип отеля': 'Mehmonxona turi';
+  Пляжный: 'Plyaj hududida';
+  'Песчано-галечный пляж': 'Qumli-shag‘alli plyaj';
+  'Собственный пляж': 'Shaxsiy plyaj';
+  Отель: 'Mehmonxona';
+  Курорт: 'Kurort';
+  Пансионат: 'Pansionat';
+  'Водные развлечения': 'Suv o‘yin-kulgilari';
+  'Открытый бассейн': 'Ochiq basseyn';
+  'Открытый бассейн с подогревом': 'Qizdiriladigan ochiq basseyn';
+  'Крытый бассейн': 'Yopiq basseyn';
+  'Для детей': 'Bolalar uchun';
+  'Детское меню': 'Bolalar menyusi';
+  'Детская площадка': 'Bolalar maydonchasi';
+  'Детский сад': 'Bolalar bog‘chasi';
+  Дополнительно: 'Qo‘shimcha';
+  'Wi-Fi': 'Wi-Fi';
+  Парковка: 'Avtoturargoh';
+  Трансфер: 'Transfer';
+  Филтры: 'Filtrlar';
+  Hайдено: 'Topildi';
+  предложений: 'takliflar';
+  'По возрастанию цены': 'Narx bo‘yicha o‘sish tartibida';
+  Все: 'Barchasi';
+  Подешевле: 'Arzonroq';
+  Подороже: 'Qimmatroq';
+  'Без скрытых комиссий': 'Yashirin komissiyalarsiz';
+  'Нужна помощь?': 'Yordam kerakmi?';
+  'Описание отеля': 'Mehmonxona tavsifi';
+  'Что включено в стоимость тура': 'Tur narxiga nimalar kiritilgan';
+  'Тур страница': 'Tur sahifasi';
+  'Полный обзор': 'To‘liq sharh';
+  Тип: 'Turi';
+  Продолжительность: 'Davomiyligi';
+  дня: 'kun';
+  'Размер группы': 'Guruh hajmi';
+  человек: 'kishi';
+  Языки: 'Tillar';
+  Найдено: 'Topildi';
+  tour_found_one: 'Найден 1 тур по {{where}}';
+  tour_found_one_general: 'Найден 1 общий тур';
+  tour_found_other: 'Найдено {{count}} туров по {{where}}';
+  tour_found_other_general: 'Найдено {{count}} туров';
+  'План путешествия': 'Sayohat rejasi';
+  'Каждый день — новые впечатления': 'Har kuni — yangi taassurotlar';
+  'Что подают в отеле': 'Mehmonxonada nima beriladi';
+  'Важно знать перед поездкой': 'Safardan oldin bilish muhim';
+  'ID Турфирмы': 'Turfirmaga oid ID';
+  'Официально зарегистрированная компания в реестре туроператоров': 'Rasmiy ro‘yxatdan o‘tgan turoperator kompaniya';
+  ID: 'ID';
+  'URL nusxalandi': 'URL nusxalandi';
+  'Требование по визе': 'Viza talablari';
+  'Мы поможем с оформлением и предоставим список документов': 'Biz hujjatlashtirishda yordam beramiz va hujjatlar ro‘yxatini taqdim etamiz';
+  'Срок оформления: 7–10 дней': 'Rasmiylashtirish muddati: 7–10 kun';
+  'Необходимые документы: загранпаспорт (действителен минимум 6 месяцев), фото, анкета, медицинская страховка': 'Kerakli hujjatlar: xorijiy passport (kamida 6 oy amal qilishi kerak), foto, anketа, tibbiy sug‘urta';
+  'В некоторых странах виза не требуется (уточняйте при бронировании)': 'Ba’zi mamlakatlarda viza talab qilinmaydi (bron qilishda aniqlang)';
+  'Отзывы наших клиентов': 'Mijozlarimiz fikrlari';
+  'Пока нет комментариев': 'Hozircha sharhlar yo‘q';
+  'Откройте новые направления': 'Yangi yo‘nalishlarni kashf eting';
+  Дата: 'Sana';
+  Участники: 'Ishtirokchilar';
+  Оплата: 'To‘lov';
+  'Дата рождения': 'Tug‘ilgan sanasi';
+  "Bron qo'shish": "Bron qo'shish";
+  'Нет сохранённых участников': 'Hech qanday ishtirokchi saqlanmagan';
+  'Время возвращения': 'Qaytish vaqti';
+  Следующий: 'Keyingi';
+  Удалить: 'O‘chirish';
+  Участник: 'Ishtirokchi';
+  'Сохранённые попутчики': 'Saqlangan hamrohlari';
+  Пол: 'Jins';
+  Мужчина: 'Erkak';
+  Женщина: 'Ayol';
+  Имя: 'Ism';
+  'Введите имя': 'Ismni kiriting';
+  Фамилия: 'Familiya';
+  'Введите фамилию': 'Familiyani kiriting';
+  'Телефон номер': 'Telefon raqami';
+  'Введите номер': 'Raqamni kiriting';
+  'Фото/скан паспорта': 'Passport fotosi/skani';
+  'Hamroh(lar) muvaffaqiyatli saqlandi': 'Hamroh(lar) muvaffaqiyatli saqlandi';
+  "Bron qilish uchun ro'yxatdan o'tishingiz kerak": "Bron qilish uchun ro'yxatdan o'tishingiz kerak";
+  'Drag or select file': 'Faylni sudrab keltiring yoki tanlang';
+  'Drop files here or click to': 'Fayllarni shu yerga tashlang yoki bosing';
+  browse: 'ko‘rib chiqing';
+  'through your machine': 'kompyuteringiz orqali';
+  'Tur muvaffaqiyatli bron qilindi': 'Tur muvaffaqiyatli bron qilindi';
+  Посмотреть: 'Ko‘rish';
+  Назад: 'Ortga';
+  'Новый участник': 'Yangi ishtirokchi';
+  Турпакет: 'Turpaket';
+  'Звезда гостиницы': 'Mehmonxona yulduzi';
+  yulduzli: 'yulduzli';
+  'Выберите категорию': 'Kategoriya tanlang';
+  Транспорт: 'Transport';
+  Экскурсии: 'Ekskursiyalar';
+  selectComfort: 'selectComfort';
+  'Дополнительные услуги': 'Qo‘shimcha xizmatlar';
+  'Общая сумма': 'Umumiy summa';
+  'Способ оплаты': 'To‘lov usuli';
+  'Uzum bank': 'Uzum bank';
+  Payme: 'Payme';
+  'Перейти к оплате': 'To‘lovga o‘tish';
+  'Подробности заказа': 'Buyurtma tafsilotlari';
+  'Скачать PDF': 'PDF yuklab olish';
+  Загрузка: 'Yuklanmoqda...';
+  'Время вылета': 'Parvoz vaqti';
+  Попутчики: 'Hamrohlar';
+  Локация: 'Joylashuv';
+  Рейтинг: 'Reyting';
+  Характеристики: 'Xususiyatlari';
+  'Открытый бассейн, Анимация, Первая линия пляжа': 'Ochiq basseyn, Animatsiya, Plyajning birinchi qatori';
+  звёзды: 'yulduzli';
+  'Тип пакета': 'Paket turi';
+  'Городская экскурсия': 'Shahar ekskursiyasi';
+  'Поездка на пляж': 'Plyaj safar';
+  'Ночной тур': 'Tungi tur';
+  Страховка: 'Sug‘urta';
+  'Визовая поддержка': 'Viza yordami';
+  Отправка: 'Yuborish';
+  "Hamroh muvaffaqiyatli o'chirildi": "Hamroh muvaffaqiyatli o'chirildi";
+  'Стать партнёром': 'Hamkor bo‘lish';
+  'Оплата прошла успешно!': 'To‘lov muvaffaqiyatli amalga oshirildi!';
+  "Hamroh muvaffaqiyatli qo'shildi": "Hamroh muvaffaqiyatli qo'shildi";
+  'Эксперт свяжется с вами в ближайшее время по номеру': 'Mutaxassis tez orada siz bilan telefon orqali bog‘lanadi';
+  'позвонив на него': 'shu raqamga qo‘ng‘iroq qilib';
+  'На главную': 'Bosh sahifaga';
+  'Hamroh muvaffaqiyatli tahrirlandi': 'Hamroh muvaffaqiyatli tahrirlandi';
+  "Hamrohga tegishli rasm muvaffaqiyatli o'chirildi": "Hamrohga tegishli rasm muvaffaqiyatli o'chirildi";
+  'Мои брони': 'Mening bronlarim';
+  'Попробовать снова': 'Qayta urinib ko‘rish';
+  'Заявка успешно отправлено': 'Ariza muvaffaqiyatli yuborildi';
+  'Произошла ошибка при отправке': 'Yuborishda xatolik yuz berdi';
+  Umumiy: 'Umumiy';
+  Вебсайт: 'Вебсайт';
+  Instagram: 'Instagram';
+  Chiqish: 'Chiqish';
+  'Hozircha yangiliklar mavjud emas': 'Hozircha yangiliklar mavjud emas. Keyinroq qayta urinib ko‘ring';
+  'Xatolik yuz berdi': 'Xatolik yuz berdi';
+  'ta tur topildi': 'ta tur topildi';
+  "So'rov muvaffaqiyatli jo'natildi": "So'rov muvaffaqiyatli jo'natildi. Tez orada siz bilan bog'lanamiz";
+  'ga tegishli': 'ga tegishli';
+  "Hisobingiz yo'qmi": "Hisobingiz yo'qmi?";
+  "Ro'yxatdan o'tish": "Ro'yxatdan o'tish";
+  'Hisobingiz bormi': 'Hisobingiz bormi?';
+  "Sms qayta jo'natildi": "Tasdiqlash kodi qayta jo'natildi";
+  'Yangiliklar topilmadi': 'Yangiliklar topilmadi';
+  'Majburiy maydon': 'Majburiy maydon';
+  'Имя обязательно': 'Ism majburiy';
+  'Фамилия обязательна': 'Familiya majburiy';
+  'Дата обязательна': 'Sana majburiy';
+  'Введите корректный номер телефона': 'To‘g‘ri telefon raqamini kiriting';
+  Хорошо: 'Yaxshi';
+  'Parol esdan chiqdimi': 'Parol esdan chiqdimi?';
+  'Название компании': 'Kompaniya nomi';
+  'Номер телефона': 'Telefon raqami';
+  'Введите ваш номер телефона': 'Telefon raqamingizni kiriting';
+  Отправить: 'Yuborish';
+  'Я даю согласие на обработку персональных данных': 'Shaxsiy ma’lumotlarimni qayta ishlashga roziman';
+  'Откройте для себя новые горизонты': 'Yangi ufqlarni kashf eting';
+  'Ваш идеальный отпуск начинается здесь и сейчас': 'Sizning ideal ta’tilingiz aynan shu yerda va hozir boshlanadi';
+  'Солнечные рассветы, вечера у моря и приключения': 'Quyoshli tonglar, dengiz bo‘yidagi kechalar va butun umr yodingizda qoladigan sarguzashtlar. Biz sizning qulayligingiz va baxtingiz uchun har bir tafsilotni puxta o‘ylab yaratamiz';
+  'Качество отдыха, которому можно доверять': 'Ishonchli dam olish sifati';
+  'В Simple Travel мы верим': 'Simple Travel’da biz har bir sayohat oson, ilhomlantiruvchi va unutilmas bo‘lishi kerak deb hisoblaymiz. Bizning vazifamiz — sizning orzuyingizdagi sayohatlarni ro‘yobga chiqarish, qulaylik, sarguzasht va madaniyat bilan tanishuvni birlashtirgan maxsus marshrutlar yaratish.';
+  'Основанная на страсти к открытиям': 'Kashfiyotlarga bo‘lgan ishtiyoq asosida, Simple Travel oddiy turlardan ko‘proq narsani izlaydiganlar uchun ishonchli hamkorga aylandi. Biz shaxsiylashtirilgan sayohatlarni tashkil etamiz — Alp tog‘laridagi osoyishta dam olishlardan tortib, Yevropaning eng yaxshi shaharlarida unutilmas dam olish kunlarigacha.';
+  'Мы организуем лучшие туры, какие только возможны': 'Biz eng yaxshi sayohatlarni tashkil qilamiz';
+  'Максимальная гибкость': 'Maksimal moslashuvchanlik';
+  'Вы выбираете — мы адаптируем': 'Siz tanlaysiz — biz moslashtiramiz...';
+  'Уникальные впечатления': 'Noyob taassurotlar';
+  'От альпийских вершин': 'Alp tog‘laridan...';
+  'Полный комфорт': 'To‘liq qulaylik';
+  'Мы берём на себя': 'Biz o‘z zimmamizga olamiz';
+  'Мы заботимся о каждой детали вашего путешествия': 'Biz sizning sayohatingizning har bir tafsilotiga e’tibor qaratamiz — marshrut tanlashdan tortib, mehmonxonalarni bron qilish, ekskursiyalar va qulay transfergacha. Bizning turlarimiz dam olishni unutilmas xotiralarga aylantirish uchun yaratilgan.';
+  'Сотрудничаем с лидерами Узбекистана': 'Oʻzbekiston yetakchilari bilan hamkorlik qilamiz';
+  'Мы успешно работаем с крупнейшими компаниями Узбекистана': 'Biz Oʻzbekistonning eng yirik kompaniyalari bilan muvaffaqiyatli hamkorlik qilib, ularga ishonchli yechimlar va uzoq muddatli hamkorlikni taklif qilamiz.';
+  'Введите название вашей компании': 'Kompaniyangiz nomini kiriting';
+  'Город, улица, дом': 'Shahar, ko‘cha, uy';
+  'Свидетельств/Лицензияо': 'Guvohnoma/Litsenziya';
+  'Drop files here or click to browse': 'Fayllarni bu yerga tashlang yoki ko‘rish uchun bosing';
+  'Выбран файл': 'Fayl tanlandi';
+  'Электронная почта': 'Elektron pochta';
+  'Instagram / Вебсайт': 'Instagram / Vebsayt';
+  'Надёжность, подтверждённая документами': 'Hujjatlar bilan tasdiqlangan ishonchlilik';
+  'Каждое наше направление сопровождается официальными лицензиями': 'Har bir yo‘nalishimiz rasmiy litsenziya va sertifikatlar bilan tasdiqlangan. Bu siz biz bilan qiladigan har bir sayohat xavfsiz va qonuniyligiga ishonch hosil qilishingiz mumkin degani.';
+  'Соответствие международным стандартам': 'Xalqaro standartlarga muvofiqlik';
+  'Пресс-релизы и новости': 'Matbuot relizlari va yangiliklar';
+  'Cтраница подробностей': 'Tafsilotlar sahifasi';
+  'Личный кабинет': 'Shaxsiy kabinet';
+  'Онлайн чат телеграм': 'Onlayn telegram chat';
+  'Колл центр': 'Qo‘ng‘iroq markazi';
+  'Ответим на все вопросы': 'Barcha savollarga javob beramiz';
+  'Введите Имя': 'Ismingizni kiriting';
+  'Алмазарский р-н, Камарнисо, 13': 'Olmazor tumani, Kamarniso, 13';
+  Телефон: 'Telefon';
+  "Eng kamida 2ta harf bo'lishi kerak": "Eng kamida 2ta harf bo'lishi kerak";
+  'Telefon raqam xato': 'Telefon raqam xato';
+  '2025 © Все права защищены': '2025 © Barcha huquqlar himoyalangan.';
+  'Вход в аккаунт': 'Akkauntga kirish';
+  'Hомер телефона': 'Telefon raqami';
+  'Вход по E-mail': 'E-mail orqali kirish';
+  'Введите номер телефона': 'Telefon raqamingizni kiriting';
+  'Получить код': 'Kod olish';
+  'E-mail': 'E-mail';
+  'Введите ваш E-mail': 'E-mailingizni kiriting';
+  "Kodni to'liq kiriting": "Kodni to'liq kiriting";
+  'Слишком много попыток': 'Urinishlar juda ko‘p';
+  'Вы ввели неверные данные 5 раз': 'Siz noto‘g‘ri ma’lumotni 5 marta kiritdingiz. Kirish 30 daqiqaga bloklandi';
+  'Код аутентификации': 'Tasdiqlash kodi';
+  'Введите 5-значный код, который мы только что отправили на': 'Biz hozirgina yuborgan 4 xonali kodni kiriting';
+  'Отправить код повторно': 'Kodni qayta yuborish';
+  'Прислать код повторно через': 'Kodni qayta yuborish vaqti:';
+  Подтвердить: 'Tasdiqlash';
+  "Parol va tasdiqlash bir xil bo'lishi kerak": "Parol va tasdiqlash bir xil bo'lishi kerak";
+  'Parolni tasdiqlang': 'Parolni tasdiqlang';
+  "Eng kamida 8ta belgi bo'lishi kerak": "Eng kamida 8ta belgi bo'lishi kerak";
+  'Регистрация аккаунта': "Akkaunt ro'yxatdan o'tkazish";
+  'Создайте свой личный кабинет, чтобы управлять бронированиями': "Shaxsiy kabinet yarating, buyurtmalarni boshqaring, sevimlilarni saqlang va Simple Travel'ning barcha imkoniyatlaridan foydalaning";
+  'Придумайте пароль': 'Parol o‘ylab toping';
+  Parol: 'Parol';
+  'Введите пароль (минимум 8 символов)': 'Parolni kiriting (kamida 8 ta belgi)';
+  'Подтвердите пароль': 'Parolni tasdiqlang';
+  'Повторите пароль': 'Parolni qaytadan kiriting';
+  'Я согласен с условиями использования и политикой конфиденциальности': 'Men foydalanish shartlari va maxfiylik siyosatiga roziman';
+  Зарегистрироваться: 'Ro‘yxatdan o‘tish';
+  'Изменить пароль': 'Parolni o‘zgartirish';
+  'Измените пароль, чтобы обеспечить безопасность вашего аккаунта': "Akkauntingiz xavfsizligini ta'minlash uchun parolni o‘zgartiring";
+  'Текущий пароль': 'Joriy parol';
+  'Введите старый пароль': 'Eski parolni kiriting';
+  'Новый пароль': 'Yangi parol';
+  'Забыл пароль': 'Parolni unutdim';
+  'Сохранить новый пароль': 'Yangi parolni saqlash';
+  Сохранить: 'Saqlash';
+  'Давайте познакомимся!': 'Keling, tanishib olaylik!';
+  'Чтобы завершить регистрацию, пожалуйста, укажите ваше имя': 'Registratsiyani yakunlash uchun ismingizni kiriting';
+  'Тут ничего нет': 'Bu yerda hech narsa yo‘q';
+  'Выберите понравивщися тур': 'Sizga yoqqan turni tanlang';
+  'Найдите понравивщися тур на сайте simple travel': 'Simple travel saytida o‘zingizga yoqqan turni toping';
+  'Добавьте тур в избранное, нажав кнопку сохранить': 'Saqlash tugmasini bosish orqali turni saralanganlarga kiriting';
+  'Зайди в свой профиль и оформите тур': 'Profilingizga kiring va sayohatni rasmiylashtiring';
+  'Мои бронирования': 'Mening bronlarim';
+  'Мои попутчики': 'Hamrohlarim';
+  Настройки: 'Sozlamalar';
+  'Изменить аватар': 'Avatarni o‘zgartirish';
+  Изменение: "O'zgartirish";
+  'Контактные данные': 'Kontakt ma’lumotlari';
+  'Последние бронирования': 'Oxirgi bronlarim';
+  'Код бронирования': 'Bronlar kodi';
+  'Название услуги': 'Xizmat nomi';
+  'Место положение': 'Joylashuv';
+  Статус: 'Holati';
+  Действие: 'Harakat';
+  'Ko‘rsatilmoqda': 'Ko‘rsatish';
+  от: 'dan';
+  'Добавить попутчика': "Hamroh qo'shish";
+  'Пока нет попутчиков': 'Hozircha hamrohlar yo‘q';
+  'Добавьте своего первого попутчика': 'Birga rejalashtirish uchun birinchi hamrohingizni kiriting';
+  'Profilga kirish': 'Profilga kirish';
+  Kirish: 'Kirish';
+  'Izohingizni yozing': 'Izohingizni yozing';
+  "Sayohat haqida fikringizni baham ko'ring": "Sayohat haqida fikringizni baham ko'ring...";
+  'Пока нет бронирования': 'Hozircha bandlov yo‘q';
+  Yuborish: 'Yuborish';
+  'Izoh qoldirish': 'Izoh qoldirish';
+  'Bekor qilish': 'Bekor qilish';
+  'Sizning fikringiz': 'Sizning fikringiz';
+  'Reytingni tanlang': 'Reytingni tanlang';
+  Kutimoqda: 'Kutimoqda';
+  Tasdiqlanmoqda: 'Tasdiqlanmoqda';
+  'Bekor qilingan': 'Bekor qilingan';
+  Tasdiqlangan: 'Tasdiqlangan';
+  Tugallangan: 'Tugallangan';
+  "Ba'tafsil": "Ba'tafsil";
+  "To'lash": "To'lash";
+  "Ko'rsatilmoqda": "Ko'rsatilmoqda";
+  'Banner yuklashda xatolik yuz berdi': 'Banner yuklashda xatolik yuz berdi';
+  'Qayta urinish': 'Qayta urinish';
 };
 export default messages;

@@ -31,10 +31,11 @@ import { useParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import 'swiper/css';
-import Hotel1 from '../../../../public/images/hotel1.png';
 import Hotel2 from '../../../../public/images/hotel2.png';
 import Hotel3 from '../../../../public/images/hotel3.png';
 import Hotel4 from '../../../../public/images/hotel4.png';
+import Hotel_MEAL from '../../../../public/images/hotel_meal.png';
+import Hotel1 from '../../../../public/images/hotel_name.png';
 import Statue from '../../../../public/images/statue.png';
 import { TicketsDetailAPi } from '../lib/api';
 import HotelInfoItem from './HotelInfoItem';
@@ -363,8 +364,8 @@ export default function SingleTour() {
                 </p>
                 <div
                   className={clsx(
-                    'grid gap-[20px] max-lg:grid-cols-1 max-lg:w-full',
-                    data.languages.length > 0 ? 'grid-cols-4' : 'grid-cols-3',
+                    'grid gap-[10px] max-lg:grid-cols-1 max-lg:w-full',
+                    data.languages.length > 0 ? 'grid-cols-5' : 'grid-cols-4',
                     data.hotel_info.length > 0 ? 'mt-5' : 'mt-0',
                   )}
                 >
@@ -380,8 +381,37 @@ export default function SingleTour() {
                   >
                     <HotelInfoItem
                       img={Hotel1}
-                      title={t(`Тип`)}
+                      title={data.ticket_hotel[0].name}
+                      title_two={
+                        String(data.ticket_hotel[0].rating) + ' ' + t('звёзды')
+                      }
                       name={t('Отели')}
+                    />
+                  </motion.div>
+                  <motion.div
+                    key={index}
+                    custom={index}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: false, amount: 0.2 }}
+                    variants={slideIn}
+                    whileHover={{ scale: 1.05 }}
+                    className="w-full max-lg:w-full h-[200px] max-lg:h-auto cursor-pointer flex flex-col max-lg:flex-row-reverse justify-between p-[20px] bg-[#EDEEF140] border border-[#EDEEF1] shadow-md rounded-[20px] relative"
+                  >
+                    <HotelInfoItem
+                      img={Hotel_MEAL}
+                      title={(() => {
+                        const meal = data.ticket_hotel?.[0]?.meal_plan;
+
+                        const mealMap: Record<string, string> = {
+                          full_board: t('Все включено'),
+                          breakfast: t('Завтрак'),
+                          half_board: t('Полупансион'),
+                        };
+
+                        return mealMap[meal] || t('Все включено');
+                      })()}
+                      name={t('Питание')}
                     />
                   </motion.div>
                   <motion.div
