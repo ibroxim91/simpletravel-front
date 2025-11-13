@@ -36,6 +36,7 @@ import Hotel3 from '../../../../public/images/hotel3.png';
 import Hotel4 from '../../../../public/images/hotel4.png';
 import Hotel_MEAL from '../../../../public/images/hotel_meal.png';
 import Hotel1 from '../../../../public/images/hotel_name.png';
+import Hotel_Star from '../../../../public/images/hotel_star.png';
 import Statue from '../../../../public/images/statue.png';
 import { TicketsDetailAPi } from '../lib/api';
 import HotelInfoItem from './HotelInfoItem';
@@ -365,7 +366,7 @@ export default function SingleTour() {
                 <div
                   className={clsx(
                     'grid gap-[10px] max-lg:grid-cols-1 max-lg:w-full',
-                    data.languages.length > 0 ? 'grid-cols-5' : 'grid-cols-4',
+                    data.languages.length > 0 ? 'grid-cols-6' : 'grid-cols-5',
                     data.hotel_info.length > 0 ? 'mt-5' : 'mt-0',
                   )}
                 >
@@ -383,6 +384,26 @@ export default function SingleTour() {
                       img={Hotel1}
                       title={data.ticket_hotel[0].name}
                       name={t('Отели')}
+                    />
+                  </motion.div>
+                  <motion.div
+                    key={index}
+                    custom={index}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: false, amount: 0.2 }}
+                    variants={slideIn}
+                    whileHover={{ scale: 1.05 }}
+                    className="w-full max-lg:w-full h-full max-lg:h-auto cursor-pointer flex flex-col max-lg:flex-row-reverse justify-between p-[20px] bg-[#EDEEF140] border border-[#EDEEF1] shadow-md rounded-[20px] relative"
+                  >
+                    <HotelInfoItem
+                      img={Hotel_Star}
+                      title={
+                        data.ticket_hotel[0].rating.toString() +
+                        ' ' +
+                        t('yulduzli')
+                      }
+                      name={t('yulduzli')}
                     />
                   </motion.div>
                   <motion.div
