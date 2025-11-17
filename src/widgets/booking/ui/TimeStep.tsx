@@ -61,12 +61,26 @@ export default function TimeStep({ onNext, data }: Props) {
     });
   }, [where, whereTo, dispatch, returned, form]);
 
+  useEffect(() => {
+    const saved = localStorage.getItem('timesStepForm');
+    if (saved) {
+      const values = JSON.parse(saved);
+
+      setWhere(values.where);
+      setWhereTo(values.whereTo);
+      setDispatch(values.dispatch ? new Date(values.dispatch) : null);
+      setReturned(values.returned ? new Date(values.returned) : null);
+    }
+  }, []);
+
   function onSubmit(values: z.infer<typeof TimesStepForm>) {
     onNext();
     setWhere(values.where);
     setWhereTo(values.whereTo);
     setDispatch(values.dispatch);
     setReturned(values.returned);
+
+    localStorage.setItem('timesStepForm', JSON.stringify(values));
   }
 
   useEffect(() => {

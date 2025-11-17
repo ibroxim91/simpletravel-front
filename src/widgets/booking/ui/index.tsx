@@ -14,8 +14,8 @@ import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
-import { useParams } from 'next/navigation';
-import { useState } from 'react';
+import { useParams, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { Ticketorder_Api } from '../lib/api';
 import formStore from '../lib/hook';
 import ParticipantsStep from './ParticipantsStep';
@@ -37,8 +37,35 @@ export default function Booking() {
     services: 4,
     payment: 5,
   };
-  const [activeTab, setActiveTab] = useState('time');
+  const searchParams = useSearchParams();
+  const tabsParms = searchParams.get('tab') || 'time';
+  const [activeTab, setActiveTab] = useState(tabsParms);
   const [step, setStep] = useState<number>(1);
+
+  useEffect(() => {
+    if (tabsParms) {
+      setStep(tabSteps[tabsParms]);
+    }
+  }, [tabsParms]);
+  const setTabsPaarams = (tab: string) => {
+    setActiveTab(tab);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('tab', tab);
+
+    route.replace(`?${params.toString()}`);
+  };
+
+  useEffect(() => {
+    if (activeTab === 'time') {
+      localStorage.removeItem('info');
+      localStorage.removeItem('participantsForm');
+      localStorage.removeItem('timesStepForm');
+      localStorage.removeItem('selectedExcursions');
+      localStorage.removeItem('selectedServices');
+      localStorage.removeItem('totalPrice');
+      clearUser();
+    }
+  }, [activeTab]);
 
   const variants = {
     hidden: { opacity: 0, x: 80 },
@@ -81,8 +108,11 @@ export default function Booking() {
         <div
           className="w-[40px] h-[40px] cursor-pointer border-2 border-[#DFDFDF] bg-white rounded-full flex items-center justify-center"
           onClick={() => {
-            route.back();
+            route.push('/selectour');
             reset();
+            localStorage.removeItem('info');
+            localStorage.removeItem('participantsForm');
+            localStorage.removeItem('timesStepForm');
           }}
         >
           <ChevronLeftIcon sx={{ color: '#031753' }} />
@@ -492,8 +522,7 @@ export default function Booking() {
                     <TimeStep
                       data={data}
                       onNext={() => {
-                        setActiveTab('participants');
-                        setStep(tabSteps['participants']);
+                        setTabsPaarams('participants');
                       }}
                     />
                   </motion.div>
@@ -513,12 +542,10 @@ export default function Booking() {
                         minPerson={data.data.min_person}
                         maxPerson={data.data.max_person}
                         onNext={() => {
-                          setActiveTab('package');
-                          setStep(tabSteps['package']);
+                          setTabsPaarams('package');
                         }}
                         onPrev={() => {
-                          setActiveTab('time');
-                          setStep(tabSteps['time']);
+                          setTabsPaarams('time');
                         }}
                       />
                     )}
@@ -544,16 +571,13 @@ export default function Booking() {
                           data &&
                           data.data.paid_extra_service.length === 0
                         ) {
-                          setActiveTab('payment');
-                          setStep(tabSteps['payment']);
+                          setTabsPaarams('payment');
                         } else {
-                          setActiveTab('services');
-                          setStep(tabSteps['services']);
+                          setTabsPaarams('services');
                         }
                       }}
                       onPrev={() => {
-                        setActiveTab('participants');
-                        setStep(tabSteps['participants']);
+                        setTabsPaarams('participants');
                         clearUser();
                       }}
                     />
@@ -575,12 +599,10 @@ export default function Booking() {
                           data={data}
                           setOrderId={setOrderId}
                           onNext={() => {
-                            setActiveTab('payment');
-                            setStep(tabSteps['payment']);
+                            setTabsPaarams('payment');
                           }}
                           onPrev={() => {
-                            setActiveTab('package');
-                            setStep(tabSteps['package']);
+                            setTabsPaarams('package');
                           }}
                         />
                       </motion.div>
@@ -601,8 +623,16 @@ export default function Booking() {
                       data={data}
                       orderId={orderId}
                       onPrev={() => {
-                        setActiveTab('services');
-                        setStep(tabSteps['services']);
+                        if (
+                          data &&
+                          data.data.extra_service.length === 0 &&
+                          data &&
+                          data.data.paid_extra_service.length === 0
+                        ) {
+                          setTabsPaarams('package');
+                        } else {
+                          setTabsPaarams('services');
+                        }
                       }}
                     />
                   </motion.div>

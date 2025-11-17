@@ -1,6 +1,6 @@
 'use client';
 
-import loaderAnimation from '@/assets/lottie/Travel Tour.json';
+import loaderAnimation from '@/assets/lottie/Loading spinner simplui.json';
 import { Link, useRouter } from '@/shared/config/i18n/navigation';
 import formatDate from '@/shared/lib/formatDate';
 import { formatPrice } from '@/shared/lib/formatPrice';
@@ -773,9 +773,9 @@ export default function Selectour() {
                     src={loaderAnimation}
                     style={{ height: '240px', width: '240px' }}
                   />
-                  <p className="text-xl font-semibold mt-3 text-gray-700">
+                  {/* <p className="text-xl font-semibold mt-3 text-gray-700">
                     {t('Загрузка')}
-                  </p>
+                  </p> */}
                 </div>
               ) : (
                 <>

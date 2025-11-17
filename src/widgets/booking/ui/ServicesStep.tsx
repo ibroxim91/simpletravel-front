@@ -43,6 +43,36 @@ export default function ServicesStep({
   const [selectedExcursions, setSelectedExcursions] = useState<number[]>([]);
   const [selectedServices, setSelectedServices] = useState<number[]>([]);
 
+  useEffect(() => {
+    const savedExcursions = localStorage.getItem('selectedExcursions');
+    const savedServices = localStorage.getItem('selectedServices');
+
+    if (savedExcursions) {
+      const parsed = JSON.parse(savedExcursions);
+      setSelectedExcursions(parsed);
+      setExcursions(parsed);
+      form.setValue('excursions', parsed);
+    }
+
+    if (savedServices) {
+      const parsed = JSON.parse(savedServices);
+      setSelectedServices(parsed);
+
+      const selectedServicesData = data?.data.extra_service
+        .filter((item) => parsed.includes(item.id))
+        .map((item) => ({
+          id: item.id,
+          name: item.name,
+        }));
+
+      if (selectedServicesData) {
+        setToursCategory(selectedServicesData);
+      }
+
+      form.setValue('additional', parsed);
+    }
+  }, [data]);
+
   const { mutate, isPending } = useMutation({
     mutationFn: (body: Create_Ticketorder) =>
       Ticketorder_Api.ticketorder_create(body),
@@ -60,7 +90,6 @@ export default function ServicesStep({
   const {
     excursions,
     setExcursions,
-    user,
     tours_category,
     setToursCategory,
     setPaidService,
@@ -128,6 +157,12 @@ export default function ServicesStep({
   }
 
   function onSubmit() {
+    const timeData = JSON.parse(localStorage.getItem('timesStepForm') || '{}');
+    const participantsData = JSON.parse(
+      localStorage.getItem('participantsForm') || '{}',
+    );
+    const tariff = JSON.parse(localStorage.getItem('info') || '{}');
+
     setExcursions(selectedExcursions);
     const selectedServicesData = data?.data.extra_service
       .filter((service) => selectedServices.includes(service.id))
@@ -139,14 +174,13 @@ export default function ServicesStep({
     if (selectedServicesData) {
       setToursCategory(selectedServicesData);
     }
-    const servicesIds = store.tours_category.map((e) => e.id);
-    const userIds = store.user.map((e) => e.userId);
+
     const basePrice = data?.data.price || 0;
     const paidServicesTotal = store.paidService.reduce(
       (acc, service) => acc + service.price,
       0,
     );
-    const userPrice = basePrice * user.length;
+    const userPrice = basePrice * participantsData.participants.length;
 
     const total_price =
       paidServicesTotal +
@@ -154,28 +188,33 @@ export default function ServicesStep({
       store.transport.price +
       userPrice;
     setTotalPrice(total_price);
-    if (
-      store.returned &&
-      store.dispatch &&
-      store.transport &&
-      id &&
-      total_price
-    ) {
+    if (id && total_price && tariff.transport) {
       mutate({
-        departure: store.where,
-        arrival_time: formatDate.format(store?.returned, 'YYYY-MM-DD'),
-        departure_date: formatDate.format(store?.dispatch, 'YYYY-MM-DD'),
-        destination: store.whereTo,
-        extra_paid_service: store.excursions,
-        extra_service: servicesIds,
-        participant: userIds,
-        tariff: store.tariff.tariff.name,
-        transport: store.transport.transport.name,
+        departure: timeData.where,
+        destination: timeData.whereTo,
+        departure_date: formatDate.format(timeData.dispatch, 'YYYY-MM-DD'),
+        arrival_time: formatDate.format(timeData.returned, 'YYYY-MM-DD'),
+
+        extra_service: selectedExcursions,
+        extra_paid_service: selectedServices,
+
+        participant: participantsData.userIds,
+
+        tariff: tariff.tariff.name,
+        transport: tariff.transport.transport.name,
         ticket: Number(id),
-        total_price: total_price,
+        total_price,
       });
     }
+    localStorage.setItem(
+      'selectedExcursions',
+      JSON.stringify(selectedExcursions),
+    );
+    localStorage.setItem('selectedServices', JSON.stringify(selectedServices));
+    localStorage.setItem('totalPrice', JSON.stringify(total_price));
   }
+
+  console.log(form.formState.errors);
 
   return (
     <div>

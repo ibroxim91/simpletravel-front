@@ -39,16 +39,7 @@ export default function TourInfoStep({
     transport: null,
   });
 
-  const {
-    setTransport: setStoreTransport,
-    user,
-    where,
-    whereTo,
-    returned,
-    dispatch,
-    tariff,
-    setTotalPrice,
-  } = formStore();
+  const { setTransport: setStoreTransport, tariff } = formStore();
 
   useEffect(() => {
     if (
@@ -83,6 +74,11 @@ export default function TourInfoStep({
   });
 
   const handleNext = () => {
+    const timeData = JSON.parse(localStorage.getItem('timesStepForm') || '{}');
+    const participantsData = JSON.parse(
+      localStorage.getItem('participantsForm') || '{}',
+    );
+
     if (transport && transport.transport) {
       setStoreTransport({
         price: transport.price,
@@ -98,28 +94,45 @@ export default function TourInfoStep({
       (data?.data.paid_extra_service &&
         data.data.paid_extra_service.length > 0);
 
-    const basePrice = data?.data.price || 0;
-    const userPrice = basePrice * (user?.length || 0);
+    const basePrice = data && data.data.price;
+    const userPrice =
+      basePrice && basePrice * participantsData.participants.length;
     const total_price = userPrice;
 
-    setTotalPrice(total_price);
-
-    if (returned && dispatch && id && total_price && !hasExtra) {
+    if (total_price && !hasExtra) {
       mutate({
-        departure: where,
-        arrival_time: formatDate.format(returned, 'YYYY-MM-DD'),
-        departure_date: formatDate.format(dispatch, 'YYYY-MM-DD'),
-        destination: whereTo,
+        departure: timeData.where,
+        destination: timeData.whereTo,
+        departure_date: formatDate.format(timeData.dispatch, 'YYYY-MM-DD'),
+        arrival_time: formatDate.format(timeData.returned, 'YYYY-MM-DD'),
+
         extra_paid_service: [],
         extra_service: [],
-        participant: user.map((u) => u.userId),
+
+        participant: participantsData.userIds,
+
         tariff: tariff.tariff.name,
         transport: transport.transport?.name,
         ticket: Number(id),
         total_price,
       });
+      localStorage.setItem(
+        'info',
+        JSON.stringify({
+          transport,
+          tariff: tariff.tariff.name,
+        }),
+      );
+      localStorage.setItem('totalPrice', JSON.stringify(total_price));
     } else {
       onNext();
+      localStorage.setItem(
+        'info',
+        JSON.stringify({
+          transport,
+          tariff: tariff.tariff.name,
+        }),
+      );
     }
   };
 

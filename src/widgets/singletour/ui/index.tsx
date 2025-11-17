@@ -182,6 +182,8 @@ export default function SingleTour() {
     return <TourDetailLoading />;
   }
 
+  console.log(data);
+
   return (
     <div className="bg-white">
       <div>
@@ -366,122 +368,78 @@ export default function SingleTour() {
                 <div
                   className={clsx(
                     'grid gap-[10px] max-lg:grid-cols-1 max-lg:w-full',
-                    data.languages.length > 0 ? 'grid-cols-6' : 'grid-cols-5',
+                    data.languages.length > 0 && data.ticket_hotel.length > 0
+                      ? 'grid-cols-6'
+                      : 'grid-cols-5',
                     data.hotel_info.length > 0 ? 'mt-5' : 'mt-0',
                   )}
                 >
-                  <motion.div
-                    key={index}
-                    custom={index}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: false, amount: 0.2 }}
-                    variants={slideIn}
-                    whileHover={{ scale: 1.05 }}
-                    className="w-full max-lg:w-full h-full max-lg:h-auto cursor-pointer flex flex-col max-lg:flex-row-reverse justify-between p-[20px] bg-[#EDEEF140] border border-[#EDEEF1] shadow-md rounded-[20px] relative"
-                  >
-                    <HotelInfoItem
-                      img={Hotel1}
-                      title={data.ticket_hotel[0].name}
-                      name={t('Отели')}
-                    />
-                  </motion.div>
-                  <motion.div
-                    key={index}
-                    custom={index}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: false, amount: 0.2 }}
-                    variants={slideIn}
-                    whileHover={{ scale: 1.05 }}
-                    className="w-full max-lg:w-full h-full max-lg:h-auto cursor-pointer flex flex-col max-lg:flex-row-reverse justify-between p-[20px] bg-[#EDEEF140] border border-[#EDEEF1] shadow-md rounded-[20px] relative"
-                  >
-                    <HotelInfoItem
-                      img={Hotel_Star}
-                      title={
-                        data.ticket_hotel[0].rating.toString() +
-                        ' ' +
-                        t('yulduzli')
-                      }
-                      name={t('yulduzli')}
-                    />
-                  </motion.div>
-                  <motion.div
-                    key={index}
-                    custom={index}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: false, amount: 0.2 }}
-                    variants={slideIn}
-                    whileHover={{ scale: 1.05 }}
-                    className="w-full max-lg:w-full h-full max-lg:h-auto cursor-pointer flex flex-col max-lg:flex-row-reverse justify-between p-[20px] bg-[#EDEEF140] border border-[#EDEEF1] shadow-md rounded-[20px] relative"
-                  >
-                    <HotelInfoItem
-                      img={Hotel_MEAL}
-                      title={(() => {
+                  {[
+                    data.ticket_hotel.length > 0 && {
+                      id: data.ticket_hotel[0].id + '-name',
+                      img: Hotel1,
+                      title: data.ticket_hotel[0].name,
+                      name: t('Отели'),
+                    },
+                    data.ticket_hotel.length > 0 && {
+                      id: data.ticket_hotel[0].id + '-rating',
+                      img: Hotel_Star,
+                      title: `${data.ticket_hotel[0].rating} ${t('yulduzli')}`,
+                      name: t('yulduzli'),
+                    },
+                    {
+                      id: 'meal',
+                      img: Hotel_MEAL,
+                      title: (() => {
                         const meal = data.ticket_hotel?.[0]?.meal_plan;
-
                         const mealMap: Record<string, string> = {
                           full_board: t('Все включено'),
                           breakfast: t('Завтрак'),
                           half_board: t('Полупансион'),
                         };
-
                         return mealMap[meal] || t('Все включено');
-                      })()}
-                      name={t('Питание')}
-                    />
-                  </motion.div>
-                  <motion.div
-                    key={index}
-                    custom={index}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: false, amount: 0.2 }}
-                    variants={slideIn}
-                    whileHover={{ scale: 1.05 }}
-                    className="w-full max-lg:w-full h-full max-lg:h-auto cursor-pointer flex flex-col max-lg:flex-row-reverse justify-between p-[20px] bg-[#EDEEF140] border border-[#EDEEF1] shadow-md rounded-[20px] relative"
-                  >
-                    <HotelInfoItem
-                      img={Hotel2}
-                      title={t(`Продолжительность`)}
-                      name={`${data.duration_days} ${t('дня')}`}
-                    />
-                  </motion.div>
-                  <motion.div
-                    key={index}
-                    custom={index}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: false, amount: 0.2 }}
-                    variants={slideIn}
-                    whileHover={{ scale: 1.05 }}
-                    className="w-full max-lg:w-full h-full max-lg:h-auto cursor-pointer flex flex-col max-lg:flex-row-reverse justify-between p-[20px] bg-[#EDEEF140] border border-[#EDEEF1] shadow-md rounded-[20px] relative"
-                  >
-                    <HotelInfoItem
-                      img={Hotel3}
-                      title={t(`Размер группы`)}
-                      name={`${data.passenger_count} ${t('человек')}`}
-                    />
-                  </motion.div>
-                  {data.languages.length > 0 && (
-                    <motion.div
-                      key={index}
-                      custom={index}
-                      initial="hidden"
-                      whileInView="visible"
-                      viewport={{ once: false, amount: 0.2 }}
-                      variants={slideIn}
-                      whileHover={{ scale: 1.05 }}
-                      className="w-full max-lg:w-full h-full max-lg:h-auto cursor-pointer flex flex-col max-lg:flex-row-reverse justify-between p-[20px] bg-[#EDEEF140] border border-[#EDEEF1] shadow-md rounded-[20px] relative"
-                    >
-                      <HotelInfoItem
-                        img={Hotel4}
-                        title={t(`Языки`)}
-                        name={data.languages}
-                      />
-                    </motion.div>
-                  )}
+                      })(),
+                      name: t('Питание'),
+                    },
+                    {
+                      id: 'duration',
+                      img: Hotel2,
+                      title: t('Продолжительность'),
+                      name: `${data.duration_days} ${t('дня')}`,
+                    },
+                    {
+                      id: 'group_size',
+                      img: Hotel3,
+                      title: t('Размер группы'),
+                      name: `${data.passenger_count} ${t('человек')}`,
+                    },
+                    data.languages.length > 0 && {
+                      id: 'languages',
+                      img: Hotel4,
+                      title: t('Языки'),
+                      name: data.languages,
+                    },
+                  ]
+                    .filter(Boolean)
+                    /* eslint-disable  @typescript-eslint/no-explicit-any */
+                    .map((item: any, index) => (
+                      <motion.div
+                        key={item.id}
+                        custom={index}
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: false, amount: 0.2 }}
+                        variants={slideIn}
+                        whileHover={{ scale: 1.05 }}
+                        className="w-full max-lg:w-full h-full max-lg:h-auto cursor-pointer flex flex-col max-lg:flex-row-reverse justify-between p-[20px] bg-[#EDEEF140] border border-[#EDEEF1] shadow-md rounded-[20px] relative"
+                      >
+                        <HotelInfoItem
+                          img={item.img}
+                          title={item.title}
+                          name={item.name}
+                        />
+                      </motion.div>
+                    ))}
                 </div>
               </motion.div>
               {data.ticket_included_services.length > 0 && (

@@ -34,7 +34,7 @@ import { format } from 'date-fns';
 import { Plus, TrashIcon, UserIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import z from 'zod';
@@ -63,6 +63,9 @@ export default function ParticipantsStep({
   const [previewFile, setPreviewFile] = useState<PassportType | null>(null);
   const { addUser, user } = formStore();
   const [userIds, setUserIds] = useState<(number | undefined)[]>([]);
+  const [selectedUserIds, setSelectedUserIds] = useState<Set<number>>(
+    new Set(),
+  );
 
   const {
     data: allParticipant,
@@ -83,7 +86,6 @@ export default function ParticipantsStep({
       }
       return undefined;
     },
-
     initialPageParam: 1,
   });
 
@@ -118,9 +120,44 @@ export default function ParticipantsStep({
   });
   const queryClient = useQueryClient();
 
+  useEffect(() => {
+    const saved = localStorage.getItem('participantsForm');
+
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+
+        if (parsed.participants && Array.isArray(parsed.participants)) {
+          if (parsed.userIds && Array.isArray(parsed.userIds)) {
+            setUserIds(parsed.userIds);
+
+            const validUserIds = parsed.userIds.filter(
+              (id: number) => id !== undefined && id !== null,
+            );
+            setSelectedUserIds(new Set(validUserIds));
+            setUserIds(validUserIds);
+          }
+          /* eslint-disable  @typescript-eslint/no-explicit-any */
+          form.reset({
+            participants: parsed.participants.map((p: any) => ({
+              gender: p.gender,
+              firstName: p.firstName,
+              lastName: p.lastName,
+              phone: p.phone,
+              passport: p.passport || null,
+              date: p.date ? new Date(p.date) : null,
+            })),
+          });
+        }
+      } catch (error) {
+        console.error('localStorage parse error:', error);
+      }
+    }
+  }, []);
+
   async function onSubmit(values: z.infer<typeof ParticipantsForm>) {
     if (fields.length < minPerson) {
-      toast.error(`Kamida ${minPerson} ta ishtirokchi kerak`);
+      toast.error(t(`Kamida ${minPerson} ta ishtirokchi kerak`));
       return;
     }
 
@@ -187,6 +224,17 @@ export default function ParticipantsStep({
 
       toast.success(t('Hamroh(lar) muvaffaqiyatli saqlandi'));
       queryClient.refetchQueries({ queryKey: ['participant_all'] });
+      const currentValues = form.getValues();
+      const saveData = {
+        participants: currentValues.participants?.map((p) => ({
+          ...p,
+          date: p.date ? p.date.toISOString() : null,
+        })),
+        userIds: userIds,
+      };
+
+      localStorage.setItem('participantsForm', JSON.stringify(saveData));
+
       onNext();
     } catch {
       toast.error(t('Xatolik yuz berdi'));
@@ -196,6 +244,19 @@ export default function ParticipantsStep({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        {/* Min/Max Info Banner */}
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+          <div className="flex items-center gap-2 text-blue-800">
+            <UserIcon className="w-5 h-5" />
+            <p className="font-medium">
+              {t('Ishtirokchilar soni')}: {fields.length} / {maxPerson}
+            </p>
+          </div>
+          <p className="text-sm text-blue-600 mt-1">
+            {t('Eng kamida')}: {minPerson} ta, {t("Eng ko'pi")}: {maxPerson} ta
+          </p>
+        </div>
+
         {fields.map((field, index) => {
           const dateValue = form.watch(`participants.${index}.date`);
           const passportValue = form.watch(`participants.${index}.passport`);
@@ -206,10 +267,20 @@ export default function ParticipantsStep({
               className="bg-white p-5 rounded-2xl relative space-y-6"
             >
               <div className="w-full flex justify-end">
-                {fields.length > 1 && (
+                {fields.length > minPerson && (
                   <button
                     type="button"
                     onClick={() => {
+                      const removedUserId = userIds[index];
+
+                      if (removedUserId) {
+                        setSelectedUserIds((prev) => {
+                          const newSet = new Set(prev);
+                          newSet.delete(removedUserId);
+                          return newSet;
+                        });
+                      }
+
                       remove(index);
                       setUserIds((prev) => prev.filter((_, i) => i !== index));
                     }}
@@ -229,14 +300,28 @@ export default function ParticipantsStep({
                   onValueChange={(value) => {
                     const selectedId = Number(value);
 
-                    // ✅ userId holatini saqlaymiz
+                    if (selectedUserIds.has(selectedId)) {
+                      toast.error(t('Bu ishtirokchi allaqachon tanlangan'));
+                      return;
+                    }
+
+                    const previousUserId = userIds[index];
+                    if (previousUserId) {
+                      setSelectedUserIds((prev) => {
+                        const newSet = new Set(prev);
+                        newSet.delete(previousUserId);
+                        return newSet;
+                      });
+                    }
+
+                    setSelectedUserIds((prev) => new Set(prev).add(selectedId));
+
                     setUserIds((prev) => {
                       const updated = [...prev];
                       updated[index] = selectedId;
                       return updated;
                     });
 
-                    // ✅ Foydalanuvchini olib kelamiz
                     User_Api.getOneParticipant({ id: selectedId }).then(
                       (res) => {
                         const p = res.data;
@@ -292,11 +377,25 @@ export default function ParticipantsStep({
                       (page) => page.data.data.results.length > 0,
                     ) ? (
                       allParticipant.pages.map((page) =>
-                        page.data.data.results.map((p) => (
-                          <SelectItem key={p.id} value={`${p.id}`}>
-                            {p.first_name} {p.last_name}
-                          </SelectItem>
-                        )),
+                        page.data.data.results.map((p) => {
+                          const isDisabled =
+                            selectedUserIds.has(p.id) &&
+                            userIds[index] !== p.id;
+
+                          return (
+                            <SelectItem
+                              key={p.id}
+                              value={`${p.id}`}
+                              disabled={isDisabled}
+                              className={cn(
+                                isDisabled && 'opacity-50 cursor-not-allowed',
+                              )}
+                            >
+                              {p.first_name} {p.last_name}
+                              {isDisabled && ' (tanlangan)'}
+                            </SelectItem>
+                          );
+                        }),
                       )
                     ) : (
                       <div className="text-center text-[#909091] p-3">
@@ -684,7 +783,9 @@ export default function ParticipantsStep({
               type="button"
               onClick={() => {
                 if (fields.length >= maxPerson) {
-                  toast.error(`Maksimal ishtirokchilar soni ${maxPerson} ta`);
+                  toast.error(
+                    t(`Maksimal ishtirokchilar soni ${maxPerson} ta`),
+                  );
                   return;
                 }
                 append({

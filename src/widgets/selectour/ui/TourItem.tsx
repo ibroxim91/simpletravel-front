@@ -1,3 +1,4 @@
+import LocationTour from '@/assets/icons/LocationTour';
 import { BASE_URL } from '@/shared/config/api/URLs';
 import { Link, useRouter } from '@/shared/config/i18n/navigation';
 import { LanguageRoutes } from '@/shared/config/i18n/types';
@@ -10,14 +11,7 @@ import Rating from '@mui/material/Rating';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
-import {
-  CalendarDays,
-  Hotel,
-  MapPinCheckInside,
-  Plane,
-  Star,
-  User,
-} from 'lucide-react';
+import { CalendarDays, Hotel, Plane, Star, User } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
@@ -142,30 +136,28 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
             <h1 className="text-2xl text-[#031753] font-semibold">
               {data.title}
             </h1>
-            <div className="flex items-center">
-              <MapPinCheckInside
-                fill="#084FE3"
-                color="white"
-                className="size-8"
-              />
-              <p className="text-[#031753]">{data.destination}</p>
+            <div className="flex gap-2 flex-col">
+              <div className="flex items-center">
+                <LocationTour width={24} height={24} color="#084FE3" />
+                <p className="text-[#031753]">{data.destination}</p>
+              </div>
+              {data.ticket_hotel.length > 0 && (
+                <div className="flex items-center">
+                  <Hotel color="#084FE3" width={24} height={24} />
+                  <p className="text-[#031753] px-1 line-clamp-1">
+                    {data.ticket_hotel[0].name}
+                  </p>
+                </div>
+              )}
+              {data.ticket_hotel.length > 0 && (
+                <div className="flex items-center">
+                  <Star color="#084FE3" width={24} height={24} />
+                  <p className="text-[#031753] px-1">
+                    {data.ticket_hotel[0].rating} {t('звёзды')}
+                  </p>
+                </div>
+              )}
             </div>
-            {data.ticket_hotel.length > 0 && (
-              <div className="flex items-center mt-2 px-2">
-                <Hotel color="#084FE3" className="size-5" />
-                <p className="text-[#031753] px-1 line-clamp-1">
-                  {data.ticket_hotel[0].name}
-                </p>
-              </div>
-            )}
-            {data.ticket_hotel.length > 0 && (
-              <div className="flex items-center mt-2 px-2">
-                <Star color="#084FE3" className="size-5" />
-                <p className="text-[#031753] px-1">
-                  {data.ticket_hotel[0].rating} {t('звёзды')}
-                </p>
-              </div>
-            )}
           </div>
 
           <ul className="px-6 text-[#646465] text-md list-disc items-center mt-5">
@@ -178,12 +170,12 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
             <button className="bg-[#1764FC] text-white text-sm rounded-full px-4 py-4 cursor-pointer max-xl:w-full">
               {formatPrice(data.price, locale as LanguageRoutes, true)}
             </button>
-            <div className="flex gap-8 items-center  text-[#646465] text-sm">
-              <div className="flex gap-3 text-[12px] items-center">
+            <div className="flex gap-8 items-center  text-[#646465] text-lg">
+              <div className="flex gap-3 text-sm items-center">
                 <Plane fill="#084FE3" color="#084FE3" className="size-5" />
                 <p>{formatDate.format(data.departure_time, 'DD MMM')}</p>
               </div>
-              <ul className="flex items-center text-[12px] gap-8 text-center">
+              <ul className="flex items-center text-sm gap-8 text-center">
                 <li className="flex items-center gap-2">
                   <User color="#084FE3" className="size-5" />
                   {data.passenger_count}

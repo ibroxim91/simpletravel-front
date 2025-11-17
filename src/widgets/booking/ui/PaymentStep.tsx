@@ -23,9 +23,26 @@ type Props = {
   orderId: number | undefined;
 };
 
+interface User {
+  date: string;
+  firstName: string;
+  gender: string;
+  lastName: string;
+  passport: {
+    id: number;
+    image: string;
+  }[];
+}
+
 export default function PaymentStep({ onPrev, data, orderId }: Props) {
   const t = useTranslations();
   const { locale } = useParams();
+  const timeData = JSON.parse(localStorage.getItem('timesStepForm') || '{}');
+  const participantsData = JSON.parse(
+    localStorage.getItem('participantsForm') || '{}',
+  );
+  const tariff = JSON.parse(localStorage.getItem('info') || '{}');
+  const price = JSON.parse(localStorage.getItem('totalPrice') || '0');
   const [isPaid, setIsPaid] = useState<boolean>(false);
   const [isPaidMobile, setIsPaidMobile] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,8 +50,6 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
   const route = useRouter();
   const [paymentTypes, setPaymentType] = useState<string | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
-  const { where, whereTo, dispatch, returned, user, transport, tariff } =
-    formStore();
 
   const { mutate, isPending } = useMutation({
     mutationFn: ({
@@ -110,8 +125,7 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
         <hr className="h-[2px] my-[24px] bg-[#DFDFDF] " />
         <div className="flex my-5 justify-between flex-col items-start gap-2 bg-[#EDEEF180] p-[20px] rounded-[20px] border-2 border-[#EDEEF180]">
           <h1 className="text-2xl font-bold text-[#212122]">
-            {store.total_price &&
-              formatPrice(store.total_price, locale as LanguageRoutes, true)}
+            {price && formatPrice(price, locale as LanguageRoutes, true)}
           </h1>
           <p className="text-[#050B08] font-medium">{t('Общая сумма')}</p>
         </div>
@@ -236,7 +250,12 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
             {t('Подробности заказа')}
           </h1>
           <button
-            onClick={() => downloadPdf({ lang: 'uz', order_id: orderId! })}
+            onClick={() =>
+              downloadPdf({
+                lang: locale as LanguageRoutes,
+                order_id: orderId!,
+              })
+            }
             className="flex items-center gap-[10px] cursor-pointer px-[15px] py-[10px] border-2 rounded-full border-[#DFDFDF] max-lg:w-full justify-center hover:bg-gray-50 transition-colors"
           >
             <InsertDriveFileIcon sx={{ color: '#031753' }} />
@@ -249,53 +268,61 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
         <h1 className="mt-5 text-lg font-bold text-[#212122]">{t('Дата')}</h1>
         <div className="grid grid-cols-2 w-full my-2 bg-[#EDEEF1] px-[8px] py-[5px] rounded-[8px] text-[#646465]">
           <p className="text-md">{t('Откуда')}</p>
-          <p className="break-words text-end !text-[#212122]">{where}</p>
+          <p className="break-words text-end !text-[#212122]">
+            {timeData.where}
+          </p>
         </div>
 
         <div className="grid grid-cols-2 w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465]">
           <p className="text-md">{t('Куда')}</p>
-          <p className="text-[#212122] break-words text-end">{whereTo}</p>
+          <p className="text-[#212122] break-words text-end">
+            {timeData.whereTo}
+          </p>
         </div>
 
         <div className="grid grid-cols-2 items-center justify-between w-full my-2 bg-[#EDEEF1] px-[8px] py-[5px] rounded-[8px] text-[#646465]">
           <p className="text-md">{t('Время вылета')}</p>
           <p className="text-[#212122] break-words text-end max-md:px-5">
-            {dispatch && formatDate.format(dispatch, 'DD-MM-YYYY')}
+            {timeData.dispatch &&
+              formatDate.format(timeData.dispatch, 'DD-MM-YYYY')}
           </p>
         </div>
 
         <div className="grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465]">
           <p className="text-md">{t('Время возвращения')}</p>
           <p className="text-[#212122] text-end break-words max-md:px-5">
-            {returned && formatDate.format(returned, 'DD-MM-YYYY')}
+            {timeData.returned &&
+              formatDate.format(timeData.returned, 'DD-MM-YYYY')}
           </p>
         </div>
 
         <h1 className="mt-5 text-lg font-bold text-[#212122]">
           {t('Мои попутчики')}
         </h1>
-        {user.map((e, index) => (
-          <>
-            <div
-              key={index}
-              className={`grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465] 
+        {participantsData &&
+          participantsData.participants &&
+          participantsData.participants.map((e: User, index: number) => (
+            <>
+              <div
+                key={index}
+                className={`grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465] 
               ${index % 2 === 0 ? 'bg-[#EDEEF1]' : 'bg-white'}`}
-            >
-              <p>
-                {t('Мои попутчики')} {index + 1}
-              </p>
-              <p className="text-[#212122] text-end break-words">
-                {e.firstName} {e.lastName}
-              </p>
-            </div>
-            <div className="grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465]">
-              <p className="text-md">{t('Дата рождения')}</p>
-              <p className="!text-black text-end break-words max-md:px-5">
-                {e.birthDate && formatDate.format(e.birthDate, 'DD-MM-YYYY')}
-              </p>
-            </div>
-          </>
-        ))}
+              >
+                <p>
+                  {t('Мои попутчики')} {index + 1}
+                </p>
+                <p className="text-[#212122] text-end break-words">
+                  {e.firstName} {e.lastName}
+                </p>
+              </div>
+              <div className="grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465]">
+                <p className="text-md">{t('Дата рождения')}</p>
+                <p className="!text-black text-end break-words max-md:px-5">
+                  {e.date && formatDate.format(e.date, 'DD-MM-YYYY')}
+                </p>
+              </div>
+            </>
+          ))}
 
         <h1 className="mt-5 text-lg font-bold text-[#212122]">
           {t('Турпакет')}
@@ -329,20 +356,23 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
             </p>
           ))}
         </div>
+        {tariff && tariff.transport && (
+          <>
+            <div className="grid grid-cols-2 items-center justify-between w-full my-2 bg-[#EDEEF1] px-[8px] py-[5px] rounded-[8px] text-[#646465]">
+              <p className="text-md">{t('Тип пакета')}</p>
+              <p className="text-[#212122] text-end break-words">
+                {tariff.tariff}
+              </p>
+            </div>
 
-        <div className="grid grid-cols-2 items-center justify-between w-full my-2 bg-[#EDEEF1] px-[8px] py-[5px] rounded-[8px] text-[#646465]">
-          <p className="text-md">{t('Тип пакета')}</p>
-          <p className="text-[#212122] text-end break-words">
-            {tariff.tariff.name}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465]">
-          <p className="text-md">{t('Транспорт')}</p>
-          <p className="text-[#212122] text-end break-words">
-            {transport.transport.name}
-          </p>
-        </div>
+            <div className="grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465]">
+              <p className="text-md">{t('Транспорт')}</p>
+              <p className="text-[#212122] text-end break-words">
+                {tariff.transport.transport.name}
+              </p>
+            </div>
+          </>
+        )}
 
         {store.paidService.length > 0 && (
           <>
