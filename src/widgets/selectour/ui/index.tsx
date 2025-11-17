@@ -140,7 +140,7 @@ export default function Selectour() {
     };
 
     setFilterLocal(filterData);
-    setSelectedDestinations(destination); // bo‘sh bo‘lsa '' bo‘ladi
+    setSelectedDestinations(destination);
   }, [searchParams]);
 
   const { data: ticket, isLoading } = useQuery({
@@ -222,7 +222,7 @@ export default function Selectour() {
     const params = new URLSearchParams(searchParams.toString());
     params.set('page', currentPage.toString());
 
-    router.replace(`/selectour?${params.toString()}`, { scroll: false });
+    router.replace(`/selectour?${params.toString()}`);
   }, [currentPage, router, searchParams]);
 
   useEffect(() => {

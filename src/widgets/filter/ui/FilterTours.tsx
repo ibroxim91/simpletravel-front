@@ -88,8 +88,23 @@ const FilterTours = () => {
 
     setSearch(departure || '');
     setSearchWhere(destination || '');
-    setFromDate(dateFrom ? new Date(dateFrom) : undefined);
-    setToDate(dateTo ? new Date(dateTo) : undefined);
+
+    const from = dateFrom ? new Date(dateFrom) : undefined;
+    const to = dateTo ? new Date(dateTo) : undefined;
+
+    setFromDate(from);
+    setToDate(to);
+
+    if (from && to) {
+      setRange({ from, to });
+      setSelectData(
+        `${formatDate.format(from, 'DD/MM/YYYY')} - ${formatDate.format(
+          to,
+          'DD/MM/YYYY',
+        )}`,
+      );
+    }
+
     setAdults(adultsParam ? parseInt(adultsParam) : 0);
     setChildren(childrenParam ? parseInt(childrenParam) : 0);
   }, [searchParams]);

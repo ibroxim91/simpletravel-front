@@ -10,7 +10,14 @@ import Rating from '@mui/material/Rating';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
-import { CalendarDays, MapPinCheckInside, Plane, User } from 'lucide-react';
+import {
+  CalendarDays,
+  Hotel,
+  MapPinCheckInside,
+  Plane,
+  Star,
+  User,
+} from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
@@ -68,7 +75,7 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
           ease: 'easeOut',
         }}
         viewport={{ once: false, amount: 0.1 }}
-        className="h-[300px] max-xl:h-[350px] flex cursor-pointer relative w-full items-center mt-5 rounded-3xl bg-[#ffff] max-lg:flex-col max-lg:h-auto"
+        className="h-[320px] max-xl:h-[350px] flex cursor-pointer relative w-full items-center mt-5 rounded-3xl bg-[#ffff] max-lg:flex-col max-lg:h-auto"
       >
         <Button
           onClick={(e) => {
@@ -143,6 +150,22 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
               />
               <p className="text-[#031753]">{data.destination}</p>
             </div>
+            {data.ticket_hotel.length > 0 && (
+              <div className="flex items-center mt-2 px-2">
+                <Hotel color="#084FE3" className="size-5" />
+                <p className="text-[#031753] px-1 line-clamp-1">
+                  {data.ticket_hotel[0].name}
+                </p>
+              </div>
+            )}
+            {data.ticket_hotel.length > 0 && (
+              <div className="flex items-center mt-2 px-2">
+                <Star color="#084FE3" className="size-5" />
+                <p className="text-[#031753] px-1">
+                  {data.ticket_hotel[0].rating} {t('звёзды')}
+                </p>
+              </div>
+            )}
           </div>
 
           <ul className="px-6 text-[#646465] text-md list-disc items-center mt-5">
@@ -158,7 +181,7 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
             <div className="flex gap-8 items-center  text-[#646465] text-sm">
               <div className="flex gap-3 text-[12px] items-center">
                 <Plane fill="#084FE3" color="#084FE3" className="size-5" />
-                <p>{formatDate.format(data.departure_date, 'DD MMM')}</p>
+                <p>{formatDate.format(data.departure_time, 'DD MMM')}</p>
               </div>
               <ul className="flex items-center text-[12px] gap-8 text-center">
                 <li className="flex items-center gap-2">

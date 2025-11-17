@@ -378,7 +378,7 @@ export default function SingleTour() {
                     viewport={{ once: false, amount: 0.2 }}
                     variants={slideIn}
                     whileHover={{ scale: 1.05 }}
-                    className="w-full max-lg:w-full h-fit max-lg:h-auto cursor-pointer flex flex-col max-lg:flex-row-reverse justify-between p-[20px] bg-[#EDEEF140] border border-[#EDEEF1] shadow-md rounded-[20px] relative"
+                    className="w-full max-lg:w-full h-full max-lg:h-auto cursor-pointer flex flex-col max-lg:flex-row-reverse justify-between p-[20px] bg-[#EDEEF140] border border-[#EDEEF1] shadow-md rounded-[20px] relative"
                   >
                     <HotelInfoItem
                       img={Hotel1}

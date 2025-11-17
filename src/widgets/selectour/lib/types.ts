@@ -34,7 +34,7 @@ export interface TickectAllResults {
   title: string;
   slug: string;
   price: number;
-  departure_date: string;
+  departure_time: string;
   departure: string;
   passenger_count: number;
   rating: number;
@@ -45,6 +45,12 @@ export interface TickectAllResults {
   badge: { id: number; name: string; color: string }[];
   visa_required: boolean;
   is_liked: boolean;
+  ticket_hotel: {
+    id: number;
+    name: string;
+    meal_plan: string;
+    rating: number;
+  }[];
 }
 
 export interface TickectAllFilter {

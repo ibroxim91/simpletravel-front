@@ -2,13 +2,12 @@
 
 import formatDate from '@/shared/lib/formatDate';
 import { Input } from '@/shared/ui/input';
-import AirplaneTicketIcon from '@mui/icons-material/AirplaneTicket';
-import LocalTaxiIcon from '@mui/icons-material/LocalTaxi';
 import StarIcon from '@mui/icons-material/Star';
 import WhereToVoteIcon from '@mui/icons-material/WhereToVote';
 import Rating from '@mui/material/Rating';
 import { useMutation } from '@tanstack/react-query';
 import clsx from 'clsx';
+import * as LucideIcons from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
@@ -214,6 +213,10 @@ export default function TourInfoStep({
                 const inputId = `selectTransport-${opt.transport.name}`;
                 const isChecked =
                   transport.transport?.name === opt.transport.name;
+                const IconComponent =
+                  LucideIcons[
+                    opt.transport.icon_name as keyof typeof LucideIcons.icons
+                  ];
                 return (
                   <div
                     key={opt.transport.name}
@@ -224,23 +227,9 @@ export default function TourInfoStep({
                       htmlFor={inputId}
                       className="flex items-center mr-[20px] gap-[10px] cursor-pointer"
                     >
-                      {opt.transport.icon_name === 'avia' ? (
-                        <AirplaneTicketIcon
-                          sx={{
-                            color: isChecked ? '#084FE3' : '#212122',
-                            width: '30px',
-                            height: '30px',
-                          }}
-                        />
-                      ) : (
-                        <LocalTaxiIcon
-                          sx={{
-                            color: isChecked ? '#084FE3' : '#212122',
-                            width: '30px',
-                            height: '30px',
-                          }}
-                        />
-                      )}
+                      {IconComponent ? (
+                        <IconComponent className="w-5 h-5 text-[#232325]" />
+                      ) : null}
                       <div className="flex flex-col">
                         <p
                           className={clsx(

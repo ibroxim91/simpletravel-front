@@ -23,7 +23,13 @@ import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Rating from '@mui/material/Rating';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion, Variants } from 'framer-motion';
-import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  HotelIcon,
+  MapPin,
+  Star,
+} from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
@@ -230,9 +236,28 @@ const MyFavourite = () => {
                       <p className="text-xl font-semibold text-[#031753]">
                         {e.ticket.title}
                       </p>
-                      <p className="text-sm text-[#031753]">
-                        {e.ticket.destination}
-                      </p>
+                      <div className="flex gap-2 mt-2">
+                        <MapPin className="size-6" color="#084FE3" />
+                        <p className="line-clamp-1 w-fit text-md text-[#031753]">
+                          {e.ticket.destination}
+                        </p>
+                      </div>
+                      {e.ticket.ticket_hotel.length > 0 && (
+                        <div className="flex gap-2 mt-2">
+                          <HotelIcon className="size-6" color="#084FE3" />
+                          <p className="line-clamp-1 w-fit text-md text-[#031753]">
+                            {e.ticket.ticket_hotel[0].name}
+                          </p>
+                        </div>
+                      )}
+                      {e.ticket.ticket_hotel.length > 0 && (
+                        <div className="flex gap-2 mt-2">
+                          <Star className="size-6" color="#084FE3" />
+                          <p className="line-clamp-1 w-fit text-md text-[#031753]">
+                            {e.ticket.ticket_hotel[0].rating} {t('звёзды')}
+                          </p>
+                        </div>
+                      )}
                       <p className="mt-2 text-[#084FE3] font-semibold">
                         {formatPrice(
                           e.ticket.price,

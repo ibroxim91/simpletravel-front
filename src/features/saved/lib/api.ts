@@ -26,6 +26,12 @@ interface Get_Saved {
         price: number;
         rating: number;
         title: string;
+        ticket_hotel: {
+          id: number;
+          name: string;
+          meal_plan: string;
+          rating: number;
+        }[];
         travel_time: string;
         visa_required: boolean;
         badge: {

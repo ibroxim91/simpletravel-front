@@ -6,7 +6,7 @@ interface Props {
   name: string;
   img: StaticImageData;
 }
-export default function HotelInfoItem({ title, name, img, title_two }: Props) {
+export default function HotelInfoItem({ title, name, img }: Props) {
   return (
     <>
       <div className="w-[80px] h-[80px]">
