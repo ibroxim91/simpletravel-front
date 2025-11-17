@@ -102,23 +102,6 @@ export default function Selectour() {
   };
 
   useEffect(() => {
-    setCurrentPage(1);
-  }, [
-    cheaper,
-    expensive,
-    hotelType,
-    hotelName,
-    priceRange,
-    visa,
-    selectedDurations,
-    selectedDestinations,
-    mealPlan,
-    hotelAmenities,
-    hotelRating,
-    hotelFeature,
-  ]);
-
-  useEffect(() => {
     const departure = searchParams.get('departure') || '';
     const destination = searchParams.get('destination') || '';
     const dateFrom = searchParams.get('dateFrom') || '';
@@ -294,14 +277,20 @@ export default function Selectour() {
               max={100000000}
               value={priceRange}
               className="placeholder:!text-[#909091] !text-[#909091]"
-              onChange={(v) => setPriceRange(v as number[])}
+              onChange={(v) => {
+                setPriceRange(v as number[]);
+                setCurrentPage(1);
+              }}
             />
             <div className="flex justify-between mt-3 border border-[#DFDFDF] rounded-xl p-3">
               <input
                 type="text"
                 value={formatPrice(priceRange[0])}
                 placeholder="2 500 000"
-                onChange={(e) => handleInputChange(e.target.value, 0)}
+                onChange={(e) => {
+                  handleInputChange(e.target.value, 0);
+                  setCurrentPage(1);
+                }}
                 className={clsx(
                   'w-1/2 border-none outline-none',
                   priceRange[0] ? 'text-[#212122]' : 'text-[#909091]',
@@ -310,7 +299,10 @@ export default function Selectour() {
               <input
                 type="text"
                 value={formatPrice(priceRange[1])}
-                onChange={(e) => handleInputChange(e.target.value, 1)}
+                onChange={(e) => {
+                  handleInputChange(e.target.value, 1);
+                  setCurrentPage(1);
+                }}
                 className={clsx(
                   'w-1/2 border-none outline-none text-right',
                   priceRange[1] ? 'text-[#212122]' : 'text-[#909091]',
@@ -324,7 +316,10 @@ export default function Selectour() {
               <input
                 type="text"
                 placeholder={t('Название отеля')}
-                onChange={(e) => setHotelName(e.target.value)}
+                onChange={(e) => {
+                  setHotelName(e.target.value);
+                  setCurrentPage(1);
+                }}
                 className="w-full border rounded-xl px-10 py-2 outline-none placeholder:text-[#909091] text-[#212122]"
               />
               <SearchIcon className="absolute left-2 top-1/2 -translate-y-1/2 text-[#909091]" />
@@ -337,6 +332,7 @@ export default function Selectour() {
               label={t('Без визы')}
               selectedValue={visa}
               setChecked={setVisa}
+              onclick={setCurrentPage}
               exclusive
             />
             <CheckboxFilter
@@ -344,6 +340,7 @@ export default function Selectour() {
               label={t('С визой')}
               selectedValue={visa}
               setChecked={setVisa}
+              onclick={setCurrentPage}
               exclusive
             />
           </FilterSection>
@@ -359,6 +356,7 @@ export default function Selectour() {
                     label={`${e.duration} ${t('дня')}`}
                     setChecked={setSelectedDurations}
                     selectedValue={selectedDurations}
+                    onclick={setCurrentPage}
                     exclusive
                   />
                 ))}
@@ -370,6 +368,7 @@ export default function Selectour() {
                 <CheckboxFilter
                   key={e.destination}
                   value={e.destination}
+                  onclick={setCurrentPage}
                   label={e.destination}
                   setChecked={setSelectedDestinations}
                   selectedValue={selectedDestinations}
@@ -384,6 +383,7 @@ export default function Selectour() {
               label={t('5 звезды')}
               setChecked={setHotelRating}
               selectedValue={hotelRating}
+              onclick={setCurrentPage}
               exclusive
             />
             <CheckboxFilter
@@ -391,11 +391,13 @@ export default function Selectour() {
               label={t('4 звезды')}
               setChecked={setHotelRating}
               selectedValue={hotelRating}
+              onclick={setCurrentPage}
               exclusive
             />
             <CheckboxFilter
               value="3.0"
               label={t('3 звезды')}
+              onclick={setCurrentPage}
               setChecked={setHotelRating}
               selectedValue={hotelRating}
               exclusive
@@ -406,6 +408,7 @@ export default function Selectour() {
             <CheckboxFilter
               value="Full"
               label={t('Все включено')}
+              onclick={setCurrentPage}
               setChecked={setMealPlan}
               selectedValue={mealPlan}
               exclusive
@@ -415,12 +418,14 @@ export default function Selectour() {
               label={t('Завтрак')}
               setChecked={setMealPlan}
               selectedValue={mealPlan}
+              onclick={setCurrentPage}
               exclusive
             />
             <CheckboxFilter
               value="Half"
               label={t('Полупансион')}
               setChecked={setMealPlan}
+              onclick={setCurrentPage}
               selectedValue={mealPlan}
               exclusive
             />
@@ -433,6 +438,7 @@ export default function Selectour() {
                   key={e}
                   value={e}
                   label={e}
+                  onclick={setCurrentPage}
                   setChecked={setHotelTypes}
                   selectedValue={hotelType}
                   exclusive
@@ -448,6 +454,7 @@ export default function Selectour() {
                   <CheckboxFilter
                     key={i}
                     value={feature}
+                    onclick={setCurrentPage}
                     label={feature}
                     setChecked={setHotelFeature}
                     selectedValue={hotelFeature}
@@ -464,6 +471,7 @@ export default function Selectour() {
                   key={e}
                   value={e}
                   label={e}
+                  onclick={setCurrentPage}
                   setChecked={setHotelAmenitie}
                   selectedValue={hotelAmenities}
                   exclusive

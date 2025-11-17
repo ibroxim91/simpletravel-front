@@ -8,6 +8,7 @@ type CheckboxFilterProps<T extends string | string[] | null> = {
   selectedValue?: T;
   exclusive?: boolean;
   setChecked?: Dispatch<SetStateAction<T>>;
+  onclick?: Dispatch<SetStateAction<number>>;
 };
 
 function CheckboxFilter<T extends string | string[] | null>({
@@ -15,6 +16,7 @@ function CheckboxFilter<T extends string | string[] | null>({
   value,
   selectedValue,
   exclusive,
+  onclick,
   setChecked,
 }: CheckboxFilterProps<T>) {
   const isChecked = Array.isArray(selectedValue)
@@ -30,7 +32,6 @@ function CheckboxFilter<T extends string | string[] | null>({
         className="cursor-pointer"
         onCheckedChange={(checked) => {
           if (!setChecked) return;
-
           if (Array.isArray(selectedValue)) {
             // multiple tanlov uchun
             if (checked) {
@@ -43,6 +44,9 @@ function CheckboxFilter<T extends string | string[] | null>({
             setChecked((checked ? value : null) as T);
           } else {
             setChecked((checked ? value : null) as T);
+          }
+          if (onclick) {
+            onclick(1);
           }
         }}
       />
