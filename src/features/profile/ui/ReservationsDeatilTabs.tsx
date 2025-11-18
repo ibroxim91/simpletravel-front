@@ -118,7 +118,9 @@ const ReservationsDeatilTabs = ({
             {t('Подробности заказа')}
           </h1>
           <button
-            onClick={() => downloadPdf({ lang: 'uz', order_id: id! })}
+            onClick={() =>
+              downloadPdf({ lang: locale as LanguageRoutes, order_id: id! })
+            }
             className="flex items-center gap-[10px] cursor-pointer px-[15px] py-[10px] border-2 rounded-full border-[#DFDFDF] max-lg:w-full justify-center hover:bg-gray-50 transition-colors"
           >
             <InsertDriveFileIcon sx={{ color: '#031753' }} />
