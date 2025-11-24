@@ -187,7 +187,7 @@ export default function ParticipantsStep({
       formData.append('phone_number', participant.phone);
       formData.append(
         'birth_date',
-        formatDate.format(participant.date!, 'YYYY-MM-DD') || '',
+        formatDate.format(participant.date!, 'YYYY-MM-DD'),
       );
 
       if (participant.passport) {
@@ -201,36 +201,40 @@ export default function ParticipantsStep({
         });
       }
 
-      const promise = User_Api.createParticipant(formData).then((res) => {
-        const newUser = res.data.data;
-        addUser({
-          userId: newUser.id,
-          birthDate: new Date(newUser.birth_date),
-          firstName: newUser.first_name,
-          gender: newUser.gender,
-          lastName: newUser.last_name,
-          passport: newUser.participant_pasport_image,
-          phone: newUser.phone_number,
-        });
+      const response = await User_Api.createParticipant(formData);
+      const newUser = response.data.data;
+
+      addUser({
+        userId: newUser.id,
+        birthDate: new Date(newUser.birth_date),
+        firstName: newUser.first_name,
+        gender: newUser.gender,
+        lastName: newUser.last_name,
+        passport: newUser.participant_pasport_image,
+        phone: newUser.phone_number,
       });
 
-      createPromises.push(promise);
+      createPromises[index] = newUser; // 🔥 har bir index bo‘yicha saqlaymiz
     }
 
     try {
-      if (createPromises.length > 0) {
-        await Promise.all(createPromises);
-      }
+      const newIds = [...userIds];
+
+      // 🔥 IDlarni to‘g‘ri indekslarga qo‘yamiz
+      createPromises.forEach((u, i) => {
+        if (u) newIds[i] = u.id;
+      });
 
       toast.success(t('Hamroh(lar) muvaffaqiyatli saqlandi'));
       queryClient.refetchQueries({ queryKey: ['participant_all'] });
+
       const currentValues = form.getValues();
       const saveData = {
         participants: currentValues.participants?.map((p) => ({
           ...p,
           date: p.date ? p.date.toISOString() : null,
         })),
-        userIds: userIds,
+        userIds: newIds, // 🔥 to‘g‘ri IDlar
       };
 
       localStorage.setItem('participantsForm', JSON.stringify(saveData));
@@ -267,6 +271,26 @@ export default function ParticipantsStep({
               className="bg-white p-5 rounded-2xl relative space-y-6"
             >
               <div className="w-full flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const removedUserId = userIds[index];
+                    if (removedUserId) {
+                      setSelectedUserIds((prev) => {
+                        const newSet = new Set(prev);
+                        newSet.delete(removedUserId);
+                        return newSet;
+                      });
+                    }
+                    remove(index);
+                    setUserIds((prev) => prev.filter((_, i) => i !== index));
+                  }}
+                  className="flex gap-4 text-white bg-red-500 px-5 py-3 rounded-3xl"
+                >
+                  <TrashIcon />
+                  <p>{t('Удалить')}</p>
+                </button>
+
                 {fields.length > minPerson && (
                   <button
                     type="button"
