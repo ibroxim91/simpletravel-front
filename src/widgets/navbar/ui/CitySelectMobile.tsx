@@ -2,7 +2,6 @@
 
 import { Input } from '@/shared/ui/input';
 import { useFilterToursStore } from '@/widgets/filter/lib/store';
-import Ticket_Api from '@/widgets/selectour/lib/api';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import DoneIcon from '@mui/icons-material/Done';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -13,6 +12,7 @@ import clsx from 'clsx';
 import { useTranslations } from 'next-intl';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { location_api } from '../lib/api';
 
 const CitySelectMobile = () => {
   const [openCity, setOpenCity] = useState(false);
@@ -26,22 +26,16 @@ const CitySelectMobile = () => {
   const searchParams = useSearchParams();
 
   const { data: ticket } = useQuery({
-    queryKey: ['ticket_all'],
-    queryFn: () =>
-      Ticket_Api.GetAllTickets({
-        params: {
-          page: 1,
-          page_size: 8,
-        },
-      }),
+    queryKey: ['location_list'],
+    queryFn: () => location_api.location_list(),
+    select(data) {
+      return data.data.data;
+    },
   });
-
   useEffect(() => {
     if (ticket) {
       const uniqueCities = Array.from(
-        new Set(
-          ticket.data.results.tickets.slice(0, 8).map((e) => e.destination),
-        ),
+        new Set(ticket.departures.slice(0, 8).map((e) => e)),
       );
       setCitiesWhere(uniqueCities);
     }
@@ -56,7 +50,7 @@ const CitySelectMobile = () => {
 
   // Handle URL params and store
   useEffect(() => {
-    const destinationParam = searchParams.get('destination') || '';
+    const destinationParam = searchParams.get('departure') || '';
     const cityToDisplay = where || destinationParam;
     setSelectedCity(cityToDisplay);
   }, [searchParams, where]);
@@ -69,7 +63,7 @@ const CitySelectMobile = () => {
       setStoreWhere('');
 
       const params = new URLSearchParams(searchParams.toString());
-      params.delete('destination');
+      params.delete('departure');
       params.set('page', '1');
 
       router.push(`/selectour?${params.toString()}`);
@@ -78,7 +72,7 @@ const CitySelectMobile = () => {
       setStoreWhere(cityName);
 
       const params = new URLSearchParams(searchParams.toString());
-      params.set('destination', cityName);
+      params.set('departure', cityName);
       params.set('page', '1');
 
       router.push(`/selectour?${params.toString()}`);

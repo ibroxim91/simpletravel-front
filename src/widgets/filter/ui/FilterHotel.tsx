@@ -4,7 +4,7 @@ import { Button } from '@/shared/ui/button';
 import { Calendar } from '@/shared/ui/calendar';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
-import Ticket_Api from '@/widgets/selectour/lib/api';
+import { location_api } from '@/widgets/navbar/lib/api';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowDropUpOutlinedIcon from '@mui/icons-material/ArrowDropUpOutlined';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
@@ -37,24 +37,17 @@ const FilterHotel = () => {
   const [cities, setCities] = useState<string[] | []>([]);
 
   const { data: ticket } = useQuery({
-    queryKey: ['ticket_all'],
-    queryFn: () =>
-      Ticket_Api.GetAllTickets({
-        params: {
-          page: 1,
-          page_size: 8,
-        },
-      }),
+    queryKey: ['location_list'],
+    queryFn: () => location_api.location_list(),
+    select(data) {
+      return data.data.data;
+    },
   });
 
   useEffect(() => {
     if (ticket) {
       const uniqueCities = Array.from(
-        new Set(
-          ticket.data.results.top_destinations
-            .slice(0, 8)
-            .map((e) => e.destination),
-        ),
+        new Set(ticket.destinations.slice(0, 8).map((e) => e)),
       );
       setCities(uniqueCities);
     }

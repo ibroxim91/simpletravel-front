@@ -3,7 +3,6 @@
 import { useRouter } from '@/shared/config/i18n/navigation';
 import { Input } from '@/shared/ui/input';
 import { useFilterToursStore } from '@/widgets/filter/lib/store';
-import Ticket_Api from '@/widgets/selectour/lib/api';
 import ArrowDropUpOutlinedIcon from '@mui/icons-material/ArrowDropUpOutlined';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import DoneIcon from '@mui/icons-material/Done';
@@ -13,6 +12,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { location_api } from '../lib/api';
 
 const CitySelect = () => {
   const t = useTranslations();
@@ -28,20 +28,18 @@ const CitySelect = () => {
 
   // Fetch tickets
   const { data: ticket } = useQuery({
-    queryKey: ['ticket_all'],
-    queryFn: () =>
-      Ticket_Api.GetAllTickets({
-        params: { page: 1, page_size: 8 },
-      }),
+    queryKey: ['location_list'],
+    queryFn: () => location_api.location_list(),
+    select(data) {
+      return data.data.data;
+    },
   });
 
   // Set unique cities from tickets
   useEffect(() => {
     if (ticket) {
       const uniqueCities = Array.from(
-        new Set(
-          ticket.data.results.tickets.slice(0, 8).map((e) => e.destination),
-        ),
+        new Set(ticket.departures.slice(0, 8).map((e) => e)),
       );
       setCitiesWhere(uniqueCities);
     }
@@ -49,7 +47,7 @@ const CitySelect = () => {
 
   // Handle URL params and store
   useEffect(() => {
-    const destinationParam = searchParams.get('destination') || '';
+    const destinationParam = searchParams.get('departure') || '';
 
     // Ustunlik beramiz store qiymatiga
     const cityToDisplay = where || destinationParam;
@@ -72,7 +70,7 @@ const CitySelect = () => {
 
       // URL dan destination ni o'chirish
       const params = new URLSearchParams(searchParams.toString());
-      params.delete('destination');
+      params.delete('departure');
       params.set('page', '1');
 
       route.push(`/selectour?${params.toString()}`);
@@ -82,7 +80,7 @@ const CitySelect = () => {
       setStoreWhere(cityName);
 
       const params = new URLSearchParams(searchParams.toString());
-      params.set('destination', cityName);
+      params.set('departure', cityName);
       params.set('page', '1');
 
       route.push(`/selectour?${params.toString()}`);

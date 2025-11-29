@@ -4,10 +4,15 @@ import { Button } from '@/shared/ui/button';
 import { Calendar } from '@/shared/ui/calendar';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
-import Ticket_Api from '@/widgets/selectour/lib/api';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/shared/ui/sheet';
+import { location_api } from '@/widgets/navbar/lib/api';
 import AddIcon from '@mui/icons-material/Add';
 import AirplanemodeActiveIcon from '@mui/icons-material/AirplanemodeActive';
-import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import CloseIcon from '@mui/icons-material/Close';
 import DoneIcon from '@mui/icons-material/Done';
@@ -16,6 +21,7 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import SearchIcon from '@mui/icons-material/Search';
 import Drawer from '@mui/material/Drawer';
 import { useQuery } from '@tanstack/react-query';
+import { X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -44,28 +50,22 @@ const FilterToursMobile = () => {
   const [citiesWhere, setCitiesWhere] = useState<string[] | []>([]);
 
   const { data: ticket } = useQuery({
-    queryKey: ['ticket_all'],
-    queryFn: () =>
-      Ticket_Api.GetAllTickets({
-        params: { page: 1, page_size: 8 },
-      }),
+    queryKey: ['location_list'],
+    queryFn: () => location_api.location_list(),
+    select(data) {
+      return data.data.data;
+    },
   });
 
   useEffect(() => {
     if (ticket) {
       const uniqueCities = Array.from(
-        new Set(
-          ticket.data.results.tickets.slice(0, 8).map((e) => e.departure),
-        ),
+        new Set(ticket.departures.slice(0, 8).map((e) => e)),
       );
       setCities(uniqueCities);
 
       const uniqueCitiesWhere = Array.from(
-        new Set(
-          ticket.data.results.top_destinations
-            .slice(0, 8)
-            .map((e) => e.destination),
-        ),
+        new Set(ticket.destinations.slice(0, 8).map((e) => e)),
       );
       setCitiesWhere(uniqueCitiesWhere);
     }
@@ -338,78 +338,83 @@ const FilterToursMobile = () => {
             />
           </div>
         </div>
-        <Drawer
-          anchor="bottom"
-          open={dataOpenMobile}
-          onClose={() => {
-            setDataOpenMobile(false);
-            setFromDate(undefined);
-            setToDate(undefined);
-          }}
-          PaperProps={{
-            sx: {
-              borderTopLeftRadius: 16,
-              borderTopRightRadius: 16,
-              padding: 2,
-              width: '100vw',
-              maxHeight: '80vh',
-              overflow: 'auto',
-            },
-          }}
-        >
-          <div className="flex flex-col gap-4 w-full font-medium">
-            <div className="flex items-center justify-between">
-              <p className="text-lg font-semibold">{t('Дата отправления')}</p>
+        <Sheet open={dataOpenMobile} onOpenChange={setDataOpenMobile}>
+          <SheetContent
+            side="bottom"
+            className="rounded-t-3xl !h-[90vh] p-0 flex flex-col"
+            style={{
+              position: 'fixed',
+              zIndex: 9999,
+            }}
+            onInteractOutside={(e) => {
+              e.preventDefault();
+            }}
+          >
+            {/* Fixed Header */}
+            <SheetHeader className="flex flex-row items-center justify-between p-4 pb-3 shrink-0">
+              <SheetTitle className="text-xl font-semibold">
+                {t('Дата отправления')}
+              </SheetTitle>
+
               <Button
-                variant={'outline'}
-                className="rounded-full h-[40px] w-[40px] cursor-pointer"
+                variant="outline"
+                size="icon"
+                className="rounded-full h-10 w-10"
                 onClick={() => setDataOpenMobile(false)}
               >
-                <CloseIcon sx={{ color: 'black' }} />
+                <X className="w-5 h-5" />
               </Button>
+            </SheetHeader>
+
+            {/* Scrollable Content */}
+            <div
+              className="flex-1 overflow-y-auto px-4 pb-4"
+              style={{
+                WebkitOverflowScrolling: 'touch',
+                overscrollBehavior: 'contain',
+              }}
+            >
+              {/* Inputs */}
+              <div className="flex gap-2 mb-4">
+                <Input
+                  placeholder={t('Когда')}
+                  value={
+                    fromDate ? formatDate.format(fromDate, 'DD/MM/YYYY') : ''
+                  }
+                  readOnly
+                  className="h-12"
+                />
+
+                <Input
+                  placeholder={t('Выезд')}
+                  value={toDate ? formatDate.format(toDate, 'DD/MM/YYYY') : ''}
+                  disabled={!fromDate}
+                  readOnly
+                  className="h-12"
+                />
+              </div>
+
+              {/* Calendar */}
+              <div className="w-full">
+                <Calendar
+                  mode="range"
+                  selected={range}
+                  onSelect={(val: any) => {
+                    setRange(val);
+                    setFromDate(val?.from);
+                    setToDate(val?.to);
+                  }}
+                  numberOfMonths={1}
+                  className="rounded-md w-full"
+                />
+              </div>
             </div>
-            <div className="flex flex-row gap-2">
-              <Input
-                placeholder={t('Когда')}
-                value={
-                  fromDate ? formatDate.format(fromDate, 'DD/MM/YYYY') : ''
-                }
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full text-black h-[50px]"
-                onClick={(e) => e.stopPropagation()}
-                onFocus={(e) => e.stopPropagation()}
-              />
-              <ArrowRightAltIcon
-                color="action"
-                sx={{ width: '28px', height: '28px' }}
-                className="self-center mx-2"
-              />
-              <Input
-                placeholder={t('Выезд')}
-                value={toDate ? formatDate.format(toDate, 'DD/MM/YYYY') : ''}
-                disabled={fromDate === undefined}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full text-black h-[50px]"
-                onClick={(e) => e.stopPropagation()}
-                onFocus={(e) => e.stopPropagation()}
-              />
-            </div>
-            <div className="grid grid-cols-1 mt-2">
-              <Calendar
-                className="w-full max-w-xl mx-auto"
-                mode="range"
-                selected={range}
-                onSelect={(val) => {
-                  setRange(val);
-                  setFromDate(val?.from);
-                  setToDate(val?.to);
-                }}
-                showOutsideDays={false}
-              />
-            </div>
-            <div className="grid grid-cols-2 mt-0 gap-2">
-              <button
-                className="bg-blue-500/40 rounded-3xl p-3 text-blue-600 cursor-pointer"
+
+            {/* Fixed Buttons */}
+            <div className="grid grid-cols-2 gap-3 p-4 pt-0 mb-5 shrink-0 bg-white">
+              <Button
+                variant="outline"
+                className="rounded-3xl bg-blue-500/20 text-blue-600"
                 onClick={() => {
                   setDataOpenMobile(false);
                   setFromDate(undefined);
@@ -419,14 +424,15 @@ const FilterToursMobile = () => {
                 }}
               >
                 {t('Отмена')}
-              </button>
-              <button
-                className="bg-blue-600 rounded-3xl text-white"
+              </Button>
+
+              <Button
+                className="rounded-3xl bg-blue-600 text-white"
                 onClick={() => {
                   setDataOpenMobile(false);
                   if (fromDate && toDate) {
                     setSelectData(
-                      `${formatDate.format(fromDate, 'DD/MM/YYYY') + ' - ' + formatDate.format(toDate, 'DD/MM/YYYY')}`,
+                      `${formatDate.format(fromDate, 'DD/MM/YYYY')} - ${formatDate.format(toDate, 'DD/MM/YYYY')}`,
                     );
                   } else {
                     setSelectData('');
@@ -434,10 +440,10 @@ const FilterToursMobile = () => {
                 }}
               >
                 {t('Применять')}
-              </button>
+              </Button>
             </div>
-          </div>
-        </Drawer>
+          </SheetContent>
+        </Sheet>
       </div>
 
       <div className="relative flex gap-2 h-full">

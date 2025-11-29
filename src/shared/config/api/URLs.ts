@@ -48,6 +48,8 @@ const GET_CONTACT = '/api/v1/dashboard/dashboard-site-settings/';
 const GET_HELP_PAGE = '/api/v1/dashboard/dashboard-site-help-page/';
 const GET_OFFERTA = '/api/v1/dashboard/dashboard-site-offerta/';
 
+const LOCATIONS = '/api/v1/locations/';
+
 export {
   BASE_URL,
   DONWLOAD_PDF,
@@ -70,6 +72,7 @@ export {
   GET_SAVED,
   GET_TAGS,
   GET_TICKETS,
+  LOCATIONS,
   NEW_PASSWORD,
   PARTICIPANT,
   PARTICIPANT_IMAGE,
