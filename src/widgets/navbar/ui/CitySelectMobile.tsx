@@ -1,5 +1,6 @@
 'use client';
 
+import { country_api } from '@/shared/config/api/country';
 import { Input } from '@/shared/ui/input';
 import { useFilterToursStore } from '@/widgets/filter/lib/store';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -12,73 +13,89 @@ import clsx from 'clsx';
 import { useTranslations } from 'next-intl';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { location_api } from '../lib/api';
 
+interface RegionType {
+  id: number | string;
+  name: string;
+}
 const CitySelectMobile = () => {
-  const [openCity, setOpenCity] = useState(false);
   const t = useTranslations();
-  const [search, setSearch] = useState('');
-  const [selectedCity, setSelectedCity] = useState('');
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const { where, setStoreWhere } = useFilterToursStore();
-  const [citiesWhere, setCitiesWhere] = useState<string[]>([]);
-  const router = useRouter();
+  const route = useRouter();
   const searchParams = useSearchParams();
+  const departure = searchParams.get('departure');
 
-  const { data: ticket } = useQuery({
-    queryKey: ['location_list'],
-    queryFn: () => location_api.location_list(),
+  const { where, setStoreWhere } = useFilterToursStore();
+
+  const [openCity, setOpenCity] = useState(false);
+  const [search, setSearch] = useState('');
+  const [selectedCity, setSelectedCity] = useState<RegionType | null>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  const { data: countries } = useQuery({
+    queryKey: ['country_list'],
+    queryFn: () => country_api.list(),
     select(data) {
       return data.data.data;
     },
   });
+
   useEffect(() => {
-    if (ticket) {
-      const uniqueCities = Array.from(
-        new Set(ticket.departures.slice(0, 8).map((e) => e)),
-      );
-      setCitiesWhere(uniqueCities);
+    if (!countries) return;
+
+    if (departure) {
+      const foundByQuery = countries
+        .flatMap((c) => c.regions)
+        .find((region: RegionType) => String(region.id) === String(departure));
+
+      if (foundByQuery) {
+        setSelectedCity(foundByQuery);
+        setStoreWhere(String(foundByQuery.id));
+        return;
+      }
     }
-  }, [ticket]);
 
-  const filteredCities =
-    search.trim() === ''
-      ? citiesWhere
-      : citiesWhere.filter((c) =>
-          c.toLowerCase().includes(search.toLowerCase()),
-        );
+    if (where) {
+      const foundByStore = countries
+        .flatMap((c) => c.regions)
+        .find((region: RegionType) => String(region.id) === String(where));
 
-  // Handle URL params and store
-  useEffect(() => {
-    const destinationParam = searchParams.get('departure') || '';
-    const cityToDisplay = where || destinationParam;
-    setSelectedCity(cityToDisplay);
-  }, [searchParams, where]);
+      if (foundByStore) {
+        setSelectedCity(foundByStore);
+      } else {
+        setSelectedCity(null);
+      }
+    }
+  }, [countries, departure, where]);
 
-  // Handle selecting a city
-  const handleCitySelect = (cityName: string) => {
-    if (cityName === 'all') {
-      setSelectedCity('');
+  useEffect(() => {}, []);
+
+  const handleCitySelect = (city: RegionType | 'all') => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (city === 'all') {
+      setSelectedCity(null);
       setSearch('');
       setStoreWhere('');
-
-      const params = new URLSearchParams(searchParams.toString());
       params.delete('departure');
-      params.set('page', '1');
-
-      router.push(`/selectour?${params.toString()}`);
     } else {
-      setSelectedCity(cityName);
-      setStoreWhere(cityName);
-
-      const params = new URLSearchParams(searchParams.toString());
-      params.set('departure', cityName);
-      params.set('page', '1');
-
-      router.push(`/selectour?${params.toString()}`);
+      setSelectedCity(city);
+      setStoreWhere(String(city.id));
+      params.set('departure', String(city.id));
     }
+
+    params.set('page', '1');
+    route.push(`/selectour?${params.toString()}`);
     setOpenCity(false);
   };
+
+  const displayCity = selectedCity ? selectedCity.name : t('Укажите город');
+
+  const filteredCities =
+    countries?.flatMap((country) =>
+      country.regions.filter((region) =>
+        region.name.toLowerCase().includes(search.toLowerCase()),
+      ),
+    ) ?? [];
 
   return (
     <div
@@ -87,17 +104,17 @@ const CitySelectMobile = () => {
     >
       <div
         onClick={() => {
-          setOpenCity(!openCity);
+          setOpenCity(true);
           setSearch('');
         }}
         className="flex items-center cursor-pointer gap-2 font-medium"
       >
-        <LocationOnIcon sx={{ color: 'white', width: 28, height: 28 }} />
-        <p className="text-sm text-white">
-          {selectedCity || t('Укажите город')}
-        </p>
-        <ChevronRightIcon sx={{ color: 'white', width: 24, height: 24 }} />
+        <LocationOnIcon sx={{ width: 28, height: 28, color: 'white' }} />
+        <p className="text-sm text-white">{displayCity}</p>
+        <ChevronRightIcon sx={{ width: 24, height: 24, color: 'white' }} />
       </div>
+
+      {/* Drawer (Bottom Sheet) */}
       <Drawer
         anchor="bottom"
         open={openCity}
@@ -106,27 +123,25 @@ const CitySelectMobile = () => {
           sx: {
             borderTopLeftRadius: 16,
             borderTopRightRadius: 16,
-            padding: 2,
+            p: 2,
             width: '100%',
-            overflow: 'hidden',
             minHeight: '70%',
+            overflow: 'hidden',
           },
         }}
       >
         <div className="flex flex-col gap-4 w-full font-medium">
-          <div className="flex items-center justify-between">
-            <p className="text-lg text-[#121212] font-semibold">
-              {t('Выберите город')}
-            </p>
-          </div>
+          <p className="text-lg text-[#121212] font-semibold">
+            {t('Выберите город')}
+          </p>
+
+          {/* Search */}
           <div className="relative">
             <Input
               placeholder={t('Укажите город')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-10 text-[#121212] placeholder:text-[#909091]"
-              onClick={(e) => e.stopPropagation()}
-              onFocus={(e) => e.stopPropagation()}
             />
             <SearchIcon
               sx={{
@@ -141,39 +156,27 @@ const CitySelectMobile = () => {
 
           <div
             className={clsx(
-              'flex overflow-y-auto max-h-[60vh] h-screen',
+              'flex overflow-y-auto max-h-[60vh]',
               filteredCities.length > 0
                 ? 'flex-col gap-2'
                 : 'justify-center items-center',
             )}
           >
-            {/* "Barchasi" */}
-            <div
-              key="all"
-              className="p-2 hover:bg-gray-200 text-[#121212] items-center cursor-pointer flex justify-between"
-              onClick={() => handleCitySelect('all')}
-            >
-              {'Barchasi'}
-              {selectedCity === '' && (
-                <DoneIcon sx={{ width: '14px', height: '14px' }} />
-              )}
-            </div>
-
             {filteredCities.length > 0 ? (
-              filteredCities.map((cityName) => (
+              filteredCities.map((city) => (
                 <div
-                  key={cityName}
-                  className="p-2 hover:bg-gray-200 text-[#121212] items-center cursor-pointer flex justify-between"
-                  onClick={() => handleCitySelect(cityName)}
+                  key={city.id}
+                  className="p-2 hover:bg-gray-200 text-[#121212] cursor-pointer flex justify-between"
+                  onClick={() => handleCitySelect(city)}
                 >
-                  {cityName}
-                  {cityName === selectedCity && (
-                    <DoneIcon sx={{ width: '14px', height: '14px' }} />
+                  {city.name}
+                  {selectedCity === city && (
+                    <DoneIcon sx={{ width: 14, height: 14 }} />
                   )}
                 </div>
               ))
             ) : (
-              <div className="p-2 text-[#121212] m-auto">{t('Не найдено')}</div>
+              <p className="text-[#121212] m-auto">{t('Не найдено')}</p>
             )}
           </div>
         </div>

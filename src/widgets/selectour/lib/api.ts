@@ -1,7 +1,12 @@
 import httpClient from '@/shared/config/api/httpClient';
-import { GET_TICKETS, SAVE_TICKETS } from '@/shared/config/api/URLs';
+import {
+  GET_TICKETS,
+  HOTEL_MEAL_PLAN,
+  SAVE_TICKETS,
+} from '@/shared/config/api/URLs';
+import { AxiosResponse } from 'axios';
 import qs from 'qs';
-import { TickectAll, TickectAllFilter } from './types';
+import { HotelMealPlan, TickectAll, TickectAllFilter } from './types';
 
 const Ticket_Api = {
   async GetAllTickets({
@@ -27,6 +32,13 @@ const Ticket_Api = {
     const res = await httpClient.delete(`${SAVE_TICKETS}${id}/`);
     return res;
   },
+};
+
+export const hotel_meal_plan = async (): Promise<
+  AxiosResponse<HotelMealPlan>
+> => {
+  const res = await httpClient.get(HOTEL_MEAL_PLAN);
+  return res;
 };
 
 export default Ticket_Api;

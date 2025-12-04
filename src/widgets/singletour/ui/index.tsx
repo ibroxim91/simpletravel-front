@@ -256,7 +256,7 @@ export default function SingleTour() {
                     <div className="flex items-center gap-[8px]">
                       <LocationOnIcon sx={{ color: '#084FE3' }} />
 
-                      <p className="text-[#084FE3]">{data.destination}</p>
+                      <p className="text-[#084FE3]">{data.destination?.name}</p>
                     </div>
                   </div>
 

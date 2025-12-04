@@ -136,8 +136,22 @@ export interface ToursDetailData {
   title: string;
   price: number;
   departure_date: string;
-  departure: string;
-  destination: string;
+  departure: {
+    id: number;
+    name: string;
+    country: {
+      id: number;
+      name: string;
+    };
+  };
+  destination: {
+    id: number;
+    name: string;
+    country: {
+      id: number;
+      name: string;
+    };
+  };
   languages: string;
   passenger_count: number;
   rating: number;

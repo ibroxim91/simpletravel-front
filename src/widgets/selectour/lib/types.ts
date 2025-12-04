@@ -35,11 +35,25 @@ export interface TickectAllResults {
   slug: string;
   price: number;
   departure_time: string;
-  departure: string;
+  departure: {
+    id: number;
+    name: string;
+    country: {
+      id: number;
+      name: string;
+    };
+  };
   passenger_count: number;
   rating: number;
   duration_days: number;
-  destination: string;
+  destination: {
+    id: number;
+    name: string;
+    country: {
+      id: number;
+      name: string;
+    };
+  };
   ticket_images: string;
   ticket_amenities: { name: string }[];
   badge: { id: number; name: string; color: string }[];
@@ -80,4 +94,12 @@ export interface TickectAllFilter {
   title?: string;
   visa_required?: boolean | string;
   cheapest?: boolean;
+}
+
+export interface HotelMealPlan {
+  status: boolean;
+  data: {
+    id: number;
+    name: string;
+  }[];
 }

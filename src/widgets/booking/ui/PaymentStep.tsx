@@ -337,7 +337,7 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
         <div className="grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465]">
           <p className="text-md">{t('Локация')}</p>
           <p className="text-[#212122] text-end break-words">
-            {data?.data.destination}
+            {data?.data.destination?.name}
           </p>
         </div>
 

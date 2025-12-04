@@ -42,11 +42,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     return {
       title: seoTitle,
-      description: seoDescription,
+      description: seoDescription?.name,
       alternates: { canonical: canonicalUrl },
       openGraph: {
         title: seoTitle,
-        description: seoDescription,
+        description: seoDescription?.name,
         url: canonicalUrl,
         type: 'website',
         locale,
@@ -63,7 +63,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       twitter: {
         card: 'summary_large_image',
         title: seoTitle,
-        description: seoDescription,
+        description: seoDescription?.name,
         images: [ogImage],
       },
     };

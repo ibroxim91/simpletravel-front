@@ -139,7 +139,7 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
             <div className="flex gap-2 flex-col">
               <div className="flex items-center">
                 <LocationTour width={24} height={24} color="#084FE3" />
-                <p className="text-[#031753]">{data.destination}</p>
+                <p className="text-[#031753]">{data.destination?.name}</p>
               </div>
               {data.ticket_hotel.length > 0 && (
                 <div className="flex items-center">

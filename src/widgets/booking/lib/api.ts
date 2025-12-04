@@ -9,10 +9,24 @@ import {
 export interface Get_Info {
   status: boolean;
   data: {
-    departure: string;
+    departure: {
+      id: number;
+      name: string;
+      country: {
+        id: number;
+        name: string;
+      };
+    };
     min_person: number;
     max_person: number;
-    destination: string;
+    destination: {
+      id: number;
+      name: string;
+      country: {
+        id: number;
+        name: string;
+      };
+    };
     price: number;
     departure_date: string;
     departure_time: string;

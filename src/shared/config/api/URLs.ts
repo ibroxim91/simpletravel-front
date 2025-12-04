@@ -6,6 +6,10 @@ const GET_TICKETS = '/api/v1/tickets/';
 const GET_BLOGS = '/api/v1/post/';
 const GET_TAGS = '/api/v1/category/';
 
+const COUNTRIES = '/api/v1/countries/';
+
+const HOTEL_MEAL_PLAN = '/api/v1/hotel-meal-plan/';
+
 //Auth
 const PHONE_SENDOTP = '/api/v1/auth/register/';
 const PHONE_RESTER_PASSWORD = '/api/v1/auth/reset-password/';
@@ -52,6 +56,7 @@ const LOCATIONS = '/api/v1/locations/';
 
 export {
   BASE_URL,
+  COUNTRIES,
   DONWLOAD_PDF,
   EMAIL_CONFIRM_RESET_PASS,
   EMAIL_CONFIRMOTP,
@@ -72,6 +77,7 @@ export {
   GET_SAVED,
   GET_TAGS,
   GET_TICKETS,
+  HOTEL_MEAL_PLAN,
   LOCATIONS,
   NEW_PASSWORD,
   PARTICIPANT,

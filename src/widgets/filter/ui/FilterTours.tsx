@@ -1,21 +1,31 @@
+import { country_api, CountryListData } from '@/shared/config/api/country';
 import { useRouter } from '@/shared/config/i18n/navigation';
 import formatDate from '@/shared/lib/formatDate';
+import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/button';
 import { Calendar } from '@/shared/ui/calendar';
+import {
+  Command,
+  CommandEmpty,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/shared/ui/command';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
-import { location_api } from '@/widgets/navbar/lib/api';
+import { MarqueeText } from '@/shared/ui/MarqueeTex';
+import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import AddIcon from '@mui/icons-material/Add';
 import AirplanemodeActiveIcon from '@mui/icons-material/AirplanemodeActive';
 import ArrowDropUpOutlinedIcon from '@mui/icons-material/ArrowDropUpOutlined';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import DoneIcon from '@mui/icons-material/Done';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import RemoveIcon from '@mui/icons-material/Remove';
-import SearchIcon from '@mui/icons-material/Search';
 import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Loader2, MoveLeft, MoveRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -25,14 +35,8 @@ const FilterTours = () => {
   const t = useTranslations();
   const route = useRouter();
   const searchParams = useSearchParams();
-  const [openCity, setOpenCity] = useState(false);
   const [ageOpen, setAgeOpen] = useState(false);
-  const [where, setWhere] = useState(false);
   const [dataOpen, setDataOpen] = useState(false);
-  const [search, setSearch] = useState('');
-  const [selectedCity, setSelectedCity] = useState('');
-  const [selectedWhere, setSelectedWhere] = useState('');
-  const [searchWhere, setSearchWhere] = useState('');
   const [fromDate, setFromDate] = useState<Date | undefined>();
   const [toDate, setToDate] = useState<Date | undefined>();
   const [selectData, setSelectData] = useState<string>('');
@@ -40,74 +44,128 @@ const FilterTours = () => {
   const [children, setChildren] = useState<number>(0);
   const selectAge = adults + children;
   const [range, setRange] = useState<DateRange | undefined>();
-  const [cities, setCities] = useState<string[] | []>([]);
-  const [citiesWhere, setCitiesWhere] = useState<string[] | []>([]);
+  const [selectedCountry, setSelectedCountry] = useState<string>('');
 
-  const { data: ticket } = useQuery({
-    queryKey: ['location_list'],
-    queryFn: () => location_api.location_list(),
+  const [selectedRegion, setSelectedRegion] = useState<string>('');
+  const [searchCountry, setSearchCountry] = useState('');
+  const [searchRegion, setSearchRegion] = useState('');
+  const [openCountry, setOpenCountry] = useState(false);
+  const [openDest, setOpenDest] = useState(false);
+  const [selectedDestCountry, setSelectedDestCountry] = useState<string>('');
+  const [selectedDestRegion, setSelectedDestRegion] = useState<string>('');
+  const [searchDestCountry, setSearchDestCountry] = useState('');
+  const [searchDestRegion, setSearchDestRegion] = useState('');
+
+  const { data: countries, isLoading } = useQuery({
+    queryKey: ['country_list'],
+    queryFn: () => country_api.list(),
     select(data) {
       return data.data.data;
     },
   });
 
-  useEffect(() => {
-    if (ticket) {
-      const uniqueCities = Array.from(
-        new Set(ticket.departures.slice(0, 8).map((e) => e)),
-      );
-      setCities(uniqueCities);
-
-      const uniqueCitiesWhere = Array.from(
-        new Set(ticket.destinations.slice(0, 8).map((e) => e)),
-      );
-      setCitiesWhere(uniqueCitiesWhere);
-    }
-  }, [ticket]);
-
-  const filteredCities = cities.filter((c) =>
-    c.toLowerCase().includes(search.toLowerCase()),
-  );
-  const filteredCitiesWhere = citiesWhere.filter((c) =>
-    c.toLowerCase().includes(searchWhere.toLowerCase()),
+  const filteredCountries = countries?.filter((c) =>
+    c.name.toLowerCase().includes(searchCountry.toLowerCase()),
   );
 
+  const filteredRegions = countries
+    ?.find((c) => c.name === selectedCountry)
+    ?.regions.filter((r) =>
+      r.name.toLowerCase().includes(searchRegion.toLowerCase()),
+    );
+
+  const filteredDestCountries = countries?.filter((c) =>
+    c.name.toLowerCase().includes(searchDestCountry.toLowerCase()),
+  );
+
+  const filteredDestRegions = countries
+    ?.find((c) => c.name === selectedDestCountry)
+    ?.regions.filter((r) =>
+      r.name.toLowerCase().includes(searchDestRegion.toLowerCase()),
+    );
+
   useEffect(() => {
-    const departure = searchParams.get('departure');
+    const departureId = searchParams.get('departure');
     const destination = searchParams.get('destination');
     const dateFrom = searchParams.get('dateFrom');
     const dateTo = searchParams.get('dateTo');
     const adultsParam = searchParams.get('adults');
     const childrenParam = searchParams.get('children');
 
-    setSearch(departure || '');
-    setSearchWhere(destination || '');
+    if (departureId) {
+      const regionId = Number(departureId);
+      let foundCountry: CountryListData | undefined;
+      let foundRegion: { id: number; name: string } | undefined;
+
+      countries?.forEach((c) => {
+        const r = c.regions.find((reg) => reg.id === regionId);
+        if (r) {
+          foundCountry = c;
+          foundRegion = r;
+        }
+      });
+
+      if (foundCountry && foundRegion) {
+        setSelectedCountry(foundCountry.name);
+        setSelectedRegion(String(foundRegion.id));
+      }
+    }
+
+    if (destination) {
+      const regionId = Number(destination);
+
+      let foundCountry: CountryListData | undefined;
+      let foundRegion: { id: number; name: string } | undefined;
+
+      countries?.forEach((c) => {
+        const reg = c.regions.find((r) => r.id === regionId);
+        if (reg) {
+          foundCountry = c;
+          foundRegion = reg;
+        }
+      });
+
+      if (foundCountry && foundRegion) {
+        setSelectedDestCountry(foundCountry.name);
+        setSelectedDestRegion(String(foundRegion.id));
+      }
+    }
 
     const from = dateFrom ? new Date(dateFrom) : undefined;
     const to = dateTo ? new Date(dateTo) : undefined;
-
     setFromDate(from);
     setToDate(to);
 
     if (from && to) {
       setRange({ from, to });
       setSelectData(
-        `${formatDate.format(from, 'DD/MM/YYYY')} - ${formatDate.format(
-          to,
-          'DD/MM/YYYY',
-        )}`,
+        `${formatDate.format(from, 'DD/MM/YYYY')} - ${formatDate.format(to, 'DD/MM/YYYY')}`,
       );
     }
 
     setAdults(adultsParam ? parseInt(adultsParam) : 0);
     setChildren(childrenParam ? parseInt(childrenParam) : 0);
-  }, [searchParams]);
+  }, [searchParams, countries]);
 
   const saveFilter = () => {
     const params = new URLSearchParams();
 
-    if (search) params.set('departure', search);
-    if (searchWhere) params.set('destination', searchWhere);
+    if (selectedCountry) {
+      if (selectedRegion) {
+        params.set('departure', selectedRegion);
+      } else {
+        params.set('departure', selectedCountry);
+      }
+    }
+
+    if (selectedDestCountry) {
+      if (selectedDestRegion) {
+        params.set('destination', selectedDestRegion);
+      } else {
+        params.set('destination', selectedDestCountry);
+      }
+    }
+
     if (fromDate)
       params.set('dateFrom', formatDate.format(fromDate, 'YYYY-MM-DD'));
     if (toDate) params.set('dateTo', formatDate.format(toDate, 'YYYY-MM-DD'));
@@ -117,178 +175,302 @@ const FilterTours = () => {
     route.push(`/selectour?page=1&${params.toString()}`);
   };
 
+  const items = selectedCountry ? filteredRegions : filteredCountries;
+  const itemsDes = selectedDestCountry
+    ? filteredDestRegions
+    : filteredDestCountries;
+
   return (
     <div className="mt-10 bg-white shadow-sm py-4 gap-4 w-full rounded-3xl grid grid-cols-5 items-center px-10 max-lg:hidden font-medium">
-      <div className="relative gap-2 h-full ">
-        <div
-          onClick={() => setOpenCity(!openCity)}
-          className="cursor-pointer flex flex-col gap-2"
-        >
-          <Label className="font-semibold text-md text-[#121212]">
-            {t('Откуда')}
-          </Label>
-          <div className="relative">
-            <Input
-              className="h-[60px] text-md placeholder:text-md placeholder:text-[#A3A3A3]"
-              placeholder={t('Откуда')}
-              value={search || selectedCity}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setSelectedCity(e.target.value);
-              }}
-            />
-            <LocationOnIcon
-              sx={{
-                position: 'absolute',
-                color: '#121212',
-                top: '50%',
-                right: '10px',
-                transform: 'translateY(-50%)',
-                pointerEvents: 'none',
-              }}
-            />
-          </div>
-        </div>
-
-        {openCity && (
-          <>
-            <div
-              className="fixed inset-0 z-10"
-              onClick={() => setOpenCity(false)}
-            />
-            <ArrowDropUpOutlinedIcon
-              sx={{
-                position: 'absolute',
-                top: '85px',
-                zIndex: 40,
-                fontSize: '32px',
-                color: 'white',
-              }}
-            />
-            <div
-              className="absolute top-[105px] border shadow-2xl rounded-2xl bg-white w-60 z-40 p-2"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="relative mb-2">
-                <SearchIcon className="absolute left-2 top-1/2 -translate-y-1/2 text-[#909091]" />
-                <Input
-                  placeholder={t('Укажите город')}
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-10 text-[#212122] placeholder:text-[#909091]"
-                />
-              </div>
-              {filteredCities.length > 0 ? (
-                filteredCities.map((cityName) => (
-                  <div
-                    key={cityName}
-                    className="p-2 hover:bg-gray-200 rounded-lg text-[#212122] items-center cursor-pointer flex justify-between"
-                    onClick={() => {
-                      setSelectedCity(cityName);
-                      setSearch(cityName);
-                      setOpenCity(false);
-                    }}
-                  >
-                    {cityName}
-                    {cityName === selectedCity && (
-                      <DoneIcon sx={{ width: '14px', height: '14px' }} />
-                    )}
-                  </div>
-                ))
-              ) : (
-                <div className="p-2 text-[#212122] text-center">
-                  {t('Не найдено')}
-                </div>
+      <div className="flex flex-col relative gap-2 h-full">
+        <Label className="text-md">{t('Откуда')}</Label>
+        <Popover open={openCountry} onOpenChange={setOpenCountry}>
+          <PopoverTrigger asChild>
+            <Button
+              type="button"
+              variant="outline"
+              role="combobox"
+              aria-expanded={openCountry}
+              className={cn(
+                'w-full h-14 cursor-pointer relative min-w-0',
+                selectedCountry
+                  ? 'text-black hover:text-black'
+                  : 'text-muted-foreground hover:text-muted-foreground',
               )}
-            </div>
-          </>
-        )}
+            >
+              <span className="flex-1 min-w-0 pr-5">
+                <MarqueeText speed={3}>
+                  {selectedCountry ? (
+                    <div className="flex gap-1.5 items-center">
+                      {selectedCountry}
+                      {selectedRegion && (
+                        <>
+                          <MoveRight />
+                          {
+                            countries
+                              ?.find((e) => e.name === selectedCountry)
+                              ?.regions.find(
+                                (e) => e.id === Number(selectedRegion),
+                              )?.name
+                          }
+                        </>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex gap-1.5">{t('Mamlakat tanlang')}</div>
+                  )}
+                </MarqueeText>
+              </span>
+
+              <LocationOnIcon
+                sx={{
+                  position: 'absolute',
+                  color: '#121212',
+                  top: '50%',
+                  right: '10px',
+                  transform: 'translateY(-50%)',
+                  pointerEvents: 'none',
+                }}
+              />
+            </Button>
+          </PopoverTrigger>
+
+          <AnimatePresence>
+            {openCountry && (
+              <PopoverContent
+                align="start"
+                className="p-0 w-[var(--radix-popover-trigger-width)]"
+              >
+                <motion.div
+                  initial={{ opacity: 0, x: -15 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -15 }}
+                  transition={{ duration: 0.25, ease: 'easeOut' }}
+                  className="w-full p-0 bg-white rounded-md shadow-lg overflow-hidden"
+                >
+                  <Command>
+                    <CommandInput
+                      placeholder={t('Qidirish')}
+                      value={selectedCountry ? searchRegion : searchCountry}
+                      onChange={(e) =>
+                        selectedCountry
+                          ? setSearchRegion(e.target.value)
+                          : setSearchCountry(e.target.value)
+                      }
+                    />
+                    {selectedCountry && (
+                      <motion.div
+                        key="change-country-btn"
+                        initial={{ opacity: 0, x: -5 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -5 }}
+                        transition={{ duration: 0.2 }}
+                        layout
+                      >
+                        <Button
+                          variant={'ghost'}
+                          onClick={() => {
+                            setSelectedCountry('');
+                            setSelectedRegion('');
+                          }}
+                          className="mt-1"
+                        >
+                          <MoveLeft className="size-5" />
+                          {t('Boshqa davlat tanlash')}
+                        </Button>
+                      </motion.div>
+                    )}
+                    <CommandList className="px-1 gap-2">
+                      {items?.length ? (
+                        items.map((item) => (
+                          <AnimatePresence key={selectedCountry + item.id}>
+                            <motion.div
+                              key={selectedCountry + item.id}
+                              initial={{ opacity: 0, x: -15 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              exit={{ opacity: 0, x: -15 }}
+                              transition={{ duration: 0.2 }}
+                              layout
+                            >
+                              <CommandItem
+                                onClick={() => {
+                                  if (selectedCountry) {
+                                    setSelectedRegion(String(item.id));
+                                    setOpenCountry(false);
+                                  } else {
+                                    setSelectedCountry(item.name);
+                                  }
+                                }}
+                              >
+                                {item.name}
+                              </CommandItem>
+                            </motion.div>
+                          </AnimatePresence>
+                        ))
+                      ) : selectedCountry ? (
+                        <CommandEmpty>{t('Shahar topilmadi')}</CommandEmpty>
+                      ) : isLoading ? (
+                        <div className="py-6 text-center">
+                          <Loader2 className="animate-spin" />
+                        </div>
+                      ) : (
+                        <CommandEmpty>{t('Davlat topilmadi')}</CommandEmpty>
+                      )}
+                    </CommandList>
+                  </Command>
+                </motion.div>
+              </PopoverContent>
+            )}
+          </AnimatePresence>
+        </Popover>
       </div>
 
-      <div className="relative gap-2 h-full ">
-        <div
-          onClick={() => setWhere(!where)}
-          className="cursor-pointer flex flex-col gap-2"
-        >
-          <Label className="font-semibold text-md text-[#121212]">
-            {t('Куда')}
-          </Label>
-          <div className="relative">
-            <Input
-              className="h-[60px] text-md placeholder:text-md placeholder:text-[#A3A3A3]"
-              placeholder={t('Страна, курорт')}
-              value={searchWhere || selectedWhere}
-              onChange={(e) => {
-                setSearchWhere(e.target.value);
-                setSelectedWhere(e.target.value);
-              }}
-            />
-            <AirplanemodeActiveIcon
-              sx={{
-                position: 'absolute',
-                color: '#212122',
-                top: '50%',
-                right: '10px',
-                transform: 'translateY(-50%)',
-                pointerEvents: 'none',
-              }}
-            />
-          </div>
-        </div>
+      <div className="flex flex-col relative gap-2 h-full">
+        <Label className="text-md">{t('Куда')}</Label>
 
-        {where && (
-          <>
-            <div
-              className="fixed inset-0 z-40"
-              onClick={() => setWhere(false)}
-            />
-            <ArrowDropUpOutlinedIcon
-              sx={{
-                position: 'absolute',
-                top: '85px',
-                zIndex: 50,
-                fontSize: '32px',
-                color: 'white',
-              }}
-            />
-            <div
-              className="absolute top-[105px] border shadow-2xl rounded-2xl bg-white w-60 z-40 p-2"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="relative mb-2">
-                <SearchIcon className="absolute left-2 top-1/2 -translate-y-1/2 text-[#909091]" />
-                <Input
-                  placeholder={t('Укажите город')}
-                  value={searchWhere}
-                  onChange={(e) => setSearchWhere(e.target.value)}
-                  className="w-full pl-10 text-[#212122] placeholder:text-[#909091]"
-                />
-              </div>
-              {filteredCitiesWhere.length > 0 ? (
-                filteredCitiesWhere.map((cityName) => (
-                  <div
-                    key={cityName}
-                    className="p-2 hover:bg-gray-200 rounded-lg text-[#212122] items-center cursor-pointer flex justify-between"
-                    onClick={() => {
-                      setSelectedWhere(cityName);
-                      setSearchWhere(cityName);
-                      setWhere(false);
-                    }}
-                  >
-                    {cityName}
-                    {cityName === selectedWhere && (
-                      <DoneIcon sx={{ width: '14px', height: '14px' }} />
-                    )}
-                  </div>
-                ))
-              ) : (
-                <div className="p-2 text-[#212122] text-center">
-                  {t('Не найдено')}
-                </div>
+        <Popover open={openDest} onOpenChange={setOpenDest}>
+          <PopoverTrigger asChild>
+            <Button
+              type="button"
+              variant="outline"
+              role="combobox"
+              aria-expanded={openDest}
+              className={cn(
+                'w-full h-14 cursor-pointer relative min-w-0',
+                selectedDestCountry
+                  ? 'text-black hover:text-black'
+                  : 'text-muted-foreground hover:text-muted-foreground',
               )}
-            </div>
-          </>
-        )}
+            >
+              <span className="flex-1 min-w-0 pr-5">
+                <MarqueeText speed={3}>
+                  {selectedDestCountry ? (
+                    <div className="flex gap-1.5 items-center">
+                      {selectedDestCountry}
+                      {selectedDestRegion && (
+                        <>
+                          <MoveRight />
+                          {
+                            countries
+                              ?.find((e) => e.name === selectedDestCountry)
+                              ?.regions.find(
+                                (e) => e.id === Number(selectedDestRegion),
+                              )?.name
+                          }
+                        </>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex gap-1.5">{t('Mamlakat tanlang')}</div>
+                  )}
+                </MarqueeText>
+              </span>
+
+              <AirplanemodeActiveIcon
+                sx={{
+                  position: 'absolute',
+                  color: 'black',
+                  top: '50%',
+                  right: '10px',
+                  transform: 'translateY(-50%)',
+                  pointerEvents: 'none',
+                }}
+              />
+            </Button>
+          </PopoverTrigger>
+
+          <AnimatePresence>
+            {openDest && (
+              <PopoverContent
+                align="start"
+                className="p-0 w-[var(--radix-popover-trigger-width)]"
+              >
+                <motion.div
+                  initial={{ opacity: 0, x: -15 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -15 }}
+                  transition={{ duration: 0.25, ease: 'easeOut' }}
+                  className="w-full p-0 bg-white rounded-md shadow-lg overflow-hidden"
+                >
+                  <Command>
+                    <CommandInput
+                      placeholder={t('Qidirish')}
+                      value={
+                        selectedDestCountry
+                          ? searchDestRegion
+                          : searchDestCountry
+                      }
+                      onChange={(e) =>
+                        selectedDestCountry
+                          ? setSearchDestRegion(e.target.value)
+                          : setSearchDestCountry(e.target.value)
+                      }
+                    />
+                    {selectedDestCountry && (
+                      <motion.div
+                        key="change-country-btn"
+                        initial={{ opacity: 0, x: -5 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -5 }}
+                        transition={{ duration: 0.2 }}
+                        layout
+                      >
+                        <Button
+                          variant={'ghost'}
+                          onClick={() => {
+                            setSelectedDestCountry('');
+                            setSelectedDestRegion('');
+                          }}
+                          className="mt-1"
+                        >
+                          <MoveLeft className="size-5" />
+                          {t('Boshqa davlat tanlash')}
+                        </Button>
+                      </motion.div>
+                    )}
+                    <CommandList className="px-1 gap-2">
+                      {itemsDes?.length ? (
+                        itemsDes.map((item) => (
+                          <AnimatePresence key={selectedDestCountry + item.id}>
+                            <motion.div
+                              key={selectedDestCountry + item.id}
+                              initial={{ opacity: 0, x: -15 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              exit={{ opacity: 0, x: -15 }}
+                              transition={{ duration: 0.2 }}
+                              layout
+                            >
+                              <CommandItem
+                                onClick={() => {
+                                  if (selectedDestCountry) {
+                                    setSelectedDestRegion(String(item.id));
+                                    setOpenDest(false);
+                                  } else {
+                                    setSelectedDestCountry(item.name);
+                                  }
+                                }}
+                              >
+                                {item.name}
+                              </CommandItem>
+                            </motion.div>
+                          </AnimatePresence>
+                        ))
+                      ) : selectedDestCountry ? (
+                        <CommandEmpty>{t('Shahar topilmadi')}</CommandEmpty>
+                      ) : isLoading ? (
+                        <div className="py-6 text-center">
+                          <Loader2 className="animate-spin" />
+                        </div>
+                      ) : (
+                        <CommandEmpty>{t('Davlat topilmadi')}</CommandEmpty>
+                      )}
+                    </CommandList>
+                  </Command>
+                </motion.div>
+              </PopoverContent>
+            )}
+          </AnimatePresence>
+        </Popover>
       </div>
       <div className="relative gap-2 h-full ">
         <div
@@ -300,7 +482,7 @@ const FilterTours = () => {
           </Label>
           <div className="relative">
             <Input
-              className="h-[60px] text-md placeholder:text-[#A3A3A3]"
+              className="h-14 text-md placeholder:text-[#A3A3A3]"
               placeholder={t('Когда')}
               value={selectData}
               readOnly
@@ -422,7 +604,7 @@ const FilterTours = () => {
           </Label>
           <div className="relative">
             <Input
-              className="h-[60px] text-md placeholder:text-md placeholder:text-[#A3A3A3]"
+              className="h-14 text-md placeholder:text-md placeholder:text-[#A3A3A3]"
               placeholder={t('Туристы')}
               value={selectAge === 0 ? '' : selectAge}
               readOnly
@@ -515,10 +697,9 @@ const FilterTours = () => {
         )}
       </div>
 
-      <div className="flex flex-col gap-2">
-        <div className="h-[25px]" />
+      <div className="flex h-full items-end">
         <Button
-          className="bg-[#1764FC] cursor-pointer hover:bg-[#1764FC] text-lg text-white h-[60px] flex items-center justify-center rounded-4xl font-semibold"
+          className="bg-[#1764FC] cursor-pointer hover:bg-[#1764FC] text-lg text-white h-14 w-full flex items-center justify-center rounded-4xl font-semibold"
           onClick={saveFilter}
         >
           <p>{t('Искать туры')}</p>

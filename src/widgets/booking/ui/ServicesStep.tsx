@@ -214,8 +214,6 @@ export default function ServicesStep({
     localStorage.setItem('totalPrice', JSON.stringify(total_price));
   }
 
-  console.log(form.formState.errors);
-
   return (
     <div>
       <div className="w-full bg-[#FFFFFF] p-[20px] rounded-[20px] relative">

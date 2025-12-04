@@ -39,6 +39,7 @@ export default function TimeStep({ onNext, data }: Props) {
     setDispatch,
     setReturned,
   } = formStore();
+
   const [date, setDate] = useState<Date>();
   const [dateReturned, setDateReturned] = useState<Date>();
   const [openReturned, setOpenReturned] = useState(false);
@@ -87,8 +88,8 @@ export default function TimeStep({ onNext, data }: Props) {
     if (data) {
       const departure = new Date(data.data.departure_time);
 
-      form.setValue('where', data.data.departure);
-      form.setValue('whereTo', data.data.destination);
+      form.setValue('where', String(data.data.departure?.id));
+      form.setValue('whereTo', String(data.data.destination?.id));
       form.setValue('dispatch', departure);
       form.setValue('returned', new Date(data.data.travel_time));
     }
@@ -116,6 +117,7 @@ export default function TimeStep({ onNext, data }: Props) {
                           placeholder={t('Откуда')}
                           {...field}
                           disabled
+                          value={data?.data.departure?.name}
                           className=" w-full h-full border-2 border-[#EDEEF1] justify-between p-[15px] rounded-md placeholder:text-[#A3A3A3] text-[#121212]"
                         />
                         <LocationOnIcon
@@ -150,6 +152,7 @@ export default function TimeStep({ onNext, data }: Props) {
                           disabled
                           placeholder={t('Куда')}
                           {...field}
+                          value={data?.data.destination?.name}
                           className=" w-full h-full border-2 border-[#EDEEF1] justify-between p-[15px] rounded-md placeholder:text-[#A3A3A3] text-[#121212]"
                         />
                         <FlightIcon

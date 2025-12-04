@@ -208,7 +208,7 @@ const HotTours = () => {
                           <div className="flex gap-2 mt-2">
                             <MapPin className="size-6" color="#084FE3" />
                             <p className="line-clamp-1 w-fit text-md text-[#031753]">
-                              {e.destination}
+                              {e.destination?.name}
                             </p>
                           </div>
                           {e.ticket_hotel.length > 0 && (
@@ -353,7 +353,7 @@ const HotTours = () => {
                           <div className="flex gap-2 mt-2">
                             <MapPin className="size-6" color="#084FE3" />
                             <p className="line-clamp-1 w-fit text-md text-[#031753]">
-                              {e.destination}
+                              {e.destination?.name}
                             </p>
                           </div>
                           {e.ticket_hotel.length > 0 && (

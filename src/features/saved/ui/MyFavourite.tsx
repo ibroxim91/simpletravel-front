@@ -486,7 +486,7 @@ const MyFavourite = () => {
                               {e.title}
                             </p>
                             <p className="text-md text-[#031753]">
-                              {e.destination}
+                              {e.destination?.name}
                             </p>
                             <p className="mt-2 text-[#084FE3] font-semibold">
                               {formatPrice(

@@ -175,7 +175,7 @@ export default function TourInfoStep({
                 sx={{ width: '24px', height: '24px', color: '#084FE3' }}
               />
               <p className="text-[#031753] font-normal">
-                {data?.data.destination}
+                {data?.data.destination?.name}
               </p>
             </div>
 

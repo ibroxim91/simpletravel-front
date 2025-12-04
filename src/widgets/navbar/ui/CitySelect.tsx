@@ -1,5 +1,6 @@
 'use client';
 
+import { country_api } from '@/shared/config/api/country';
 import { useRouter } from '@/shared/config/i18n/navigation';
 import { Input } from '@/shared/ui/input';
 import { useFilterToursStore } from '@/widgets/filter/lib/store';
@@ -12,86 +13,90 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { location_api } from '../lib/api';
+
+interface RegionType {
+  id: number | string;
+  name: string;
+}
 
 const CitySelect = () => {
   const t = useTranslations();
   const route = useRouter();
   const searchParams = useSearchParams();
+  const departure = searchParams.get('departure');
+
   const { where, setStoreWhere } = useFilterToursStore();
 
   const [openCity, setOpenCity] = useState(false);
   const [search, setSearch] = useState('');
-  const [selectedCity, setSelectedCity] = useState('');
+  const [selectedCity, setSelectedCity] = useState<RegionType | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const [citiesWhere, setCitiesWhere] = useState<string[]>([]);
 
-  // Fetch tickets
-  const { data: ticket } = useQuery({
-    queryKey: ['location_list'],
-    queryFn: () => location_api.location_list(),
+  const { data: countries } = useQuery({
+    queryKey: ['country_list'],
+    queryFn: () => country_api.list(),
     select(data) {
       return data.data.data;
     },
   });
 
-  // Set unique cities from tickets
   useEffect(() => {
-    if (ticket) {
-      const uniqueCities = Array.from(
-        new Set(ticket.departures.slice(0, 8).map((e) => e)),
-      );
-      setCitiesWhere(uniqueCities);
+    if (!countries) return;
+
+    if (departure) {
+      const foundByQuery = countries
+        .flatMap((c) => c.regions)
+        .find((region: RegionType) => String(region.id) === String(departure));
+
+      if (foundByQuery) {
+        setSelectedCity(foundByQuery);
+        setStoreWhere(String(foundByQuery.id));
+        return;
+      }
     }
-  }, [ticket]);
 
-  // Handle URL params and store
-  useEffect(() => {
-    const destinationParam = searchParams.get('departure') || '';
+    if (where) {
+      const foundByStore = countries
+        .flatMap((c) => c.regions)
+        .find((region: RegionType) => String(region.id) === String(where));
 
-    // Ustunlik beramiz store qiymatiga
-    const cityToDisplay = where || destinationParam;
+      if (foundByStore) {
+        setSelectedCity(foundByStore);
+      } else {
+        setSelectedCity(null);
+      }
+    }
+  }, [countries, departure, where]);
 
-    setSelectedCity(cityToDisplay);
-    setSearch(cityToDisplay);
-  }, [searchParams, where]);
+  useEffect(() => {}, []);
 
-  // Filter cities for search
-  const filteredCities = citiesWhere.filter((c) =>
-    c.toLowerCase().includes(search.toLowerCase()),
-  );
+  const handleCitySelect = (city: RegionType | 'all') => {
+    const params = new URLSearchParams(searchParams.toString());
 
-  // Handle selecting a city
-  const handleCitySelect = (cityName: string) => {
-    if (cityName === 'all') {
-      setSelectedCity('');
+    if (city === 'all') {
+      setSelectedCity(null);
       setSearch('');
       setStoreWhere('');
-
-      // URL dan destination ni o'chirish
-      const params = new URLSearchParams(searchParams.toString());
       params.delete('departure');
-      params.set('page', '1');
-
-      route.push(`/selectour?${params.toString()}`);
     } else {
-      setSelectedCity(cityName);
-      setSearch(cityName);
-      setStoreWhere(cityName);
-
-      const params = new URLSearchParams(searchParams.toString());
-      params.set('departure', cityName);
-      params.set('page', '1');
-
-      route.push(`/selectour?${params.toString()}`);
+      setSelectedCity(city);
+      setStoreWhere(String(city.id));
+      params.set('departure', String(city.id));
     }
 
+    params.set('page', '1');
+    route.push(`/selectour?${params.toString()}`);
     setOpenCity(false);
   };
 
-  // Display city name or placeholder
-  const displayCity =
-    !selectedCity || selectedCity === 'all' ? t('Укажите город') : selectedCity;
+  const displayCity = selectedCity ? selectedCity.name : t('Укажите город');
+
+  const filteredRegions =
+    countries?.flatMap((country) =>
+      country.regions.filter((region) =>
+        region.name.toLowerCase().includes(search.toLowerCase()),
+      ),
+    ) ?? [];
 
   return (
     <div
@@ -129,45 +134,29 @@ const CitySelect = () => {
       )}
 
       {openCity && (
-        <div
-          className="absolute top-10 mt-1.5 shadow-md font-medium rounded-2xl bg-white w-60 z-50 p-2"
-          onClick={(e) => e.stopPropagation()}
-        >
+        <div className="absolute top-10 mt-1.5 shadow-md font-medium rounded-2xl bg-white w-60 z-50 p-2">
           <div className="relative mb-2 flex items-center gap-2">
             <div className="relative flex-1">
               <SearchIcon className="absolute left-2 top-1/2 -translate-y-1/2 text-[#909091]" />
               <Input
                 placeholder={t('Укажите город')}
-                className="w-full pl-10 text-[#212122] placeholder:text-[#909091]"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
+                className="w-full pl-10 text-[#212122] placeholder:text-[#909091]"
               />
             </div>
           </div>
 
-          {/* "Barchasi" */}
-          <div
-            key="all"
-            className="p-2 hover:bg-gray-200 rounded-lg text-[#212122] flex justify-between items-center cursor-pointer"
-            onClick={() => handleCitySelect('all')}
-          >
-            {'Barchasi'}
-            {selectedCity === '' && (
-              <DoneIcon sx={{ width: '14px', height: '14px' }} />
-            )}
-          </div>
-
-          {/* Cities list */}
-          {filteredCities.length > 0 ? (
-            filteredCities.map((cityName) => (
+          {filteredRegions.length > 0 ? (
+            filteredRegions.map((city) => (
               <div
-                key={cityName}
+                key={city.id}
                 className="p-2 hover:bg-gray-200 rounded-lg text-[#212122] flex justify-between items-center cursor-pointer"
-                onClick={() => handleCitySelect(cityName)}
+                onClick={() => handleCitySelect(city)}
               >
-                {cityName}
-                {cityName === selectedCity && (
-                  <DoneIcon sx={{ width: '14px', height: '14px' }} />
+                {city.name}
+                {selectedCity?.id === city.id && (
+                  <DoneIcon sx={{ width: 14, height: 14 }} />
                 )}
               </div>
             ))
