@@ -23,9 +23,11 @@ import PaymentStep from './PaymentStep';
 import ServicesStep from './ServicesStep';
 import TimeStep from './TimeStep';
 import TourInfoStep from './TourInfoStep';
+import { TicketsDetailAPi } from '@/widgets/singletour/lib/api';
 
 export default function Booking() {
-  const t = useTranslations();
+  const tourOperatorId = localStorage.getItem("tourOperatorId") 
+ const t = useTranslations();
   const [orderId, setOrderId] = useState<number>();
   const route = useRouter();
   const { id } = useParams();
@@ -76,14 +78,32 @@ export default function Booking() {
     hidden: { opacity: 0, x: -30 },
     visible: { opacity: 1, x: 0 },
   };
-  const { data } = useQuery({
-    queryKey: ['tickets_info', id],
-    queryFn: () => Ticketorder_Api.ticketorder_info({ id: Number(id) }),
+
+//  const data = JSON.parse( localStorage.getItem("tour") )
+//  console.log("BOOKING TOUR DATA ",data)
+
+ const { data, isLoading } = useQuery({
+    queryKey: ['tickets_detail', tourOperatorId],
+    queryFn: () =>
+      TicketsDetailAPi.getTicketsDetail({ id: String(tourOperatorId) }),
     select(data) {
       return data.data;
     },
   });
 
+  console.log()
+  console.log("BOOKING DATA ", data)
+  console.log()
+//  const { data } = useQuery({
+//    queryKey: ['tickets_info', id],
+//    queryFn: () => Ticketorder_Api.ticketorder_info({ id: String(tourOperatorId) }),
+//    select(data) {
+//      return data.data;
+//    },
+//  });
+if (isLoading){ 
+  return <div>Loading...</div>;
+}
   return (
     <div className="custom-container py-[16px]">
       <Breadcrumbs
@@ -346,8 +366,8 @@ export default function Booking() {
                   </svg>
                 </div>
               </TabsTrigger>
-              {((data && data.data.extra_service.length !== 0) ||
-                (data && data.data.paid_extra_service.length !== 0)) && (
+              {((data && data?.data?.extra_service &&  data?.data.extra_service.length !== 0) ||
+                (data &&  data.data?.paid_extra_service && data.data?.paid_extra_service.length !== 0)) && (
                 <TabsTrigger
                   value="services"
                   className={clsx(
@@ -567,9 +587,9 @@ export default function Booking() {
                       onNext={() => {
                         if (
                           data &&
-                          data.data.extra_service.length === 0 &&
+                          data?.data?.extra_service && data?.data?.extra_service.length === 0 &&
                           data &&
-                          data.data.paid_extra_service.length === 0
+                          data?.data?.paid_extra_service &&  data?.data?.paid_extra_service.length === 0
                         ) {
                           setTabsPaarams('payment');
                         } else {
@@ -583,8 +603,8 @@ export default function Booking() {
                     />
                   </motion.div>
                 )}
-                {((data && data.data.extra_service) ||
-                  data?.data.paid_extra_service) && (
+                {((data && data?.data?.extra_service) ||
+                  data?.data?.paid_extra_service) && (
                   <>
                     {activeTab === 'services' && (
                       <motion.div
@@ -625,9 +645,9 @@ export default function Booking() {
                       onPrev={() => {
                         if (
                           data &&
-                          data.data.extra_service.length === 0 &&
+                          data?.data?.extra_service && data?.data?.extra_service.length === 0 &&
                           data &&
-                          data.data.paid_extra_service.length === 0
+                          data?.data?.paid_extra_service &&  data.data?.paid_extra_service.length === 0
                         ) {
                           setTabsPaarams('package');
                         } else {

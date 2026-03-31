@@ -166,6 +166,8 @@ export default function Selectour() {
       const params: TickectAllFilter = {
         page: currentPage,
         page_size: 10,
+        adults: filterLocal?.adults,
+        children: filterLocal?.children,
         departure: filterLocal ? filterLocal.from : '',
         destination: selectedDestinations === null ? '' : selectedDestinations,
         hotel_amenity: hotelAmenities ?? '',
@@ -197,6 +199,9 @@ export default function Selectour() {
           qs.stringify(params, { arrayFormat: 'repeat' }),
       });
     },
+    staleTime: 0,
+  cacheTime: 0,
+    enabled: !!filterLocal || !!selectedDestinations,
   });
 
   const initialized = useRef(false);

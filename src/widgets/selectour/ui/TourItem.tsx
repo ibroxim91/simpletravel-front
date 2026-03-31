@@ -58,9 +58,45 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
     },
   });
 
+  const savedData = localStorage.getItem('filterTours');
+let queryString = '';
+
+if (savedData) {
+  try {
+    const filters = JSON.parse(savedData); // objectga aylantiramiz
+    const params = new URLSearchParams();
+
+    if (filters.departure) params.set('departure', filters.departure);
+    if (filters.destination) params.set('destination', filters.destination);
+    if (filters.dateFrom) params.set('dateFrom', filters.dateFrom);
+    if (filters.dateTo) params.set('dateTo', filters.dateTo);
+    if (filters.adults) params.set('adults', filters.adults);
+    if (filters.children) params.set('children', filters.children);
+
+    queryString = params.toString();
+  } catch (e) {
+    console.error('Filter parse error', e);
+  }
+}
+
+
+
+//localStorage.setItem("tourOperator", data?.operator)
+//localStorage.setItem("tourOperatorId", data?.tour_operator_id)
   return (
-    <Link href={`/selectour/${data.slug}`} prefetch={true}>
-      <motion.div
+    <Link  href={`/selectour/${data?.tour_operator_id}`} 
+       
+	 onClick={() => {
+      localStorage.setItem("tourOperator", data?.operator ?? "");
+      localStorage.setItem("tourOperatorId", String(data?.tour_operator_id ?? ""));
+
+      
+      console.log("OLD tourOperatorId",       )
+      console.log("change tourOperatorId")
+      
+    }} 
+prefetch={true}>    
+ <motion.div
         initial={{ opacity: 0, x: 30 }}
         whileInView={{ opacity: 1, x: 0 }}
         transition={{
@@ -149,14 +185,18 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
                   </p>
                 </div>
               )}
-              {data.ticket_hotel.length > 0 && (
-                <div className="flex items-center">
-                  <Star color="#084FE3" width={24} height={24} />
-                  <p className="text-[#031753] px-1">
-                    {data.ticket_hotel[0].rating} {t('звёзды')}
-                  </p>
-                </div>
-              )}
+             
+             {data.ticket_hotel.length > 0 && (
+              <div className="flex items-center">
+                <Star color="#084FE3" width={24} height={24} />
+                <p className="text-[#031753] px-1">
+                  {/^\d/.test(data.ticket_hotel[0].rating)
+                    ? `${data.ticket_hotel[0].rating} ${t('звёзды')}`
+                    : data.ticket_hotel[0].rating}
+                </p>
+              </div>
+            )}
+
             </div>
           </div>
 

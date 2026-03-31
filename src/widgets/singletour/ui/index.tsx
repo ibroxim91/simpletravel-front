@@ -49,6 +49,7 @@ import WantHelpModal from './WantHelpModal';
 import WatchTour from './WatchTour';
 import CommentTour from './commentTour';
 
+
 const fadeInUp = {
   hidden: { opacity: 0, y: 40 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
@@ -67,20 +68,27 @@ export default function SingleTour() {
   const t = useTranslations();
   const route = useRouter();
   const { tourid, locale } = useParams();
-  const idFromSlug = Array.isArray(tourid)
+  const tourOperatorId = localStorage.getItem("tourOperatorId") 
+ const idFromSlug = Array.isArray(tourid)
     ? Number(tourid[tourid.length - 1].split('-').pop())
     : tourid
       ? Number(tourid.split('-').pop())
       : undefined;
+  
+  
+
   const { data, isLoading } = useQuery({
-    queryKey: ['tickets_detail', idFromSlug],
+    queryKey: ['tickets_detail', tourOperatorId],
     queryFn: () =>
-      TicketsDetailAPi.getTicketsDetail({ id: Number(idFromSlug) }),
+      TicketsDetailAPi.getTicketsDetail({ id: String(tourOperatorId) }),
     select(data) {
+      console.log("data.data.data ",data.data.data)
+      localStorage.setItem("tour", JSON.stringify(data.data.data));
       return data.data.data;
     },
   });
 
+  
   const { data: hotTicket } = useQuery({
     queryKey: ['ticket_hot'],
     queryFn: () =>
@@ -93,6 +101,7 @@ export default function SingleTour() {
       }),
     enabled: !!data,
   });
+ 
 
   const { data: user } = useQuery({
     queryKey: ['get_me'],
@@ -182,7 +191,6 @@ export default function SingleTour() {
     return <TourDetailLoading />;
   }
 
-  console.log(data);
 
   return (
     <div className="bg-white">
@@ -371,7 +379,7 @@ export default function SingleTour() {
                     data.languages.length > 0 && data.ticket_hotel.length > 0
                       ? 'grid-cols-6'
                       : 'grid-cols-5',
-                    data.hotel_info.length > 0 ? 'mt-5' : 'mt-0',
+                    data?.hotel_info.length > 0 ? 'mt-5' : 'mt-0',
                   )}
                 >
                   {[
@@ -384,8 +392,13 @@ export default function SingleTour() {
                     data.ticket_hotel.length > 0 && {
                       id: data.ticket_hotel[0].id + '-rating',
                       img: Hotel_Star,
-                      title: `${data.ticket_hotel[0].rating} ${t('yulduzli')}`,
-                      name: t('yulduzli'),
+                      title: typeof data.ticket_hotel[0].rating === 'string' &&
+                            /^\d/.test(data.ticket_hotel[0].rating) // agar 3*, 4* kabi bo‘lsa
+                        ? `${data.ticket_hotel[0].rating} ${t('yulduzli')}`
+                        : data.ticket_hotel[0].rating, // string bo‘lsa faqat o‘zini ko‘rsat
+                      name: /^\d/.test(data.ticket_hotel[0].rating)
+                        ? t('yulduzli')
+                        : data.ticket_hotel[0].rating,
                     },
                     {
                       id: 'meal',

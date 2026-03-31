@@ -58,7 +58,7 @@ export default function ServicesStep({
       const parsed = JSON.parse(savedServices);
       setSelectedServices(parsed);
 
-      const selectedServicesData = data?.data.extra_service
+      const selectedServicesData = data?.extra_service
         .filter((item) => parsed.includes(item.id))
         .map((item) => ({
           id: item.id,
@@ -115,7 +115,7 @@ export default function ServicesStep({
         : [...prev, id];
       setExcursions(updated);
 
-      const selectedExcursionData = data?.data.paid_extra_service
+      const selectedExcursionData = data?.paid_extra_service
         .filter((service) => updated.includes(service.id))
         .map((service) => ({
           id: service.id,
@@ -139,7 +139,7 @@ export default function ServicesStep({
         ? prev.filter((s) => s !== id)
         : [...prev, id];
 
-      const selectedServicesData = data?.data.extra_service
+      const selectedServicesData = data?.extra_service
         .filter((service) => updated.includes(service.id))
         .map((service) => ({
           id: service.id,
@@ -164,7 +164,7 @@ export default function ServicesStep({
     const tariff = JSON.parse(localStorage.getItem('info') || '{}');
 
     setExcursions(selectedExcursions);
-    const selectedServicesData = data?.data.extra_service
+    const selectedServicesData = data?.extra_service
       .filter((service) => selectedServices.includes(service.id))
       .map((service) => ({
         id: service.id,
@@ -175,7 +175,7 @@ export default function ServicesStep({
       setToursCategory(selectedServicesData);
     }
 
-    const basePrice = data?.data.price || 0;
+    const basePrice = data?.price || 0;
     const paidServicesTotal = store.paidService.reduce(
       (acc, service) => acc + service.price,
       0,
@@ -233,7 +233,7 @@ export default function ServicesStep({
                     </Label>
                     <FormControl>
                       <div className="mt-4 grid grid-cols-2 justify-between gap-[16px] my-5 max-lg:grid-cols-1">
-                        {data?.data.paid_extra_service.map((opt) => {
+                        {data?.paid_extra_service.map((opt) => {
                           const isChecked = selectedExcursions.includes(opt.id);
                           return (
                             <div
@@ -279,7 +279,7 @@ export default function ServicesStep({
                   {t('Дополнительные услуги')}
                 </Label>
                 <div className="mt-[8px] grid grid-cols-2 gap-[16px] max-lg:grid-cols-1">
-                  {data?.data.extra_service.map((opt) => {
+                  {data?.extra_service.map((opt) => {
                     const isChecked = selectedServices.includes(opt.id);
                     return (
                       <div

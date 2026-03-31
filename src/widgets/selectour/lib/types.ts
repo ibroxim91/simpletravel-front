@@ -74,8 +74,9 @@ export interface TickectAllFilter {
   departure_time?: string;
   destination?: string;
   hotel_name?: string;
+  dateTo?: string;
+  dateFrom?: string;
   hotel_feature?: string[];
-  destinations?: string;
   duration_days?: string;
   rating?: number;
   hotel_rating?: string;
@@ -87,6 +88,8 @@ export interface TickectAllFilter {
   most_expensive?: boolean;
   max_departure_date?: string;
   min_departure_date?: string;
+  adults?: number;
+  children?: number;
   passenger_count?: number;
   page: number;
   page_size: number;

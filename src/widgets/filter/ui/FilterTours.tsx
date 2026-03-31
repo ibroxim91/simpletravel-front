@@ -91,7 +91,17 @@ const FilterTours = () => {
     const dateTo = searchParams.get('dateTo');
     const adultsParam = searchParams.get('adults');
     const childrenParam = searchParams.get('children');
+        const filters = {
+      departure: departureId,
+      destination,
+      dateFrom,
+      dateTo,
+      adults: adultsParam,
+      children: childrenParam,
+    };
+    localStorage.setItem('filterTours', JSON.stringify(filters));
 
+		
     if (departureId) {
       const regionId = Number(departureId);
       let foundCountry: CountryListData | undefined;
@@ -145,7 +155,21 @@ const FilterTours = () => {
 
     setAdults(adultsParam ? parseInt(adultsParam) : 0);
     setChildren(childrenParam ? parseInt(childrenParam) : 0);
-  }, [searchParams, countries]);
+
+    if (!selectedCountry && countries?.length) {
+      const defaultCountry = countries.find((c) => c.default_country === true);
+      if (defaultCountry) {
+        setSelectedCountry(defaultCountry.name);
+  
+        const defaultRegion = defaultCountry.regions?.find(
+          (r) => r.default_region === true
+        );
+        if (defaultRegion) {
+          setSelectedRegion(String(defaultRegion.id));
+        }
+      }
+    }
+  }, [searchParams, countries,  selectedCountry, setSelectedCountry, setSelectedRegion]);
 
   const saveFilter = () => {
     const params = new URLSearchParams();
@@ -179,6 +203,19 @@ const FilterTours = () => {
   const itemsDes = selectedDestCountry
     ? filteredDestRegions
     : filteredDestCountries;
+
+
+    // items ni tayyorlash
+const defaultitems = selectedCountry
+? countries
+    ?.find((c) => c.name === selectedCountry)
+    ?.regions || []
+: (() => {
+    // Agar default bor bo‘lsa faqat o‘sha chiqadi
+    const defaultCountry = countries?.find((c) => c.default_country === true);
+    return defaultCountry ? [defaultCountry] : countries || [];
+  })();
+
 
   return (
     <div className="mt-10 bg-white shadow-sm py-4 gap-4 w-full rounded-3xl grid grid-cols-5 items-center px-10 max-lg:hidden font-medium">
@@ -281,8 +318,8 @@ const FilterTours = () => {
                       </motion.div>
                     )}
                     <CommandList className="px-1 gap-2">
-                      {items?.length ? (
-                        items.map((item) => (
+                      {defaultitems?.length ? (
+                        defaultitems.map((item) => (
                           <AnimatePresence key={selectedCountry + item.id}>
                             <motion.div
                               key={selectedCountry + item.id}

@@ -99,20 +99,20 @@ const MobileNavbar = ({ setOpen, open }: Props) => {
           </Link>
         ))}
         <Link
-          href={'mailto:Tourex@gmail.com'}
+          href={'mailto:simpletraveluz@gmail.com'}
           className="flex gap-2 text-[#212122] items-center"
         >
           <EmailIcon sx={{ color: '#084FE3', width: '26px', height: '26px' }} />
-          <p className="text-sm text-[#212122]">Tourex@gmail.com</p>
+          <p className="text-sm text-[#212122]">simpletraveluz@gmail.com</p>
         </Link>
         <Link
-          href={'tel:+998902222922'}
+          href={'tel:+998974805800'}
           className="flex gap-2 text-black items-center"
         >
           <LocalPhoneIcon
             sx={{ color: '#084FE3', width: '26px', height: '26px' }}
           />
-          <p className="text-sm text-[#212122]">90 222 29 22</p>
+          <p className="text-sm text-[#212122]">+998 97 480 58 00</p>
         </Link>
       </div>
     </Drawer>

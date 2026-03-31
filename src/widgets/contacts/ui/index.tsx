@@ -22,8 +22,11 @@ import {
 } from '@/shared/ui/form';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
+import PersonIcon from '@mui/icons-material/Person';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { getContact } from '@/widgets/footer/lib/api';
 import { zodResolver } from '@hookform/resolvers/zod';
+import EmailIcon from '@mui/icons-material/Email';
 import CallEndIcon from '@mui/icons-material/CallEnd';
 import CloseIcon from '@mui/icons-material/Close';
 import DoneIcon from '@mui/icons-material/Done';
@@ -240,6 +243,31 @@ export default function Contacts() {
               </div>
               <p>{data && formatPhone(data[0].main_phone)}</p>
             </div>
+              <hr className="border-[#FFFFFF29]" />       
+            <div className="flex items-center justify-between my-5">
+              <div className="flex items-center gap-2 ">
+                <EmailIcon />
+                {t('Электронная почта')}:
+              </div>
+              <p> {data && data[0].email}</p>
+            </div>
+              <hr className="border-[#FFFFFF29]" />         
+            <div className="flex items-center justify-between my-5">
+              <div className="flex items-center gap-2 ">
+                <PersonIcon />
+                {t('Директор')}:
+              </div>
+              <p>{data && data[0].direktor_fullname}</p>
+            </div>
+            <hr className="border-[#FFFFFF29]" />       
+            <div className="flex items-center justify-between my-5">
+              <div className="flex items-center gap-2 ">
+                <AccessTimeIcon />
+                {t('Рабочие дни')}:
+              </div>
+              <p>{t('Пн-Пт')} {data && data[0].working_days}</p>
+            </div>
+
 
             <div className="flex items-center gap-4 my-5 max-[400px]:flex-col max-[400px]:items-start">
               {data && data[0].telegram && (
