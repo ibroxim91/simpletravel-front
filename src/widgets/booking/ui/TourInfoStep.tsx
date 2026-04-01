@@ -51,8 +51,8 @@ export default function TourInfoStep({
       const defaultTransport = {
         price: firstTransport.price,
         transport: {
-          icon_name: firstTransport.transport.icon_name,
-          name: firstTransport.transport.name,
+          icon_name: firstTransport.transport?.icon_name,
+          name: firstTransport.transport?.name,
         },
       };
       setTransport(defaultTransport);
@@ -60,11 +60,19 @@ export default function TourInfoStep({
     }
   }, [data, transport.transport, setStoreTransport]);
 
+   const tourData = JSON.parse(localStorage.getItem('tour'))
+      if (tourData){
+        tourData.tour_operator_id = localStorage.getItem('tourOperatorId')
+        tourData.tour_operator = localStorage.getItem('tourOperator')
+        tourData.ticket_hotel = tourData.ticket_hotel[0]
+      } 
   const { mutate, isPending } = useMutation({
     mutationFn: (body: Create_Ticketorder) =>
-      Ticketorder_Api.ticketorder_create(body),
+      Ticketorder_Api.ticketorder_create(tourData),
     onSuccess: (res) => {
-      setOrderId(res.data.data.id);
+      console.log("res ", res)
+      console.log("res.data.data.id ", res.data.id)
+      setOrderId(res.data.id);
       onNext();
       toast.success(t('Tur muvaffaqiyatli bron qilindi'));
     },
@@ -195,7 +203,8 @@ export default function TourInfoStep({
 
         <div className="mt-[8px] grid grid-cols-2 justify-between gap-[16px] max-md:grid-cols-1">
           <div
-            className={`flex w-full justify-between items-center py-[17px] px-[20px] cursor-pointer border rounded-xl bg-[#EDEEF180] border-[#EDEEF1]`}
+            className={`flex w-full justify-between items-center py-[17px] px-[20px] cursor-pointer border rounded-xl
+               bg-[#EDEEF180] border-[#EDEEF1]`}
           >
             <label className="flex items-center mr-[70px] gap-[10px] cursor-pointer">
               <StarIcon
@@ -223,16 +232,16 @@ export default function TourInfoStep({
             </p>
             <div className="mt-[8px] grid grid-cols-2 justify-between gap-[16px] max-md:grid-cols-1">
               {data?.data.transports.map((opt) => {
-                const inputId = `selectTransport-${opt.transport.name}`;
-                const isChecked =
-                  transport.transport?.name === opt.transport.name;
+                console.log("opt ", opt)
+                const inputId = `selectTransport-${opt?.name}`;
+                const isChecked =transport?.name === opt?.name;
                 const IconComponent =
                   LucideIcons[
-                    opt.transport.icon_name as keyof typeof LucideIcons.icons
+                    opt?.icon_name as keyof typeof LucideIcons.icons
                   ];
                 return (
                   <div
-                    key={opt.transport.name}
+                    key={opt?.name}
                     onClick={() => setTransport(opt)}
                     className={`flex w-full justify-between items-center py-[17px] px-[20px] cursor-pointer border rounded-xl bg-[#EDEEF180] border-[#EDEEF1]`}
                   >
@@ -249,7 +258,7 @@ export default function TourInfoStep({
                             isChecked ? 'text-[#084FE3]' : 'text-[#212122]',
                           )}
                         >
-                          {opt.transport.name}
+                          {opt?.name}
                         </p>
                       </div>
                     </label>

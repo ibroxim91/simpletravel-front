@@ -91,9 +91,9 @@ export default function Booking() {
     },
   });
 
-  console.log()
-  console.log("BOOKING DATA ", data)
-  console.log()
+  // console.log()
+  // console.log("BOOKING DATA ", data)
+  // console.log()
 //  const { data } = useQuery({
 //    queryKey: ['tickets_info', id],
 //    queryFn: () => Ticketorder_Api.ticketorder_info({ id: String(tourOperatorId) }),
