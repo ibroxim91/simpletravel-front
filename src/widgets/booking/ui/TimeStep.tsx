@@ -86,14 +86,14 @@ export default function TimeStep({ onNext, data }: Props) {
 
   useEffect(() => {
     if (data) {
-      const departure = new Date(data.data.departure_time);
+      const departure = new Date(data.data?.departure_time);
       console.log()
       console.log("data.data.departure?.name ", data.data.departure?.name )
       console.log()
       form.setValue('where', String(data.data.departure?.id));
       form.setValue('whereTo', String(data.data.destination?.id));
       form.setValue('dispatch', departure);
-      form.setValue('returned', new Date(data.data.travel_time));
+      form.setValue('returned', new Date(data.data?.travel_time));
     }
   }, [data, form]);
 
