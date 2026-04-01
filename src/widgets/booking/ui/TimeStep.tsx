@@ -85,7 +85,7 @@ export default function TimeStep({ onNext, data }: Props) {
   }
 
   useEffect(() => {
-    if (data) {
+    if (data.data?.departure) {
       const departure = new Date(data.data?.departure_time);
       console.log()
       console.log("data.data.departure?.name ", data.data?.departure?.name )
