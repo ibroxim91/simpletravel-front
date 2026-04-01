@@ -79,17 +79,19 @@ export default function Booking() {
     visible: { opacity: 1, x: 0 },
   };
 
-//  const data = JSON.parse( localStorage.getItem("tour") )
-//  console.log("BOOKING TOUR DATA ",data)
+ const data = {status:true, data:null}
+ const LocalData =  JSON.parse( localStorage.getItem("tour") )
+ data.data = LocalData
+ console.log("BOOKING TOUR DATA ",data)
 
- const { data, isLoading } = useQuery({
-    queryKey: ['tickets_detail', tourOperatorId],
-    queryFn: () =>
-      TicketsDetailAPi.getTicketsDetail({ id: String(tourOperatorId) }),
-    select(data) {
-      return data.data;
-    },
-  });
+//  const { data, isLoading } = useQuery({
+//     queryKey: ['tickets_detail', tourOperatorId],
+//     queryFn: () =>
+//       TicketsDetailAPi.getTicketsDetail({ id: String(tourOperatorId) }),
+//     select(data) {
+//       return data.data;
+//     },
+//   });
 
   // console.log()
   // console.log("BOOKING DATA ", data)
@@ -101,9 +103,9 @@ export default function Booking() {
 //      return data.data;
 //    },
 //  });
-if (isLoading){ 
-  return <div>Loading...</div>;
-}
+// if (isLoading){ 
+//   return <div>Loading...</div>;
+// }
   return (
     <div className="custom-container py-[16px]">
       <Breadcrumbs
