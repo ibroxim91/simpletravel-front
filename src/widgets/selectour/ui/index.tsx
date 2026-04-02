@@ -779,9 +779,9 @@ export default function Selectour() {
                       </span>
                     </>
                   ) : (
-                    t('Umumiy')
+                    t('Filter uchun Kerakli davlat va shaharni tanlang')
                   )}{' '}
-                  {ticket ? (
+                  {ticket && (regionName || ticket.data.total_items > 0) ? (
                     <>
                       {ticket.data.total_items} {t('ta tur topildi')}
                     </>
