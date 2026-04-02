@@ -775,7 +775,7 @@ export default function Selectour() {
                       <span>{countryName}</span>
                       <KeyboardArrowRightIcon />
                       <span>
-                        {regionName} {t('ga tegishli')}
+                        {regionName} {ticket ? t('ga tegishli') : ''}
                       </span>
                     </>
                   ) : (
