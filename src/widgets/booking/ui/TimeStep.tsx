@@ -90,8 +90,8 @@ export default function TimeStep({ onNext, data }: Props) {
       console.log()
       console.log("data.data.departure?.name ", data.data?.departure?.name )
       console.log()
-      form.setValue('where', String(data.data?.departure?.id));
-      form.setValue('whereTo', String(data.data?.destination?.id));
+      form.setValue('where', String(data.data?.departure?.name));
+      form.setValue('whereTo', String(data.data?.destination?.name));
       form.setValue('dispatch', departure);
       form.setValue('returned', new Date(data.data?.travel_time));
     }

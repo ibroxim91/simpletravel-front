@@ -37,6 +37,8 @@ const FilterToursMobile = () => {
       return data.data.data;
     },
   });
+
+  const defaultCountry = ticket?.find((c) => c.default_country === true);
   const t = useTranslations();
   const route = useRouter();
   const searchParams = useSearchParams();
@@ -77,7 +79,7 @@ const FilterToursMobile = () => {
     [];
 
   const filteredRegions =
-    selectedCountry?.regions.filter((r) =>
+    defaultCountry?.regions.filter((r) =>
       r.name.toLowerCase().includes(searchRegion.toLowerCase()),
     ) || [];
 
@@ -103,13 +105,16 @@ const FilterToursMobile = () => {
 
     if (departure && ticket) {
       const regionId = parseInt(departure, 10);
-      for (const country of ticket) {
-        const region = country.regions.find((r) => r.id === regionId);
-        if (region) {
-          setSelectedCountry(country);
-          setSelectedRegion(region);
-          break;
-        }
+      const region = defaultCountry?.regions.find((r) => r.id === regionId);
+      if (region) {
+        setSelectedCountry(defaultCountry);
+        setSelectedRegion(region);
+      }
+    } else if (defaultCountry && !selectedCountry) {
+      setSelectedCountry(defaultCountry);
+      const defaultRegion = defaultCountry.regions?.find((r) => r.default_region === true);
+      if (defaultRegion) {
+        setSelectedRegion(defaultRegion);
       }
     }
 
@@ -129,7 +134,7 @@ const FilterToursMobile = () => {
     setToDate(dateTo ? new Date(dateTo) : undefined);
     setAdults(adultsParam ? parseInt(adultsParam) : 0);
     setChildren(childrenParam ? parseInt(childrenParam) : 0);
-  }, [searchParams, ticket]);
+  }, [searchParams, ticket, defaultCountry, selectedCountry]);
 
   const saveFilter = () => {
     const params = new URLSearchParams();
@@ -236,109 +241,47 @@ const FilterToursMobile = () => {
                 <CloseIcon sx={{ color: 'black' }} />
               </Button>
             </div>
-            {selectedCountry ? (
-              <>
-                <div className="relative">
-                  <Input
-                    placeholder={t('Укажите регион')}
-                    value={searchRegion}
-                    onChange={(e) => setSearchRegion(e.target.value)}
-                    className="w-full pl-10 text-black"
-                  />
-                  <SearchIcon
-                    sx={{
-                      position: 'absolute',
-                      top: '50%',
-                      left: '12px',
-                      transform: 'translateY(-50%)',
-                      color: 'gray',
-                    }}
-                  />
-                </div>
-                <div className="flex flex-col gap-2 max-h-[30vh] overflow-y-auto">
-                  <Button
-                    variant={'ghost'}
+            <div className="relative">
+              <Input
+                placeholder={t('Укажите регион')}
+                value={searchRegion}
+                onChange={(e) => setSearchRegion(e.target.value)}
+                className="w-full pl-10 text-black"
+              />
+              <SearchIcon
+                sx={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '12px',
+                  transform: 'translateY(-50%)',
+                  color: 'gray',
+                }}
+              />
+            </div>
+            <div className="flex flex-col gap-2 max-h-[30vh] overflow-y-auto">
+              {filteredRegions.length ? (
+                filteredRegions.map((region) => (
+                  <div
+                    key={region.id}
+                    className="p-2 hover:bg-gray-200 rounded-lg cursor-pointer flex justify-between"
                     onClick={() => {
-                      setSelectedCountry(null);
-                      setSelectedRegion(null);
-                      setSearchCountry('');
-                      setSearchRegion('');
+                      setSelectedRegion(region);
+                      setSearchRegion(region.name);
+                      setOpenDrawer(false);
                     }}
-                    className="mt-1 w-fit"
                   >
-                    <MoveLeft className="size-5" />
-                    {t('Boshqa davlat tanlash')}
-                  </Button>
-                  {filteredRegions.length ? (
-                    filteredRegions.map((region) => (
-                      <div
-                        key={region.id}
-                        className="p-2 hover:bg-gray-200 rounded-lg cursor-pointer flex justify-between"
-                        onClick={() => {
-                          setSelectedRegion(region);
-                          setSearchRegion(region.name);
-                          setOpenDrawer(false);
-                        }}
-                      >
-                        {region.name}
-                        {selectedRegion?.id === region.id && (
-                          <DoneIcon sx={{ width: '14px', height: '14px' }} />
-                        )}
-                      </div>
-                    ))
-                  ) : (
-                    <div className="p-2 text-black h-screen flex justify-center items-end">
-                      {t('Не найдено')}
-                    </div>
-                  )}
+                    {region.name}
+                    {selectedRegion?.id === region.id && (
+                      <DoneIcon sx={{ width: '14px', height: '14px' }} />
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className="p-2 text-black h-screen flex justify-center items-end">
+                  {t('Не найдено')}
                 </div>
-              </>
-            ) : (
-              <>
-                <div className="relative">
-                  <Input
-                    placeholder={t('Укажите страну')}
-                    value={searchCountry}
-                    onChange={(e) => setSearchCountry(e.target.value)}
-                    className="w-full text-black pl-10"
-                  />
-                  <SearchIcon
-                    sx={{
-                      position: 'absolute',
-                      top: '50%',
-                      left: '12px',
-                      transform: 'translateY(-50%)',
-                      color: 'gray',
-                    }}
-                  />
-                </div>
-
-                <div className="flex flex-col gap-2 max-h-[30vh] overflow-y-auto">
-                  {filteredCountries.length ? (
-                    filteredCountries.map((country) => (
-                      <div
-                        key={country.id}
-                        className="p-2 hover:bg-gray-200 rounded-lg cursor-pointer flex justify-between"
-                        onClick={() => {
-                          setSelectedCountry(country);
-                          setSelectedRegion(null);
-                          setSearchCountry(country.name);
-                        }}
-                      >
-                        {country.name}
-                        {selectedCountry === country.id && (
-                          <DoneIcon sx={{ width: '14px', height: '14px' }} />
-                        )}
-                      </div>
-                    ))
-                  ) : (
-                    <div className="p-2 text-black h-screen flex justify-center items-end">
-                      {t('Не найдено')}
-                    </div>
-                  )}
-                </div>
-              </>
-            )}
+              )}
+            </div>
           </div>
         </Drawer>
       </div>

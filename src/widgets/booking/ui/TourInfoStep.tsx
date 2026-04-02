@@ -32,10 +32,8 @@ export default function TourInfoStep({
   const t = useTranslations();
   const { id } = useParams();
   const [transport, setTransport] = useState<{
-    transport: { name: string; icon_name: string } | null;
-    price: number;
+    transport: { name: string; id: number; icon_name?: string } | null;
   }>({
-    price: 0,
     transport: null,
   });
 
@@ -48,13 +46,14 @@ export default function TourInfoStep({
       !transport.transport
     ) {
       const firstTransport = data.data.transports[0];
+      console.log("firstTransport ", firstTransport)
       const defaultTransport = {
-        price: firstTransport.price,
         transport: {
-          icon_name: firstTransport.transport?.icon_name,
-          name: firstTransport.transport?.name,
+          id: firstTransport?.id,
+          name: firstTransport?.name,
         },
       };
+      console.log("defaultTransport ", defaultTransport)
       setTransport(defaultTransport);
       setStoreTransport(defaultTransport);
     }
@@ -155,7 +154,7 @@ export default function TourInfoStep({
         <div className="flex items-center gap-[20px] my-[20px] max-lg:flex-col max-lg:items-start">
           <div className="relative rounded-2xl aspect-square w-48 cursor-pointer max-lg:w-full">
             <Image
-              src={data?.data.image_banner || ''}
+              src={data?.data.ticket_images?.[0]?.image || ''}
               alt="tour"
               className="object-cover rounded-2xl"
               fill
@@ -232,17 +231,19 @@ export default function TourInfoStep({
             </p>
             <div className="mt-[8px] grid grid-cols-2 justify-between gap-[16px] max-md:grid-cols-1">
               {data?.data.transports.map((opt) => {
-                console.log("opt ", opt)
-                const inputId = `selectTransport-${opt?.name}`;
-                const isChecked =transport?.name === opt?.name;
+                console.log("opt?.name ", opt?.id)
+                console.log("transport?.name ", transport?.transport?.id)
+                console.log("transport", transport)
+                const inputId = `selectTransport-${opt?.id}`;
+                const isChecked = transport?.transport?.id === opt?.id;
                 const IconComponent =
                   LucideIcons[
                     opt?.icon_name as keyof typeof LucideIcons.icons
                   ];
                 return (
                   <div
-                    key={opt?.name}
-                    onClick={() => setTransport(opt)}
+                    key={opt?.id}
+                    onClick={() => setTransport({ transport: { id: opt.id, name: opt.name, icon_name: opt?.icon_name } })}
                     className={`flex w-full justify-between items-center py-[17px] px-[20px] cursor-pointer border rounded-xl bg-[#EDEEF180] border-[#EDEEF1]`}
                   >
                     <label
@@ -267,7 +268,7 @@ export default function TourInfoStep({
                       id={inputId}
                       name="selectTransport"
                       checked={isChecked}
-                      onChange={() => setTransport(opt)}
+                      onChange={() => setTransport({ transport: { id: opt.id, name: opt.name, icon_name: opt.icon_name } })}
                       className="w-6 h-6 accent-[#084FE3]"
                     />
                   </div>
