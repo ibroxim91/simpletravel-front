@@ -206,13 +206,13 @@ export default function Selectour() {
 
   const initialized = useRef(false);
   useEffect(() => {
-    if (ticket && !initialized.current) {
+    if (ticket ) {
       setDurationDays(ticket.data.results.top_duration);
       setDestinations(ticket.data.results.top_destinations);
       setHotelType(ticket.data.results.hotel_types);
       setHotelAmenities(ticket.data.results.hotel_amenities);
       setFeatures(ticket.data.results.hotel_features_by_type);
-      initialized.current = true;
+      // initialized.current = true;
     }
   }, [
     ticket,
