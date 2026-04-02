@@ -51,14 +51,15 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
   const [paymentTypes, setPaymentType] = useState<string | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
+  const order_id = localStorage.getItem('orderId');
+
   const { mutate, isPending } = useMutation({
     mutationFn: ({
-      order_id,
+      paymentType,
       return_url,
     }: {
       paymentType: string;
       return_url: string;
-      order_id: number;
     }) => {
       return Ticketorder_Api.payments({
         return_url,

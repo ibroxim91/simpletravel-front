@@ -69,8 +69,7 @@ export default function TourInfoStep({
     mutationFn: (body: Create_Ticketorder) =>
       Ticketorder_Api.ticketorder_create(tourData),
     onSuccess: (res) => {
-      console.log("res ", res)
-      console.log("res.data.data.id ", res.data.id)
+      localStorage.setItem('orderId', res.data.id.toString());
       setOrderId(res.data.id);
       onNext();
       toast.success(t('Tur muvaffaqiyatli bron qilindi'));
@@ -214,9 +213,15 @@ export default function TourInfoStep({
                 }}
               />
               <div className="flex flex-col">
-                <p className={clsx('text-[#084FE3]')}>
-                  {data?.data.hotel_rating} {t('yulduzli')}
-                </p>
+                {typeof data?.data?.ticket_hotel[0]?.rating === 'number' ? (
+                  <p className={clsx('text-[#084FE3]')}>
+                    {data.data.ticket_hotel[0]?.rating} {t('yulduzli')}
+                  </p>
+                ) : (
+                  <p className={clsx('text-[#084FE3]')}>
+                    {data?.data?.ticket_hotel[0]?.rating ?? ''}
+                  </p>
+                )}
               </div>
             </label>
             <div className="w-6 h-6 border border-[#084FE3] flex justify-center items-center rounded-full">
@@ -231,9 +236,7 @@ export default function TourInfoStep({
             </p>
             <div className="mt-[8px] grid grid-cols-2 justify-between gap-[16px] max-md:grid-cols-1">
               {data?.data.transports.map((opt) => {
-                console.log("opt?.name ", opt?.id)
-                console.log("transport?.name ", transport?.transport?.id)
-                console.log("transport", transport)
+           
                 const inputId = `selectTransport-${opt?.id}`;
                 const isChecked = transport?.transport?.id === opt?.id;
                 const IconComponent =
