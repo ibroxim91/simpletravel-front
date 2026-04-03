@@ -23,15 +23,9 @@ const PopulardestinationsMboile = () => {
   const t = useTranslations();
 
   const { data: ticket } = useQuery({
-    queryKey: ['ticket_popular'],
+    queryKey: ['ticket_home_popular'],
     queryFn: () =>
-      Ticket_Api.GetAllTickets({
-        params: {
-          page: 1,
-          page_size: 6,
-          featured_tickets: true,
-        },
-      }),
+      Ticket_Api.GetHomeTickets(),
     select(data) {
       return data.data.results.tickets;
     },
@@ -73,7 +67,7 @@ const PopulardestinationsMboile = () => {
               className="basis-1/2 max-sm:basis-1/1 h-[200px] font-medium"
             >
               <Link
-                href={`/selectour/${e.slug}`}
+                href={`/selectour/${e.tour_operator_id}/?departure=${e.departure_id}&destination=${e.destination_id}&adults=${e.adults}}&operator=${e.tour_operator}`}
                 prefetch={true}
                 className="rounded-3xl w-full relative h-full"
               >
@@ -199,3 +193,6 @@ const PopulardestinationsMboile = () => {
 };
 
 export default PopulardestinationsMboile;
+
+
+  

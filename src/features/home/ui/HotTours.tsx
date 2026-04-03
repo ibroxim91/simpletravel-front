@@ -34,25 +34,13 @@ const HotTours = () => {
   const { data: ticket, isLoading } = useQuery({
     queryKey: ['ticket_no_visa'],
     queryFn: () =>
-      Ticket_Api.GetAllTickets({
-        params: {
-          page: 1,
-          page_size: 8,
-          visa_required: false,
-        },
-      }),
+      Ticket_Api.GetHomeTickets(),
   });
 
   const { data: hotTicket, isLoading: hotLoading } = useQuery({
     queryKey: ['ticket_hot'],
     queryFn: () =>
-      Ticket_Api.GetAllTickets({
-        params: {
-          page: 1,
-          page_size: 8,
-          rating: 3.5,
-        },
-      }),
+      Ticket_Api.GetHomeTickets(),
   });
   const {
     data: banner,

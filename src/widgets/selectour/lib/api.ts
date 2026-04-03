@@ -3,12 +3,19 @@ import {
   GET_TICKETS,
   HOTEL_MEAL_PLAN,
   SAVE_TICKETS,
+  HOMETICKETS,
 } from '@/shared/config/api/URLs';
 import { AxiosResponse } from 'axios';
 import qs from 'qs';
 import { HotelMealPlan, TickectAll, TickectAllFilter } from './types';
 
 const Ticket_Api = {
+  
+  async GetHomeTickets() {
+    const res = await httpClient.get(HOMETICKETS);
+    return res.data;
+  },
+  
   async GetAllTickets({
     params,
   }: {

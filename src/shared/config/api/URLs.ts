@@ -53,9 +53,10 @@ const GET_HELP_PAGE = '/api/v1/dashboard/dashboard-site-help-page/';
 const GET_OFFERTA = '/api/v1/dashboard/dashboard-site-offerta/';
 
 const LOCATIONS = '/api/v1/locations/';
-
+const HOMETICKETS = '/api/v1/home-tours/';
 export {
   BASE_URL,
+  HOMETICKETS,
   COUNTRIES,
   DONWLOAD_PDF,
   EMAIL_CONFIRM_RESET_PASS,

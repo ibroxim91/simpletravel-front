@@ -42,15 +42,9 @@ const Populardestinations = () => {
   const { locale } = useParams();
   const t = useTranslations();
   const { data: ticket, isLoading } = useQuery({
-    queryKey: ['ticket_popular'],
+    queryKey: ['ticket_home_popular'],
     queryFn: () =>
-      Ticket_Api.GetAllTickets({
-        params: {
-          page: 1,
-          page_size: 6,
-          featured_tickets: true,
-        },
-      }),
+      Ticket_Api.GetHomeTickets(),
     select(data) {
       return data.data.results.tickets;
     },
