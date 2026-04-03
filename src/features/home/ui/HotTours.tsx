@@ -143,7 +143,15 @@ const HotTours = () => {
                       key={idx}
                       className="flex flex-col w-auto basis-1/4 max-lg:basis-1/3 max-md:basis-[70%] shrink-0 font-medium"
                     >
-                      <Link href={`/selectour/${e.slug}`} prefetch={true}>
+                      <Link href={`/selectour/${e.tour_operator_id}/?departure=${e.departure_id}&destination=${e.destination_id}&adults=${e.adults}&operator=${e.tour_operator}`} 
+                      onClick={() => {
+                        localStorage.setItem("tourOperator", e?.operator ?? "");
+                        localStorage.setItem("tourOperatorId", String(e?.tour_operator_id ?? ""));
+                        
+                      }} 
+                      prefetch={true}>
+                      
+                      prefetch={true}>
                         <motion.div
                           initial={{ opacity: 0, y: 40, scale: 0.95 }}
                           whileInView={{ opacity: 1, y: 0, scale: 1 }}
@@ -286,7 +294,13 @@ const HotTours = () => {
                       key={idx}
                       className="flex flex-col w-auto basis-1/4 max-lg:basis-1/3 max-md:basis-[70%] shrink-0 font-medium"
                     >
-                      <Link href={`/selectour/${e.slug}`} prefetch={true}>
+                      <Link href={`/selectour/${e.tour_operator_id}/?departure=${e.departure_id}&destination=${e.destination_id}&adults=${e.adults}&operator=${e.tour_operator}`}
+                      onclick={() => {
+                        localStorage.setItem("tourOperator", e?.operator ?? "");
+                        localStorage.setItem("tourOperatorId", String(e?.tour_operator_id ?? ""));
+                      }
+                    }
+                      prefetch={true}>
                         <motion.div
                           initial={{ opacity: 0, y: 40, scale: 0.95 }}
                           whileInView={{ opacity: 1, y: 0, scale: 1 }}

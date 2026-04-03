@@ -67,7 +67,12 @@ const PopulardestinationsMboile = () => {
               className="basis-1/2 max-sm:basis-1/1 h-[200px] font-medium"
             >
               <Link
-                href={`/selectour/${e.tour_operator_id}/?departure=${e.departure_id}&destination=${e.destination_id}&adults=${e.adults}}&operator=${e.tour_operator}`}
+                href={`/selectour/${e.tour_operator_id}/?departure=${e.departure_id}&destination=${e.destination_id}&adults=${e.adults}&operator=${e.tour_operator}`}
+                onClick={() => {
+                        localStorage.setItem("tourOperator", e?.operator ?? "");
+                        localStorage.setItem("tourOperatorId", String(e?.tour_operator_id ?? ""));
+                        
+                      }} 
                 prefetch={true}
                 className="rounded-3xl w-full relative h-full"
               >
