@@ -42,6 +42,20 @@ const PopulardestinationsMboile = () => {
     select: (data) => data.data.data,
   });
 
+  function updateData(e) {
+        const filters = {
+          departure: e.departure_id,
+          destination: e.destination_id,
+          dateFrom: e.checkIn,
+          dateTo: e.checkOut,
+          adults: e.adult,
+          children: e.child,
+          operator: e.operator,
+        };
+        localStorage.setItem('filterTours', JSON.stringify(filters));
+  }
+  
+
   return (
     <div className="custom-container mt-10 lg:hidden">
       <div className="flex justify-between items-center">
@@ -71,7 +85,7 @@ const PopulardestinationsMboile = () => {
                 onClick={() => {
                         localStorage.setItem("tourOperator", e?.operator ?? "");
                         localStorage.setItem("tourOperatorId", String(e?.tour_operator_id ?? ""));
-                        
+                        updateData(e)
                       }} 
                 prefetch={true}
                 className="rounded-3xl w-full relative h-full"

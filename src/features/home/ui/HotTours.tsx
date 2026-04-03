@@ -85,6 +85,19 @@ const HotTours = () => {
     hot.on('select', updateButtons);
   }, [hot]);
 
+
+    function updateData(e) {
+        const filters = {
+          departure: e.departure_id,
+          destination: e.destination_id,
+          dateFrom: e.checkIn,
+          dateTo: e.checkOut,
+          adults: e.adult,
+          children: e.child,
+          operator: e.operator,
+        };
+        localStorage.setItem('filterTours', JSON.stringify(filters));
+  }
   return (
     <>
       {ticket && ticket.data.results.tickets.length > 0 && (
@@ -147,7 +160,7 @@ const HotTours = () => {
                       onClick={() => {
                         localStorage.setItem("tourOperator", e?.operator ?? "");
                         localStorage.setItem("tourOperatorId", String(e?.tour_operator_id ?? ""));
-                        
+                        updateData(e)
                       }} 
                       prefetch={true}>
                       
@@ -298,6 +311,7 @@ const HotTours = () => {
                       onclick={() => {
                         localStorage.setItem("tourOperator", e?.operator ?? "");
                         localStorage.setItem("tourOperatorId", String(e?.tour_operator_id ?? ""));
+                        updateData(e)
                       }
                     }
                       prefetch={true}>

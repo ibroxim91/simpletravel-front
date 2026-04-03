@@ -50,6 +50,21 @@ const Populardestinations = () => {
     },
   });
 
+    function updateData(e) {
+      const filters = {
+        departure: e.departure_id,
+        destination: e.destination_id,
+        dateFrom: e.checkIn,
+        dateTo: e.checkOut,
+        adults: e.adult,
+        children: e.child,
+        operator: e.operator,
+      };
+      localStorage.setItem('filterTours', JSON.stringify(filters));
+    
+  }
+
+
   const {
     data: banner,
     isLoading: bannerLoad,
@@ -108,7 +123,7 @@ const Populardestinations = () => {
                 onClick={() => {
                         localStorage.setItem("tourOperator", ticket[0]?.operator ?? "");
                         localStorage.setItem("tourOperatorId", String(ticket[0]?.tour_operator_id ?? ""));
-                        
+                         updateData(ticket[0])
                       }} 
               >
                 <Image
@@ -158,7 +173,7 @@ const Populardestinations = () => {
                     onClick={() => {
                         localStorage.setItem("tourOperator", ticket[1]?.operator ?? "");
                         localStorage.setItem("tourOperatorId", String(ticket[1]?.tour_operator_id ?? ""));
-                        
+                        updateData(ticket[1])
                       }} 
                     className="block relative w-full h-full"
                   >
@@ -206,7 +221,7 @@ const Populardestinations = () => {
                     onClick={() => {
                         localStorage.setItem("tourOperator", ticket[2]?.operator ?? "");
                         localStorage.setItem("tourOperatorId", String(ticket[2]?.tour_operator_id ?? ""));
-                        
+                        updateData(ticket[2])
                       }} 
                     className="block relative w-full h-full"
                   >
@@ -255,7 +270,7 @@ const Populardestinations = () => {
                     onClick={() => {
                         localStorage.setItem("tourOperator", ticket[3]?.operator ?? "");
                         localStorage.setItem("tourOperatorId", String(ticket[3]?.tour_operator_id ?? ""));
-                        
+                        updateData(ticket[3])
                       }} 
                     className="block relative w-full h-full"
                   >
@@ -303,7 +318,7 @@ const Populardestinations = () => {
                      onClick={() => {
                         localStorage.setItem("tourOperator", ticket[4]?.operator ?? "");
                         localStorage.setItem("tourOperatorId", String(ticket[4]?.tour_operator_id ?? ""));
-                        
+                        updateData(ticket[4])
                       }} 
                     className="block relative w-full h-full"
                   >
