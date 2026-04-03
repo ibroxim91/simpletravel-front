@@ -90,8 +90,8 @@ const HotTours = () => {
         const filters = {
           departure: e.departure_id,
           destination: e.destination_id,
-          dateFrom: e.checkIn,
-          dateTo: e.checkOut,
+          // dateFrom: e.checkIn,
+          // dateTo: e.checkOut,
           adults: e.adult,
           children: e.child,
           operator: e.operator,
