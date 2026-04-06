@@ -451,7 +451,7 @@ const FilterToursMobile = () => {
                   />
                 </div>
 
-                <div className="flex flex-col gap-2 max-h-[40vh] overflow-y-auto">
+                <div className="flex flex-col gap-2 max-h-[50vh] overflow-y-auto">
                   {filteredCountriesDes.length ? (
                     filteredCountriesDes.map((country) => (
                       <div
