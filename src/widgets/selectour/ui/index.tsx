@@ -209,7 +209,7 @@ export default function Selectour() {
     if (ticket ) {
       setDurationDays(ticket.data.results.top_duration);
       setDestinations(ticket.data.results.top_destinations);
-      setHotelType(ticket.data.results.hotel_types);
+      setHotelType(ticket.data.results.hotels);
       setHotelAmenities(ticket.data.results.hotel_amenities);
       setFeatures(ticket.data.results.hotel_features_by_type);
       // initialized.current = true;

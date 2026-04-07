@@ -12,6 +12,7 @@ import { HotelMealPlan, TickectAll, TickectAllFilter } from './types';
 const Ticket_Api = {
   
   async GetHomeTickets() {
+    
     const res = await httpClient.get(HOMETICKETS);
     return res.data;
   },

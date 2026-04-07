@@ -89,10 +89,6 @@ if (savedData) {
 	 onClick={() => {
       localStorage.setItem("tourOperator", data?.operator ?? "");
       localStorage.setItem("tourOperatorId", String(data?.tour_operator_id ?? ""));
-
-      
-      console.log("OLD tourOperatorId",       )
-      console.log("change tourOperatorId")
       
     }} 
 prefetch={true}>    
