@@ -19,6 +19,12 @@ export interface TickectAll {
         features: string[];
       }[];
       hotel_types: string[];
+      hotels?: {
+        id: number;
+        name: string;
+        meal_plan: string;
+        rating: number | string;
+      }[];
       top_destinations: {
         destination: string;
       }[];
@@ -72,6 +78,7 @@ export interface TickectAllFilter {
   featured_tickets?: boolean;
   departure_date?: string;
   departure_time?: string;
+  town?: string;
   destination?: string;
   hotel_name?: string;
   dateTo?: string;

@@ -10,6 +10,10 @@ export interface CountryList {
     regions: {
       id: number;
       name: string;
+      towns?: {
+        id: number;
+        name: string;
+      }[];
     }[];
   }[];
 }
@@ -20,6 +24,10 @@ export interface CountryListData {
   regions: {
     id: number;
     name: string;
+    towns?: {
+      id: number;
+      name: string;
+    }[];
   }[];
 }
 

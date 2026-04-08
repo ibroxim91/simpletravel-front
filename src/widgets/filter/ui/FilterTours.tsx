@@ -31,7 +31,7 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { DateRange } from 'react-day-picker';
 
-const FilterTours = () => {
+const FilterTours = ({ selectedDestRegions, setSelectedDestRegions }) => {
   const t = useTranslations();
   const route = useRouter();
   const searchParams = useSearchParams();
@@ -134,10 +134,12 @@ const FilterTours = () => {
           foundRegion = reg;
         }
       });
-
+     
       if (foundCountry && foundRegion) {
         setSelectedDestCountry(foundCountry.name);
         setSelectedDestRegion(String(foundRegion.id));
+        setSelectedDestRegions(String(foundRegion.id));
+        
       }
     }
 
@@ -189,6 +191,12 @@ const FilterTours = () => {
         params.set('destination', selectedDestCountry);
       }
     }
+    const currentParams = new URLSearchParams(window.location.search);
+  const townParam = currentParams.get('town');
+
+  if (townParam) {
+    params.set('town', townParam);
+  }
 
     if (fromDate)
       params.set('dateFrom', formatDate.format(fromDate, 'YYYY-MM-DD'));
@@ -333,6 +341,7 @@ const defaultitems = selectedCountry
                                 onClick={() => {
                                   if (selectedCountry) {
                                     setSelectedRegion(String(item.id));
+                                    setSelectedDestRegions(String(item.id));
                                     setOpenCountry(false);
                                   } else {
                                     setSelectedCountry(item.name);

@@ -1,10 +1,10 @@
 import { Checkbox } from '@/shared/ui/checkbox';
 import { Label } from '@/shared/ui/label';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { Dispatch, SetStateAction, useEffect } from 'react';
+import { Dispatch, ReactNode, SetStateAction, useEffect } from 'react';
 
 type CheckboxFilterProps<T extends string | string[] | null> = {
-  label: string;
+  label: ReactNode;
   value: string;
   selectedValue?: T;
   exclusive?: boolean;
@@ -98,13 +98,13 @@ function CheckboxFilter<T extends string | string[] | null>({
   return (
     <label className="flex items-center gap-3 cursor-pointer mt-2">
       <Checkbox
-        id={label}
+        id={value}
         checked={isChecked}
         value={value}
         className="cursor-pointer"
         onCheckedChange={handleChange}
       />
-      <Label className="text-[#373739] text-md cursor-pointer" htmlFor={label}>
+      <Label className="text-[#373739] text-md cursor-pointer" htmlFor={value}>
         {label}
       </Label>
     </label>

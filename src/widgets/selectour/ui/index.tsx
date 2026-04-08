@@ -85,9 +85,9 @@ export default function Selectour() {
   const [selectedDurations, setSelectedDurations] = useState<string | null>(
     null,
   );
-  const [selectedDestinations, setSelectedDestinations] = useState<
-    string | null
-  >(null);
+  const [selectedTown, setSelectedTown] = useState<string | null>(null);
+
+  const [selectedDestinations, setSelectedDestinations] = useState<string | null>(null);
   const [hotelRating, setHotelRating] = useState<string | null>(null);
   const [mealPlan, setMealPlan] = useState<string | null>(null);
   const [hotelType, setHotelTypes] = useState<string | null>(null);
@@ -110,12 +110,14 @@ export default function Selectour() {
     const dateTo = searchParams.get('dateTo') || '';
     const adultsParam = searchParams.get('adults') || '0';
     const childrenParam = searchParams.get('children') || '0';
+    const town = searchParams.get('town') || '0';
 
     const filterData = {
       from: departure,
       where: destination,
       date: dateFrom,
       toDate: dateTo,
+      town: town,
       selectData:
         dateFrom && dateTo
           ? `${formatDate.format(new Date(dateFrom), 'DD/MM/YYYY')} - ${formatDate.format(new Date(dateTo), 'DD/MM/YYYY')}`
@@ -124,6 +126,7 @@ export default function Selectour() {
       children: parseInt(childrenParam),
     };
     setFilterLocal(filterData);
+   
     setSelectedDestinations(destination);
   }, [searchParams]);
 
@@ -174,6 +177,7 @@ export default function Selectour() {
         hotel_name: hotelName,
         hotel_type: hotelType ?? '',
         cheapest: cheaper,
+        town: selectedTown === null ? '' : selectedTown,
         most_expensive: expensive,
         min_departure_date: filterLocal?.date
           ? formatDate.format(filterLocal?.date, 'YYYY-MM-DD')
@@ -209,7 +213,7 @@ export default function Selectour() {
     if (ticket ) {
       setDurationDays(ticket.data.results.top_duration);
       setDestinations(ticket.data.results.top_destinations);
-      setHotelType(ticket.data.results.hotel_types);
+      setHotelType(ticket.data.results.hotel_type);
       setHotelAmenities(ticket.data.results.hotel_amenities);
       setFeatures(ticket.data.results.hotel_features_by_type);
       // initialized.current = true;
@@ -270,7 +274,10 @@ export default function Selectour() {
           ease: 'easeOut',
         }}
       >
-        <FilterTours />
+        <FilterTours 
+          selectedDestRegions={selectedDestinations}
+          setSelectedDestRegions={setSelectedDestinations} 
+        />
       </motion.div>
       <motion.div
         initial={{ opacity: 0, y: 40 }}
@@ -341,20 +348,7 @@ export default function Selectour() {
             </div>
           </FilterSection>
 
-          <FilterSection title={t('Название отеля')}>
-            <div className="relative">
-              <input
-                type="text"
-                placeholder={t('Название отеля')}
-                onChange={(e) => {
-                  setHotelName(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="w-full border rounded-xl px-10 py-2 outline-none placeholder:text-[#909091] text-[#212122]"
-              />
-              <SearchIcon className="absolute left-2 top-1/2 -translate-y-1/2 text-[#909091]" />
-            </div>
-          </FilterSection>
+    
 
           <FilterSection title={t('Условия въезда')}>
             <CheckboxFilter
@@ -395,24 +389,48 @@ export default function Selectour() {
                 ))}
           </FilterSection>
 
-          <FilterSection title={t('Регионы и курорты')}>
-            {country &&
-              country.map((e) => (
-                <>
-                  {e.regions.map((r) => (
-                    <CheckboxFilter
-                      key={r.id}
-                      value={String(r.id)}
-                      label={r.name}
-                      setChecked={setSelectedDestinations}
-                      selectedValue={selectedDestinations}
-                      exclusive
-                      paramName="destination"
-                    />
-                  ))}
-                </>
-              ))}
-          </FilterSection>
+         <FilterSection title={t('Регионы и курорты')}>
+          {country &&
+            (() => {
+              // Tanlangan regionni topamiz
+              const selectedRegionObj = country
+                .flatMap((c) => c.regions)
+                .find((r) => String(r.id) === selectedDestinations);
+
+              if (!selectedRegionObj) {
+                return null; // Agar tanlanmagan bo‘lsa hech narsa chiqmaydi
+              }
+              console.log('Selected Region Object:', selectedRegionObj); // Tanlangan regionni konsolga chiqaramiz
+              return (
+                <div key={selectedRegionObj.id}>
+                  {/* <CheckboxFilter
+                    value={String(selectedRegionObj.id)}
+                    label={selectedRegionObj.name}
+                    setChecked={setSelectedDestinations}
+                    selectedValue={selectedDestinations}
+                    exclusive
+                    paramName="destination"
+                  /> */}
+
+                  {Array.isArray(selectedRegionObj.towns) &&
+                    selectedRegionObj.towns.length > 0 &&
+                    selectedRegionObj.towns.map((town) => (
+                      <CheckboxFilter
+                        key={town.id}
+                        value={String(town.id)}
+                        label={<span className="pl-6">{town.name}</span>}
+
+                        setChecked={setSelectedTown}   // endi town uchun alohida state
+                        selectedValue={selectedTown}
+                        exclusive
+                        paramName="town"
+                      />
+                    ))}
+                </div>
+              );
+            })()}
+        </FilterSection>
+
 
           <FilterSection title={t('Категория отеля')}>
             <CheckboxFilter
@@ -444,21 +462,6 @@ export default function Selectour() {
             />
           </FilterSection>
 
-          <FilterSection title={t('Питание')}>
-            {meal?.map((e) => (
-              <CheckboxFilter
-                value={String(e.id)}
-                label={e.name}
-                key={e.id}
-                onclick={setCurrentPage}
-                setChecked={setMealPlan}
-                selectedValue={mealPlan}
-                exclusive
-                paramName="meal"
-              />
-            ))}
-          </FilterSection>
-
           <FilterSection title={t('Тип отеля')}>
             {hotel_type &&
               hotel_type.map((e) => (
@@ -473,6 +476,52 @@ export default function Selectour() {
                   paramName="type-hotel"
                 />
               ))}
+          </FilterSection>
+
+       <FilterSection title={t('Отели')}>
+  {ticket?.data.results?.hotels?.map((hotel) => (
+    <CheckboxFilter
+      key={hotel.id}
+      value={hotel.name}
+      label={
+        <span className="flex flex-wrap items-center gap-2">
+          <span>{hotel.name}</span>
+          <span className="text-sm text-[#909091]">
+            {typeof hotel.rating === 'number' ? `${hotel.rating}★` : hotel.rating}
+          </span>
+        </span>
+      }
+      setChecked={(val) => {
+        setHotelName(val);
+
+        // URL parametrlarga qo‘shish
+        const params = new URLSearchParams(window.location.search);
+        params.set('hotel_id', String(hotel.id));
+        params.set('operator', String(hotel.operator));
+
+        router.push(`/selectour?${params.toString()}`);
+      }}
+      selectedValue={hotelName}
+      exclusive
+      // paramName="hotel_name"
+    />
+  ))}
+</FilterSection>
+
+
+          <FilterSection title={t('Питание')}>
+            {meal?.map((e) => (
+              <CheckboxFilter
+                value={String(e.id)}
+                label={e.name}
+                key={e.id}
+                onclick={setCurrentPage}
+                setChecked={setMealPlan}
+                selectedValue={mealPlan}
+                exclusive
+                paramName="meal"
+              />
+            ))}
           </FilterSection>
 
           {hotel_features_by_type.map((row) => (
@@ -585,6 +634,7 @@ export default function Selectour() {
             <FilterSection title={t('Название отеля')}>
               <input
                 type="text"
+                value={hotelName}
                 placeholder={t('Название отеля')}
                 onChange={(e) => setHotelName(e.target.value)}
                 className="w-full border rounded-xl px-3 py-2 outline-none"
@@ -633,19 +683,37 @@ export default function Selectour() {
             <FilterSection title={t('Регионы и курорты')}>
               {country &&
                 country.map((e) => (
-                  <>
-                    {e.regions.map((r) => (
-                      <CheckboxFilter
-                        key={r.id}
-                        value={String(r.id)}
-                        label={r.name}
-                        setChecked={setSelectedDestinations}
-                        selectedValue={selectedDestinations}
-                        exclusive
-                        paramName="destination"
-                      />
-                    ))}
-                  </>
+                  <div key={e.id}>
+                    {e.regions.map((r) => {
+                      const isSelectedRegion = String(r.id) === selectedDestinations;
+                      const showTowns = isSelectedRegion && Array.isArray(r.towns) && r.towns.length > 0;
+
+                      return (
+                        <div key={r.id}>
+                          <CheckboxFilter
+                            value={String(r.id)}
+                            label={r.name}
+                            setChecked={setSelectedDestinations}
+                            selectedValue={selectedDestinations}
+                            exclusive
+                            paramName="destination"
+                          />
+                          {showTowns &&
+                            r.towns.map((town) => (
+                              <CheckboxFilter
+                                key={town.id}
+                                value={String(town.id)}
+                                label={<span className="pl-6">{town.name}</span>}
+                                setChecked={setSelectedDestinations}
+                                selectedValue={selectedDestinations}
+                                exclusive
+                                paramName="destination"
+                              />
+                            ))}
+                        </div>
+                      );
+                    })}
+                  </div>
                 ))}
             </FilterSection>
 
@@ -708,6 +776,28 @@ export default function Selectour() {
                     paramName="type-hotel"
                   />
                 ))}
+            </FilterSection>
+
+            <FilterSection title={t('Отели')}>
+              {ticket?.data.results?.hotels?.map((hotel) => (
+                <CheckboxFilter
+                  key={hotel.id}
+                  value={hotel.name}
+                  label={
+                    <span className="flex flex-wrap items-center gap-2">
+                      <span>{hotel.name}</span>
+                      <span className="text-sm text-[#909091]">
+                        {typeof hotel.rating === 'number' ? `★${hotel.rating}` : hotel.rating}
+                      </span>
+                    </span>
+                  }
+                  onclick={setCurrentPage}
+                  setChecked={setHotelName}
+                  selectedValue={hotelName}
+                  exclusive
+                  paramName="hotel_name"
+                />
+              ))}
             </FilterSection>
 
             {hotel_features_by_type.map((row) => (
