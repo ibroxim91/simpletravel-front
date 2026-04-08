@@ -111,13 +111,17 @@ export default function Selectour() {
     const adultsParam = searchParams.get('adults') || '0';
     const childrenParam = searchParams.get('children') || '0';
     const town = searchParams.get('town') || '0';
+    const hotel_id = searchParams.get('hotel_id') || '';
+    const operator = searchParams.get('operator') || '';
 
     const filterData = {
       from: departure,
       where: destination,
       date: dateFrom,
+      operator: operator,
       toDate: dateTo,
       town: town,
+      hotel_id: hotel_id,
       selectData:
         dateFrom && dateTo
           ? `${formatDate.format(new Date(dateFrom), 'DD/MM/YYYY')} - ${formatDate.format(new Date(dateTo), 'DD/MM/YYYY')}`
@@ -171,10 +175,11 @@ export default function Selectour() {
         page_size: 10,
         adults: filterLocal?.adults,
         children: filterLocal?.children,
+        operator: filterLocal?.operator,
         departure: filterLocal ? filterLocal.from : '',
         destination: selectedDestinations === null ? '' : selectedDestinations,
         hotel_amenity: hotelAmenities ?? '',
-        hotel_name: hotelName,
+        hotel_id: filterLocal?.hotel_id,
         hotel_type: hotelType ?? '',
         cheapest: cheaper,
         town: selectedTown === null ? '' : selectedTown,
@@ -703,7 +708,7 @@ export default function Selectour() {
                               <CheckboxFilter
                                 key={town.id}
                                 value={String(town.id)}
-                                label={<span className="pl-6">{town.name}</span>}
+                                label={<span>{town.name}</span>}
                                 setChecked={setSelectedDestinations}
                                 selectedValue={selectedDestinations}
                                 exclusive
