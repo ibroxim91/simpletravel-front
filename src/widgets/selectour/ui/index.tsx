@@ -110,10 +110,11 @@ export default function Selectour() {
     const dateTo = searchParams.get('dateTo') || '';
     const adultsParam = searchParams.get('adults') || '0';
     const childrenParam = searchParams.get('children') || '0';
-    const town = searchParams.get('town') || '0';
+    const town = searchParams.get('town') || '';
     const hotel_id = searchParams.get('hotel_id') || '';
     const operator = searchParams.get('operator') || '';
 
+    localStorage.setItem('town', town);
     const filterData = {
       from: departure,
       where: destination,
@@ -170,6 +171,8 @@ export default function Selectour() {
       hotelFeature,
     ],
     queryFn: () => {
+      const town = localStorage.getItem('town')
+      
       const params: TickectAllFilter = {
         page: currentPage,
         page_size: 10,
@@ -182,7 +185,7 @@ export default function Selectour() {
         hotel_id: filterLocal?.hotel_id,
         hotel_type: hotelType ?? '',
         cheapest: cheaper,
-        town: selectedTown === null ? '' : selectedTown,
+        town: town ? town : '',
         most_expensive: expensive,
         min_departure_date: filterLocal?.date
           ? formatDate.format(filterLocal?.date, 'YYYY-MM-DD')
@@ -212,19 +215,33 @@ export default function Selectour() {
   cacheTime: 0,
     enabled: !!filterLocal || !!selectedDestinations,
   });
+const prevCountry = useRef<string | null>(null);
+const prevRegion = useRef<string | null>(null);
 
   const initialized = useRef(false);
   useEffect(() => {
     if (ticket ) {
-      setDurationDays(ticket.data.results.top_duration);
-      setDestinations(ticket.data.results.top_destinations);
+
+       if (
+           filterLocal?.from !== prevCountry.current ||
+            filterLocal?.where !== prevRegion.current
+      ) {
       setHotelType(ticket.data.results.hotel_type);
       setHotelAmenities(ticket.data.results.hotel_amenities);
       setFeatures(ticket.data.results.hotel_features_by_type);
+
+      // eski qiymatlarni yangilab qo‘yish
+      prevCountry.current = filterLocal?.from || null;
+      prevRegion.current = filterLocal?.where || null;
+    }
+      setDurationDays(ticket.data.results.top_duration);
+      setDestinations(ticket.data.results.top_destinations);
+
       // initialized.current = true;
     }
   }, [
     ticket,
+    filterLocal,
     setDurationDays,
     setDestinations,
     setHotelType,
@@ -236,7 +253,7 @@ export default function Selectour() {
     const params = new URLSearchParams(searchParams.toString());
     params.set('page', currentPage.toString());
 
-    router.replace(`/selectour?${params.toString()}`);
+    router.replace(`/selectour?${params.toString()}`, { scroll: false });
   }, [currentPage, router, searchParams]);
 
   useEffect(() => {
@@ -252,7 +269,12 @@ export default function Selectour() {
 
   const regionName = regionData?.regions.find((r) => r.id === regionId)?.name;
   const countryName = regionData?.name;
-
+// if(isLoading) {
+//    window.scrollTo({
+//     top: 700, // kerakli balandlikka moslab qo‘y
+//     behavior: 'smooth',
+//   });
+// }
   return (
     <div className="custom-container mt-5 bg-[#edeef1] min-h-screen pb-20">
       <Breadcrumbs
@@ -484,34 +506,34 @@ export default function Selectour() {
           </FilterSection>
 
        <FilterSection title={t('Отели')}>
-  {ticket?.data.results?.hotels?.map((hotel) => (
-    <CheckboxFilter
-      key={hotel.id}
-      value={hotel.name}
-      label={
-        <span className="flex flex-wrap items-center gap-2">
-          <span>{hotel.name}</span>
-          <span className="text-sm text-[#909091]">
-            {typeof hotel.rating === 'number' ? `${hotel.rating}★` : hotel.rating}
-          </span>
-        </span>
-      }
-      setChecked={(val) => {
-        setHotelName(val);
+        {ticket?.data.results?.hotels?.map((hotel) => (
+          <CheckboxFilter
+            key={hotel.id}
+            value={hotel.name}
+            label={
+              <span className="flex flex-wrap items-center gap-2">
+                <span>{hotel.name}</span>
+                <span className="text-sm text-[#909091]">
+                  {typeof hotel.rating === 'number' ? `${hotel.rating}★` : hotel.rating}
+                </span>
+              </span>
+            }
+            setChecked={(val) => {
+              setHotelName(val);
 
-        // URL parametrlarga qo‘shish
-        const params = new URLSearchParams(window.location.search);
-        params.set('hotel_id', String(hotel.id));
-        params.set('operator', String(hotel.operator));
+              // URL parametrlarga qo‘shish
+              const params = new URLSearchParams(window.location.search);
+              params.set('hotel_id', String(hotel.id));
+              params.set('operator', String(hotel.operator));
 
-        router.push(`/selectour?${params.toString()}`);
-      }}
-      selectedValue={hotelName}
-      exclusive
-      // paramName="hotel_name"
-    />
-  ))}
-</FilterSection>
+              router.push(`/selectour?${params.toString()}`);
+            }}
+            selectedValue={hotelName}
+            exclusive
+            // paramName="hotel_name"
+          />
+        ))}
+      </FilterSection>
 
 
           <FilterSection title={t('Питание')}>
@@ -792,15 +814,23 @@ export default function Selectour() {
                     <span className="flex flex-wrap items-center gap-2">
                       <span>{hotel.name}</span>
                       <span className="text-sm text-[#909091]">
-                        {typeof hotel.rating === 'number' ? `★${hotel.rating}` : hotel.rating}
+                        {typeof hotel.rating === 'number' ? `${hotel.rating}★` : hotel.rating}
                       </span>
                     </span>
                   }
                   onclick={setCurrentPage}
-                  setChecked={setHotelName}
+                  // setChecked={setHotelName}
                   selectedValue={hotelName}
                   exclusive
-                  paramName="hotel_name"
+                   setChecked={(val) => {
+                        // setHotelName(val);
+                        const params = new URLSearchParams(window.location.search);
+                        params.set('hotel_id', String(hotel.id));
+                        params.set('operator', String(hotel.operator));
+
+                        router.push(`/selectour?${params.toString()}`);
+                      }}
+                  // paramName="hotel_name"
                 />
               ))}
             </FilterSection>

@@ -364,7 +364,7 @@ export default function SingleTour() {
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: false, amount: 0.2 }}
-                variants={slideIn}
+                // variants={slideIn}
                 className="mt-[60px]"
               >
                 <h1 className="text-[28px] font-bold text-[#232325]">
@@ -442,7 +442,7 @@ export default function SingleTour() {
                         initial="hidden"
                         whileInView="visible"
                         viewport={{ once: false, amount: 0.2 }}
-                        variants={slideIn}
+                        // variants={slideIn}
                         whileHover={{ scale: 1.05 }}
                         className="w-full max-lg:w-full h-full max-lg:h-auto cursor-pointer flex flex-col max-lg:flex-row-reverse justify-between p-[20px] bg-[#EDEEF140] border border-[#EDEEF1] shadow-md rounded-[20px] relative"
                       >
@@ -460,7 +460,7 @@ export default function SingleTour() {
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: false, amount: 0.2 }}
-                  variants={slideIn}
+                  // variants={slideIn}
                   className="custom-container mt-20"
                 >
                   <div className="flex justify-between items-center">
@@ -496,7 +496,8 @@ export default function SingleTour() {
                       {data.ticket_included_services?.map((item, key) => (
                         <CarouselItem
                           key={key}
-                          className="flex flex-col w-auto basis-1/5 max-xl:basis-1/3 max-lg:basis-1/2 max-md:basis-[60%] shrink-0 font-medium"
+                          className="flex flex-col w-auto basis-1/5 max-xl:basis-1/3 max-lg:basis-1/2 
+                          max-md:basis-[60%] shrink-0 font-medium"
                         >
                           <TourItem key={`${item}-${key}`} data={item} />
                         </CarouselItem>
@@ -514,7 +515,7 @@ export default function SingleTour() {
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: false, amount: 0.2 }}
-                variants={slideIn}
+                // variants={slideIn}
                 className="w-full p-[33px] max-lg:p-4 max-lg:h-[500px] rounded-[20px] text-white bg-linear-to-r from-[#1764FC] to-[#42B5CD] flex items-center max-lg:items-start justify-between relative z-10"
               >
                 <div>
@@ -554,7 +555,7 @@ export default function SingleTour() {
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: false, amount: 0.2 }}
-                variants={slideIn}
+                // variants={slideIn}
                 className="mt-10 max-lg:hidden"
               >
                 {data.ticket_itinerary?.map((item, key) => (
@@ -602,7 +603,7 @@ export default function SingleTour() {
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: false, amount: 0.2 }}
-                  variants={slideIn}
+                  // variants={slideIn}
                   className="mt-20"
                 >
                   <h1 className="font-bold text-[28px] text-[#232325]">
@@ -640,7 +641,7 @@ export default function SingleTour() {
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: false, amount: 0.2 }}
-                  variants={fadeInUp}
+                  // variants={fadeInUp}
                 >
                   <h1 className="font-bold text-[28px] text-[#232325]">
                     {t('Важно знать перед поездкой')}
@@ -652,14 +653,14 @@ export default function SingleTour() {
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: false, amount: 0.2 }}
-                    variants={{
-                      hidden: { opacity: 0, x: -60 },
-                      visible: () => ({
-                        opacity: 1,
-                        x: 0,
-                        transition: { delay: 0.5, duration: 0.5 },
-                      }),
-                    }}
+                    // variants={{
+                    //   hidden: { opacity: 0, x: -60 },
+                    //   visible: () => ({
+                    //     opacity: 1,
+                    //     x: 0,
+                    //     transition: { delay: 0.5, duration: 0.5 },
+                    //   }),
+                    // }}
                     className="bg-linear-to-b from-[#084FE3] text-white to-[#0A3CA9] w-[360px] h-[360px] max-lg:w-full rounded-[20px] flex flex-col justify-between p-[32px]"
                   >
                     <div>
@@ -700,14 +701,14 @@ export default function SingleTour() {
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: false, amount: 0.2 }}
-                    variants={{
-                      hidden: { opacity: 0, x: 60 },
-                      visible: () => ({
-                        opacity: 1,
-                        x: 0,
-                        transition: { delay: 0.5, duration: 0.5 },
-                      }),
-                    }}
+                    // variants={{
+                    //   hidden: { opacity: 0, x: 60 },
+                    //   visible: () => ({
+                    //     opacity: 1,
+                    //     x: 0,
+                    //     transition: { delay: 0.5, duration: 0.5 },
+                    //   }),
+                    // }}
                     className="w-full p-[32px] h-[360px] max-lg:h-full bg-[#FFFFFF] rounded-[20px]"
                   >
                     <h1 className="font-bold text-[24px] text-[#212122]">
@@ -790,14 +791,14 @@ export default function SingleTour() {
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: false, amount: 0.2 }}
-                    variants={{
-                      hidden: { opacity: 0, x: 60 },
-                      visible: () => ({
-                        opacity: 1,
-                        x: 0,
-                        transition: { delay: 0.5, duration: 0.5 },
-                      }),
-                    }}
+                    // variants={{
+                    //   hidden: { opacity: 0, x: 60 },
+                    //   visible: () => ({
+                    //     opacity: 1,
+                    //     x: 0,
+                    //     transition: { delay: 0.5, duration: 0.5 },
+                    //   }),
+                    // }}
                     className="flex gap-2"
                   >
                     <Button

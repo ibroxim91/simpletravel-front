@@ -174,6 +174,8 @@ const FilterTours = ({ selectedDestRegions, setSelectedDestRegions }) => {
   }, [searchParams, countries,  selectedCountry, setSelectedCountry, setSelectedRegion]);
 
   const saveFilter = () => {
+    localStorage.removeItem('town')
+    console.log("Town: ", localStorage.getItem('town'))
     const params = new URLSearchParams();
 
     if (selectedCountry) {
@@ -194,9 +196,9 @@ const FilterTours = ({ selectedDestRegions, setSelectedDestRegions }) => {
     const currentParams = new URLSearchParams(window.location.search);
   const townParam = currentParams.get('town');
 
-  if (townParam) {
-    params.set('town', townParam);
-  }
+  // if (townParam) {
+  //   params.set('town', townParam);
+  // }
 
     if (fromDate)
       params.set('dateFrom', formatDate.format(fromDate, 'YYYY-MM-DD'));

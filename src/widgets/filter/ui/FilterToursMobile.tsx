@@ -148,7 +148,7 @@ const FilterToursMobile = () => {
     if (adults > 0) params.set('adults', adults.toString());
     if (children > 0) params.set('children', children.toString());
 
-    route.push(`/selectour?page=1&${params.toString()}`);
+    route.push(`/selectour?page=1&${params.toString()}`,  { scroll: false });
   };
 
   return (
@@ -736,7 +736,14 @@ const FilterToursMobile = () => {
       <div className="flex flex-col gap-2">
         <Button
           className="bg-blue-600 text-lg text-white h-[60px] flex items-center justify-center rounded-4xl text-center font-semibold cursor-pointer"
-          onClick={saveFilter}
+         onClick={() => {
+            saveFilter();
+            // sahifani pastga siljitish
+            window.scrollTo({
+              top: 700, // kerakli balandlikka moslab qo‘y
+              behavior: 'smooth',
+            });
+          }}
         >
           <p>{t('Искать туры')}</p>
         </Button>

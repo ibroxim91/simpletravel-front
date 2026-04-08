@@ -26,7 +26,7 @@ export default function TourItem({ data }: Props) {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: false, amount: 0.2 }}
-        variants={slideIn}
+        // variants={slideIn}
         className="cursor-pointer max-lg:hidden"
       >
         <div className="w-full aspect-square relative rounded-2xl">

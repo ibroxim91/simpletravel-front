@@ -25,7 +25,7 @@ export default function TourFoodItem({
         initial="hidden"
         whileInView="visible"
         viewport={{ once: false, amount: 0.2 }}
-        variants={slideIn}
+        // variants={slideIn}
         className="flex items-center flex-col max-lg:hidden"
       >
         <div className="w-[120px] h-[120px] object-cover cursor-pointer relative rounded-full">
