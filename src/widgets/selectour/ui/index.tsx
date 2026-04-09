@@ -113,8 +113,10 @@ export default function Selectour() {
     const town = searchParams.get('town') || '';
     const hotel_id = searchParams.get('hotel_id') || '';
     const operator = searchParams.get('operator') || '';
+    const mealPlan = searchParams.get('meal') || '';
 
     localStorage.setItem('town', town);
+    localStorage.setItem('mealPlan', mealPlan);
     const filterData = {
       from: departure,
       where: destination,
@@ -172,7 +174,8 @@ export default function Selectour() {
     ],
     queryFn: () => {
       const town = localStorage.getItem('town')
-      
+      const meal_Plan = localStorage.getItem('mealPlan')
+
       const params: TickectAllFilter = {
         page: currentPage,
         page_size: 10,
@@ -201,7 +204,7 @@ export default function Selectour() {
         visa_required: visa === 'visa' ? true : visa === 'no_visa' ? false : '',
         hotel_rating: hotelRating ?? '',
         duration_days: selectedDurations ?? '',
-        meal_plan: mealPlan ?? '',
+        meal_plan: meal_Plan ?? '',
         hotel_feature: hotelFeature,
       };
 
@@ -217,8 +220,42 @@ export default function Selectour() {
   });
 const prevCountry = useRef<string | null>(null);
 const prevRegion = useRef<string | null>(null);
-
-  const initialized = useRef(false);
+ const top_duration = [
+                {
+                    "duration": 7,
+                    "count": 123
+                },
+                {
+                    "duration": 8,
+                    "count": 73
+                },
+                {
+                    "duration": 9,
+                    "count": 47
+                },
+                {
+                    "duration": 10,
+                    "count": 23
+                },
+                {
+                    "duration": 11,
+                    "count": 17
+                },
+               
+                {
+                    "duration": 12,
+                    "count": 6
+                },
+                {
+                    "duration": 13,
+                    "count": 5
+                },
+                {
+                    "duration": 14,
+                    "count": 5
+                }
+            ]
+  // const initialized = useRef(false);
   useEffect(() => {
     if (ticket ) {
 
@@ -234,7 +271,9 @@ const prevRegion = useRef<string | null>(null);
       prevCountry.current = filterLocal?.from || null;
       prevRegion.current = filterLocal?.where || null;
     }
-      setDurationDays(ticket.data.results.top_duration);
+
+   
+      setDurationDays(top_duration);
       setDestinations(ticket.data.results.top_destinations);
 
       // initialized.current = true;
@@ -269,12 +308,7 @@ const prevRegion = useRef<string | null>(null);
 
   const regionName = regionData?.regions.find((r) => r.id === regionId)?.name;
   const countryName = regionData?.name;
-// if(isLoading) {
-//    window.scrollTo({
-//     top: 700, // kerakli balandlikka moslab qo‘y
-//     behavior: 'smooth',
-//   });
-// }
+
   return (
     <div className="custom-container mt-5 bg-[#edeef1] min-h-screen pb-20">
       <Breadcrumbs
@@ -304,6 +338,9 @@ const prevRegion = useRef<string | null>(null);
         <FilterTours 
           selectedDestRegions={selectedDestinations}
           setSelectedDestRegions={setSelectedDestinations} 
+          setHotelRating={setHotelRating}
+          setSelectedDurations={setSelectedDurations}
+          setMealPlan={setMealPlan}
         />
       </motion.div>
       <motion.div
@@ -315,7 +352,13 @@ const prevRegion = useRef<string | null>(null);
           ease: 'easeOut',
         }}
       >
-        <FilterToursMobile />
+        <FilterToursMobile 
+        selectedDestRegions={selectedDestinations}
+          setSelectedDestRegions={setSelectedDestinations} 
+          setHotelRating={setHotelRating}
+          setSelectedDurations={setSelectedDurations}
+          setMealPlan={setMealPlan}
+           />
       </motion.div>
 
       <div className="mt-10 flex gap-10 max-lg:flex-col">
@@ -377,7 +420,7 @@ const prevRegion = useRef<string | null>(null);
 
     
 
-          <FilterSection title={t('Условия въезда')}>
+          {/* <FilterSection title={t('Условия въезда')}>
             <CheckboxFilter
               value="no_visa"
               label={t('Без визы')}
@@ -396,11 +439,11 @@ const prevRegion = useRef<string | null>(null);
               exclusive
               paramName="visa"
             />
-          </FilterSection>
+          </FilterSection> */}
 
           <FilterSection title={t('Продолжительность тура')}>
-            {durationDays &&
-              [...durationDays]
+            {top_duration &&
+              [...top_duration]
                 .sort((a, b) => a.duration - b.duration)
                 .map((e) => (
                   <CheckboxFilter
@@ -427,7 +470,7 @@ const prevRegion = useRef<string | null>(null);
               if (!selectedRegionObj) {
                 return null; // Agar tanlanmagan bo‘lsa hech narsa chiqmaydi
               }
-              console.log('Selected Region Object:', selectedRegionObj); // Tanlangan regionni konsolga chiqaramiz
+              // console.log('Selected Region Object:', selectedRegionObj); // Tanlangan regionni konsolga chiqaramiz
               return (
                 <div key={selectedRegionObj.id}>
                   {/* <CheckboxFilter
@@ -481,6 +524,15 @@ const prevRegion = useRef<string | null>(null);
             <CheckboxFilter
               value="3.0"
               label={t('3 звезды')}
+              onclick={setCurrentPage}
+              setChecked={setHotelRating}
+              selectedValue={hotelRating}
+              exclusive
+              paramName="rating"
+            />
+            <CheckboxFilter
+              value="2.0"
+              label={t('2 звезды')}
               onclick={setCurrentPage}
               setChecked={setHotelRating}
               selectedValue={hotelRating}
@@ -668,7 +720,7 @@ const prevRegion = useRef<string | null>(null);
               />
             </FilterSection>
 
-            <FilterSection title={t('Условия въезда')}>
+            {/* <FilterSection title={t('Условия въезда')}>
               <CheckboxFilter
                 value="no_visa"
                 label={t('Без визы')}
@@ -687,7 +739,7 @@ const prevRegion = useRef<string | null>(null);
                 exclusive
                 paramName="visa"
               />
-            </FilterSection>
+            </FilterSection> */}
 
             <FilterSection title={t('Продолжительность тура')}>
               {durationDays &&
@@ -708,40 +760,45 @@ const prevRegion = useRef<string | null>(null);
             </FilterSection>
 
             <FilterSection title={t('Регионы и курорты')}>
-              {country &&
-                country.map((e) => (
-                  <div key={e.id}>
-                    {e.regions.map((r) => {
-                      const isSelectedRegion = String(r.id) === selectedDestinations;
-                      const showTowns = isSelectedRegion && Array.isArray(r.towns) && r.towns.length > 0;
+               {country &&
+            (() => {
+              // Tanlangan regionni topamiz
+              const selectedRegionObj = country
+                .flatMap((c) => c.regions)
+                .find((r) => String(r.id) === selectedDestinations);
 
-                      return (
-                        <div key={r.id}>
-                          <CheckboxFilter
-                            value={String(r.id)}
-                            label={r.name}
-                            setChecked={setSelectedDestinations}
-                            selectedValue={selectedDestinations}
-                            exclusive
-                            paramName="destination"
-                          />
-                          {showTowns &&
-                            r.towns.map((town) => (
-                              <CheckboxFilter
-                                key={town.id}
-                                value={String(town.id)}
-                                label={<span>{town.name}</span>}
-                                setChecked={setSelectedDestinations}
-                                selectedValue={selectedDestinations}
-                                exclusive
-                                paramName="destination"
-                              />
-                            ))}
-                        </div>
-                      );
-                    })}
-                  </div>
-                ))}
+              if (!selectedRegionObj) {
+                return null; // Agar tanlanmagan bo‘lsa hech narsa chiqmaydi
+              }
+              // console.log('Selected Region Object:', selectedRegionObj); // Tanlangan regionni konsolga chiqaramiz
+              return (
+                <div key={selectedRegionObj.id}>
+                  {/* <CheckboxFilter
+                    value={String(selectedRegionObj.id)}
+                    label={selectedRegionObj.name}
+                    setChecked={setSelectedDestinations}
+                    selectedValue={selectedDestinations}
+                    exclusive
+                    paramName="destination"
+                  /> */}
+
+                  {Array.isArray(selectedRegionObj.towns) &&
+                    selectedRegionObj.towns.length > 0 &&
+                    selectedRegionObj.towns.map((town) => (
+                      <CheckboxFilter
+                        key={town.id}
+                        value={String(town.id)}
+                        label={<span className="pl-6">{town.name}</span>}
+
+                        setChecked={setSelectedTown}   // endi town uchun alohida state
+                        selectedValue={selectedTown}
+                        exclusive
+                        paramName="town"
+                      />
+                    ))}
+                </div>
+              );
+            })()}
             </FilterSection>
 
             <FilterSection title={t('Категория отеля')}>
@@ -772,6 +829,15 @@ const prevRegion = useRef<string | null>(null);
                 exclusive
                 paramName="rating"
               />
+              <CheckboxFilter
+              value="2.0"
+              label={t('2 звезды')}
+              onclick={setCurrentPage}
+              setChecked={setHotelRating}
+              selectedValue={hotelRating}
+              exclusive
+              paramName="rating"
+            />
             </FilterSection>
 
             <FilterSection title={t('Питание')}>

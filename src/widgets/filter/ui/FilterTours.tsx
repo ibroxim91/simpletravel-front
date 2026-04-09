@@ -31,7 +31,7 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { DateRange } from 'react-day-picker';
 
-const FilterTours = ({ selectedDestRegions, setSelectedDestRegions }) => {
+const FilterTours = ({ selectedDestRegions, setSelectedDestRegions, setHotelRating, setSelectedDurations, setMealPlan }) => {
   const t = useTranslations();
   const route = useRouter();
   const searchParams = useSearchParams();
@@ -175,7 +175,10 @@ const FilterTours = ({ selectedDestRegions, setSelectedDestRegions }) => {
 
   const saveFilter = () => {
     localStorage.removeItem('town')
-    console.log("Town: ", localStorage.getItem('town'))
+    localStorage.removeItem('mealPlan')
+    setHotelRating(null)
+    setSelectedDurations(null)
+    setMealPlan(null)
     const params = new URLSearchParams();
 
     if (selectedCountry) {
@@ -193,12 +196,8 @@ const FilterTours = ({ selectedDestRegions, setSelectedDestRegions }) => {
         params.set('destination', selectedDestCountry);
       }
     }
-    const currentParams = new URLSearchParams(window.location.search);
-  const townParam = currentParams.get('town');
 
-  // if (townParam) {
-  //   params.set('town', townParam);
-  // }
+
 
     if (fromDate)
       params.set('dateFrom', formatDate.format(fromDate, 'YYYY-MM-DD'));

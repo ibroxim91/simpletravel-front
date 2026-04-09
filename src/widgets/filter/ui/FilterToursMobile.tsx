@@ -29,7 +29,7 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { DateRange } from 'react-day-picker';
 
-const FilterToursMobile = () => {
+const FilterToursMobile = ({ selectedDestRegions, setSelectedDestRegions, setHotelRating, setSelectedDurations, setMealPlan }) => {
   const { data: ticket } = useQuery({
     queryKey: ['country_list'],
     queryFn: () => country_api.list(),
@@ -138,7 +138,13 @@ const FilterToursMobile = () => {
 
   const saveFilter = () => {
     const params = new URLSearchParams();
-
+    
+    localStorage.removeItem('town')
+    localStorage.removeItem('mealPlan')
+    setHotelRating(null)
+    setSelectedDurations(null)
+    setMealPlan(null)
+    
     if (selectedRegion) params.set('departure', String(selectedRegion.id));
     if (selectedRegionDes)
       params.set('destination', String(selectedRegionDes.id));
