@@ -80,6 +80,35 @@ if (savedData) {
 }
 
 
+function saveQueryParamsToLocalStorage() {
+  // Hozirgi sahifa URL’ini olish
+  const url = window.location.href;
+  const queryString = url.split("?")[1];
+  if (!queryString) return;
+
+  const params = new URLSearchParams(queryString);
+
+  // Tekshirish kerak bo‘lgan parametrlarga mapping
+  const keys = [
+    { key: "hotel_id", storageKey: "hotel_id" },
+    { key: "town", storageKey: "town" },
+    { key: "meal", storageKey: "mealPlan" },
+    { key: "duration", storageKey: "duration" },
+    { key: "rating", storageKey: "rating" },
+    { key: "page", storageKey: "page" },
+  ];
+
+  keys.forEach(({ key, storageKey }) => {
+    const value = params.get(key);
+    if (value) {
+      localStorage.setItem(storageKey, value);
+    } else {
+      localStorage.removeItem(storageKey);
+    }
+  });
+}
+
+
 
 //localStorage.setItem("tourOperator", data?.operator)
 //localStorage.setItem("tourOperatorId", data?.tour_operator_id)
@@ -89,6 +118,7 @@ if (savedData) {
 	 onClick={() => {
       localStorage.setItem("tourOperator", data?.operator ?? "");
       localStorage.setItem("tourOperatorId", String(data?.tour_operator_id ?? ""));
+      saveQueryParamsToLocalStorage();
       
     }} 
 prefetch={true}>    

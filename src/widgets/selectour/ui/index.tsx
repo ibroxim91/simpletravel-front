@@ -82,9 +82,7 @@ export default function Selectour() {
     selectData: string;
     where: string;
   }>();
-  const [selectedDurations, setSelectedDurations] = useState<string | null>(
-    null,
-  );
+  const [selectedDurations, setSelectedDurations] = useState<string | null>(null,);
   const [selectedTown, setSelectedTown] = useState<string | null>(null);
 
   const [selectedDestinations, setSelectedDestinations] = useState<string | null>(null);
@@ -94,6 +92,7 @@ export default function Selectour() {
   const [hotelAmenities, setHotelAmenitie] = useState<string | null>(null);
   const [hotelFeature, setHotelFeature] = useState<string[]>([]);
   const [openFilter, setFilter] = useState(false);
+
   const savedData = localStorage.getItem('filterTours');
 
   const handleInputChange = (value: string, index: number) => {

@@ -9,7 +9,14 @@ export const TicketsDetailAPi = {
     if (savedData) {
       try {
         const filters = JSON.parse(savedData);
-        filters.operator = localStorage.getItem("tourOperator")
+        filters.operator = localStorage.getItem("tourOperator") || undefined; 
+        filters.hotel_id = localStorage.getItem("hotel_id") || undefined; 
+        filters.town = localStorage.getItem("town") || undefined; 
+        filters.mealPlan = localStorage.getItem("meal") || undefined; 
+        filters.duration = localStorage.getItem("duration") || undefined; 
+        filters.rating = localStorage.getItem("rating") || undefined; 
+        filters.page = localStorage.getItem("page") || undefined; 
+
         const params = new URLSearchParams();
 
         if (filters.departure) params.set('departure', filters.departure);
@@ -19,6 +26,12 @@ export const TicketsDetailAPi = {
         if (filters.adults) params.set('adults', filters.adults);
         if (filters.children) params.set('children', filters.children);
         if (filters.operator) params.set('operator', filters.operator);
+        if (filters.hotel_id) params.set('hotel_id', filters.hotel_id);
+        if (filters.town) params.set('town', filters.town);
+        if (filters.mealPlan) params.set('meal', filters.mealPlan);
+        if (filters.duration) params.set('duration', filters.duration);
+        if (filters.rating) params.set('rating', filters.rating);
+        if (filters.page) params.set('page', filters.page);
 
         const queryString = params.toString();
         if (queryString) {
