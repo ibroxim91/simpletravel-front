@@ -170,6 +170,7 @@ export default function Selectour() {
       hotelAmenities,
       hotelRating,
       hotelFeature,
+    
     ],
     queryFn: () => {
       const town = localStorage.getItem('town')
@@ -215,6 +216,7 @@ export default function Selectour() {
     },
     staleTime: 0,
   cacheTime: 0,
+    keepPreviousData: false,
     enabled: !!filterLocal || !!selectedDestinations,
   });
 const prevCountry = useRef<string | null>(null);

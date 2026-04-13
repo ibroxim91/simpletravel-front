@@ -86,6 +86,9 @@ export default function SingleTour() {
       localStorage.setItem("tour", JSON.stringify(data.data.data));
       return data.data.data;
     },
+     enabled: !!tourOperatorId, // faqat ID mavjud bo‘lsa ishlaydi
+    staleTime: 0,              // har safar yangi fetch
+    cacheTime: 0,
   });
 
   
