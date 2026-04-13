@@ -78,7 +78,7 @@ export default function SingleTour() {
   
 
   const { data, isLoading } = useQuery({
-    queryKey: ['tickets_detail', tourOperatorId],
+    queryKey: ['tickets_detail', idFromSlug],
     queryFn: () =>
       TicketsDetailAPi.getTicketsDetail({ id: String(tourOperatorId) }),
     select(data) {
