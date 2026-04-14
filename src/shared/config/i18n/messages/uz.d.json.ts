@@ -5,6 +5,9 @@ declare const messages: {
   "Главная": "Bosh sahifa",
   "Подобрать тур": "Sayohat tanlash",
   "О нас": "Biz haqimizda",
+  "Директор":"Direktor",
+  "Рабочие дни":"Ish kunlari",
+  "Пн-Пт":"Du-Ju",
   "Блоги": "Bloglar",
   "Ответы на вопросы": "Savollarga javoblar",
   "Контакты": "Aloqa",
@@ -83,6 +86,7 @@ declare const messages: {
   "5 звезды": "5 yulduz",
   "4 звезды": "4 yulduz",
   "3 звезды": "3 yulduz",
+  "2 звезды": "2 yulduz",
   "Питание": "Ovqatlanish",
   "Все включено": "Hammasi ichiga kiritilgan",
   "Завтрак": "Nonushta",
@@ -367,6 +371,7 @@ declare const messages: {
   "To'lash": "To'lash",
   "Ko'rsatilmoqda": "Ko'rsatilmoqda",
   "Banner yuklashda xatolik yuz berdi": "Banner yuklashda xatolik yuz berdi",
-  "Qayta urinish": "Qayta urinish"
+  "Qayta urinish": "Qayta urinish",
+  "Filter uchun Kerakli davlat va shaharni tanlang": "Filter uchun Kerakli davlat va shaharni tanlang"
 };
 export default messages;

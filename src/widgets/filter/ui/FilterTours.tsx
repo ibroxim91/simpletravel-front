@@ -341,6 +341,7 @@ const defaultitems = selectedCountry
                               <CommandItem
                                 onClick={() => {
                                   if (selectedCountry) {
+                                   
                                     setSelectedRegion(String(item.id));
                                     setSelectedDestRegions(String(item.id));
                                     setOpenCountry(false);

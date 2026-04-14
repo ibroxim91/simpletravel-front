@@ -73,19 +73,22 @@ export default function ServicesStep({
     }
   }, [data]);
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: (body: Create_Ticketorder) =>
-      Ticketorder_Api.ticketorder_create(body),
-    onSuccess: (res) => {
-      setOrderId(res.data.data.id);
-      toast.success(t('Tur muvaffaqiyatli bron qilindi'));
-      queryClient.refetchQueries({ queryKey: ['order_all'] });
-      onNext();
-    },
-    onError: () => {
-      toast.error(t('Xatolik yuz berdi'));
-    },
-  });
+ const { mutate, isPending } = useMutation({
+  mutationFn: (body: Create_Ticketorder) => {
+    console.log("body 1", body);
+    return Ticketorder_Api.ticketorder_create(body);
+  },
+  onSuccess: (res) => {
+    setOrderId(res.data.data.id);
+    toast.success(t('Tur muvaffaqiyatli bron qilindi'));
+    queryClient.refetchQueries({ queryKey: ['order_all'] });
+    onNext();
+  },
+  onError: () => {
+    toast.error(t('Xatolik yuz berdi'));
+  },
+});
+
 
   const {
     excursions,

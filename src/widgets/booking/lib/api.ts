@@ -91,6 +91,13 @@ export const Ticketorder_Api = {
   },
 
   async ticketorder_create(body: Create_Ticketorder) {
+    let parisipants = JSON.parse(localStorage.getItem('participantsForm'))
+    parisipants = parisipants.userIds
+    console.log("parisipants 2", parisipants);
+    console.log("typeof parisipants 2", typeof parisipants);
+
+    body.participant = parisipants 
+    console.log("body 2", body);
     const res = await httpClient.post(TICKETORDER, body);
     return res;
   },
