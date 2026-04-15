@@ -86,6 +86,7 @@ export default function Selectour() {
   const [selectedTown, setSelectedTown] = useState<string | null>(null);
 
   const [selectedDestinations, setSelectedDestinations] = useState<string | null>(null);
+  const [selectedDefaulDestination, setSelectedDefaulDestination] = useState<string | null>(null);
   const [hotelRating, setHotelRating] = useState<string | null>(null);
   const [mealPlan, setMealPlan] = useState<string | null>(null);
   const [hotelType, setHotelTypes] = useState<string | null>(null);
@@ -102,8 +103,26 @@ export default function Selectour() {
     setPriceRange(newRange);
   };
 
+  const changeDestination = (newDestination: string) => {
+   
+    
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('destination', newDestination);
+   
+    
+    router.replace(`/selectour?${params.toString()}`, { scroll: false });
+  };
+  
+  const changeTown = (newDestination: string, newTown: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('destination', newDestination);
+    params.set('town', newTown);
+
+    router.replace(`/selectour?${params.toString()}`, { scroll: false });
+};
+
   useEffect(() => {
-    const departure = searchParams.get('departure') || '';
+    const departure = searchParams.get('departure') || selectedDefaulDestination || '';
     const destination = searchParams.get('destination') || '';
     const dateFrom = searchParams.get('dateFrom') || '';
     const dateTo = searchParams.get('dateTo') || '';
@@ -156,7 +175,7 @@ export default function Selectour() {
     queryKey: [
       'ticket_all',
       savedData,
-      selectedDestinations,
+      // selectedDestinations,
       cheaper,
       expensive,
       filterLocal,
@@ -175,6 +194,7 @@ export default function Selectour() {
     queryFn: () => {
       const town = localStorage.getItem('town')
       const meal_Plan = localStorage.getItem('mealPlan')
+      const dest_id =localStorage.getItem('dest_id')
 
       const params: TickectAllFilter = {
         page: currentPage,
@@ -339,6 +359,7 @@ const prevRegion = useRef<string | null>(null);
         <FilterTours 
           selectedDestRegions={selectedDestinations}
           setSelectedDestRegions={setSelectedDestinations} 
+          setSelectedDefaulDestination={setSelectedDefaulDestination} 
           setHotelRating={setHotelRating}
           setSelectedDurations={setSelectedDurations}
           setMealPlan={setMealPlan}
@@ -487,6 +508,12 @@ const prevRegion = useRef<string | null>(null);
                     selectedRegionObj.towns.length > 0 &&
                     selectedRegionObj.towns.map((town) => (
                       <CheckboxFilter
+                      onclick={() =>{
+                       
+                        changeDestination(String(selectedRegionObj.id))
+                         changeTown(String(selectedRegionObj.id), String(town.id));
+                        //  setSelectedDestinations(String(selectedRegionObj.id));
+                      }}
                         key={town.id}
                         value={String(town.id)}
                         label={<span className="pl-6">{town.name}</span>}

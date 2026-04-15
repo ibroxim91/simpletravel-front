@@ -31,7 +31,7 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { DateRange } from 'react-day-picker';
 
-const FilterTours = ({ selectedDestRegions, setSelectedDestRegions, setHotelRating, setSelectedDurations, setMealPlan }) => {
+const FilterTours = ({ selectedDestRegions, setSelectedDestRegions,setSelectedDefaulDestination, setHotelRating, setSelectedDurations, setMealPlan }) => {
   const t = useTranslations();
   const route = useRouter();
   const searchParams = useSearchParams();
@@ -63,6 +63,29 @@ const FilterTours = ({ selectedDestRegions, setSelectedDestRegions, setHotelRati
       return data.data.data;
     },
   });
+
+  const changeDeparture= (newDep: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('departure', newDep);
+
+    route.replace(`/selectour?${params.toString()}`, { scroll: false });
+};
+useEffect(() => {
+  if (countries) {
+    // Default regionni topamiz
+    const defaultRegion = countries
+      .flatMap((c) => c.regions)
+      .find((r) => r.default_region);
+
+    if (defaultRegion) {
+      setSelectedDefaulDestination(String(defaultRegion.id));
+      changeDeparture(String(defaultRegion.id));
+      localStorage.setItem("dest_id", String(defaultRegion.id));
+    
+    }
+  }
+}, [countries]);
+ 
 
   const filteredCountries = countries?.filter((c) =>
     c.name.toLowerCase().includes(searchCountry.toLowerCase()),
@@ -136,6 +159,7 @@ const FilterTours = ({ selectedDestRegions, setSelectedDestRegions, setHotelRati
       });
      
       if (foundCountry && foundRegion) {
+       
         setSelectedDestCountry(foundCountry.name);
         setSelectedDestRegion(String(foundRegion.id));
         setSelectedDestRegions(String(foundRegion.id));
@@ -191,7 +215,14 @@ const FilterTours = ({ selectedDestRegions, setSelectedDestRegions, setHotelRati
 
     if (selectedDestCountry) {
       if (selectedDestRegion) {
-        params.set('destination', selectedDestRegion);
+       
+        if( localStorage.getItem('dest_id')){
+
+          params.set('destination', localStorage.getItem('dest_id'));
+        }else{
+          params.set('destination', selectedDestRegion);
+
+        }
       } else {
         params.set('destination', selectedDestCountry);
       }
@@ -343,7 +374,7 @@ const defaultitems = selectedCountry
                                   if (selectedCountry) {
                                    
                                     setSelectedRegion(String(item.id));
-                                    setSelectedDestRegions(String(item.id));
+                                   
                                     setOpenCountry(false);
                                   } else {
                                     setSelectedCountry(item.name);
@@ -493,6 +524,9 @@ const defaultitems = selectedCountry
                                   if (selectedDestCountry) {
                                     setSelectedDestRegion(String(item.id));
                                     setOpenDest(false);
+                                     setSelectedDestRegions(String(item.id));
+                                     localStorage.setItem("dest_id", String(item.id))
+                                   
                                   } else {
                                     setSelectedDestCountry(item.name);
                                   }
