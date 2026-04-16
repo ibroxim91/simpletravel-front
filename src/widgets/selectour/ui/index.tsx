@@ -377,6 +377,7 @@ const prevRegion = useRef<string | null>(null);
         <FilterToursMobile 
         selectedDestRegions={selectedDestinations}
           setSelectedDestRegions={setSelectedDestinations} 
+          setSelectedDefaulDestination={setSelectedDefaulDestination} 
           setHotelRating={setHotelRating}
           setSelectedDurations={setSelectedDurations}
           setMealPlan={setMealPlan}

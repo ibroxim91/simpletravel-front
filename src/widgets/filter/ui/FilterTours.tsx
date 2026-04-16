@@ -64,11 +64,13 @@ const FilterTours = ({ selectedDestRegions, setSelectedDestRegions,setSelectedDe
     },
   });
 
-  const changeDeparture= (newDep: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('departure', newDep);
-
-    route.replace(`/selectour?${params.toString()}`, { scroll: false });
+      const changeDeparture= (newDep: string) => {
+      if (window.location.pathname === '/selectour') {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('departure', newDep);
+       route.replace(`/selectour?${params.toString()}`, { scroll: false });
+  } 
+   
 };
 useEffect(() => {
   if (countries) {

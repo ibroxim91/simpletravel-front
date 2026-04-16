@@ -10,6 +10,7 @@ const TabsTours = ({ active }: Props) => {
   const [hotelRating, setHotelRating] = useState<string | null>(null);
   const [mealPlan, setMealPlan] = useState<string | null>(null);
   const [selectedDurations, setSelectedDurations] = useState<string | null>(null);
+  const [selectedDefaulDestination, setSelectedDefaulDestination] = useState<string | null>(null);
 
   return (
     <>
@@ -17,6 +18,7 @@ const TabsTours = ({ active }: Props) => {
         <FilterTours
           selectedDestRegions={selectedDestinations}
           setSelectedDestRegions={setSelectedDestinations}
+          setSelectedDefaulDestination={setSelectedDefaulDestination}
           setHotelRating={setHotelRating}
           setSelectedDurations={setSelectedDurations}
           setMealPlan={setMealPlan}

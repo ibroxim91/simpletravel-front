@@ -29,7 +29,7 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { DateRange } from 'react-day-picker';
 
-const FilterToursMobile = ({ selectedDestRegions, setSelectedDestRegions, setHotelRating, setSelectedDurations, setMealPlan }) => {
+const FilterToursMobile = ({ selectedDestRegions, setSelectedDestRegions,setSelectedDefaulDestination, setHotelRating, setSelectedDurations, setMealPlan }) => {
   const { data: ticket } = useQuery({
     queryKey: ['country_list'],
     queryFn: () => country_api.list(),
@@ -37,6 +37,31 @@ const FilterToursMobile = ({ selectedDestRegions, setSelectedDestRegions, setHot
       return data.data.data;
     },
   });
+
+    const changeDeparture= (newDep: string) => {
+      if (window.location.pathname === '/selectour') {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('departure', newDep);
+       route.replace(`/selectour?${params.toString()}`, { scroll: false });
+  } 
+   
+};
+
+  useEffect(() => {
+  if (ticket) {
+    // Default regionni topamiz
+    const defaultRegion = ticket
+      .flatMap((c) => c.regions)
+      .find((r) => r.default_region);
+
+    if (defaultRegion) {
+      setSelectedDefaulDestination(String(defaultRegion.id));
+      changeDeparture(String(defaultRegion.id));
+      localStorage.setItem("dest_id", String(defaultRegion.id));
+    
+    }
+  }
+}, [ticket]);
 
   const defaultCountry = ticket?.find((c) => c.default_country === true);
   const t = useTranslations();
