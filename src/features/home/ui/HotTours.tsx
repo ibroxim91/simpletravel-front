@@ -164,7 +164,7 @@ const HotTours = () => {
                       }} 
                       prefetch={true}>
                       
-                      prefetch={true}>
+                   
                         <motion.div
                           initial={{ opacity: 0, y: 40, scale: 0.95 }}
                           whileInView={{ opacity: 1, y: 0, scale: 1 }}

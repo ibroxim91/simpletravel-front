@@ -683,7 +683,7 @@ const prevRegion = useRef<string | null>(null);
             onClick={() => setFilter(true)}
           >
             <p className="font-semibold text-lg text-[#212122]">
-              {t('Филтры')}
+              {t('Фильтры')}
             </p>
             <FilterListIcon />
           </div>
