@@ -113,7 +113,7 @@ function saveQueryParamsToLocalStorage() {
 //localStorage.setItem("tourOperator", data?.operator)
 //localStorage.setItem("tourOperatorId", data?.tour_operator_id)
   return (
-    <Link  href={`/selectour/${data?.tour_operator_id}`} 
+    <Link  href={`/selectour/${data?.slug}`} 
        
 	 onClick={() => {
       localStorage.setItem("tourOperator", data?.operator ?? "");

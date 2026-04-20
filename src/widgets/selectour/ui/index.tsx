@@ -41,12 +41,13 @@ import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import { useEffect, useRef, useState } from 'react';
 import Ticket_Api, { hotel_meal_plan } from '../lib/api';
+import { useQueryClient } from '@tanstack/react-query';
 import { useFilterTickectsStore } from '../lib/store';
 import { TickectAllFilter } from '../lib/types';
 import CheckboxFilter from './CheckBox';
 import FilterSection from './FilterSection';
 import TourItem from './TourItem';
-
+import isEqual from 'lodash/isEqual';
 const Player = dynamic(
   () => import('@lottiefiles/react-lottie-player').then((mod) => mod.Player),
   { ssr: false },
@@ -95,6 +96,25 @@ export default function Selectour() {
   const [openFilter, setFilter] = useState(false);
 
   const savedData = localStorage.getItem('filterTours');
+
+const queryClient = useQueryClient();
+const isFirstRender = useRef(true);
+useEffect(() => {
+  console.log('isFirstRender.current ',isFirstRender.current)
+  if (isFirstRender.current) {
+    isFirstRender.current = false;
+    return; // ❌ birinchi render skip
+  }
+
+  queryClient.removeQueries({ queryKey: ['ticket_all'] });
+
+}, [
+  filterLocal?.from,
+  filterLocal?.where,
+  filterLocal?.date,
+  filterLocal?.toDate,
+]);
+
 
   const handleInputChange = (value: string, index: number) => {
     const numericValue = Number(value.replace(/\s/g, '')) || 0;
@@ -150,7 +170,17 @@ export default function Selectour() {
       adults: parseInt(adultsParam),
       children: parseInt(childrenParam),
     };
-    setFilterLocal(filterData);
+    // setFilterLocal(filterData);
+    setFilterLocal(prev => {
+    if (isEqual(prev, filterData)) {
+      console.log("No set filterData")
+      return prev; // ❌ set qilmaydi → re-render yo‘q
+    }
+    console.log(" set filterData")
+    return filterData; // ✅ faqat o‘zgarsa
+  });
+    console.log(filterData)
+    console.log(selectedDestinations)
    
     setSelectedDestinations(destination);
   }, [searchParams]);
@@ -174,24 +204,43 @@ export default function Selectour() {
   const { data: ticket, isLoading } = useQuery({
     queryKey: [
       'ticket_all',
-      savedData,
-      // selectedDestinations,
-      cheaper,
-      expensive,
-      filterLocal,
+      filterLocal?.from,
+      filterLocal?.where,
+      filterLocal?.adults,
+      filterLocal?.children,
+      filterLocal?.date,
+      filterLocal?.toDate,
       currentPage,
-      hotelType,
-      hotelName,
-      priceRange,
-      visa,
       selectedDurations,
       mealPlan,
-      hotelAmenities,
       hotelRating,
-      hotelFeature,
+      // hotelType,
+      // hotelName,
+      // savedData,
+      //  selectedDestinations,
+      // cheaper,
+      // expensive,
+      // priceRange,
+      // visa,
+      // hotelAmenities,
+      // hotelFeature,
     
     ],
     queryFn: () => {
+       console.log("QueryFn ishladi");
+    console.log("QueryKey:", [
+      'ticket_all',
+      filterLocal?.from,
+      filterLocal?.where,
+      filterLocal?.adults,
+      filterLocal?.children,
+      filterLocal?.date,
+      filterLocal?.toDate,
+      currentPage,
+      selectedDurations,
+      mealPlan,
+      hotelRating,
+    ]);
       const town = localStorage.getItem('town')
       const meal_Plan = localStorage.getItem('mealPlan')
       const dest_id =localStorage.getItem('dest_id')
@@ -235,8 +284,8 @@ export default function Selectour() {
       });
     },
     staleTime: 0,
-  cacheTime: 0,
-    keepPreviousData: false,
+    cacheTime: 0,
+    placeholderData: undefined,
     enabled: !!filterLocal || !!selectedDestinations,
   });
 const prevCountry = useRef<string | null>(null);
@@ -587,7 +636,7 @@ const prevRegion = useRef<string | null>(null);
           </FilterSection>
 
        <FilterSection title={t('Отели')}>
-        {ticket?.data.results?.hotels?.map((hotel) => (
+        {ticket?.data?.results?.hotels?.map((hotel) => (
           <CheckboxFilter
             key={hotel.id}
             value={hotel.name}
@@ -901,7 +950,7 @@ const prevRegion = useRef<string | null>(null);
             </FilterSection>
 
             <FilterSection title={t('Отели')}>
-              {ticket?.data.results?.hotels?.map((hotel) => (
+              {ticket?.data?.results?.hotels?.map((hotel) => (
                 <CheckboxFilter
                   key={hotel.id}
                   value={hotel.name}
@@ -995,13 +1044,13 @@ const prevRegion = useRef<string | null>(null);
                       <span>{countryName}</span>
                       <KeyboardArrowRightIcon />
                       <span>
-                        {regionName} {ticket ? t('ga tegishli') : ''}
+                        {regionName} {ticket && ticket ? t('ga tegishli') : ''}
                       </span>
                     </>
                   ) : (
                     t('Filter uchun Kerakli davlat va shaharni tanlang')
                   )}{' '}
-                  {ticket && (regionName || ticket.data.total_items > 0) ? (
+                  {ticket && (regionName || ticket?.data?.total_items > 0) ? (
                     <>
                       {ticket.data.total_items} {t('ta tur topildi')}
                     </>
@@ -1052,8 +1101,10 @@ const prevRegion = useRef<string | null>(null);
                 </div>
               ) : (
                 <>
-                  {ticket && ticket.data.results.tickets.length > 0 ? (
-                    ticket?.data.results.tickets.map((item) => (
+               
+                  {ticket && ticket?.data?.results.tickets.length > 0 ? (
+                   
+                    ticket?.data?.results.tickets.map((item) => (
                       <TourItem key={item.id} data={item} />
                     ))
                   ) : (
