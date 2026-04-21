@@ -1,22 +1,19 @@
+"use client";
 import httpClient from '@/shared/config/api/httpClient';
 import { GET_TICKETS, SEND_COMMENT } from '@/shared/config/api/URLs';
 import { ToursDetail } from './data';
+// import { useSearchParams } from 'next/navigation';
 
 export const TicketsDetailAPi = {
   async getTicketsDetail({ id }: { id: number | string }) {
-        let url = `${GET_TICKETS}${id}/`;
+    let url = `${GET_TICKETS}${id}/`;
     const savedData = localStorage.getItem('filterTours');
     if (savedData) {
       try {
+   
         const filters = JSON.parse(savedData);
         filters.operator = localStorage.getItem("tourOperator") || undefined; 
-        filters.hotel_id = localStorage.getItem("hotel_id") || undefined; 
-        filters.town = localStorage.getItem("town") || undefined; 
-        filters.mealPlan = localStorage.getItem("meal") || undefined; 
-        filters.duration = localStorage.getItem("duration") || undefined; 
-        filters.rating = localStorage.getItem("rating") || undefined; 
-        filters.page = localStorage.getItem("page") || undefined; 
-
+  
         const params = new URLSearchParams();
 
         if (filters.departure) params.set('departure', filters.departure);
@@ -32,8 +29,11 @@ export const TicketsDetailAPi = {
         if (filters.duration) params.set('duration', filters.duration);
         if (filters.rating) params.set('rating', filters.rating);
         if (filters.page) params.set('page', filters.page);
-
+        if (filters.from_cache) params.set('from_cache', filters.from_cache);
+          // const from_cache = searchParams.get('from_cache') || '';
+        //  params.set('from_cache', from_cache);
         const queryString = params.toString();
+        console.log("queryString ", queryString)
         if (queryString) {
           url += `?${queryString}`;
         }

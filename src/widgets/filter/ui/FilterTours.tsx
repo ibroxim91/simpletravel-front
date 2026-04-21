@@ -237,6 +237,11 @@ useEffect(() => {
     if (toDate) params.set('dateTo', formatDate.format(toDate, 'YYYY-MM-DD'));
     if (adults > 0) params.set('adults', adults.toString());
     if (children > 0) params.set('children', children.toString());
+    // if (searchParams.get("hotel_id")) params.set('hotel_id', searchParams.get("hotel_id") || "");
+    // if (searchParams.get("town")) params.set('town', searchParams.get("town") || "");
+    // if (searchParams.get("rating")) params.set('rating', searchParams.get("rating") || "");
+    // if (searchParams.get("duration")) params.set('duration', searchParams.get("duration") || "");
+    // if (searchParams.get("meal")) params.set('meal', searchParams.get("meal") || "");
 
     route.push(`/selectour?page=1&${params.toString()}`);
   };

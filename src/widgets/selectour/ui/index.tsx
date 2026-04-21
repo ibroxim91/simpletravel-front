@@ -100,7 +100,7 @@ export default function Selectour() {
 const queryClient = useQueryClient();
 const isFirstRender = useRef(true);
 useEffect(() => {
-  console.log('isFirstRender.current ',isFirstRender.current)
+  // console.log('isFirstRender.current ',isFirstRender.current)
   if (isFirstRender.current) {
     isFirstRender.current = false;
     return; // ❌ birinchi render skip
@@ -152,6 +152,26 @@ useEffect(() => {
     const hotel_id = searchParams.get('hotel_id') || '';
     const operator = searchParams.get('operator') || '';
     const mealPlan = searchParams.get('meal') || '';
+    const rating = searchParams.get('rating') || '';
+    const duration = searchParams.get('duration') || '';
+    const from_cache = searchParams.get('from_cache') || '';
+
+    let newData = {
+      departure:departure,
+      from_cache:from_cache,
+      destination:destination,
+      dateFrom:dateFrom,
+      dateTo:dateTo,
+      duration:duration,
+      town:town,
+      rating:rating,
+      hotel_id:hotel_id,
+      mealPlan:mealPlan,
+      adults:adultsParam,
+      children:childrenParam,
+      operator:operator,
+   }
+   localStorage.setItem('filterTours', JSON.stringify(newData));
 
     localStorage.setItem('town', town);
     localStorage.setItem('mealPlan', mealPlan);
@@ -162,6 +182,7 @@ useEffect(() => {
       operator: operator,
       toDate: dateTo,
       town: town,
+      mealPlan: mealPlan,
       hotel_id: hotel_id,
       selectData:
         dateFrom && dateTo
@@ -210,6 +231,9 @@ useEffect(() => {
       filterLocal?.children,
       filterLocal?.date,
       filterLocal?.toDate,
+      filterLocal?.town,
+      filterLocal?.hotel_id,
+      filterLocal?.mealPlan,
       currentPage,
       selectedDurations,
       mealPlan,
@@ -227,23 +251,7 @@ useEffect(() => {
     
     ],
     queryFn: () => {
-       console.log("QueryFn ishladi");
-    console.log("QueryKey:", [
-      'ticket_all',
-      filterLocal?.from,
-      filterLocal?.where,
-      filterLocal?.adults,
-      filterLocal?.children,
-      filterLocal?.date,
-      filterLocal?.toDate,
-      currentPage,
-      selectedDurations,
-      mealPlan,
-      hotelRating,
-    ]);
-      const town = localStorage.getItem('town')
-      const meal_Plan = localStorage.getItem('mealPlan')
-      const dest_id =localStorage.getItem('dest_id')
+      
 
       const params: TickectAllFilter = {
         page: currentPage,
@@ -254,10 +262,11 @@ useEffect(() => {
         departure: filterLocal ? filterLocal.from : '',
         destination: selectedDestinations === null ? '' : selectedDestinations,
         hotel_amenity: hotelAmenities ?? '',
-        hotel_id: filterLocal?.hotel_id,
+        hotel_id: filterLocal?.hotel_id ?? '',
+        town: filterLocal?.town ?? '',
         hotel_type: hotelType ?? '',
         cheapest: cheaper,
-        town: town ? town : '',
+      
         most_expensive: expensive,
         min_departure_date: filterLocal?.date
           ? formatDate.format(filterLocal?.date, 'YYYY-MM-DD')
@@ -273,7 +282,7 @@ useEffect(() => {
         visa_required: visa === 'visa' ? true : visa === 'no_visa' ? false : '',
         hotel_rating: hotelRating ?? '',
         duration_days: selectedDurations ?? '',
-        meal_plan: meal_Plan ?? '',
+        meal_plan: filterLocal?.mealPlan ?? '',
         hotel_feature: hotelFeature,
       };
 
@@ -923,12 +932,12 @@ const prevRegion = useRef<string | null>(null);
                 <CheckboxFilter
                   value={String(e.id)}
                   label={e.name}
+                  key={e.id}
                   onclick={setCurrentPage}
                   setChecked={setMealPlan}
                   selectedValue={mealPlan}
                   exclusive
                   paramName="meal"
-                  key={e.id}
                 />
               ))}
             </FilterSection>
