@@ -2,7 +2,7 @@
 import httpClient from '@/shared/config/api/httpClient';
 import { GET_TICKETS, SEND_COMMENT } from '@/shared/config/api/URLs';
 import { ToursDetail } from './data';
-// import { useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
 export const TicketsDetailAPi = {
   async getTicketsDetail({ id }: { id: number | string }) {
@@ -15,6 +15,7 @@ export const TicketsDetailAPi = {
         filters.operator = localStorage.getItem("tourOperator") || undefined; 
   
         const params = new URLSearchParams();
+        const searchParams =  useSearchParams();
 
         if (filters.departure) params.set('departure', filters.departure);
         if (filters.destination) params.set('destination', filters.destination);
@@ -30,8 +31,8 @@ export const TicketsDetailAPi = {
         if (filters.rating) params.set('rating', filters.rating);
         if (filters.page) params.set('page', filters.page);
         if (filters.from_cache) params.set('from_cache', filters.from_cache);
-          // const from_cache = searchParams.get('from_cache') || '';
-        //  params.set('from_cache', from_cache);
+        const from_cache = searchParams.get('from_cache') || '';
+         params.set('from_cache', from_cache);
         const queryString = params.toString();
         console.log("queryString ", queryString)
         if (queryString) {
