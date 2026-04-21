@@ -112,19 +112,36 @@ useEffect(() => {
   useEffect(() => {
     const departureId = searchParams.get('departure');
     const destination = searchParams.get('destination');
-    const dateFrom = searchParams.get('dateFrom');
     const dateTo = searchParams.get('dateTo');
     const adultsParam = searchParams.get('adults');
     const childrenParam = searchParams.get('children');
-        const filters = {
-      departure: departureId,
-      destination,
-      dateFrom,
-      dateTo,
-      adults: adultsParam,
-      children: childrenParam,
-    };
-    localStorage.setItem('filterTours', JSON.stringify(filters));
+    const departure = searchParams.get('departure') ||  '';
+    const dateFrom = searchParams.get('dateFrom') || '';
+
+    const town = searchParams.get('town') || '';
+    const hotel_id = searchParams.get('hotel_id') || '';
+    const operator = searchParams.get('operator') || '';
+    const mealPlan = searchParams.get('meal') || '';
+    const rating = searchParams.get('rating') || '';
+    const duration = searchParams.get('duration') || '';
+    const from_cache = searchParams.get('from_cache') || '';
+
+    let newData = {
+      departure:departure,
+      from_cache:from_cache,
+      destination:destination,
+      dateFrom:dateFrom,
+      dateTo:dateTo,
+      duration:duration,
+      town:town,
+      rating:rating,
+      hotel_id:hotel_id,
+      mealPlan:mealPlan,
+      adults:adultsParam,
+      children:childrenParam,
+      operator:operator,
+   }
+   localStorage.setItem('filterTours', JSON.stringify(newData));
 
 		
     if (departureId) {
