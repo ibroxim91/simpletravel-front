@@ -51,6 +51,7 @@ const PopulardestinationsMboile = () => {
           adults: e.adult,
           children: e.child,
           operator: e.operator,
+           from_cache: e?.from_cache,
         };
         localStorage.setItem('filterTours', JSON.stringify(filters));
   }

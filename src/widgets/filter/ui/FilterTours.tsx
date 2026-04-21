@@ -140,6 +140,7 @@ useEffect(() => {
       adults:adultsParam,
       children:childrenParam,
       operator:operator,
+      
    }
    localStorage.setItem('filterTours', JSON.stringify(newData));
 
