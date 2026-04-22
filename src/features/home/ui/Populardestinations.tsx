@@ -124,7 +124,7 @@ const Populardestinations = () => {
                 onClick={() => {
                         localStorage.setItem("tourOperator", ticket[0]?.operator ?? "");
                         localStorage.setItem("tourOperatorId", String(ticket[0]?.tour_operator_id ?? ""));
-                         updateData(ticket[0])
+                        //  updateData(ticket[0])
                       }} 
               >
                 <Image
@@ -174,7 +174,7 @@ const Populardestinations = () => {
                     onClick={() => {
                         localStorage.setItem("tourOperator", ticket[1]?.operator ?? "");
                         localStorage.setItem("tourOperatorId", String(ticket[1]?.tour_operator_id ?? ""));
-                        updateData(ticket[1])
+                        // updateData(ticket[1])
                       }} 
                     className="block relative w-full h-full"
                   >
@@ -222,7 +222,7 @@ const Populardestinations = () => {
                     onClick={() => {
                         localStorage.setItem("tourOperator", ticket[2]?.operator ?? "");
                         localStorage.setItem("tourOperatorId", String(ticket[2]?.tour_operator_id ?? ""));
-                        updateData(ticket[2])
+                        // updateData(ticket[2])
                       }} 
                     className="block relative w-full h-full"
                   >
@@ -271,7 +271,7 @@ const Populardestinations = () => {
                     onClick={() => {
                         localStorage.setItem("tourOperator", ticket[3]?.operator ?? "");
                         localStorage.setItem("tourOperatorId", String(ticket[3]?.tour_operator_id ?? ""));
-                        updateData(ticket[3])
+                        // updateData(ticket[3])
                       }} 
                     className="block relative w-full h-full"
                   >
@@ -319,7 +319,7 @@ const Populardestinations = () => {
                      onClick={() => {
                         localStorage.setItem("tourOperator", ticket[4]?.operator ?? "");
                         localStorage.setItem("tourOperatorId", String(ticket[4]?.tour_operator_id ?? ""));
-                        updateData(ticket[4])
+                        // updateData(ticket[4])
                       }} 
                     className="block relative w-full h-full"
                   >

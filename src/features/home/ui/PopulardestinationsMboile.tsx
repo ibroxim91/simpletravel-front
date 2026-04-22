@@ -86,7 +86,7 @@ const PopulardestinationsMboile = () => {
                 onClick={() => {
                         localStorage.setItem("tourOperator", e?.operator ?? "");
                         localStorage.setItem("tourOperatorId", String(e?.tour_operator_id ?? ""));
-                        updateData(e)
+                        // updateData(e)
                       }} 
                 prefetch={true}
                 className="rounded-3xl w-full relative h-full"
