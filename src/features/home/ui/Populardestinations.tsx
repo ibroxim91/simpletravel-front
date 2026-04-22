@@ -118,7 +118,7 @@ const Populardestinations = () => {
           >
             {ticket && ticket[0] && (
               <Link
-                href={`/selectour/${ticket[0].slug}/?departure=${ticket[0].departure_id}&destination=${ticket[0].destination_id}&adults=${ticket[0].adults}&operator=${ticket[0].operator}&from_cache=${ticket[0]?.from_cache}`}
+                href={`/selectour/${ticket[0].slug}/?from_cache=${ticket[0]?.from_cache}`}
                 className="block relative w-full h-full"
                 prefetch={true}
                 onClick={() => {
@@ -169,7 +169,7 @@ const Populardestinations = () => {
               >
                 {ticket && ticket[1] && (
                   <Link
-                    href={`/selectour/${ticket[1].slug}/?departure=${ticket[1].departure_id}&destination=${ticket[1].destination_id}&adults=${ticket[1].adults}&operator=${ticket[1].operator}&from_cache=${ticket[1]?.from_cache}`}
+                    href={`/selectour/${ticket[1].slug}/?from_cache=${ticket[1]?.from_cache}`}
                     prefetch={true}
                     onClick={() => {
                         localStorage.setItem("tourOperator", ticket[1]?.operator ?? "");
@@ -217,7 +217,7 @@ const Populardestinations = () => {
               >
                 {ticket && ticket[2] && (
                   <Link
-                    href={`/selectour/${ticket[2].slug}/?departure=${ticket[2].departure_id}&destination=${ticket[2].destination_id}&adults=${ticket[2].adults}&operator=${ticket[2].operator}&from_cache=${ticket[2]?.from_cache}`}
+                    href={`/selectour/${ticket[2].slug}/?from_cache=${ticket[2]?.from_cache}`}
                     prefetch={true}
                     onClick={() => {
                         localStorage.setItem("tourOperator", ticket[2]?.operator ?? "");
@@ -266,7 +266,7 @@ const Populardestinations = () => {
               >
                 {ticket && ticket[3] && (
                   <Link
-                    href={`/selectour/${ticket[3].slug}/?departure=${ticket[3].departure_id}&destination=${ticket[3].destination_id}&adults=${ticket[3].adults}&operator=${ticket[3].operator}&from_cache=${ticket[3]?.from_cache}`}
+                    href={`/selectour/${ticket[3].slug}/?from_cache=${ticket[3]?.from_cache}`}
                     prefetch={true}
                     onClick={() => {
                         localStorage.setItem("tourOperator", ticket[3]?.operator ?? "");
@@ -314,7 +314,7 @@ const Populardestinations = () => {
               >
                 {ticket && ticket[4] && (
                   <Link
-                    href={`/selectour/${ticket[4].slug}/?departure=${ticket[4].departure_id}&destination=${ticket[4].destination_id}&adults=${ticket[4].adults}&operator=${ticket[4].operator}&from_cache=${ticket[4]?.from_cache}`}
+                    href={`/selectour/${ticket[4].slug}/?from_cache=${ticket[4]?.from_cache}`}
                     prefetch={true}
                      onClick={() => {
                         localStorage.setItem("tourOperator", ticket[4]?.operator ?? "");

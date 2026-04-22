@@ -157,7 +157,7 @@ const HotTours = () => {
                       key={idx}
                       className="flex flex-col w-auto basis-1/4 max-lg:basis-1/3 max-md:basis-[70%] shrink-0 font-medium"
                     >
-                      <Link href={`/selectour/${e.slug}/?departure=${e.departure_id}&destination=${e.destination_id}&adults=${e.adults}&operator=${e.tour_operator}&from_cache=${e?.from_cache}`} 
+                      <Link href={`/selectour/${e.slug}/?from_cache=${e?.from_cache}`} 
                       onClick={() => {
                         localStorage.setItem("tourOperator", e?.operator ?? "");
                         localStorage.setItem("tourOperatorId", String(e?.tour_operator_id ?? ""));
@@ -308,7 +308,7 @@ const HotTours = () => {
                       key={idx}
                       className="flex flex-col w-auto basis-1/4 max-lg:basis-1/3 max-md:basis-[70%] shrink-0 font-medium"
                     >
-                      <Link href={`/selectour/${e.slug}/?departure=${e.departure_id}&destination=${e.destination_id}&adults=${e.adults}&operator=${e.tour_operator}&from_cache=${e?.from_cache}`}
+                      <Link href={`/selectour/${e.slug}/?from_cache=${e?.from_cache}`}
                       onclick={() => {
                         localStorage.setItem("tourOperator", e?.operator ?? "");
                         localStorage.setItem("tourOperatorId", String(e?.tour_operator_id ?? ""));

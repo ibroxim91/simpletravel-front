@@ -82,7 +82,7 @@ const PopulardestinationsMboile = () => {
               className="basis-1/2 max-sm:basis-1/1 h-[200px] font-medium"
             >
               <Link
-                href={`/selectour/${e.slug}/?departure=${e.departure_id}&destination=${e.destination_id}&adults=${e.adults}&operator=${e.tour_operator}&from_cache=${e?.from_cache}`}
+                href={`/selectour/${e.slug}/?from_cache=${e?.from_cache}`}
                 onClick={() => {
                         localStorage.setItem("tourOperator", e?.operator ?? "");
                         localStorage.setItem("tourOperatorId", String(e?.tour_operator_id ?? ""));
