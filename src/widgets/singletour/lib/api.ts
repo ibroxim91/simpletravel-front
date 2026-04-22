@@ -8,6 +8,7 @@ export const TicketsDetailAPi = {
   async getTicketsDetail({ id }: { id: number | string }) {
     let url = `${GET_TICKETS}${id}/`;
     const savedData = localStorage.getItem('filterTours');
+    const from_cache = localStorage.getItem('from_cache');
     if (savedData) {
       try {
    
@@ -30,7 +31,12 @@ export const TicketsDetailAPi = {
         if (filters.duration) params.set('duration', filters.duration);
         if (filters.rating) params.set('rating', filters.rating);
         if (filters.page) params.set('page', filters.page);
-        if (filters.from_cache) params.set('from_cache', filters.from_cache);
+        
+        if (!filters.destination){
+           if (filters.from_cache) params.set('from_cache', filters.from_cache);
+           if (from_cache) params.set('from_cache', from_cache);
+
+         }
         // const from_cache = searchParams.get('from_cache') || '';
         //  params.set('from_cache', from_cache);
         const queryString = params.toString();

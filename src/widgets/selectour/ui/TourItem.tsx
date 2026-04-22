@@ -106,18 +106,35 @@ function saveQueryParamsToLocalStorage() {
       localStorage.removeItem(storageKey);
     }
   });
-}
 
+   let savedData = localStorage.getItem('filterTours');
+    const from_cache = params.get("from_cache");
 
+    try {
+      savedData = savedData ? JSON.parse(savedData) : { init: true };
+    } catch (e) {
+      savedData = { init: true };
+    }
 
-//localStorage.setItem("tourOperator", data?.operator)
+    if (from_cache) {
+      savedData.from_cache = from_cache;
+      localStorage.setItem('filterTours', JSON.stringify(savedData));
+    }
+    
+    
+  }
+  
+  
+  
+  //localStorage.setItem("tourOperator", data?.operator)
 //localStorage.setItem("tourOperatorId", data?.tour_operator_id)
-  return (
-    <Link  href={`/selectour/${data?.slug}`} 
+return (
+    <Link  href={`/selectour/${data?.slug}?from_cache=${data?.from_cache}`} 
        
 	 onClick={() => {
-      localStorage.setItem("tourOperator", data?.operator ?? "");
-      localStorage.setItem("tourOperatorId", String(data?.tour_operator_id ?? ""));
+     localStorage.setItem("tourOperator", data?.operator ?? "");
+     localStorage.setItem("tourOperatorId", String(data?.tour_operator_id ?? ""));
+     localStorage.setItem('from_cache', String(data?.from_cache));
       saveQueryParamsToLocalStorage();
       
     }} 

@@ -124,12 +124,8 @@ useEffect(() => {
   };
 
   const changeDestination = (newDestination: string) => {
-   
-    
     const params = new URLSearchParams(searchParams.toString());
     params.set('destination', newDestination);
-   
-    
     router.replace(`/selectour?${params.toString()}`, { scroll: false });
   };
   

@@ -178,6 +178,11 @@ const FilterToursMobile = ({ selectedDestRegions, setSelectedDestRegions,setSele
     if (toDate) params.set('dateTo', formatDate.format(toDate, 'YYYY-MM-DD'));
     if (adults > 0) params.set('adults', adults.toString());
     if (children > 0) params.set('children', children.toString());
+    if (searchParams.get("hotel_id")) params.set('hotel_id', "");
+    if (searchParams.get("town")) params.set('town', "");
+    if (searchParams.get("rating")) params.set('rating',  "");
+    if (searchParams.get("duration")) params.set('duration',  "");
+    if (searchParams.get("meal")) params.set('meal',  "");
 
     route.push(`/selectour?page=1&${params.toString()}`,  { scroll: false });
   };
