@@ -160,6 +160,7 @@ const HotTours = () => {
                       <Link href={`/selectour/${e.slug}/?from_cache=${e?.from_cache}`} 
                       onClick={() => {
                         localStorage.setItem("tourOperator", e?.operator ?? "");
+                        localStorage.setItem("from_cache", e?.from_cache ?? "");
                         localStorage.setItem("tourOperatorId", String(e?.tour_operator_id ?? ""));
                         // updateData(e)
                       }} 
@@ -311,6 +312,7 @@ const HotTours = () => {
                       <Link href={`/selectour/${e.slug}/?from_cache=${e?.from_cache}`}
                       onclick={() => {
                         localStorage.setItem("tourOperator", e?.operator ?? "");
+                          localStorage.setItem("from_cache", e?.from_cache ?? "");
                         localStorage.setItem("tourOperatorId", String(e?.tour_operator_id ?? ""));
                         // updateData(e)
                       }
