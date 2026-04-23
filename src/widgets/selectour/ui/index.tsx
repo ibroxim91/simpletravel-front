@@ -37,6 +37,7 @@ import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
 import qs from 'qs';
+import { toast } from 'sonner';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import { useEffect, useRef, useState } from 'react';
@@ -68,6 +69,7 @@ export default function Selectour() {
     hotel_type,
   } = useFilterTickectsStore();
   const [hotelName, setHotelName] = useState<string>('');
+  const [hotelID, setHotelID] = useState<number>(0);
   const [expensive, setExpensive] = useState<boolean>(false);
   const [cheaper, setCheaper] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -99,10 +101,12 @@ export default function Selectour() {
 
 const queryClient = useQueryClient();
 const isFirstRender = useRef(true);
+
+
+
 useEffect(() => {
   // console.log('isFirstRender.current ',isFirstRender.current)
   if (isFirstRender.current) {
-    isFirstRender.current = false;
     return; // ❌ birinchi render skip
   }
 
@@ -152,6 +156,11 @@ useEffect(() => {
     const duration = searchParams.get('duration') || '';
     const from_cache = searchParams.get('from_cache') || '';
 
+    const hotelIdParam = searchParams.get("hotel_id");
+  if (hotelIdParam) {
+    setHotelID(Number(hotelIdParam)); // statega yozib qo‘yish
+  }
+
     let newData = {
       departure:departure,
       from_cache:from_cache,
@@ -193,7 +202,7 @@ useEffect(() => {
       console.log("No set filterData")
       return prev; // ❌ set qilmaydi → re-render yo‘q
     }
-    console.log(" set filterData")
+  
     return filterData; // ✅ faqat o‘zgarsa
   });
     console.log(filterData)
@@ -201,6 +210,17 @@ useEffect(() => {
    
     setSelectedDestinations(destination);
   }, [searchParams]);
+
+
+  useEffect(() => {
+  if (!filterLocal?.from || !filterLocal?.where) {
+    console.log("filterLocal?.from && filterLocal?.where",filterLocal?.from, filterLocal?.where)
+    toast.error("Avval shaharni tanlang!");
+  }
+  console.log("isFirstRender " ,isFirstRender.current)
+  console.log("check " , isFirstRender.current || (!!filterLocal?.from && !!filterLocal?.where))
+}, [searchParams]);
+
 
   const { data: country } = useQuery({
     queryKey: ['country_list'],
@@ -217,8 +237,39 @@ useEffect(() => {
       return data.data.data;
     },
   });
+const shouldEnable = () => {
 
-  const { data: ticket, isLoading } = useQuery({
+
+  // Agar from va where yo‘q bo‘lsa va boshqa filterlar ham yo‘q bo‘lsa → true (default turlarni ko‘rsatish)
+  const noMainFilters =
+    !filterLocal?.hotel_id &&
+    !filterLocal?.town &&
+    !selectedDurations &&
+    !hotelRating &&
+    !filterLocal?.mealPlan;
+
+  if (!filterLocal?.from && !filterLocal?.where && noMainFilters) {
+    return true;
+  }
+
+  // Agar hotel_id, town, duration, rating, meal bo‘lsa-yu, where bo‘lmasa → false + toast
+  const hasSecondaryFilters =
+    filterLocal?.hotel_id ||
+    filterLocal?.town ||
+    selectedDurations ||
+    hotelRating ||
+    filterLocal?.mealPlan;
+
+  if (hasSecondaryFilters && !filterLocal?.where) {
+    toast.error("Avval shaharni tanlang!");
+    return false;
+  }
+
+  // Default shart: faqat from va where bo‘lsa ishlasin
+  return !!filterLocal?.from && !!filterLocal?.where;
+};
+
+ const { data: ticket, isLoading } = useQuery({
     queryKey: [
       'ticket_all',
       filterLocal?.from,
@@ -232,18 +283,7 @@ useEffect(() => {
       filterLocal?.mealPlan,
       currentPage,
       selectedDurations,
-      mealPlan,
-      hotelRating,
-      // hotelType,
-      // hotelName,
-      // savedData,
-      //  selectedDestinations,
-      // cheaper,
-      // expensive,
-      // priceRange,
-      // visa,
-      // hotelAmenities,
-      // hotelFeature,
+      hotelRating, 
     
     ],
     queryFn: () => {
@@ -291,11 +331,21 @@ useEffect(() => {
     staleTime: 0,
     cacheTime: 0,
     placeholderData: undefined,
-    enabled: !!filterLocal || !!selectedDestinations,
+    enabled:shouldEnable(), // isFirstRender.current || (!!filterLocal?.from && !!filterLocal?.where), //!!filterLocal || !!selectedDestinations,
+   
   });
+
+useEffect(() => {
+    
+  if (isFirstRender.current && !isLoading && ticket) {
+    isFirstRender.current = false;
+  }
+}, [isLoading, ticket]);
+
+
 const prevCountry = useRef<string | null>(null);
 const prevRegion = useRef<string | null>(null);
- const top_duration = [
+const top_duration = [
                 {
                     "duration": 7,
                     "count": 123
@@ -374,6 +424,7 @@ const prevRegion = useRef<string | null>(null);
     if (searchParams.get('page')) {
       setCurrentPage(Number(searchParams.get('page')));
     }
+  
   }, [searchParams]);
 
   const regionId = Number(filterLocal?.where);
@@ -563,17 +614,23 @@ const prevRegion = useRef<string | null>(null);
                     selectedRegionObj.towns.length > 0 &&
                     selectedRegionObj.towns.map((town) => (
                       <CheckboxFilter
-                      onclick={() =>{
-                       
-                        changeDestination(String(selectedRegionObj.id))
-                         changeTown(String(selectedRegionObj.id), String(town.id));
-                        //  setSelectedDestinations(String(selectedRegionObj.id));
-                      }}
+                       onclick={setCurrentPage}
                         key={town.id}
                         value={String(town.id)}
                         label={<span className="pl-6">{town.name}</span>}
 
-                        setChecked={setSelectedTown}   // endi town uchun alohida state
+                        // setChecked={setSelectedTown}   // endi town uchun alohida state
+                          setChecked={(val) => {
+                              setSelectedTown(val);
+
+                              const params = new URLSearchParams(searchParams.toString());
+                              if (val) {
+                                params.set("town", val);
+                              } else {
+                                params.delete("town"); // ❌ check olib tashlansa URL’dan o‘chadi
+                              }
+                              router.replace(`/selectour?${params.toString()}`, { scroll: false });
+                            }}
                         selectedValue={selectedTown}
                         exclusive
                         paramName="town"
@@ -644,7 +701,7 @@ const prevRegion = useRef<string | null>(null);
         {ticket?.data?.results?.hotels?.map((hotel) => (
           <CheckboxFilter
             key={hotel.id}
-            value={hotel.name}
+            value={hotel.id}
             label={
               <span className="flex flex-wrap items-center gap-2">
                 <span>{hotel.name}</span>
@@ -654,16 +711,25 @@ const prevRegion = useRef<string | null>(null);
               </span>
             }
             setChecked={(val) => {
-              setHotelName(val);
-
+              console.log("VAL ", val)
+              
               // URL parametrlarga qo‘shish
               const params = new URLSearchParams(window.location.search);
-              params.set('hotel_id', String(hotel.id));
-              params.set('operator', String(hotel.operator));
+              if (val) {
+                setHotelID(hotel.id);
+                
+                params.set('hotel_id', String(hotel.id));
+                params.set('operator', String(hotel.operator));
+              }else{
+                setHotelID(0);
+                params.delete('hotel_id');
+                params.delete('operator');
+
+              }
 
               router.push(`/selectour?${params.toString()}`);
             }}
-            selectedValue={hotelName}
+            selectedValue={hotelID}
             exclusive
             // paramName="hotel_name"
           />
@@ -838,7 +904,7 @@ const prevRegion = useRef<string | null>(null);
                       onclick={setCurrentPage}
                       exclusive
                       paramName="duration"
-                    />
+                      />
                   ))}
             </FilterSection>
 
@@ -872,8 +938,20 @@ const prevRegion = useRef<string | null>(null);
                         key={town.id}
                         value={String(town.id)}
                         label={<span className="pl-6">{town.name}</span>}
+                        
+                        onclick={setCurrentPage}
+                        // setChecked={setSelectedTown}   // endi town uchun alohida state
+                          setChecked={(val) => {
+                              setSelectedTown(val);
 
-                        setChecked={setSelectedTown}   // endi town uchun alohida state
+                              const params = new URLSearchParams(searchParams.toString());
+                              if (val) {
+                                params.set("town", val);
+                              } else {
+                                params.delete("town"); // ❌ check olib tashlansa URL’dan o‘chadi
+                              }
+                              router.replace(`/selectour?${params.toString()}`, { scroll: false });
+                            }}
                         selectedValue={selectedTown}
                         exclusive
                         paramName="town"
@@ -958,7 +1036,7 @@ const prevRegion = useRef<string | null>(null);
               {ticket?.data?.results?.hotels?.map((hotel) => (
                 <CheckboxFilter
                   key={hotel.id}
-                  value={hotel.name}
+                  value={hotel.id}
                   label={
                     <span className="flex flex-wrap items-center gap-2">
                       <span>{hotel.name}</span>
@@ -969,13 +1047,21 @@ const prevRegion = useRef<string | null>(null);
                   }
                   onclick={setCurrentPage}
                   // setChecked={setHotelName}
-                  selectedValue={hotelName}
+                  selectedValue={hotelID}
                   exclusive
                    setChecked={(val) => {
-                        // setHotelName(val);
-                        const params = new URLSearchParams(window.location.search);
-                        params.set('hotel_id', String(hotel.id));
-                        params.set('operator', String(hotel.operator));
+                     console.log("VAL ", val)
+                     const params = new URLSearchParams(window.location.search);
+                     if(val){
+                       setHotelID(hotel.id);
+                       params.set('hotel_id', String(hotel.id));
+                       params.set('operator', String(hotel.operator));
+                      }else{
+                          setHotelID(0);
+                          params.delete('hotel_id');
+                          params.delete('operator');
+
+                        }
 
                         router.push(`/selectour?${params.toString()}`);
                       }}

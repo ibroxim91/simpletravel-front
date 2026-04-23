@@ -256,7 +256,7 @@ export default function PaidModal({
               </p>
               <p className="text-[#646465] font-medium text-md">
                 {t('Эксперт свяжется с вами в ближайшее время по номеру')} +998
-                88 007 78 03 {t('позвонив на него')}
+               97 480 58 00 {t('позвонив на него')}
               </p>
               <div className="grid grid-cols-2 w-full mt-4 gap-4 absolute bottom-2 px-5">
                 <Button

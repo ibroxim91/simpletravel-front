@@ -409,10 +409,12 @@ export default function SingleTour() {
                       title: (() => {
                         const meal = data.ticket_hotel?.[0]?.meal_plan;
                         const mealMap: Record<string, string> = {
-                          full_board: t('Все включено'),
-                          breakfast: t('Завтрак'),
-                          half_board: t('Полупансион'),
-                        };
+                            full_board: t('Полный пансион'),
+                            breakfast: t('Завтрак'),
+                            half_board: t('Полупансион'),
+                            all_inclusive: t('Все включено'),
+                            room_only: t('Без питания'),
+                          };
                         return mealMap[meal] || t('Все включено');
                       })(),
                       name: t('Питание'),
