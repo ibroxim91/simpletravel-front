@@ -28,10 +28,11 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Loader2, MoveLeft, MoveRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
+import { toast } from 'sonner';
 import { useEffect, useState } from 'react';
 import { DateRange } from 'react-day-picker';
 
-const FilterTours = ({ selectedDestRegions, setSelectedDestRegions,setSelectedDefaulDestination, setHotelRating, setSelectedDurations, setMealPlan }) => {
+const FilterTours = ({ selectedDestRegions, setSelectedDestRegions,setSelectedDefaulDestination, setHotelRating, setSelectedDurations, setMealPlan,setIsSearchClicked }) => {
   const t = useTranslations();
   const route = useRouter();
   const searchParams = useSearchParams();
@@ -218,6 +219,10 @@ useEffect(() => {
   }, [searchParams, countries,  selectedCountry, setSelectedCountry, setSelectedRegion]);
 
   const saveFilter = () => {
+    if (!selectedRegion || !selectedDestRegion) {
+      toast.error("Avval davlat va shaharni tanlang!");
+      return;
+    }
     localStorage.removeItem('town')
     localStorage.removeItem('mealPlan')
     setHotelRating(null)
@@ -250,8 +255,7 @@ useEffect(() => {
 
 
 
-    if (fromDate)
-      params.set('dateFrom', formatDate.format(fromDate, 'YYYY-MM-DD'));
+    if (fromDate) params.set('dateFrom', formatDate.format(fromDate, 'YYYY-MM-DD'));
     if (toDate) params.set('dateTo', formatDate.format(toDate, 'YYYY-MM-DD'));
     if (adults > 0) params.set('adults', adults.toString());
     if (children > 0) params.set('children', children.toString());
@@ -807,7 +811,15 @@ const defaultitems = selectedCountry
       <div className="flex h-full items-end">
         <Button
           className="bg-[#1764FC] cursor-pointer hover:bg-[#1764FC] text-lg text-white h-14 w-full flex items-center justify-center rounded-4xl font-semibold"
-          onClick={saveFilter}
+          // onClick={saveFilter}
+            onClick={() => {
+              saveFilter()
+              if (selectedDestRegion && selectedRegion) {
+                setIsSearchClicked(true);
+              } else {
+                toast.error("Avval shaharni tanlang!");
+              }
+            }}
         >
           <p>{t('Искать туры')}</p>
         </Button>

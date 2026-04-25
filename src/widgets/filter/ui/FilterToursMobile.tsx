@@ -26,6 +26,7 @@ import { useQuery } from '@tanstack/react-query';
 import { MoveLeft, MoveRight, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
+import { toast } from 'sonner';
 import { useEffect, useState } from 'react';
 import { DateRange } from 'react-day-picker';
 
@@ -162,6 +163,10 @@ const FilterToursMobile = ({ selectedDestRegions, setSelectedDestRegions,setSele
   }, [searchParams, ticket, defaultCountry, selectedCountry]);
 
   const saveFilter = () => {
+    if (!selectedRegion || !selectedRegionDes) {
+      toast.error("Avval davlat va shaharni tanlang!");
+      return;
+    }
     const params = new URLSearchParams();
     
     localStorage.removeItem('town')

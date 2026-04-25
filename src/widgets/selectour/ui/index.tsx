@@ -49,13 +49,18 @@ import CheckboxFilter from './CheckBox';
 import FilterSection from './FilterSection';
 import TourItem from './TourItem';
 import isEqual from 'lodash/isEqual';
+import { useMemo } from "react";
+
 const Player = dynamic(
   () => import('@lottiefiles/react-lottie-player').then((mod) => mod.Player),
   { ssr: false },
 );
 
 export default function Selectour() {
+  const prevRegionRef = useRef<string | null>(null);
+const prevHotelsRef = useRef<any[] | null>(null);
   const t = useTranslations();
+  const [isSearchClicked, setIsSearchClicked] = useState(false);
   const [priceRange, setPriceRange] = useState<number[] | []>([]);
   const {
     durationDays,
@@ -97,7 +102,6 @@ export default function Selectour() {
   const [hotelFeature, setHotelFeature] = useState<string[]>([]);
   const [openFilter, setFilter] = useState(false);
 
-  const savedData = localStorage.getItem('filterTours');
 
 const queryClient = useQueryClient();
 const isFirstRender = useRef(true);
@@ -105,13 +109,10 @@ const isFirstRender = useRef(true);
 
 
 useEffect(() => {
-  // console.log('isFirstRender.current ',isFirstRender.current)
   if (isFirstRender.current) {
     return; // ❌ birinchi render skip
   }
-
   queryClient.removeQueries({ queryKey: ['ticket_all'] });
-
 }, [
   filterLocal?.from,
   filterLocal?.where,
@@ -127,19 +128,7 @@ useEffect(() => {
     setPriceRange(newRange);
   };
 
-  const changeDestination = (newDestination: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('destination', newDestination);
-    router.replace(`/selectour?${params.toString()}`, { scroll: false });
-  };
-  
-  const changeTown = (newDestination: string, newTown: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('destination', newDestination);
-    params.set('town', newTown);
 
-    router.replace(`/selectour?${params.toString()}`, { scroll: false });
-};
 
   useEffect(() => {
     const departure = searchParams.get('departure') || selectedDefaulDestination || '';
@@ -155,11 +144,16 @@ useEffect(() => {
     const rating = searchParams.get('rating') || '';
     const duration = searchParams.get('duration') || '';
     const from_cache = searchParams.get('from_cache') || '';
-
     const hotelIdParam = searchParams.get("hotel_id");
   if (hotelIdParam) {
     setHotelID(Number(hotelIdParam)); // statega yozib qo‘yish
   }
+
+  if(!destination){
+    toast.error("Avval shaxarni tanlang")
+    return
+  }
+
 
     let newData = {
       departure:departure,
@@ -212,14 +206,6 @@ useEffect(() => {
   }, [searchParams]);
 
 
-  useEffect(() => {
-  if (!filterLocal?.from || !filterLocal?.where) {
-    console.log("filterLocal?.from && filterLocal?.where",filterLocal?.from, filterLocal?.where)
-    toast.error("Avval shaharni tanlang!");
-  }
-  console.log("isFirstRender " ,isFirstRender.current)
-  console.log("check " , isFirstRender.current || (!!filterLocal?.from && !!filterLocal?.where))
-}, [searchParams]);
 
 
   const { data: country } = useQuery({
@@ -237,6 +223,8 @@ useEffect(() => {
       return data.data.data;
     },
   });
+
+  // let toastShown = false;
 const shouldEnable = () => {
 
 
@@ -248,7 +236,10 @@ const shouldEnable = () => {
     !hotelRating &&
     !filterLocal?.mealPlan;
 
-  if (!filterLocal?.from && !filterLocal?.where && noMainFilters) {
+  if ( !filterLocal?.where && noMainFilters) {
+     if (isFirstRender.current) {
+      isFirstRender.current = false
+    }
     return true;
   }
 
@@ -261,12 +252,17 @@ const shouldEnable = () => {
     filterLocal?.mealPlan;
 
   if (hasSecondaryFilters && !filterLocal?.where) {
-    toast.error("Avval shaharni tanlang!");
+   
     return false;
   }
 
+
   // Default shart: faqat from va where bo‘lsa ishlasin
-  return !!filterLocal?.from && !!filterLocal?.where;
+  let check = !!filterLocal?.from && !!filterLocal?.where;
+    if (isFirstRender.current && check) {
+      isFirstRender.current = false
+    }
+  return check
 };
 
  const { data: ticket, isLoading } = useQuery({
@@ -335,13 +331,29 @@ const shouldEnable = () => {
    
   });
 
-useEffect(() => {
-    
-  if (isFirstRender.current && !isLoading && ticket) {
-    isFirstRender.current = false;
-  }
-}, [isLoading, ticket]);
+const displayedHotels = useMemo(() => {
+  const currentRegion = filterLocal?.where ?? null;
+  const newHotels = ticket?.data?.results?.hotels ?? [];
 
+ 
+  if (
+    currentRegion !== null &&
+    prevRegionRef.current === currentRegion &&
+    Array.isArray(prevHotelsRef.current)
+  ) {
+    return prevHotelsRef.current;
+  }
+
+
+  if (Array.isArray(newHotels) && newHotels.length > 0) {
+    prevRegionRef.current = currentRegion;
+    prevHotelsRef.current = newHotels;
+    return newHotels;
+  }
+
+
+  return Array.isArray(prevHotelsRef.current) ? prevHotelsRef.current : [];
+}, [ticket, filterLocal?.where]);
 
 const prevCountry = useRef<string | null>(null);
 const prevRegion = useRef<string | null>(null);
@@ -468,6 +480,7 @@ const top_duration = [
           setHotelRating={setHotelRating}
           setSelectedDurations={setSelectedDurations}
           setMealPlan={setMealPlan}
+          setIsSearchClicked={setIsSearchClicked}
         />
       </motion.div>
       <motion.div
@@ -641,47 +654,31 @@ const top_duration = [
             })()}
         </FilterSection>
 
+<FilterSection title={t('Категория отеля')}>
+  {["5","4","3","2"].map((rating) => (
+    <CheckboxFilter
+      key={rating}
+      value={rating}
+      label={t(`${rating} звезды`)}
+      setChecked={(val) => {
+        setHotelRating(val ? rating : null);
+        setCurrentPage(1);
 
-          <FilterSection title={t('Категория отеля')}>
-            <CheckboxFilter
-              value="5.0"
-              label={t('5 звезды')}
-              setChecked={setHotelRating}
-              selectedValue={hotelRating}
-              onclick={setCurrentPage}
-              exclusive
-              paramName="rating"
-            />
-            <CheckboxFilter
-              value="4.0"
-              label={t('4 звезды')}
-              setChecked={setHotelRating}
-              selectedValue={hotelRating}
-              onclick={setCurrentPage}
-              exclusive
-              paramName="rating"
-            />
-            <CheckboxFilter
-              value="3.0"
-              label={t('3 звезды')}
-              onclick={setCurrentPage}
-              setChecked={setHotelRating}
-              selectedValue={hotelRating}
-              exclusive
-              paramName="rating"
-            />
-            <CheckboxFilter
-              value="2.0"
-              label={t('2 звезды')}
-              onclick={setCurrentPage}
-              setChecked={setHotelRating}
-              selectedValue={hotelRating}
-              exclusive
-              paramName="rating"
-            />
-          </FilterSection>
+        // URL parametrlardan hotel_id va operatorni olib tashlash
+        const params = new URLSearchParams(window.location.search);
+        params.delete("hotel_id");
+        params.delete("operator");
 
-          <FilterSection title={t('Тип отеля')}>
+        router.push(`/selectour?${params.toString()}`);
+      }}
+      selectedValue={hotelRating}
+      exclusive
+      paramName="rating"
+    />
+  ))}
+</FilterSection>
+
+          {/* <FilterSection title={t('Тип отеля')}>
             {hotel_type &&
               hotel_type.map((e) => (
                 <CheckboxFilter
@@ -695,10 +692,10 @@ const top_duration = [
                   paramName="type-hotel"
                 />
               ))}
-          </FilterSection>
+          </FilterSection> */}
 
        <FilterSection title={t('Отели')}>
-        {ticket?.data?.results?.hotels?.map((hotel) => (
+        {displayedHotels.map((hotel) => (
           <CheckboxFilter
             key={hotel.id}
             value={hotel.id}
@@ -961,45 +958,29 @@ const top_duration = [
               );
             })()}
             </FilterSection>
+<FilterSection title={t('Категория отеля')}>
+  {["5","4","3","2"].map((rating) => (
+    <CheckboxFilter
+      key={rating}
+      value={rating}
+      label={t(`${rating} звезды`)}
+      setChecked={(val) => {
+        setHotelRating(val ? rating : null);
+        setCurrentPage(1);
 
-            <FilterSection title={t('Категория отеля')}>
-              <CheckboxFilter
-                value="5.0"
-                label={t('5 звезды')}
-                setChecked={setHotelRating}
-                selectedValue={hotelRating}
-                onclick={setCurrentPage}
-                exclusive
-                paramName="rating"
-              />
-              <CheckboxFilter
-                value="4.0"
-                label={t('4 звезды')}
-                setChecked={setHotelRating}
-                selectedValue={hotelRating}
-                onclick={setCurrentPage}
-                exclusive
-                paramName="rating"
-              />
-              <CheckboxFilter
-                value="3.0"
-                label={t('3 звезды')}
-                onclick={setCurrentPage}
-                setChecked={setHotelRating}
-                selectedValue={hotelRating}
-                exclusive
-                paramName="rating"
-              />
-              <CheckboxFilter
-              value="2.0"
-              label={t('2 звезды')}
-              onclick={setCurrentPage}
-              setChecked={setHotelRating}
-              selectedValue={hotelRating}
-              exclusive
-              paramName="rating"
-            />
-            </FilterSection>
+        // URL parametrlardan hotel_id va operatorni olib tashlash
+        const params = new URLSearchParams(window.location.search);
+        params.delete("hotel_id");
+        params.delete("operator");
+
+        router.push(`/selectour?${params.toString()}`);
+      }}
+      selectedValue={hotelRating}
+      exclusive
+      paramName="rating"
+    />
+  ))}
+</FilterSection>
 
             <FilterSection title={t('Питание')}>
               {meal?.map((e) => (
@@ -1033,7 +1014,7 @@ const top_duration = [
             </FilterSection>
 
             <FilterSection title={t('Отели')}>
-              {ticket?.data?.results?.hotels?.map((hotel) => (
+              {displayedHotels.map((hotel) => (
                 <CheckboxFilter
                   key={hotel.id}
                   value={hotel.id}
