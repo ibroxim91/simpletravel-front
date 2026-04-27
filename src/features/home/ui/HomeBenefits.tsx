@@ -17,49 +17,45 @@ const HomeBenefits = () => {
       title: t('Лучшие цены'),
       desc: t('Гарантируем самые выгодные предложения на рынке'),
       bg: '#DBEAFE',
-      width: 'w-[249px]',
     },
     {
       icon: <HeadsetMicIcon sx={{ color: '#FF6B00', fontSize: 24 }} />,
       title: t('Поддержка 24/7'),
       desc: t('Всегда на связи, чтобы помочь вам в любое время'),
       bg: '#FFEDD4',
-      width: 'w-[248px]',
     },
     {
       icon: <SecurityOutlinedIcon sx={{ color: '#22C55E', fontSize: 20 }} />,
       title: t('Проверенные туры'),
       desc: t('Работаем только с надежными туроператорами'),
       bg: '#DBFCE7',
-      width: 'w-[249px]',
     },
     {
       icon: <BoltIcon sx={{ color: '#9810FA', fontSize: 22 }} />,
       title: t('Быстрое бронирование'),
       desc: t('Оформите тур всего за несколько минут'),
       bg: '#F3E8FF',
-      width: 'w-[248px]',
     },
   ];
 
   return (
     <section>
       <div className="custom-container">
-        <div className="mx-auto h-[350px] w-full max-w-[1078px] rounded-[14px] bg-white px-6 pt-[25px] shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
-          <div className="flex w-[445px] flex-col gap-4">
-            <h3 className="text-[32px] font-bold leading-[44px] text-[#1C1C1E]">
+        <div className="mx-auto w-full max-w-[1240px] rounded-[14px] bg-white px-4 py-6 shadow-[0_2px_4px_rgba(0,0,0,0.15)] md:px-6 md:pt-[25px] md:pb-8">
+          <div className="flex w-full flex-col gap-3 md:w-[445px] md:gap-4">
+            <h3 className="text-[24px] font-bold leading-[32px] text-[#1C1C1E] md:text-[32px] md:leading-[44px]">
               {t('Почему выбирают нас')}
             </h3>
-            <p className="text-base font-medium leading-[22px] text-[#6B7280]">
+            <p className="text-sm font-medium leading-5 text-[#6B7280] md:text-base md:leading-[22px]">
               {t('Мы делаем путешествия простыми и доступными')}
             </p>
           </div>
 
-          <div className="mt-[61px] flex items-start gap-3">
+          <div className="mt-6 grid grid-cols-2 gap-4 md:mt-[61px] md:grid-cols-4 md:gap-3">
             {benefitItems.map((item) => (
               <div
                 key={item.title}
-                className={`flex h-[139px] flex-col items-center gap-6 ${item.width}`}
+                className="flex h-auto min-h-[150px] w-full flex-col items-center gap-4 md:h-[139px] md:gap-6"
               >
                 <div
                   className="grid h-[46px] w-[46px] place-items-center rounded-lg"
@@ -68,7 +64,7 @@ const HomeBenefits = () => {
                   {item.icon}
                 </div>
                 <div className="flex w-full flex-col items-center gap-2 text-center">
-                  <p className="text-xl font-bold leading-[27px] text-[#1C1C1E]">
+                  <p className="text-[22px] font-bold leading-7 text-[#1C1C1E] md:text-xl md:leading-[27px]">
                     {item.title}
                   </p>
                   <p className="text-sm leading-[17px] text-[#6B7280]">
