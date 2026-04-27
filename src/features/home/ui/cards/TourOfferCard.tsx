@@ -12,6 +12,7 @@ import StarIcon from '@mui/icons-material/Star';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
+import { useEffect, useState } from 'react';
 
 interface TourOfferCardProps {
   item: any;
@@ -33,6 +34,7 @@ const TourOfferCard = ({
   starsText,
 }: TourOfferCardProps) => {
   const t = useTranslations();
+  const [enableAnimation, setEnableAnimation] = useState(false);
   const oldPrice = Math.round(Number(item.price || 0) * 1.23);
   const fadeUp = {
     hidden: { opacity: 0, y: 60 },
@@ -43,12 +45,22 @@ const TourOfferCard = ({
     }),
   };
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mediaQuery = window.matchMedia('(min-width: 768px)');
+    const syncAnimationMode = () => setEnableAnimation(mediaQuery.matches);
+    syncAnimationMode();
+    mediaQuery.addEventListener('change', syncAnimationMode);
+    return () => mediaQuery.removeEventListener('change', syncAnimationMode);
+  }, []);
+
   return (
     <motion.div
       variants={fadeUp}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: false, amount: 0.2 }}
+      initial={enableAnimation ? 'hidden' : false}
+      animate={enableAnimation ? undefined : 'visible'}
+      whileInView={enableAnimation ? 'visible' : undefined}
+      viewport={enableAnimation ? { once: false, amount: 0.2 } : undefined}
       custom={index}
     >
       <Link
@@ -64,16 +76,16 @@ const TourOfferCard = ({
                     fill
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
                   />
-                  <div className="absolute left-2 top-2">
+                  <div className="absolute left-3 top-3 z-10">
                     <span className="inline-flex h-[27px] items-center rounded-[14px] bg-[#FF6B00] px-2 text-sm font-medium text-white">
                       -30%
                     </span>
                   </div>
                 </div>
 
-                <div className="mx-auto flex w-full max-w-[217px] flex-col gap-4 pb-3 pt-3 xl:h-[209px]">
+                <div className="flex w-full flex-col gap-3 px-4 pb-4 pt-4 text-left sm:gap-4 xl:h-[209px]">
                   <div className="flex flex-col">
-                    <p className="h-10 overflow-hidden text-base font-bold leading-5 text-black [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
+                    <p className="min-h-10 overflow-hidden text-base font-bold leading-5 text-black [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2]">
                       {item.title}
                     </p>
                     <p className="text-sm font-medium text-[#6B7280]">
@@ -84,19 +96,19 @@ const TourOfferCard = ({
                   <div className="space-y-1 text-sm font-medium text-[#6B7280]">
                     <div className="flex items-center gap-2">
                       <FmdGoodOutlinedIcon sx={{ fontSize: 24, color: '#1A73E8' }} />
-                      <span className="block max-w-[175px] min-w-0 truncate">
+                      <span className="block min-w-0 truncate">
                         {item.destination?.name}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <BusinessIcon sx={{ fontSize: 24, color: '#1A73E8' }} />
-                      <span className="block max-w-[175px] min-w-0 truncate">
+                      <span className="block min-w-0 truncate">
                         {item.ticket_hotel?.[0]?.name || t('Отель hotels') || fallbackHotelText}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <StarIcon sx={{ fontSize: 24, color: '#1A73E8' }} />
-                      <span className="block max-w-[175px] min-w-0 truncate">
+                      <span className="block min-w-0 truncate">
                         {t('3 звездочный') || starsText}
                       </span>
                     </div>

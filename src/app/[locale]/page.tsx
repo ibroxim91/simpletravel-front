@@ -15,7 +15,7 @@ export default async function Home() {
               <SearchTours />
             </div>
           </div>
-          <div className="-mt-[76px] max-lg:mt-8 relative z-10">
+          <div className="-mt-[246px]  max-lg:mt-26 relative z-10">
             <HotTours />
           </div>
           <div className="mt-[104px] flex flex-col gap-[104px]">

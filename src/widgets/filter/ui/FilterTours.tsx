@@ -300,11 +300,11 @@ const defaultitems = selectedCountry
 
 
   return (
-    <div className="mt-0 hidden h-[101px] w-full max-w-[1240px] font-medium lg:relative lg:flex">
-      <div className="absolute left-0 top-0 flex w-full items-start gap-6">
-      <div className="grid h-[60px] w-[924px] grid-cols-4 rounded-[14px] bg-white shadow-[0_4px_10px_rgba(0,0,0,0.1)]">
-      <div className="relative flex h-full flex-col rounded-l-[14px] border-r border-[#E5E7EB]">
-        <Label className="sr-only">{t('Откуда')}</Label>
+    <div className="mt-0  hidden h-[101px] w-full max-w-[1240px] font-medium lg:relative lg:flex">
+      <div className="absolute left-0 top-0 mx-auto flex w-full items-start gap-6">
+      <div className="grid h-[60px] min-w-0 flex-1 grid-cols-4 overflow-hidden rounded-[14px] bg-white shadow-[0_4px_10px_rgba(0,0,0,0.1)] xl:max-w-[924px]">
+      <div className="relative flex h-full flex-col overflow-hidden rounded-l-[14px] border-r border-[#E5E7EB]">
+        <Label className="sr-only  ">{t('Откуда')}</Label>
         <Popover open={openCountry} onOpenChange={setOpenCountry}>
           <PopoverTrigger asChild>
             <Button
@@ -313,7 +313,7 @@ const defaultitems = selectedCountry
               role="combobox"
               aria-expanded={openCountry}
               className={cn(
-                'w-full  h-[60px] cursor-pointer relative min-w-0 !rounded-none border-0 px-6 shadow-none hover:!rounded-none hover:bg-transparent focus-visible:!rounded-none data-[state=open]:!rounded-none',
+                'w-full h-[60px] cursor-pointer relative min-w-0 !rounded-l-[14px] !rounded-r-none border-0 px-6 shadow-none hover:bg-transparent',
                 selectedCountry
                   ? 'text-[#7B8DA1] hover:text-[#7B8DA1]'
                   : 'text-[#6B7280] hover:text-[#6B7280]',
@@ -445,7 +445,7 @@ const defaultitems = selectedCountry
               role="combobox"
               aria-expanded={openDest}
               className={cn(
-                'w-full h-[60px] cursor-pointer relative min-w-0 !rounded-l-[14px] !rounded-r-none border-0 px-6 shadow-none hover:!rounded-l-[14px] hover:!rounded-r-none hover:bg-transparent focus-visible:!rounded-l-[14px] focus-visible:!rounded-r-none data-[state=open]:!rounded-l-[14px] data-[state=open]:!rounded-r-none',
+                'w-full h-[60px] cursor-pointer relative min-w-0 !rounded-none border-0 px-6 shadow-none hover:bg-transparent',
                 selectedDestCountry
                   ? 'text-[#6B7280] hover:text-[#6B7280]'
                   : 'text-[#6B7280] hover:text-[#6B7280]',
@@ -678,7 +678,7 @@ const defaultitems = selectedCountry
         )}
       </div>
 
-      <div className="relative h-full">
+      <div className="relative h-full overflow-hidden rounded-r-[14px]">
         <div
           onClick={() => setAgeOpen(!ageOpen)}
           className="cursor-pointer flex h-[60px] items-center justify-between px-6"
@@ -778,7 +778,7 @@ const defaultitems = selectedCountry
       </div>
 
       </div>
-      <div className="flex h-[60px] w-[292px] items-end">
+      <div className="flex h-[60px] w-[292px] shrink-0 items-end">
         <Button
           className="h-[60px] w-full cursor-pointer rounded-[14px] bg-[#FF6B00] px-[10px] text-base font-normal leading-[19px] text-white hover:bg-[#ff7a1f]"
           // onClick={saveFilter}

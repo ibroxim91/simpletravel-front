@@ -21,6 +21,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/ui/select';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from '@/shared/ui/carousel';
 import FilterTours from '@/widgets/filter/ui/FilterTours';
 import FilterToursMobile from '@/widgets/filter/ui/FilterToursMobile';
 import CloseIcon from '@mui/icons-material/Close';
@@ -508,7 +513,7 @@ const top_duration = [
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+          <div className="hidden grid-cols-1 gap-6 md:grid-cols-2 xl:grid">
             {interestedTours.map((item: any, index: number) => (
               <InterestedTourCard
                 key={item.id}
@@ -517,6 +522,30 @@ const top_duration = [
                 locale={locale as LanguageRoutes}
               />
             ))}
+          </div>
+          <div className="xl:hidden">
+            <Carousel
+              opts={{
+                align: 'start',
+                dragFree: true,
+              }}
+              className="w-full"
+            >
+              <CarouselContent className="-ml-3">
+                {interestedTours.map((item: any, index: number) => (
+                  <CarouselItem
+                    key={item.id}
+                    className="basis-[88%] pl-3 sm:basis-[60%]"
+                  >
+                    <InterestedTourCard
+                      item={item}
+                      index={index}
+                      locale={locale as LanguageRoutes}
+                    />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+            </Carousel>
           </div>
         </div>
       </section> */}

@@ -15,6 +15,7 @@ const TabsTours = ({ active }: Props) => {
   return (
     <>
       {active === 'tours' && (
+        
         <FilterTours
           selectedDestRegions={selectedDestinations}
           setSelectedDestRegions={setSelectedDestinations}

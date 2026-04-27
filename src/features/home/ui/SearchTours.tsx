@@ -20,10 +20,10 @@ const SearchTours = () => {
         </p>
       </div>
 
-      <div>
+      <div className=''>
         <TabsTours active="tours" />
       </div>
-      <div className="-mt-6">
+      <div className="-mt-6 mb-[104px] " >
         <TabsTourMobile active="tours" />
       </div>
     </section>
