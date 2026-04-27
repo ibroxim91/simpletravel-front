@@ -13,6 +13,7 @@ declare const messages: {
   "Контакты": "Aloqa",
   "Избранное": "Sevimlilar",
   "Профиль": "Profil",
+  "Регистрация": "Ro'yxatdan o'tish",
   "Войти": "Kirish",
   "Oʻzbekcha": "Oʻzbekcha",
   "Русский": "Ruscha",
@@ -26,6 +27,7 @@ declare const messages: {
   "Куда": "Qayerga",
   "Дата отправления": "Jo‘nash sanasi",
   "Туристы": "Sayohatchilar",
+  "1 пассажир": "1 yo'lovchi",
   "Страна, курорт": "Mamlakat, kurort",
   "Когда": "Qachon",
   "Выезд": "Jo‘nash",
@@ -257,6 +259,8 @@ declare const messages: {
   "Я даю согласие на обработку персональных данных": "Shaxsiy ma’lumotlarimni qayta ishlashga roziman",
   "Откройте для себя новые горизонты": "Yangi ufqlarni kashf eting",
   "Ваш идеальный отпуск начинается здесь и сейчас": "Sizning ideal ta’tilingiz aynan shu yerda va hozir boshlanadi",
+  "Мы находим лучшие цены на туры и билеты — тебе остаётся только выбрать": "Biz turlar va chiptalar uchun eng yaxshi narxlarni topamiz — sizga faqat tanlash qoladi",
+  "Найди и забронируй идеальный тур по выгодной цене, подбери удобные авиабилеты и начни своё незабываемое приключение вместе с Simple Travel!": "Qulay narxda ideal turni toping va bron qiling, qulay aviachiptalarni tanlang va Simple Travel bilan unutilmas sarguzashtni boshlang!",
   "Солнечные рассветы, вечера у моря и приключения": "Quyoshli tonglar, dengiz bo‘yidagi kechalar va butun umr yodingizda qoladigan sarguzashtlar. Biz sizning qulayligingiz va baxtingiz uchun har bir tafsilotni puxta o‘ylab yaratamiz",
   "Качество отдыха, которому можно доверять": "Ishonchli dam olish sifati",
   "В Simple Travel мы верим": "Simple Travel’da biz har bir sayohat oson, ilhomlantiruvchi va unutilmas bo‘lishi kerak deb hisoblaymiz. Bizning vazifamiz — sizning orzuyingizdagi sayohatlarni ro‘yobga chiqarish, qulaylik, sarguzasht va madaniyat bilan tanishuvni birlashtirgan maxsus marshrutlar yaratish.",
@@ -372,6 +376,7 @@ declare const messages: {
   "Ko'rsatilmoqda": "Ko'rsatilmoqda",
   "Banner yuklashda xatolik yuz berdi": "Banner yuklashda xatolik yuz berdi",
   "Qayta urinish": "Qayta urinish",
-  "Filter uchun Kerakli davlat va shaharni tanlang": "Filter uchun Kerakli davlat va shaharni tanlang"
+  "Filter uchun Kerakli davlat va shaharni tanlang": "Filter uchun Kerakli davlat va shaharni tanlang",
+  "Переходи в раздел “Подобрать тур”, чтобы ознакомиться со всеми турами": "Barcha turlarni ko'rish uchun “Tur tanlash” bo'limiga o'ting"
 };
 export default messages;

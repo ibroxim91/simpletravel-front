@@ -18,12 +18,18 @@ import Image, { StaticImageData } from 'next/image';
 import { useParams, usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-export function ChangeLang() {
+type ChangeLangProps = {
+  compact?: boolean;
+  theme?: 'dark' | 'light';
+};
+
+export function ChangeLang({ compact = false, theme = 'dark' }: ChangeLangProps) {
   const { locale } = useParams<{ locale: LanguageRoutes }>();
   const t = useTranslations();
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const isLight = theme === 'light';
 
   const languages: {
     code: LanguageRoutes;
@@ -43,7 +49,12 @@ export function ChangeLang() {
   };
 
   return (
-    <div className="relative px-0 flex gap-2 text-white items-center h-full">
+    <div
+      className={clsx(
+        'relative px-0 flex gap-2 items-center h-full',
+        isLight ? 'text-[#6B7280]' : 'text-white',
+      )}
+    >
       {open && (
         <div
           className="fixed inset-0 bg-black/40 z-40"
@@ -57,12 +68,26 @@ export function ChangeLang() {
         onValueChange={(newLocale: LanguageRoutes) => changeLocale(newLocale)}
       >
         <SelectTrigger
-          className="w-auto p-0 border-none bg-transparent cursor-pointer shadow-none focus:ring-0 focus:outline-none gap-2"
+          className={clsx(
+            'w-auto border-none bg-transparent cursor-pointer shadow-none focus:ring-0 focus:outline-none',
+            compact ? 'p-0 min-h-0 h-auto gap-0' : 'p-0 gap-2',
+          )}
           aria-label="Open menu language"
         >
-          <PublicIcon sx={{ color: 'white', width: '24px', height: '24px' }} />
-          <p className="text-md text-white font-medium">
-            {t(languages.find((l) => l.code === locale)?.label || 'Русский')}
+          {!compact && (
+            <PublicIcon
+              sx={{ color: isLight ? '#6B7280' : 'white', width: '24px', height: '24px' }}
+            />
+          )}
+          <p
+            className={clsx(
+              compact ? 'text-[16px] leading-[100%] font-bold' : 'text-md font-medium',
+              isLight ? 'text-[#6B7280]' : 'text-white',
+            )}
+          >
+            {compact
+              ? String(locale || LanguageRoutes.RU).toUpperCase()
+              : t(languages.find((l) => l.code === locale)?.label || 'Русский')}
           </p>
         </SelectTrigger>
         {open && (
@@ -71,7 +96,7 @@ export function ChangeLang() {
               position: 'absolute',
               bottom: '-30px',
               fontSize: '32px',
-              color: 'white',
+              color: isLight ? '#FFFFFF' : 'white',
               left: '8px',
             }}
           />

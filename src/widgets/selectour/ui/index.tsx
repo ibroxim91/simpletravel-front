@@ -3,6 +3,7 @@
 import loaderAnimation from '@/assets/lottie/Loading spinner simplui.json';
 import { country_api } from '@/shared/config/api/country';
 import { Link, useRouter } from '@/shared/config/i18n/navigation';
+import { LanguageRoutes } from '@/shared/config/i18n/types';
 import formatDate from '@/shared/lib/formatDate';
 import { formatPrice } from '@/shared/lib/formatPrice';
 import { Button } from '@/shared/ui/button';
@@ -35,7 +36,7 @@ import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, SearchIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
-import { useSearchParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import qs from 'qs';
 import { toast } from 'sonner';
 import Slider from 'rc-slider';
@@ -44,11 +45,11 @@ import { useEffect, useRef, useState } from 'react';
 import Ticket_Api, { hotel_meal_plan } from '../lib/api';
 import { useQueryClient } from '@tanstack/react-query';
 import { useFilterTickectsStore } from '../lib/store';
-import { TickectAllFilter } from '../lib/types';
+import { TickectAll, TickectAllFilter } from '../lib/types';
 import CheckboxFilter from './CheckBox';
 import FilterSection from './FilterSection';
-import TourItem from './TourItem';
-import isEqual from 'lodash/isEqual';
+import InterestedTourCard from '@/widgets/selectour/ui/InterestedTourCard';
+import TourItem from '@/widgets/selectour/ui/TourItem';
 import { useMemo } from "react";
 
 const Player = dynamic(
@@ -56,7 +57,25 @@ const Player = dynamic(
   { ssr: false },
 );
 
+type FilterLocalState = {
+  adults: number;
+  children: number;
+  from: string;
+  date: string;
+  toDate: string;
+  selectData: string;
+  where: string;
+  operator?: string;
+  town?: string;
+  hotel_id?: string;
+  mealPlan?: string;
+};
+
+const isEqualState = (a: unknown, b: unknown) =>
+  JSON.stringify(a) === JSON.stringify(b);
+
 export default function Selectour() {
+  const { locale } = useParams();
   const prevRegionRef = useRef<string | null>(null);
 const prevHotelsRef = useRef<any[] | null>(null);
   const t = useTranslations();
@@ -74,22 +93,14 @@ const prevHotelsRef = useRef<any[] | null>(null);
     hotel_type,
   } = useFilterTickectsStore();
   const [hotelName, setHotelName] = useState<string>('');
-  const [hotelID, setHotelID] = useState<number>(0);
+  const [hotelID, setHotelID] = useState<string | null>(null);
   const [expensive, setExpensive] = useState<boolean>(false);
   const [cheaper, setCheaper] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [visa, setVisa] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [filterLocal, setFilterLocal] = useState<{
-    adults: number;
-    children: number;
-    from: string;
-    date: string;
-    toDate: string;
-    selectData: string;
-    where: string;
-  }>();
+  const [filterLocal, setFilterLocal] = useState<FilterLocalState>();
   const [selectedDurations, setSelectedDurations] = useState<string | null>(null,);
   const [selectedTown, setSelectedTown] = useState<string | null>(null);
 
@@ -109,15 +120,11 @@ const isFirstRender = useRef(true);
 
 
 useEffect(() => {
-  if (isFirstRender.current) {
-    return; // ❌ birinchi render skip
-  }
+  if (!filterLocal) return;
+  if (isFirstRender.current) return;
   queryClient.removeQueries({ queryKey: ['ticket_all'] });
 }, [
-  filterLocal?.from,
-  filterLocal?.where,
-  filterLocal?.date,
-  filterLocal?.toDate,
+  filterLocal,
 ]);
 
 
@@ -146,12 +153,9 @@ useEffect(() => {
     const from_cache = searchParams.get('from_cache') || '';
     const hotelIdParam = searchParams.get("hotel_id");
   if (hotelIdParam) {
-    setHotelID(Number(hotelIdParam)); // statega yozib qo‘yish
-  }
-
-  if(!destination){
-    toast.error("Avval shaxarni tanlang")
-    return
+    setHotelID(hotelIdParam); // statega yozib qo‘yish
+  } else {
+    setHotelID(null);
   }
 
 
@@ -192,15 +196,12 @@ useEffect(() => {
     };
     // setFilterLocal(filterData);
     setFilterLocal(prev => {
-    if (isEqual(prev, filterData)) {
-      console.log("No set filterData")
+    if (isEqualState(prev, filterData)) {
       return prev; // ❌ set qilmaydi → re-render yo‘q
     }
   
     return filterData; // ✅ faqat o‘zgarsa
   });
-    console.log(filterData)
-    console.log(selectedDestinations)
    
     setSelectedDestinations(destination);
   }, [searchParams]);
@@ -226,46 +227,14 @@ useEffect(() => {
 
   // let toastShown = false;
 const shouldEnable = () => {
-
-
-  // Agar from va where yo‘q bo‘lsa va boshqa filterlar ham yo‘q bo‘lsa → true (default turlarni ko‘rsatish)
-  const noMainFilters =
-    !filterLocal?.hotel_id &&
-    !filterLocal?.town &&
-    !selectedDurations &&
-    !hotelRating &&
-    !filterLocal?.mealPlan;
-
-  if ( !filterLocal?.where && noMainFilters) {
-     if (isFirstRender.current) {
-      isFirstRender.current = false
-    }
-    return true;
+  if (!filterLocal) return false;
+  if (isFirstRender.current) {
+    isFirstRender.current = false;
   }
-
-  // Agar hotel_id, town, duration, rating, meal bo‘lsa-yu, where bo‘lmasa → false + toast
-  const hasSecondaryFilters =
-    filterLocal?.hotel_id ||
-    filterLocal?.town ||
-    selectedDurations ||
-    hotelRating ||
-    filterLocal?.mealPlan;
-
-  if (hasSecondaryFilters && !filterLocal?.where) {
-   
-    return false;
-  }
-
-
-  // Default shart: faqat from va where bo‘lsa ishlasin
-  let check = !!filterLocal?.from && !!filterLocal?.where;
-    if (isFirstRender.current && check) {
-      isFirstRender.current = false
-    }
-  return check
+  return true;
 };
 
- const { data: ticket, isLoading } = useQuery({
+ const { data: ticket, isLoading } = useQuery<TickectAll>({
     queryKey: [
       'ticket_all',
       filterLocal?.from,
@@ -325,9 +294,9 @@ const shouldEnable = () => {
       });
     },
     staleTime: 0,
-    cacheTime: 0,
+    gcTime: 0,
     placeholderData: undefined,
-    enabled:shouldEnable(), // isFirstRender.current || (!!filterLocal?.from && !!filterLocal?.where), //!!filterLocal || !!selectedDestinations,
+    enabled: shouldEnable(),
    
   });
 
@@ -400,7 +369,7 @@ const top_duration = [
            filterLocal?.from !== prevCountry.current ||
             filterLocal?.where !== prevRegion.current
       ) {
-      setHotelType(ticket.data.results.hotel_type);
+      setHotelType(ticket.data.results.hotel_types);
       setHotelAmenities(ticket.data.results.hotel_amenities);
       setFeatures(ticket.data.results.hotel_features_by_type);
 
@@ -446,63 +415,113 @@ const top_duration = [
 
   const regionName = regionData?.regions.find((r) => r.id === regionId)?.name;
   const countryName = regionData?.name;
+  const interestedTours = (ticket?.data?.results?.tickets ?? []).slice(0, 4);
 
   return (
-    <div className="custom-container mt-5 bg-[#edeef1] min-h-screen pb-20">
-      <Breadcrumbs
-        aria-label="breadcrumb"
-        separator={<EastIcon fontSize="small" className="text-[#646465]" />}
-        sx={{
-          '& .MuiBreadcrumbs-separator': {
-            mx: 2,
-          },
-        }}
-      >
-        <Link href="/" className="font-medium text-[#646465]">
-          {t('Главная')}
-        </Link>
-        <p className="text-[#646465] font-medium">{t('Подобрать тур')}</p>
-      </Breadcrumbs>
+    <div className="min-h-screen bg-[#FAFBFC] pb-20">
+      <section className="bg-[#1A73E8] pb-[88px] pt-6 xl:h-[520px]">
+        <div className="mx-auto w-full max-w-[1240px] px-4 xl:px-0">
+          <Breadcrumbs
+            aria-label="breadcrumb"
+            separator={<EastIcon fontSize="small" className="text-white/70" />}
+            sx={{
+              '& .MuiBreadcrumbs-separator': {
+                mx: 1,
+              },
+            }}
+          >
+            <Link href="/" className="text-sm font-normal text-white">
+              {t('Главная')}
+            </Link>
+            <p className="text-sm font-normal text-[#97B0D9]">{t('Подобрать тур')}</p>
+          </Breadcrumbs>
 
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{
-          duration: 0.5,
-          delay: 0.3,
-          ease: 'easeOut',
-        }}
-      >
-        <FilterTours 
-          selectedDestRegions={selectedDestinations}
-          setSelectedDestRegions={setSelectedDestinations} 
-          setSelectedDefaulDestination={setSelectedDefaulDestination} 
-          setHotelRating={setHotelRating}
-          setSelectedDurations={setSelectedDurations}
-          setMealPlan={setMealPlan}
-          setIsSearchClicked={setIsSearchClicked}
-        />
-      </motion.div>
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{
-          duration: 0.5,
-          delay: 0.3,
-          ease: 'easeOut',
-        }}
-      >
-        <FilterToursMobile 
-        selectedDestRegions={selectedDestinations}
-          setSelectedDestRegions={setSelectedDestinations} 
-          setSelectedDefaulDestination={setSelectedDefaulDestination} 
-          setHotelRating={setHotelRating}
-          setSelectedDurations={setSelectedDurations}
-          setMealPlan={setMealPlan}
-           />
-      </motion.div>
+          <div className="mt-16 flex flex-col items-center gap-6 text-center xl:mt-[68px]">
+            <h1 className="w-full max-w-[1240px] text-3xl font-bold leading-[110%] text-white xl:text-[48px]">
+              {t('Более 26 000 проверенных туров для вашего безупречного отдыха')}
+            </h1>
+            <p className="w-full max-w-[1240px] text-lg font-semibold leading-[29px] text-[#E8F1FF] xl:text-[24px]">
+              {t('Лучшие предложения, отобранные вручную')}
+            </p>
+          </div>
 
-      <div className="mt-10 flex gap-10 max-lg:flex-col">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.5,
+              delay: 0.3,
+              ease: 'easeOut',
+            }}
+            className="mt-16 xl:mt-[68px]"
+          >
+            <FilterTours
+              selectedDestRegions={selectedDestinations}
+              setSelectedDestRegions={setSelectedDestinations}
+              setSelectedDefaulDestination={setSelectedDefaulDestination}
+              setHotelRating={setHotelRating}
+              setSelectedDurations={setSelectedDurations}
+              setMealPlan={setMealPlan}
+              setIsSearchClicked={setIsSearchClicked}
+            />
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.5,
+              delay: 0.3,
+              ease: 'easeOut',
+            }}
+            className="mt-6"
+          >
+            <FilterToursMobile
+              selectedDestRegions={selectedDestinations}
+              setSelectedDestRegions={setSelectedDestinations}
+              setSelectedDefaulDestination={setSelectedDefaulDestination}
+              setHotelRating={setHotelRating}
+              setSelectedDurations={setSelectedDurations}
+              setMealPlan={setMealPlan}
+            />
+          </motion.div>
+        </div>
+      </section>
+
+      <section className="mt-[104px] px-4 xl:px-0">
+        <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-9 xl:h-[488px]">
+          <div className="flex items-center gap-6 max-lg:flex-col max-lg:items-start">
+            <div className="w-full max-w-[924px] space-y-4">
+              <h2 className="text-[32px] font-bold leading-[39px] text-black">
+                {t('Вас может заинтересовать')}
+              </h2>
+              <p className="text-base font-normal leading-5 text-black">
+                {t(
+                  'Собираетесь куда-нибудь отпраздновать этот сезон? Независимо от того, едете ли вы домой или отправляетесь в путешествие, у нас есть инструменты для организации поездок, которые помогут вам добраться до места назначения.',
+                )}
+              </p>
+            </div>
+            <Button className="flex h-[54px] w-[292px] items-center justify-center rounded-[19px] bg-[#FF6B00] px-4 py-4 text-sm font-medium text-white hover:bg-[#ff7a1f]">
+              <span className="flex w-[260px] items-center justify-between">
+                <span>{t('Смотреть все')}</span>
+                <EastIcon sx={{ fontSize: 22 }} />
+              </span>
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
+            {interestedTours.map((item: any, index: number) => (
+              <InterestedTourCard
+                key={item.id}
+                item={item}
+                index={index}
+                locale={locale as LanguageRoutes}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <div className="custom-container mt-[104px] flex w-full gap-6 max-lg:flex-col">
         <motion.div
           initial={{ opacity: 0, x: -40 }}
           animate={{ opacity: 1, x: 0 }}
@@ -511,13 +530,25 @@ const top_duration = [
             delay: 0.3,
             ease: 'easeOut',
           }}
-          className="w-[40%] p-5 rounded-2xl bg-white h-max max-lg:hidden"
+          className="hidden h-max w-[292px] shrink-0 flex-col gap-4 max-lg:hidden lg:flex"
         >
-          <h2 className="text-lg font-semibold text-[#212122]">
-            {t('Фильтры')}
-          </h2>
-          <hr className="my-3 border-[#DFDFDF]" />
+          <div className="flex h-[72px] w-full items-center gap-4 rounded-[14px] bg-white px-4 py-6 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
+            <FilterListIcon sx={{ color: '#1A73E8', fontSize: 24 }} />
+            <p className="text-base font-bold leading-5 text-[#1A73E8]">
+              {t('Настройте свой отдых')}
+            </p>
+          </div>
+          <div className="flex h-[56px] w-full items-center justify-between rounded-[14px] bg-white px-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
+            <div className="flex items-center gap-4">
+              <FilterListIcon sx={{ color: '#1A73E8', fontSize: 24 }} />
+              <p className="text-sm font-medium leading-[17px] text-[#6B7280]">
+                {t('По возрастанию цены')}
+              </p>
+            </div>
+            <KeyboardArrowDownIcon sx={{ color: '#6B7280', fontSize: 16 }} />
+          </div>
 
+          <div className="w-full rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
           <FilterSection title={t('Стоимость')}>
             <Slider
               range
@@ -558,6 +589,7 @@ const top_duration = [
               />
             </div>
           </FilterSection>
+          </div>
 
     
 
@@ -582,6 +614,7 @@ const top_duration = [
             />
           </FilterSection> */}
 
+          <div className="w-full rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
           <FilterSection title={t('Продолжительность тура')}>
             {top_duration &&
               [...top_duration]
@@ -599,8 +632,10 @@ const top_duration = [
                   />
                 ))}
           </FilterSection>
+          </div>
 
-         <FilterSection title={t('Регионы и курорты')}>
+          <div className="w-full rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
+         <FilterSection title={t('Страна')}>
           {country &&
             (() => {
               // Tanlangan regionni topamiz
@@ -638,7 +673,7 @@ const top_duration = [
 
                               const params = new URLSearchParams(searchParams.toString());
                               if (val) {
-                                params.set("town", val);
+                                params.set("town", typeof val === 'string' ? val : '');
                               } else {
                                 params.delete("town"); // ❌ check olib tashlansa URL’dan o‘chadi
                               }
@@ -653,7 +688,9 @@ const top_duration = [
               );
             })()}
         </FilterSection>
+        </div>
 
+          <div className="w-full rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
 <FilterSection title={t('Категория отеля')}>
   {["5","4","3","2"].map((rating) => (
     <CheckboxFilter
@@ -677,6 +714,7 @@ const top_duration = [
     />
   ))}
 </FilterSection>
+</div>
 
           {/* <FilterSection title={t('Тип отеля')}>
             {hotel_type &&
@@ -694,11 +732,12 @@ const top_duration = [
               ))}
           </FilterSection> */}
 
-       <FilterSection title={t('Отели')}>
+          <div className="w-full rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
+       <FilterSection title={t('Отель')}>
         {displayedHotels.map((hotel) => (
           <CheckboxFilter
             key={hotel.id}
-            value={hotel.id}
+            value={String(hotel.id)}
             label={
               <span className="flex flex-wrap items-center gap-2">
                 <span>{hotel.name}</span>
@@ -713,12 +752,12 @@ const top_duration = [
               // URL parametrlarga qo‘shish
               const params = new URLSearchParams(window.location.search);
               if (val) {
-                setHotelID(hotel.id);
+                setHotelID(String(hotel.id));
                 
                 params.set('hotel_id', String(hotel.id));
                 params.set('operator', String(hotel.operator));
               }else{
-                setHotelID(0);
+                setHotelID(null);
                 params.delete('hotel_id');
                 params.delete('operator');
 
@@ -732,8 +771,10 @@ const top_duration = [
           />
         ))}
       </FilterSection>
+      </div>
 
 
+          <div className="w-full rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
           <FilterSection title={t('Питание')}>
             {meal?.map((e) => (
               <CheckboxFilter
@@ -748,6 +789,7 @@ const top_duration = [
               />
             ))}
           </FilterSection>
+          </div>
 
           {hotel_features_by_type.map((row) => (
             <FilterSection key={row.type} title={row.type}>
@@ -943,7 +985,7 @@ const top_duration = [
 
                               const params = new URLSearchParams(searchParams.toString());
                               if (val) {
-                                params.set("town", val);
+                                params.set("town", typeof val === 'string' ? val : '');
                               } else {
                                 params.delete("town"); // ❌ check olib tashlansa URL’dan o‘chadi
                               }
@@ -1017,7 +1059,7 @@ const top_duration = [
               {displayedHotels.map((hotel) => (
                 <CheckboxFilter
                   key={hotel.id}
-                  value={hotel.id}
+                  value={String(hotel.id)}
                   label={
                     <span className="flex flex-wrap items-center gap-2">
                       <span>{hotel.name}</span>
@@ -1034,11 +1076,11 @@ const top_duration = [
                      console.log("VAL ", val)
                      const params = new URLSearchParams(window.location.search);
                      if(val){
-                       setHotelID(hotel.id);
+                      setHotelID(String(hotel.id));
                        params.set('hotel_id', String(hotel.id));
                        params.set('operator', String(hotel.operator));
                       }else{
-                          setHotelID(0);
+                          setHotelID(null);
                           params.delete('hotel_id');
                           params.delete('operator');
 
@@ -1098,7 +1140,7 @@ const top_duration = [
           </Drawer>
         </motion.div>
 
-        <div className="w-[100%] flex flex-col justify-between">
+        <div className="flex w-full max-w-[924px] flex-col justify-between">
           <div>
             <motion.div
               initial={{ opacity: 0, x: 40 }}
@@ -1158,7 +1200,7 @@ const top_duration = [
               </div>
             </motion.div>
 
-            <div className="mt-5">
+            <div className="mt-6">
               {isLoading ? (
                 <div className="flex flex-col justify-center items-center min-h-screen bg-[#edeef1]">
                   <Player
@@ -1176,9 +1218,11 @@ const top_duration = [
                
                   {ticket && ticket?.data?.results.tickets.length > 0 ? (
                    
-                    ticket?.data?.results.tickets.map((item) => (
+                    <div className="flex flex-col gap-6">
+                    {ticket?.data?.results.tickets.map((item: any) => (
                       <TourItem key={item.id} data={item} />
-                    ))
+                    ))}
+                    </div>
                   ) : (
                     <motion.div
                       initial={{ opacity: 0, x: 30 }}

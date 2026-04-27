@@ -15,20 +15,19 @@ function FilterSection({
   const toggleHide = () => setHide(!hide);
 
   return (
-    <div className="mt-5">
+    <div>
       <div
-        className="flex justify-between items-center mb-2 cursor-pointer"
+        className="flex items-center justify-between cursor-pointer"
         onClick={toggleHide}
       >
-        <p className="font-semibold text-[#212122]">{title}</p>
+        <p className="text-base font-semibold leading-5 text-[#6B7280]">{title}</p>
         {hide ? (
-          <ChevronDownIcon color="#212122" />
+          <ChevronDownIcon size={16} color="#6B7280" />
         ) : (
-          <ChevronUpIcon color="#212122" />
+          <ChevronUpIcon size={16} color="#6B7280" />
         )}
       </div>
-      {!hide && children}
-      <hr className="my-3 border-[#DFDFDF]" />
+      {!hide && <div className="mt-6">{children}</div>}
     </div>
   );
 }

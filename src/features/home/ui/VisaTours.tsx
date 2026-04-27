@@ -6,29 +6,21 @@ import { Skeleton } from '@/shared/ui/skeleton';
 import Ticket_Api from '@/widgets/selectour/lib/api';
 import { useQuery } from '@tanstack/react-query';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
-import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 import TourOfferCard from './cards/TourOfferCard';
 
-const HotTours = () => {
+const VisaTours = () => {
   const t = useTranslations();
   const { locale } = useParams();
   const { data, isLoading } = useQuery({
-    queryKey: ['home_tickets'],
+    queryKey: ['home_tickets_visa'],
     queryFn: () => Ticket_Api.GetHomeTickets(),
     select: (res) => res.data.results.tickets ?? [],
   });
 
-  const hotTours = data?.slice(0, 4) ?? [];
-  const fadeUp = {
-    hidden: { opacity: 0, y: 60 },
-    visible: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.8, delay: i * 0.2, ease: 'easeOut' as const },
-    }),
-  };
+  const visaTours = data?.slice(4, 8) ?? [];
+
   const renderCards = (items: any[]) => (
     <div className="grid w-full grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
       {isLoading
@@ -44,43 +36,35 @@ const HotTours = () => {
             </div>
           ))
         : items.map((item, index) => (
-            <motion.div
+            <TourOfferCard
               key={item.id}
-              variants={fadeUp}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: false, amount: 0.2 }}
-              custom={index}
-            >
-              <TourOfferCard
-                item={item}
-                index={index}
-                locale={locale as LanguageRoutes}
-                fallbackDurationText={t('9 дней')}
-                fallbackHotelText={t('Отель hotels')}
-                starsText={t('3 звездочный')}
-                onClick={() => {
-                  localStorage.setItem('tourOperator', item?.operator ?? '');
-                  localStorage.setItem('from_cache', item?.from_cache ?? '');
-                  localStorage.setItem(
-                    'tourOperatorId',
-                    String(item?.tour_operator_id ?? ''),
-                  );
-                }}
-              />
-            </motion.div>
+              item={item}
+              index={index}
+              locale={locale as LanguageRoutes}
+              fallbackDurationText={t('9 дней')}
+              fallbackHotelText={t('Отель hotels')}
+              starsText={t('3 звездочный')}
+              onClick={() => {
+                localStorage.setItem('tourOperator', item?.operator ?? '');
+                localStorage.setItem('from_cache', item?.from_cache ?? '');
+                localStorage.setItem(
+                  'tourOperatorId',
+                  String(item?.tour_operator_id ?? ''),
+                );
+              }}
+            />
           ))}
     </div>
   );
 
   return (
-    <section className="bg-transparent pb-8 pt-0">
+    <section className="bg-transparent pb-0 pt-0">
       <div className="custom-container">
         <div className="mx-auto w-full max-w-[1078px] rounded-[14px] bg-white px-4 pb-6 pt-6 shadow-[0_2px_20px_rgba(0,0,0,0.15)] md:px-6 xl:h-[725px]">
           <div className="flex h-[74px] w-full flex-col gap-2">
             <div className="flex h-[44px] w-full items-center justify-between">
               <h2 className="text-[32px] font-bold leading-[44px] text-[#1C1C1E]">
-                {t('Горящие туры: успейте забронировать!')}
+                {t('Виза не нужна')}
               </h2>
               <div className="hidden items-center gap-2 md:flex">
                 <button
@@ -100,12 +84,12 @@ const HotTours = () => {
               </div>
             </div>
             <p className="text-base font-medium leading-[22px] text-[#6B7280]">
-              {t('Лучшие направления по минимальным ценам')}
+              {t('Путешествуйте без лишних хлопот')}
             </p>
           </div>
 
           <div className="mt-6">
-            {renderCards(hotTours)}
+            {renderCards(visaTours)}
           </div>
 
           <div className="mt-4 flex justify-center">
@@ -119,4 +103,4 @@ const HotTours = () => {
   );
 };
 
-export default HotTours;
+export default VisaTours;

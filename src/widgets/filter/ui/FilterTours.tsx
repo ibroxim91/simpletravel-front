@@ -20,12 +20,13 @@ import AirplanemodeActiveIcon from '@mui/icons-material/AirplanemodeActive';
 import ArrowDropUpOutlinedIcon from '@mui/icons-material/ArrowDropUpOutlined';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import RemoveIcon from '@mui/icons-material/Remove';
 import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Loader2, MoveLeft, MoveRight } from 'lucide-react';
+import { Loader2, MoveLeft, SearchIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
@@ -240,13 +241,11 @@ useEffect(() => {
 
     if (selectedDestCountry) {
       if (selectedDestRegion) {
-       
-        if( localStorage.getItem('dest_id')){
-
-          params.set('destination', localStorage.getItem('dest_id'));
-        }else{
+        const cachedDestId = localStorage.getItem('dest_id');
+        if (cachedDestId) {
+          params.set('destination', cachedDestId);
+        } else {
           params.set('destination', selectedDestRegion);
-
         }
       } else {
         params.set('destination', selectedDestCountry);
@@ -259,11 +258,11 @@ useEffect(() => {
     if (toDate) params.set('dateTo', formatDate.format(toDate, 'YYYY-MM-DD'));
     if (adults > 0) params.set('adults', adults.toString());
     if (children > 0) params.set('children', children.toString());
-    if (searchParams.get("hotel_id")) params.set('hotel_id', "");
-    if (searchParams.get("town")) params.set('town', "");
-    if (searchParams.get("rating")) params.set('rating',  "");
-    if (searchParams.get("duration")) params.set('duration',  "");
-    if (searchParams.get("meal")) params.set('meal',  "");
+    if (searchParams.get('hotel_id')) params.delete('hotel_id');
+    if (searchParams.get('town')) params.delete('town');
+    if (searchParams.get('rating')) params.delete('rating');
+    if (searchParams.get('duration')) params.delete('duration');
+    if (searchParams.get('meal')) params.delete('meal');
 
     route.push(`/selectour?page=1&${params.toString()}`);
   };
@@ -285,11 +284,27 @@ const defaultitems = selectedCountry
     return defaultCountry ? [defaultCountry] : countries || [];
   })();
 
+  const selectedDepartureRegionName = countries
+    ?.find((e) => e.name === selectedCountry)
+    ?.regions.find((e) => e.id === Number(selectedRegion))?.name;
+
+  const selectedDestinationRegionName = countries
+    ?.find((e) => e.name === selectedDestCountry)
+    ?.regions.find((e) => e.id === Number(selectedDestRegion))?.name;
+
+  const departureCode = selectedDepartureRegionName
+    ? selectedDepartureRegionName.toLowerCase() === 'ташкент'
+      ? 'TAS'
+      : selectedDepartureRegionName.slice(0, 3).toUpperCase()
+    : '';
+
 
   return (
-    <div className="mt-10 bg-white shadow-sm py-4 gap-4 w-full rounded-3xl grid grid-cols-5 items-center px-10 max-lg:hidden font-medium">
-      <div className="flex flex-col relative gap-2 h-full">
-        <Label className="text-md">{t('Откуда')}</Label>
+    <div className="mt-0 hidden h-[101px] w-full max-w-[1240px] font-medium lg:relative lg:flex">
+      <div className="absolute left-0 top-0 flex w-full items-start gap-6">
+      <div className="grid h-[60px] w-[924px] grid-cols-4 rounded-[14px] bg-white shadow-[0_4px_10px_rgba(0,0,0,0.1)]">
+      <div className="relative flex h-full flex-col rounded-l-[14px] border-r border-[#E5E7EB]">
+        <Label className="sr-only">{t('Откуда')}</Label>
         <Popover open={openCountry} onOpenChange={setOpenCountry}>
           <PopoverTrigger asChild>
             <Button
@@ -298,44 +313,30 @@ const defaultitems = selectedCountry
               role="combobox"
               aria-expanded={openCountry}
               className={cn(
-                'w-full h-14 cursor-pointer relative min-w-0',
+                'w-full  h-[60px] cursor-pointer relative min-w-0 !rounded-none border-0 px-6 shadow-none hover:!rounded-none hover:bg-transparent focus-visible:!rounded-none data-[state=open]:!rounded-none',
                 selectedCountry
-                  ? 'text-black hover:text-black'
-                  : 'text-muted-foreground hover:text-muted-foreground',
+                  ? 'text-[#7B8DA1] hover:text-[#7B8DA1]'
+                  : 'text-[#6B7280] hover:text-[#6B7280]',
               )}
             >
               <span className="flex-1 min-w-0 pr-5">
                 <MarqueeText speed={3}>
-                  {selectedCountry ? (
+                  {selectedDepartureRegionName ? (
                     <div className="flex gap-1.5 items-center">
-                      {selectedCountry}
-                      {selectedRegion && (
-                        <>
-                          <MoveRight />
-                          {
-                            countries
-                              ?.find((e) => e.name === selectedCountry)
-                              ?.regions.find(
-                                (e) => e.id === Number(selectedRegion),
-                              )?.name
-                          }
-                        </>
-                      )}
+                      <span className="text-[#7B8DA1]">{departureCode} ·</span>
+                      <span className="text-[#1C1C1E]">{selectedDepartureRegionName}</span>
                     </div>
                   ) : (
-                    <div className="flex gap-1.5">{t('Mamlakat tanlang')}</div>
+                    <div className="flex gap-1.5">{t('Откуда')}</div>
                   )}
                 </MarqueeText>
               </span>
 
               <LocationOnIcon
                 sx={{
-                  position: 'absolute',
-                  color: '#121212',
-                  top: '50%',
-                  right: '10px',
-                  transform: 'translateY(-50%)',
-                  pointerEvents: 'none',
+                  color: '#1A73E8',
+                  width: '16px',
+                  height: '16px',
                 }}
               />
             </Button>
@@ -433,8 +434,8 @@ const defaultitems = selectedCountry
         </Popover>
       </div>
 
-      <div className="flex flex-col relative gap-2 h-full">
-        <Label className="text-md">{t('Куда')}</Label>
+      <div className="flex flex-col relative h-full border-r border-[#E5E7EB]">
+        <Label className="sr-only">{t('Куда')}</Label>
 
         <Popover open={openDest} onOpenChange={setOpenDest}>
           <PopoverTrigger asChild>
@@ -444,44 +445,29 @@ const defaultitems = selectedCountry
               role="combobox"
               aria-expanded={openDest}
               className={cn(
-                'w-full h-14 cursor-pointer relative min-w-0',
+                'w-full h-[60px] cursor-pointer relative min-w-0 !rounded-l-[14px] !rounded-r-none border-0 px-6 shadow-none hover:!rounded-l-[14px] hover:!rounded-r-none hover:bg-transparent focus-visible:!rounded-l-[14px] focus-visible:!rounded-r-none data-[state=open]:!rounded-l-[14px] data-[state=open]:!rounded-r-none',
                 selectedDestCountry
-                  ? 'text-black hover:text-black'
-                  : 'text-muted-foreground hover:text-muted-foreground',
+                  ? 'text-[#6B7280] hover:text-[#6B7280]'
+                  : 'text-[#6B7280] hover:text-[#6B7280]',
               )}
             >
               <span className="flex-1 min-w-0 pr-5">
                 <MarqueeText speed={3}>
-                  {selectedDestCountry ? (
+                  {selectedDestinationRegionName ? (
                     <div className="flex gap-1.5 items-center">
-                      {selectedDestCountry}
-                      {selectedDestRegion && (
-                        <>
-                          <MoveRight />
-                          {
-                            countries
-                              ?.find((e) => e.name === selectedDestCountry)
-                              ?.regions.find(
-                                (e) => e.id === Number(selectedDestRegion),
-                              )?.name
-                          }
-                        </>
-                      )}
+                      {selectedDestinationRegionName}
                     </div>
                   ) : (
-                    <div className="flex gap-1.5">{t('Mamlakat tanlang')}</div>
+                    <div className="flex gap-1.5">{t('Куда')}</div>
                   )}
                 </MarqueeText>
               </span>
 
               <AirplanemodeActiveIcon
                 sx={{
-                  position: 'absolute',
-                  color: 'black',
-                  top: '50%',
-                  right: '10px',
-                  transform: 'translateY(-50%)',
-                  pointerEvents: 'none',
+                  color: '#1A73E8',
+                  width: '16px',
+                  height: '16px',
                 }}
               />
             </Button>
@@ -583,31 +569,18 @@ const defaultitems = selectedCountry
           </AnimatePresence>
         </Popover>
       </div>
-      <div className="relative gap-2 h-full ">
+      <div className="relative h-full border-r border-[#E5E7EB]">
         <div
           onClick={() => setDataOpen(!dataOpen)}
-          className="cursor-pointer flex flex-col gap-2"
+          className="cursor-pointer flex h-[60px] items-center justify-between px-6"
         >
-          <Label className="font-semibold text-md text-[#121212]">
-            {t('Дата отправления')}
-          </Label>
-          <div className="relative">
-            <Input
-              className="h-14 text-md placeholder:text-[#A3A3A3]"
-              placeholder={t('Когда')}
-              value={selectData}
-              readOnly
-            />
-            <CalendarMonthIcon
-              sx={{
-                position: 'absolute',
-                color: 'black',
-                top: '50%',
-                right: '10px',
-                transform: 'translateY(-50%)',
-              }}
-            />
-          </div>
+          <Input
+            className="h-auto border-0 p-0 text-[14px] font-medium text-[#6B7280] shadow-none placeholder:text-[#6B7280] focus-visible:ring-0"
+            placeholder={t('Когда')}
+            value={selectData}
+            readOnly
+          />
+          <CalendarMonthIcon sx={{ color: '#1A73E8', width: '16px', height: '16px' }} />
         </div>
 
         {dataOpen && (
@@ -705,22 +678,18 @@ const defaultitems = selectedCountry
         )}
       </div>
 
-      <div className="relative gap-2 h-full ">
+      <div className="relative h-full">
         <div
           onClick={() => setAgeOpen(!ageOpen)}
-          className="cursor-pointer flex flex-col gap-2"
+          className="cursor-pointer flex h-[60px] items-center justify-between px-6"
         >
-          <Label className="font-semibold text-md text-[#121212]">
-            {t('Туристы')}
-          </Label>
-          <div className="relative">
-            <Input
-              className="h-14 text-md placeholder:text-md placeholder:text-[#A3A3A3]"
-              placeholder={t('Туристы')}
-              value={selectAge === 0 ? '' : selectAge}
-              readOnly
-            />
-          </div>
+          <Input
+            className="h-auto border-0 p-0 text-[14px] font-medium text-[#1C1C1E] shadow-none placeholder:text-[#1C1C1E] focus-visible:ring-0"
+            placeholder={t('1 пассажир')}
+            value={selectAge === 0 ? '' : `${selectAge} ${t('пассажир')}`}
+            readOnly
+          />
+          <KeyboardArrowDownIcon sx={{ color: '#1A73E8', width: '16px', height: '16px' }} />
         </div>
 
         {ageOpen && (
@@ -808,9 +777,10 @@ const defaultitems = selectedCountry
         )}
       </div>
 
-      <div className="flex h-full items-end">
+      </div>
+      <div className="flex h-[60px] w-[292px] items-end">
         <Button
-          className="bg-[#1764FC] cursor-pointer hover:bg-[#1764FC] text-lg text-white h-14 w-full flex items-center justify-center rounded-4xl font-semibold"
+          className="h-[60px] w-full cursor-pointer rounded-[14px] bg-[#FF6B00] px-[10px] text-base font-normal leading-[19px] text-white hover:bg-[#ff7a1f]"
           // onClick={saveFilter}
             onClick={() => {
               saveFilter()
@@ -821,9 +791,16 @@ const defaultitems = selectedCountry
               }
             }}
         >
-          <p>{t('Искать туры')}</p>
+          <span className="flex items-center gap-4">
+            <SearchIcon className="size-6" />
+            <p>{t('Искать тур')}</p>
+          </span>
         </Button>
       </div>
+      </div>
+      <p className="absolute right-1 top-[84px] text-right text-[14px] font-normal leading-[17px] text-white">
+        {t('Переходи в раздел “Подобрать тур”, чтобы ознакомиться со всеми турами')}
+      </p>
     </div>
   );
 };

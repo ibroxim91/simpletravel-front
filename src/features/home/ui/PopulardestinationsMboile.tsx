@@ -1,6 +1,5 @@
 'use client';
 
-import BannerCircle from '@/assets/divCircleMobile.png';
 import { BASE_URL } from '@/shared/config/api/URLs';
 import { Link } from '@/shared/config/i18n/navigation';
 import { LanguageRoutes } from '@/shared/config/i18n/types';
@@ -42,7 +41,7 @@ const PopulardestinationsMboile = () => {
     select: (data) => data.data.data,
   });
 
-  function updateData(e) {
+  function updateData(e:any) {
         const filters = {
           departure: e.departure_id,
           destination: e.destination_id,
@@ -76,7 +75,7 @@ const PopulardestinationsMboile = () => {
         className="w-full mt-4"
       >
         <CarouselContent>
-          {ticket?.map((e) => (
+          {ticket?.map((e:any) => (
             <CarouselItem
               key={e.id}
               className="basis-1/2 max-sm:basis-1/1 h-[200px] font-medium"
@@ -163,13 +162,6 @@ const PopulardestinationsMboile = () => {
               <CarouselItem key={e.id}>
                 <div className="w-full h-[800px] relative overflow-hidden flex rounded-4xl font-medium">
                   <div className="h-[800px] w-full overflow-hidden relative rounded-4xl">
-                    <div className="w-[100%] h-[50%] max-sm:h-[60%] z-10 absolute left-0 top-0">
-                      <Image
-                        src={BannerCircle}
-                        alt="circle"
-                        className="w-full h-full"
-                      />
-                    </div>
                     <div className="absolute z-20 top-10 left-4 flex flex-col gap-4">
                       <p className="text-4xl w-[90%] text-[#031753] font-semibold">
                         {e.title}

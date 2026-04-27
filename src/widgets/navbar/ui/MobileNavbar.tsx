@@ -42,19 +42,6 @@ const MobileNavbar = ({ setOpen, open }: Props) => {
       }}
     >
       <div className="w-screen" />
-      <div className="bg-[#031753] p-2 relative">
-        <div className="flex custom-container px-0 justify-between">
-          <Suspense>
-            <CitySelect />
-          </Suspense>
-          <Suspense>
-            <CitySelectMobile />
-          </Suspense>
-          <div className="flex gap-4 items-center">
-            <ChangeLang />
-          </div>
-        </div>
-      </div>
       <div className="bg-[#FFFFFF] w-full shadow-sm rounded-b-2xl p-2">
         <div className="flex justify-between custom-container px-0 w-full">
           <div className="w-full h-16 flex items-center gap-8">

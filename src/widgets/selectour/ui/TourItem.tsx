@@ -1,17 +1,13 @@
-import LocationTour from '@/assets/icons/LocationTour';
 import { BASE_URL } from '@/shared/config/api/URLs';
 import { Link, useRouter } from '@/shared/config/i18n/navigation';
 import { LanguageRoutes } from '@/shared/config/i18n/types';
-import formatDate from '@/shared/lib/formatDate';
 import { formatPrice } from '@/shared/lib/formatPrice';
-import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
-import Rating from '@mui/material/Rating';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
-import { CalendarDays, Hotel, Plane, Star, User } from 'lucide-react';
+import { CalendarDays, Hotel, MapPin, Star } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
@@ -24,26 +20,21 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
   const t = useTranslations();
   const route = useRouter();
   const queryClient = useQueryClient();
+
   const { mutate } = useMutation({
-    mutationFn: ({ ticket }: { ticket: number }) => {
-      return Ticket_Api.saveTickets({ ticket });
-    },
+    mutationFn: ({ ticket }: { ticket: number }) => Ticket_Api.saveTickets({ ticket }),
     onSuccess() {
       queryClient.refetchQueries({ queryKey: ['ticket_all'] });
       queryClient.refetchQueries({ queryKey: ['get_saved'] });
       queryClient.refetchQueries({ queryKey: ['tickets_detail'] });
     },
     onError() {
-      route.push(
-        `/auth/login?callbackUrl=${encodeURIComponent(window.location.href)}`,
-      );
+      route.push(`/auth/login?callbackUrl=${encodeURIComponent(window.location.href)}`);
     },
   });
 
   const { mutate: deletLike } = useMutation({
-    mutationFn: ({ ticket }: { ticket: number }) => {
-      return Ticket_Api.removeTickets({ id: ticket });
-    },
+    mutationFn: ({ ticket }: { ticket: number }) => Ticket_Api.removeTickets({ id: ticket }),
     onSuccess() {
       queryClient.refetchQueries({ queryKey: ['ticket_all'] });
       queryClient.refetchQueries({ queryKey: ['get_saved'] });
@@ -58,217 +49,148 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
     },
   });
 
-  const savedData = localStorage.getItem('filterTours');
-let queryString = '';
+  function saveQueryParamsToLocalStorage() {
+    const url = window.location.href;
+    const queryString = url.split('?')[1];
+    if (!queryString) return;
 
-if (savedData) {
-  try {
-    const filters = JSON.parse(savedData); // objectga aylantiramiz
-    const params = new URLSearchParams();
+    const params = new URLSearchParams(queryString);
+    const keys = [
+      { key: 'hotel_id', storageKey: 'hotel_id' },
+      { key: 'town', storageKey: 'town' },
+      { key: 'meal', storageKey: 'mealPlan' },
+      { key: 'duration', storageKey: 'duration' },
+      { key: 'rating', storageKey: 'rating' },
+      { key: 'page', storageKey: 'page' },
+    ];
 
-    if (filters.departure) params.set('departure', filters.departure);
-    if (filters.destination) params.set('destination', filters.destination);
-    if (filters.dateFrom) params.set('dateFrom', filters.dateFrom);
-    if (filters.dateTo) params.set('dateTo', filters.dateTo);
-    if (filters.adults) params.set('adults', filters.adults);
-    if (filters.children) params.set('children', filters.children);
+    keys.forEach(({ key, storageKey }) => {
+      const value = params.get(key);
+      if (value) localStorage.setItem(storageKey, value);
+      else localStorage.removeItem(storageKey);
+    });
 
-    queryString = params.toString();
-  } catch (e) {
-    console.error('Filter parse error', e);
-  }
-}
-
-
-function saveQueryParamsToLocalStorage() {
-  // Hozirgi sahifa URL’ini olish
-  const url = window.location.href;
-  const queryString = url.split("?")[1];
-  if (!queryString) return;
-
-  const params = new URLSearchParams(queryString);
-
-  // Tekshirish kerak bo‘lgan parametrlarga mapping
-  const keys = [
-    { key: "hotel_id", storageKey: "hotel_id" },
-    { key: "town", storageKey: "town" },
-    { key: "meal", storageKey: "mealPlan" },
-    { key: "duration", storageKey: "duration" },
-    { key: "rating", storageKey: "rating" },
-    { key: "page", storageKey: "page" },
-  ];
-
-  keys.forEach(({ key, storageKey }) => {
-    const value = params.get(key);
-    if (value) {
-      localStorage.setItem(storageKey, value);
-    } else {
-      localStorage.removeItem(storageKey);
-    }
-  });
-
-   let savedData = localStorage.getItem('filterTours');
-    const from_cache = params.get("from_cache");
+    let savedData = localStorage.getItem('filterTours');
+    const from_cache = params.get('from_cache');
 
     try {
       savedData = savedData ? JSON.parse(savedData) : { init: true };
-    } catch (e) {
+    } catch {
       savedData = { init: true };
     }
 
     if (from_cache) {
-      savedData.from_cache = from_cache;
+      (savedData as Record<string, string>).from_cache = from_cache;
       localStorage.setItem('filterTours', JSON.stringify(savedData));
     }
-    
-    
   }
-  
-  
-  
-  //localStorage.setItem("tourOperator", data?.operator)
-//localStorage.setItem("tourOperatorId", data?.tour_operator_id)
-return (
-    <Link  href={`/selectour/${data?.slug}?from_cache=${data?.from_cache}`} 
-       
-	 onClick={() => {
-     localStorage.setItem("tourOperator", data?.operator ?? "");
-     localStorage.setItem("tourOperatorId", String(data?.tour_operator_id ?? ""));
-     localStorage.setItem('from_cache', String(data?.from_cache));
-      saveQueryParamsToLocalStorage();
-      
-    }} 
-prefetch={true}>    
- <motion.div
+
+  return (
+    <Link
+      href={`/selectour/${data?.slug}?from_cache=${data?.from_cache}`}
+      onClick={() => {
+        localStorage.setItem('tourOperator', data?.operator ?? '');
+        localStorage.setItem('tourOperatorId', String(data?.tour_operator_id ?? ''));
+        localStorage.setItem('from_cache', String(data?.from_cache));
+        saveQueryParamsToLocalStorage();
+      }}
+      prefetch
+    >
+      <motion.div
         initial={{ opacity: 0, x: 30 }}
         whileInView={{ opacity: 1, x: 0 }}
-        transition={{
-          duration: 0.8,
-          delay: 0.1,
-          ease: 'easeOut',
-        }}
+        transition={{ duration: 0.8, delay: 0.1, ease: 'easeOut' }}
         viewport={{ once: false, amount: 0.1 }}
-        className="h-[320px] max-xl:h-[350px] flex cursor-pointer relative w-full items-center mt-5 rounded-3xl bg-[#ffff] max-lg:flex-col max-lg:h-auto"
+        className="relative flex h-[296.5px] w-full overflow-hidden rounded-[12px] bg-white shadow-[0_4px_16px_rgba(17,34,17,0.05)] max-lg:h-auto max-lg:flex-col"
       >
-        <Button
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            if (data.is_liked) {
-              deletLike({
-                ticket: data.id,
-              });
-            } else if (!data.is_liked) {
-              mutate({
-                ticket: data.id,
-              });
-            }
-          }}
-          className={clsx(
-            'absolute cursor-pointer z-40 border-2 w-10 h-10 rounded-full right-4 top-5',
-            data.is_liked
-              ? 'bg-[#FFE4E5] border-[#E0313733] hover:bg-[#FFE4E5]'
-              : 'bg-[#FFFF] border-[#DFDFDF] hover:bg-[#FFFF]',
-          )}
-        >
-          <FavoriteRoundedIcon
-            sx={{ color: data.is_liked ? '#E03137' : '#212122' }}
-          />
-        </Button>
-        <div className="h-full aspect-square rounded-3xl w-[40%] relative max-lg:w-full">
+        <div className="relative h-full w-[297px] shrink-0 max-lg:h-[240px] max-lg:w-full">
           <Image
             src={BASE_URL + data.ticket_images}
             alt={data.title}
-            fetchPriority="high"
-            className="w-full h-full object-cover rounded-3xl"
-            width={500}
-            priority
-            height={500}
+            className="h-full w-full object-cover"
+            width={297}
+            height={297}
             quality={100}
           />
-          <div className="flex flex-col absolute top-2 left-4 gap-2 z-20">
-            {data.badge.map((e) => (
-              <Badge
-                key={e.id}
-                variant="default"
-                className={`bg-[${e.color}] text-sm px-4 py-1 rounded-4xl font-semibold`}
-                style={{ background: e.color }}
-              >
-                {e.name}
-              </Badge>
-            ))}
+          <div className="absolute right-2 top-2 rounded-lg bg-white/50 px-4 py-2 text-xs font-medium leading-4 text-[#112211] backdrop-blur-[2px]">
+            {`${Math.max(data.badge?.length || 0, 10)} ${t('фото')}`}
           </div>
         </div>
 
-        <div className="w-full p-6 h-full ">
-          <div className="flex flex-col">
-            <div className="flex items-center gap-2 mb-2">
-              <Rating
-                name="read-only"
-                size="medium"
-                sx={{ color: '#F08125' }}
-                value={data.rating}
-                readOnly
-                precision={0.1}
-              />
-            </div>
-            <h1 className="text-2xl text-[#031753] font-semibold">
-              {data.title}
-            </h1>
-            <div className="flex gap-2 flex-col">
-              <div className="flex items-center">
-                <LocationTour width={24} height={24} color="#084FE3" />
-                <p className="text-[#031753]">{data.destination?.name}</p>
-              </div>
-              {data.ticket_hotel.length > 0 && (
-                <div className="flex items-center">
-                  <Hotel color="#084FE3" width={24} height={24} />
-                  <p className="text-[#031753] px-1 line-clamp-1">
-                    {data.ticket_hotel[0].name}
+        <div className="flex h-full w-[627px] flex-col gap-6 bg-white px-6 pb-6 pt-6 max-lg:w-full">
+          <div className="flex items-start justify-between gap-6">
+            <div className="flex w-[386px] flex-col gap-4 max-lg:w-full">
+              <h1 className="text-[20px] font-bold leading-6 text-[#1C1C1E]">{data.title}</h1>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2">
+                  <MapPin color="#1A73E8" className="size-6" />
+                  <p className="text-sm font-medium leading-[17px] text-[#6B7280]/80">
+                    {data.destination?.name}
                   </p>
                 </div>
-              )}
-             
-             {data.ticket_hotel.length > 0 && (
-              <div className="flex items-center">
-                <Star color="#084FE3" width={24} height={24} />
-                <p className="text-[#031753] px-1">
-                  {/^\d/.test(data.ticket_hotel[0].rating)
-                    ? `${data.ticket_hotel[0].rating} ${t('звёзды')}`
-                    : data.ticket_hotel[0].rating}
-                </p>
+                {data.ticket_hotel.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    <Hotel color="#1A73E8" className="size-6" />
+                    <p className="line-clamp-1 text-sm font-medium leading-[17px] text-[#6B7280]/80">
+                      {data.ticket_hotel[0].name}
+                    </p>
+                  </div>
+                )}
+                {data.ticket_hotel.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    <Star color="#1A73E8" className="size-6" />
+                    <p className="text-sm font-semibold leading-[17px] text-[#1C1C1E]">
+                      {/^\d/.test(String(data.ticket_hotel[0].rating))
+                        ? `${data.ticket_hotel[0].rating} ${t('звёзды')}`
+                        : data.ticket_hotel[0].rating}
+                    </p>
+                  </div>
+                )}
+                <div className="flex items-center gap-2">
+                  <CalendarDays color="#1A73E8" className="size-6" />
+                  <p className="text-sm font-semibold leading-[17px] text-[#1C1C1E]">
+                    {data.ticket_hotel[0]?.meal_plan || 'BB'}
+                  </p>
+                </div>
               </div>
-            )}
+            </div>
 
+            <div className="flex w-[153px] flex-col items-end">
+              <p className="text-right text-sm font-medium leading-[17px] text-[#6B7280]/75 line-through">
+                {formatPrice(data.price * 1.55, locale as LanguageRoutes, true)}
+              </p>
+              <p className="text-right text-2xl font-bold leading-[29px] text-[#FF6B00]">
+                {formatPrice(data.price, locale as LanguageRoutes, true)}
+              </p>
+              <p className="text-right text-xs font-medium leading-[15px] text-[#6B7280]/75">
+                {t('с учетом налогов')}
+              </p>
             </div>
           </div>
 
-          <ul className="px-6 text-[#646465] text-md list-disc items-center mt-5">
-            {data.ticket_amenities.slice(0, 3).map((e) => (
-              <li key={e.name}>{e.name}</li>
-            ))}
-          </ul>
+          <div className="h-px w-full bg-[rgba(17,34,17,0.25)]/25" />
 
-          <div className="flex items-center gap-4 max-xl:flex-col mt-5 max-xl:items-start">
-            <button className="bg-[#1764FC] text-white text-sm rounded-full px-4 py-4 cursor-pointer max-xl:w-full">
-              {formatPrice(data.price, locale as LanguageRoutes, true)}
+          <div className="flex items-center gap-4">
+            <Button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (data.is_liked) deletLike({ ticket: data.id });
+                else mutate({ ticket: data.id });
+              }}
+              className={clsx(
+                'h-12 w-12 cursor-pointer rounded-full border shadow-[0_0_4px_rgba(0,0,0,0.15)]',
+                data.is_liked
+                  ? 'border-[#E0313733] bg-[#FFE4E5] hover:bg-[#FFE4E5]'
+                  : 'border-[#DFDFDF] bg-white hover:bg-white',
+              )}
+            >
+              <FavoriteRoundedIcon sx={{ color: '#E03137', fontSize: 20 }} />
+            </Button>
+
+            <button className="flex h-12 w-[434px] items-center justify-center rounded-[14px] bg-[#1A73E8] text-sm font-semibold leading-[17px] text-white">
+              {t('Смотреть тур')}
             </button>
-            <div className="flex gap-8 items-center  text-[#646465] text-lg">
-              <div className="flex gap-3 text-sm items-center">
-                <Plane fill="#084FE3" color="#084FE3" className="size-5" />
-                <p>{formatDate.format(data.departure_time, 'DD MMM')}</p>
-              </div>
-              <ul className="flex items-center text-sm gap-8 text-center">
-                <li className="flex items-center gap-2">
-                  <User color="#084FE3" className="size-5" />
-                  {data.passenger_count}
-                </li>
-                <li className="flex items-center gap-2">
-                  <CalendarDays color="#084FE3" className="size-5" />
-                  {data.duration_days}
-                </li>
-              </ul>
-            </div>
           </div>
         </div>
       </motion.div>

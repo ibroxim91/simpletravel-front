@@ -4,12 +4,10 @@ import Logo from '@/assets/navLogo.png';
 import { User_Api } from '@/features/profile/lib/api';
 import { useWelcomeStore } from '@/features/profile/lib/hook';
 import { Link, usePathname } from '@/shared/config/i18n/navigation';
-import formatPhone from '@/shared/lib/formatPhone';
-import { getContact } from '@/widgets/footer/lib/api';
-import EmailIcon from '@mui/icons-material/Email';
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import HomeIcon from '@mui/icons-material/Home';
-import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import MenuIcon from '@mui/icons-material/Menu';
 import PersonIcon from '@mui/icons-material/Person';
 import SearchIcon from '@mui/icons-material/Search';
@@ -19,10 +17,8 @@ import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { Suspense, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ChangeLang } from './ChangeLang';
-import CitySelect from './CitySelect';
-import CitySelectMobile from './CitySelectMobile';
 import MobileNavbar from './MobileNavbar';
 
 const Navbar = () => {
@@ -35,25 +31,23 @@ const Navbar = () => {
     queryFn: () => User_Api.getMe(),
   });
 
+  const navLinks = [
+    { href: '/', label: 'Главная' },
+    { href: '/selectour?page=1', label: 'Подобрать тур' },
+    { href: '/about', label: 'О нас' },
+    { href: '/contacts', label: 'Контакты' },
+  ];
+
   useEffect(() => {
     if (user && (!user.data.data.first_name || !user.data.data.last_name)) {
       setOpenModal(true);
     }
   }, [user, setOpenModal]);
 
-  const links = [
-    { href: '/', label: 'Главная' },
-    { href: '/selectour', label: 'Подобрать тур' },
-    { href: '/about', label: 'О нас' },
-    { href: '/blogs', label: 'Блоги' },
-    { href: '/faq', label: 'Ответы на вопросы' },
-    { href: '/contacts', label: 'Контакты' },
-  ];
-
   const linksMobile = [
     { href: '/', label: 'Главная', icon: HomeIcon, active: '/' },
     {
-      href: '/selectour',
+      href: '/selectour?page=1',
       label: 'Подобрать тур',
       icon: SearchIcon,
       active: '/selectour',
@@ -72,140 +66,143 @@ const Navbar = () => {
     },
   ];
 
-  const { data: contact } = useQuery({
-    queryKey: ['get_contact'],
-    queryFn: () => getContact(),
-    select(data) {
-      return data.data.data.results;
-    },
-  });
+  const profileHref = user ? '/profile?tabs=profile' : '/auth/register';
+  const profileLabel = user ? t('Профиль') : t('Регистрация');
+  const profileName = user
+    ? `${user.data.data.first_name || ''} ${user.data.data.last_name || ''}`.trim()
+    : '';
+  const profileInitials = user
+    ? `${(user.data.data.first_name || '').slice(0, 1)}${(user.data.data.last_name || '').slice(0, 1)}`.toUpperCase() || 'ST'
+    : 'ST';
+  const isActiveLink = (href: string) =>
+    href === '/' ? pathname === '/' : pathname.startsWith(href);
 
   return (
     <>
-      <section className="sticky w-full top-0 z-50">
-        <div className="bg-[#084FE3] p-2 relative">
-          <div className="flex custom-container justify-between items-center">
-            <Suspense>
-              <CitySelect />
-            </Suspense>
-            <Suspense>
-              <CitySelectMobile />
-            </Suspense>
-            <div className="flex gap-4 items-center font-medium">
-              <ChangeLang />
-              <div className="w-[1px] h-[60%] bg-white max-lg:hidden" />
-              {contact && contact[0].email && (
-                <Link
-                  href={`mailto:${contact[0].email}`}
-                  className="flex gap-2 text-white items-center max-lg:hidden"
-                >
-                  <EmailIcon
-                    sx={{ color: 'white', width: '24px', height: '24px' }}
-                  />
-                  <p className="text-sm">{contact[0].email}</p>
-                </Link>
-              )}
-              <div className="w-[1px] h-[60%] bg-white max-lg:hidden" />
-              {contact && contact[0].main_phone && (
-                <Link
-                  href={`tel:+${contact[0].main_phone}`}
-                  className="flex gap-2 text-white items-center max-lg:hidden"
-                >
-                  <LocalPhoneIcon
-                    sx={{ color: 'white', width: '24px', height: '24px' }}
-                  />
-                  <p className="text-sm">
-                    {formatPhone(contact[0].main_phone)}
-                  </p>
-                </Link>
-              )}
-            </div>
-          </div>
-        </div>
-        <div className="bg-[#FFFFFF] w-full shadow-sm rounded-b-2xl p-2">
-          <div className="flex justify-between custom-container w-full">
-            <div className="w-full h-16 flex items-center gap-8">
-              <Link href={'/'}>
+      <section className="sticky top-0 z-50 w-full bg-[#FAFBFC]">
+        <div className="custom-container h-[102px]">
+          <div className="mx-auto flex h-full w-full max-w-[1240px] items-center">
+            <div className="hidden h-full w-full items-center justify-between xl:flex">
+              <Link href="/" className="shrink-0">
                 <Image
                   src={Logo}
                   alt="Logo"
-                  width={120}
-                  height={40}
+                  width={187}
+                  height={62}
                   priority
                   className="h-auto w-auto"
                 />
               </Link>
-              <div className="flex gap-4 items-center justify-center h-full max-lg:hidden">
-                {links.map(({ href, label }) => (
+
+              <div className="flex min-w-0 items-center gap-8 2xl:gap-[68px]">
+                <div className="flex h-full items-center gap-5 whitespace-nowrap 2xl:gap-9">
+                {navLinks.map(({ href, label }) => (
                   <div
                     key={label}
                     className={clsx(
-                      'h-full xl:text-lg flex items-center font-medium text-md',
-                      pathname === href
-                        ? 'text-[#084FE3] border-b-2 border-[#084FE3] underline-offset-4'
-                        : 'text-[#212122] hover:text-[#084FE3]',
+                      'flex font-bold items-center text-[14px]',
+                      isActiveLink(href)
+                        ? 'text-[#1A73E8] font-bold'
+                        : 'text-[#6B7280] font-medium hover:text-[#1A73E8]',
                     )}
                   >
                     <Link href={href}>{t(label)}</Link>
                   </div>
                 ))}
               </div>
+                <div className="flex shrink-0 items-center gap-4 xl:gap-5 2xl:gap-6">
+                  <div className="h-6 w-[2px] bg-[#E5E7EB]" />
+                  <Link href="/saved">
+                    <IconButton
+                      aria-label="favourite"
+                      sx={{
+                        p: 0,
+                        minWidth: 0,
+                        backgroundColor: 'transparent',
+                        '&:hover': {
+                          backgroundColor: 'transparent',
+                        },
+                      }}
+                    >
+                      <FavoriteIcon
+                        sx={{ color: '#6B7280', width: '20px', height: '18px' }}
+                      />
+                    </IconButton>
+                  </Link>
+                  <div className="flex h-9 items-center justify-center rounded-[20px] px-2 py-[9px]">
+                    <ChangeLang compact theme="light" />
+                  </div>
+                  {user ? (
+                    <>
+                      <div className="h-6 w-[2px] bg-[#E5E7EB]" />
+                      <Link
+                        href={profileHref}
+                        className="flex items-center gap-2 text-[#112211]"
+                      >
+                        <div className="relative">
+                          <Avatar className="size-[45px]">
+                            <AvatarImage src={user?.data.data.avatar || undefined} />
+                            <AvatarFallback className="bg-[#E9EEF8] text-[#1A73E8] font-semibold text-sm">
+                              {profileInitials}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="absolute -bottom-[1px] -right-[1px] z-10 flex size-[20px] items-center justify-center rounded-full bg-[#1A73E8]">
+                            <KeyboardArrowDownIcon
+                              sx={{ width: '14px', height: '14px', color: '#FFFFFF' }}
+                            />
+                          </span>
+                        </div>
+                        <p className="text-[14px] font-semibold leading-[100%]">
+                          {profileName || profileLabel}
+                        </p>
+                      </Link>
+                    </>
+                  ) : (
+                    <Link href={profileHref}>
+                      <Button
+                        variant="outlined"
+                        sx={{
+                          borderColor: '#FF6B00',
+                          color: '#FF6B00',
+                          width: '170px',
+                          height: '48px',
+                          borderRadius: '14px',
+                          gap: '10px',
+                          textTransform: 'none',
+                          fontSize: '15px',
+                          fontWeight: 400,
+                          lineHeight: '100%',
+                          '&:hover': {
+                            borderColor: '#FF6B00',
+                            backgroundColor: '#FFF7ED',
+                          },
+                          '@media (min-width: 1536px)': {
+                            width: '211px',
+                            gap: '16px',
+                            fontSize: '16px',
+                          },
+                        }}
+                      >
+                        <PersonIcon sx={{ width: '24px', height: '24px' }} />
+                        <p>{profileLabel}</p>
+                      </Button>
+                    </Link>
+                  )}
+                </div>
+              </div>
             </div>
-            <div className="flex items-center gap-4 max-lg:hidden">
-              <Link href={'/saved'}>
-                <IconButton
-                  aria-label="favourite"
-                  sx={{
-                    border: '1px solid #9ca3af',
-                    backgroundColor: 'transparent',
-                    '&:hover': {
-                      backgroundColor: 'transparent',
-                    },
-                  }}
-                >
-                  <FavoriteIcon
-                    sx={{ color: '#212122', width: '24px', height: '24px' }}
-                  />
-                </IconButton>
+
+            <div className="flex h-full w-full items-center justify-between xl:hidden">
+              <Link href="/" className="shrink-0">
+                <Image
+                  src={Logo}
+                  alt="Logo"
+                  width={187}
+                  height={62}
+                  priority
+                  className="h-auto w-[160px]"
+                />
               </Link>
-              <div className="w-[1px] h-[30%] bg-ring" />
-              {user ? (
-                <Link href={'/profile?tabs=profile'}>
-                  <Button
-                    variant="contained"
-                    size="large"
-                    sx={{
-                      borderRadius: '34px',
-                      gap: '8px',
-                      background: '#084FE3',
-                    }}
-                  >
-                    <PersonIcon
-                      sx={{ color: 'white', width: '24px', height: '24px' }}
-                    />
-                    <p>{t('Профиль')}</p>
-                  </Button>
-                </Link>
-              ) : (
-                <Link href={'/auth/register'}>
-                  <Button
-                    variant="contained"
-                    size="large"
-                    sx={{
-                      borderRadius: '34px',
-                      gap: '8px',
-                      background: '#084FE3',
-                    }}
-                  >
-                    <PersonIcon
-                      sx={{ color: 'white', width: '24px', height: '24px' }}
-                    />
-                    <p>{t('Войти')}</p>
-                  </Button>
-                </Link>
-              )}
-            </div>
-            <div className="flex items-center gap-4 lg:hidden">
               <IconButton
                 onClick={() => setOpenMobile(true)}
                 sx={{ border: '1px solid gray' }}
@@ -217,8 +214,8 @@ const Navbar = () => {
               </IconButton>
             </div>
           </div>
-          <MobileNavbar open={openMobie} setOpen={setOpenMobile} />
         </div>
+        <MobileNavbar open={openMobie} setOpen={setOpenMobile} />
       </section>
       <div className="bg-white shadow-2xl border-1 rounded-t-2xl grid grid-cols-4 justify-center items-center py-3 h-auto w-full fixed bottom-0 z-30 lg:hidden">
         {linksMobile.map((e) => (

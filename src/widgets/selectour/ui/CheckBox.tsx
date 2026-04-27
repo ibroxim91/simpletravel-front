@@ -96,15 +96,15 @@ function CheckboxFilter<T extends string | string[] | null>({
   };
 
   return (
-    <label className="flex items-center gap-3 cursor-pointer mt-2">
+    <label className="mt-2 flex cursor-pointer items-center gap-3">
       <Checkbox
         id={value}
         checked={isChecked}
         value={value}
-        className="cursor-pointer"
+        className="h-6 w-6 cursor-pointer rounded-[2px] border-[#6B7280] data-[state=checked]:border-[#1A73E8] data-[state=checked]:bg-[#1A73E8]"
         onCheckedChange={handleChange}
       />
-      <Label className="text-[#373739] text-md cursor-pointer" htmlFor={value}>
+      <Label className="cursor-pointer text-sm font-normal leading-[17px] text-[#6B7280]" htmlFor={value}>
         {label}
       </Label>
     </label>

@@ -70,232 +70,138 @@ const Footer = () => {
     return null;
   }
 
+  const whatsappHref = data?.[0]?.main_phone
+    ? `https://wa.me/${data[0].main_phone.replace(/\D/g, '')}`
+    : undefined;
+
+  const socialLinks = [
+    { key: 'telegram', href: data?.[0]?.telegram, icon: <TelegramIcon sx={{ color: '#E5E7EB', width: 20, height: 20 }} /> },
+    { key: 'whatsapp', href: whatsappHref, icon: <span className="text-[13px] font-semibold text-[#E5E7EB]">WA</span> },
+    { key: 'facebook', href: data?.[0]?.facebook, icon: <FacebookOutlinedIcon sx={{ color: '#E5E7EB', width: 20, height: 20 }} /> },
+    { key: 'linkedin', href: data?.[0]?.linkedin, icon: <LinkedInIcon sx={{ color: '#E5E7EB', width: 20, height: 20 }} /> },
+    { key: 'instagram', href: data?.[0]?.instagram, icon: <InstagramIcon sx={{ color: '#E5E7EB', width: 20, height: 20 }} /> },
+    { key: 'twitter', href: data?.[0]?.twitter, icon: <XIcon sx={{ color: '#E5E7EB', width: 18, height: 18 }} /> },
+  ].filter((item) => Boolean(item.href));
+  const paymentLogos = [
+    { src: '/humo.png', alt: 'Humo', width: 54 },
+    { src: '/uzcard.png', alt: 'Uzcard', width: 52 },
+    { src: '/uzumbank.png', alt: 'Uzum bank', width: 52 },
+    { src: '/visa.png', alt: 'Visa', width: 52 },
+    { src: '/mastercard.png', alt: 'Mastercard', width: 52 },
+  ];
+
   return (
-    <section className="py-8 bg-[#084FE3] rounded-t-4xl max-lg:mb-16">
-      <div className="custom-container">
-        <div className="flex items-center">
-          <div className="w-full h-12 flex items-center gap-8">
+    <section className="bg-[#1A73E8] pb-10 pt-[56px] max-lg:mb-16 max-lg:pt-10">
+      <div className="mx-auto w-full max-w-[1241px] px-4">
+        <div className="flex items-start justify-between gap-10 max-lg:flex-col">
+          <div className="w-full max-w-[398px]">
             <Image
               src={Logo}
-              alt="Logo"
-              width={120}
-              height={40}
+              alt="Simple Travel"
+              width={187}
+              height={60}
               priority
-              className="h-full w-auto size-12"
+              className="h-[60px] w-[187px]"
             />
-          </div>
-          <div className="flex gap-4 max-lg:hidden">
-            {data && data[0].telegram && (
-              <Link href={data[0].telegram}>
-                <IconButton
-                  sx={{ border: '1px solid var(--ring)' }}
-                  aria-label="Link to LinkedIn"
-                >
-                  <TelegramIcon
-                    sx={{ color: 'white', width: '28px', height: '28px' }}
-                  />
-                </IconButton>
-              </Link>
-            )}
-            {data && data[0].linkedin && (
-              <Link href={data[0].linkedin}>
-                <IconButton
-                  sx={{ border: '1px solid var(--ring)' }}
-                  aria-label="Link to LinkedIn"
-                >
-                  <LinkedInIcon
-                    sx={{ color: 'white', width: '28px', height: '28px' }}
-                  />
-                </IconButton>
-              </Link>
-            )}
-            {data && data[0].twitter && (
-              <Link href={data[0].twitter}>
-                <IconButton
-                  sx={{ border: '1px solid var(--ring)' }}
-                  aria-label="Link to Twitter"
-                >
-                  <XIcon
-                    sx={{ color: 'white', width: '28px', height: '28px' }}
-                  />
-                </IconButton>
-              </Link>
-            )}
-            {data && data[0].instagram && (
-              <Link href={data[0].instagram}>
-                <IconButton
-                  sx={{ border: '1px solid var(--ring)' }}
-                  aria-label="Link to Instagram"
-                >
-                  <InstagramIcon
-                    sx={{ color: 'white', width: '28px', height: '28px' }}
-                  />
-                </IconButton>
-              </Link>
-            )}
-            {data && data[0].facebook && (
-              <Link href={data[0].facebook}>
-                <IconButton
-                  sx={{ border: '1px solid var(--ring)' }}
-                  aria-label="Link to facebook"
-                >
-                  <FacebookOutlinedIcon
-                    sx={{ color: 'white', width: '28px', height: '28px' }}
-                  />
-                </IconButton>
-              </Link>
-            )}
-          </div>
-        </div>
-        <div className="w-full h-[1px] bg-ring mt-10" />
-        <div className="grid grid-cols-4 font-medium max-lg:grid-cols-3 max-md:grid-cols-2 max-sm:grid-cols-1 max-lg:gap-10 mt-10">
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-1">
-              <p className="text-[#D3D3D3] text-sm">{t('Служба поддержки')}</p>
-              <p className="text-[#FFFFFF] text-lg font-semibold">
-                {data && formatPhone(data[0].main_phone)}
-              </p>
-            </div>
-            <div className="flex flex-col gap-1">
-              <p className="text-[#D3D3D3] text-sm">{t('Общие вопросы')}</p>
-              <p className="text-[#FFFFFF] text-lg font-semibold">
-                {data && data[0].email}
-              </p>
-            </div>
-            <div className="flex flex-col gap-1">
-              <p className="text-[#D3D3D3] text-sm">{t('Адрес')}</p>
-              <p className="text-[#FFFFFF] text-sm font-semibold">
-                {data && data[0].address}
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-1">
-              <p className="text-[#FFFFFF] text-lg font-semibold">
-                {t('Страница')}
-              </p>
-            </div>
-            <div className="flex flex-col gap-1">
-              <Link href={'/'} className="text-[#D3D3D3] text-sm w-fit">
-                {t('Главная')}
-              </Link>
-            </div>
-            <div className="flex flex-col gap-1">
-              <Link
-                href={'/selectour'}
-                className="text-[#D3D3D3] text-sm w-fit"
-              >
-                {t('Подобрать тур')}
-              </Link>
-            </div>
-            <div className="flex flex-col gap-1">
-              <Link href={'/blogs'} className="text-[#D3D3D3] text-sm w-fit">
-                {t('Блоги')}
-              </Link>
-            </div>
-          </div>
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-1">
-              <p className="text-[#FFFFFF] text-lg font-semibold">
-                {t('О сервисе')}
-              </p>
-            </div>
-            <div className="flex flex-col gap-1">
-              <Link href={'/about'} className="text-[#D3D3D3] text-sm w-fit">
-                {t('О нас')}
-              </Link>
-            </div>
-            <div className="flex flex-col gap-1">
-              <Link href={'/contacts'} className="text-[#D3D3D3] text-sm w-fit">
-                {t('Услуги')}
-              </Link>
-            </div>
-            {offerta && offerta.length !== 0 && (
-              <div className="flex flex-col gap-1">
-                <Link
-                  href={'/public-offer'}
-                  prefetch={true}
-                  className="text-[#D3D3D3] text-sm w-fit"
-                >
-                  {t('Публичная оферта')}
-                </Link>
-              </div>
-            )}
-            {legalOffer && legalOffer.length !== 0 && (
-              <div className="flex flex-col gap-1">
-                <Link
-                  href={'/legal-offerta'}
-                  prefetch={true}
-                  className="text-[#D3D3D3] text-sm w-fit"
-                >
-                  {t('Оферта для юрлиц')}
-                </Link>
-              </div>
-            )}
-          </div>
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-1">
-              <p className="text-[#FFFFFF] text-lg font-semibold">
-                {t('Помощь')}
-              </p>
-            </div>
-            {UserAgreement && UserAgreement.length !== 0 && (
-              <Link
-                href={'/user-agreement'}
-                prefetch={true}
-                className="text-[#D3D3D3] text-sm w-fit"
-              >
-                <p className="text-[#D3D3D3] text-sm">
-                  {t('Инструкция пользователя')}
+            <p className="mt-6 text-base font-medium leading-[22px] text-white">
+              {t('Туристическое агентство из Ташкента (Узбекистан)')}
+            </p>
+
+            <div className="mt-9 space-y-6">
+              <div className="space-y-2">
+                <p className="text-base font-medium leading-[22px] text-white">
+                  {t('Связаться с оператором:')}
                 </p>
-              </Link>
-            )}
-            {PrivacyPolicy && PrivacyPolicy.length !== 0 && (
-              <div className="flex flex-col gap-1">
-                <Link
-                  href={'/privacy-policy'}
-                  className="text-[#D3D3D3] text-sm w-fit"
-                  prefetch={true}
-                >
-                  {t('Политика конфиденциальности')}
-                </Link>
+                <p className="text-base font-bold leading-[22px] text-white">
+                  {data?.[0]?.main_phone ? formatPhone(data[0].main_phone) : '+998 95 953 10 70'}
+                </p>
               </div>
-            )}
+              <div className="space-y-2">
+                <p className="text-base font-medium leading-[22px] text-white">
+                  {t('Адрес:')}
+                </p>
+                <p className="text-base font-bold leading-[22px] text-white">
+                  {data?.[0]?.address || "Baxodir ko'chasi 44A, Yakkasaroy Tumani, Toshkent, 100100, Oʻzbekiston"}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="w-full max-w-[609px] space-y-10">
+            <div className="flex items-start gap-6 max-md:grid max-md:grid-cols-2 max-md:gap-8 max-sm:grid-cols-1">
+              <div className="w-[187px] space-y-8">
+                <p className="text-xl font-bold leading-[27px] text-white">{t('Бронирование:')}</p>
+                <div className="flex flex-col gap-4 text-base font-medium leading-[22px] text-white">
+                  <Link href="/selectour" className="w-fit">{t('Подобрать тур')}</Link>
+                  <Link href="/contacts" className="w-fit">{t('Контакты')}</Link>
+                </div>
+              </div>
+
+              <div className="w-[187px] space-y-8">
+                <p className="text-xl font-bold leading-[27px] text-white">{t('Компания:')}</p>
+                <div className="flex flex-col gap-4 text-base font-medium leading-[22px] text-white">
+                  <Link href="/about" className="w-fit">{t('О нас')}</Link>
+                  <Link href="/blogs" className="w-fit">{t('Блог')}</Link>
+                  <Link href="/faq" className="w-fit">{t('Ответы на вопросы')}</Link>
+                </div>
+              </div>
+
+              <div className="w-[187px] space-y-8">
+                <p className="text-xl font-bold leading-[27px] text-white">{t('Сервисы:')}</p>
+                <div className="flex flex-col gap-4 text-base font-medium leading-[22px] text-white">
+                  <Link href="/contacts" className="w-fit">{t('Услуги')}</Link>
+                  {(offerta && offerta.length !== 0) && (
+                    <Link href="/public-offer" prefetch className="w-fit">{t('Публичная оферта')}</Link>
+                  )}
+                  {(legalOffer && legalOffer.length !== 0) && (
+                    <Link href="/legal-offerta" prefetch className="w-fit">{t('Оферта для юрлиц')}</Link>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-6 max-md:flex-col max-md:items-start">
+              <p className="text-xl font-bold leading-[27px] text-white">{t('Способы оплаты:')}</p>
+              <div className="flex items-center gap-6">
+                {paymentLogos.map((logo) => (
+                  <div key={logo.src} className="h-8 w-[54px] overflow-hidden rounded-[2px] bg-white">
+                    <Image
+                      src={logo.src}
+                      alt={logo.alt}
+                      width={logo.width}
+                      height={32}
+                      className="h-8 w-[54px] object-contain"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
-        <div className="w-full h-[1px] bg-ring mt-10" />
-        <div className="flex gap-4 min-lg:hidden mt-10">
-          <Link href={'https://www.linkedin.com/'} aria-label="Linkedin">
-            <IconButton sx={{ border: '1px solid var(--ring)' }}>
-              <LinkedInIcon
-                sx={{ color: 'white', width: '28px', height: '28px' }}
-              />
-            </IconButton>
-          </Link>
-          <Link href={'https://x.com/'} aria-label="twitter">
-            <IconButton sx={{ border: '1px solid var(--ring)' }}>
-              <XIcon sx={{ color: 'white', width: '28px', height: '28px' }} />
-            </IconButton>
-          </Link>
-          <Link href={'https://www.instagram.com/'} aria-label="instagram">
-            <IconButton sx={{ border: '1px solid var(--ring)' }}>
-              <InstagramIcon
-                sx={{ color: 'white', width: '28px', height: '28px' }}
-              />
-            </IconButton>
-          </Link>
-          <Link href={'#https://www.facebook.com/'} aria-label="facebook">
-            <IconButton sx={{ border: '1px solid var(--ring)' }}>
-              <FacebookOutlinedIcon
-                sx={{ color: 'white', width: '28px', height: '28px' }}
-              />
-            </IconButton>
-          </Link>
+
+        <div className="mt-6 flex items-center gap-6 max-lg:flex-wrap">
+          <p className="text-base font-bold leading-[22px] text-white">{t('Мы в социальных сетях:')}</p>
+          <div className="flex items-center gap-2">
+            {socialLinks.map((item) => (
+              <Link key={item.key} href={item.href as string} aria-label={item.key}>
+                <IconButton
+                  sx={{
+                    width: '32px',
+                    height: '32px',
+                    border: '1px solid #E5E7EB',
+                    padding: 0,
+                  }}
+                >
+                  {item.icon}
+                </IconButton>
+              </Link>
+            ))}
+          </div>
         </div>
-        <p className="mt-10 text-white font-medium text-sm">
-          {t(
-            '«simpletravel» Подробные сведения, политика конфиденциальности и пользовательское соглашение размещены в разделе «Документы и файлы»',
-          )}
+
+        <div className="mt-10 h-px w-full bg-[#E5E7EB]" />
+        <p className="mt-8 text-base font-bold leading-[22px] text-white">
+          © 2020-2026 Simple Travel
         </p>
       </div>
     </section>

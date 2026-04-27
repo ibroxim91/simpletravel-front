@@ -1,24 +1,28 @@
-import BannerCarousel from '@/features/home/ui/BannerCarousel';
-import BannerCarouselMobile from '@/features/home/ui/BannerCarouselMobile';
+import HomeBenefits from '@/features/home/ui/HomeBenefits';
 import HotTours from '@/features/home/ui/HotTours';
-import News from '@/features/home/ui/News';
 import Populardestinations from '@/features/home/ui/Populardestinations';
 import PopulardestinationsMboile from '@/features/home/ui/PopulardestinationsMboile';
 import SearchTours from '@/features/home/ui/SearchTours';
+import VisaTours from '@/features/home/ui/VisaTours';
 
 export default async function Home() {
   return (
     <>
       <main>
-        <div className="flex flex-col gap-10">
-          <BannerCarousel />
-          <BannerCarouselMobile />
-          <SearchTours />
-          <div className="bg-white shadow-xl rounded-t-4xl p-4">
-            <Populardestinations />
-            <PopulardestinationsMboile />
+        <div className="flex flex-col">
+          <div className="bg-[#1E73E8] pb-[180px] max-lg:pb-0">
+            <div className="pt-[104px] max-lg:pt-8">
+              <SearchTours />
+            </div>
+          </div>
+          <div className="-mt-[76px] max-lg:mt-8 relative z-10">
             <HotTours />
-            <News />
+          </div>
+          <div className="mt-[104px] flex flex-col gap-[104px]">
+            <Populardestinations />
+            {/* <PopulardestinationsMboile /> */}
+            <VisaTours />
+            <HomeBenefits />
           </div>
         </div>
       </main>
