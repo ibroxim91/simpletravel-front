@@ -21,7 +21,7 @@ export default async function Home() {
           <div className="mt-[104px] flex flex-col gap-[104px]">
             <Populardestinations />
             {/* <PopulardestinationsMboile /> */}
-            <VisaTours />
+            <VisaTours />     
             <HomeBenefits />
           </div>
         </div>

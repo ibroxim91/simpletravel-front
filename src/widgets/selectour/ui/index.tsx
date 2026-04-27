@@ -487,7 +487,7 @@ const top_duration = [
         </div>
       </section>
 
-      <section className="mt-[104px] px-4 xl:px-0">
+      {/* <section className="mt-[104px] px-4 xl:px-0">
         <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-9 xl:h-[488px]">
           <div className="flex items-center gap-6 max-lg:flex-col max-lg:items-start">
             <div className="w-full max-w-[924px] space-y-4">
@@ -519,7 +519,7 @@ const top_duration = [
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       <div className="custom-container mt-[104px] flex w-full gap-6 max-lg:flex-col">
         <motion.div
