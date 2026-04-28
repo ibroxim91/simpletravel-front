@@ -117,10 +117,12 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
           </div>
         </div>
 
-        <div className="flex h-full w-[627px] flex-col gap-6 bg-white px-6 pb-6 pt-6 max-lg:w-full">
-          <div className="flex items-start justify-between gap-6">
+        <div className="flex h-full w-[627px] flex-col bg-white px-6 pb-6 pt-6 max-lg:w-full">
+          <div className="flex items-start justify-between gap-6 max-lg:gap-3">
             <div className="flex w-[386px] flex-col gap-4 max-lg:w-full">
-              <h1 className="text-[20px] font-bold leading-6 text-[#1C1C1E]">{data.title}</h1>
+              <h1 className="min-h-12 text-[20px] font-bold leading-6 text-[#1C1C1E] line-clamp-2">
+                {data.title}
+              </h1>
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
                   <MapPin color="#1A73E8" className="size-6" />
@@ -155,22 +157,25 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
               </div>
             </div>
 
+
             <div className="flex w-[153px] flex-col items-end">
               <p className="text-right text-sm font-medium leading-[17px] text-[#6B7280]/75 line-through">
                 {formatPrice(data.price * 1.1, locale as LanguageRoutes, true)}
+
+
               </p>
-              <p className="text-right text-2xl font-bold leading-[29px] text-[#FF6B00]">
+              <p className="whitespace-nowrap text-right text-2xl font-bold leading-[29px] text-[#FF6B00] max-lg:text-xl max-lg:leading-6">
                 {formatPrice(data.price, locale as LanguageRoutes, true)}
               </p>
-              <p className="text-right text-xs font-medium leading-[15px] text-[#6B7280]/75">
+              <p className="text-right text-xs font-medium leading-[15px] text-[#6B7280]/75 max-lg:text-[10px]">
                 {t('с учетом налогов')}
               </p>
             </div>
           </div>
 
-          <div className="h-px w-full bg-[rgba(17,34,17,0.25)]/25" />
+          <div className="mt-auto h-px w-full bg-[rgba(17,34,17,0.25)]/25" />
 
-          <div className="flex items-center gap-4">
+          <div className="mt-6 flex items-center gap-4">
             <Button
               onClick={(e) => {
                 e.preventDefault();

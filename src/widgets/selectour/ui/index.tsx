@@ -21,11 +21,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/ui/select';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from '@/shared/ui/carousel';
 import FilterTours from '@/widgets/filter/ui/FilterTours';
 import FilterToursMobile from '@/widgets/filter/ui/FilterToursMobile';
 import CloseIcon from '@mui/icons-material/Close';
@@ -53,7 +48,6 @@ import { useFilterTickectsStore } from '../lib/store';
 import { TickectAll, TickectAllFilter } from '../lib/types';
 import CheckboxFilter from './CheckBox';
 import FilterSection from './FilterSection';
-import InterestedTourCard from '@/widgets/selectour/ui/InterestedTourCard';
 import TourItem from '@/widgets/selectour/ui/TourItem';
 import { useMemo } from "react";
 
@@ -420,7 +414,6 @@ const top_duration = [
 
   const regionName = regionData?.regions.find((r) => r.id === regionId)?.name;
   const countryName = regionData?.name;
-  const interestedTours = (ticket?.data?.results?.tickets ?? []).slice(0, 4);
 
   return (
     <div className="min-h-screen bg-[#FAFBFC] pb-20">
@@ -492,6 +485,7 @@ const top_duration = [
         </div>
       </section>
 
+
       {/* <section className="mt-[104px] px-4 xl:px-0">
         <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-9 xl:h-[488px]">
           <div className="flex items-center gap-6 max-lg:flex-col max-lg:items-start">
@@ -549,6 +543,7 @@ const top_duration = [
           </div>
         </div>
       </section> */}
+
 
       <div className="custom-container mt-[104px] flex w-full gap-6 max-lg:flex-col">
         <motion.div

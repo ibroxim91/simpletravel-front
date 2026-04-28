@@ -302,7 +302,7 @@ const defaultitems = selectedCountry
   return (
     <div className="mt-0  hidden h-[101px] w-full max-w-[1240px] font-medium lg:relative lg:flex">
       <div className="absolute left-0 top-0 mx-auto flex w-full items-start gap-6">
-      <div className="grid h-[60px] min-w-0 flex-1 grid-cols-4 overflow-hidden rounded-[14px] bg-white shadow-[0_4px_10px_rgba(0,0,0,0.1)] xl:max-w-[924px]">
+      <div className="grid h-[60px] min-w-0 flex-1 grid-cols-4 rounded-[14px] bg-white shadow-[0_4px_10px_rgba(0,0,0,0.1)] xl:max-w-[924px]">
       <div className="relative flex h-full flex-col overflow-hidden rounded-l-[14px] border-r border-[#E5E7EB]">
         <Label className="sr-only  ">{t('Откуда')}</Label>
         <Popover open={openCountry} onOpenChange={setOpenCountry}>
@@ -678,7 +678,7 @@ const defaultitems = selectedCountry
         )}
       </div>
 
-      <div className="relative h-full overflow-hidden rounded-r-[14px]">
+      <div className="relative h-full rounded-r-[14px]">
         <div
           onClick={() => setAgeOpen(!ageOpen)}
           className="cursor-pointer flex h-[60px] items-center justify-between px-6"
