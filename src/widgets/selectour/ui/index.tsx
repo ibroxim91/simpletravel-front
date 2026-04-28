@@ -28,12 +28,22 @@ import EastIcon from '@mui/icons-material/East';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import StarIcon from '@mui/icons-material/Star';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Drawer from '@mui/material/Drawer';
 import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, SearchIcon } from 'lucide-react';
+import {
+  BadgeDollarSign,
+  Building2,
+  ChevronLeft,
+  ChevronRight,
+  Clock3,
+  Flag,
+  SearchIcon,
+  Utensils,
+} from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
 import { useParams, useSearchParams } from 'next/navigation';
@@ -43,7 +53,6 @@ import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import { useEffect, useRef, useState } from 'react';
 import Ticket_Api, { hotel_meal_plan } from '../lib/api';
-import { useQueryClient } from '@tanstack/react-query';
 import { useFilterTickectsStore } from '../lib/store';
 import { TickectAll, TickectAllFilter } from '../lib/types';
 import CheckboxFilter from './CheckBox';
@@ -74,7 +83,7 @@ const isEqualState = (a: unknown, b: unknown) =>
   JSON.stringify(a) === JSON.stringify(b);
 
 export default function Selectour() {
-  const { locale } = useParams();
+  const { locale:any } = useParams();
   const prevRegionRef = useRef<string | null>(null);
 const prevHotelsRef = useRef<any[] | null>(null);
   const t = useTranslations();
@@ -111,20 +120,6 @@ const prevHotelsRef = useRef<any[] | null>(null);
   const [hotelAmenities, setHotelAmenitie] = useState<string | null>(null);
   const [hotelFeature, setHotelFeature] = useState<string[]>([]);
   const [openFilter, setFilter] = useState(false);
-
-
-const queryClient = useQueryClient();
-const isFirstRender = useRef(true);
-
-
-
-useEffect(() => {
-  if (!filterLocal) return;
-  if (isFirstRender.current) return;
-  queryClient.removeQueries({ queryKey: ['ticket_all'] });
-}, [
-  filterLocal,
-]);
 
 
   const handleInputChange = (value: string, index: number) => {
@@ -225,15 +220,7 @@ useEffect(() => {
   });
 
   // let toastShown = false;
-const shouldEnable = () => {
-  if (!filterLocal) return false;
-  if (isFirstRender.current) {
-    isFirstRender.current = false;
-  }
-  return true;
-};
-
- const { data: ticket, isLoading } = useQuery<TickectAll>({
+ const { data: ticket, isLoading, isFetching, isError, error, refetch } = useQuery<TickectAll>({
     queryKey: [
       'ticket_all',
       filterLocal?.from,
@@ -295,7 +282,7 @@ const shouldEnable = () => {
     staleTime: 0,
     gcTime: 0,
     placeholderData: undefined,
-    enabled: shouldEnable(),
+    enabled: Boolean(filterLocal),
    
   });
 
@@ -485,67 +472,7 @@ const top_duration = [
         </div>
       </section>
 
-
-      {/* <section className="mt-[104px] px-4 xl:px-0">
-        <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-9 xl:h-[488px]">
-          <div className="flex items-center gap-6 max-lg:flex-col max-lg:items-start">
-            <div className="w-full max-w-[924px] space-y-4">
-              <h2 className="text-[32px] font-bold leading-[39px] text-black">
-                {t('Вас может заинтересовать')}
-              </h2>
-              <p className="text-base font-normal leading-5 text-black">
-                {t(
-                  'Собираетесь куда-нибудь отпраздновать этот сезон? Независимо от того, едете ли вы домой или отправляетесь в путешествие, у нас есть инструменты для организации поездок, которые помогут вам добраться до места назначения.',
-                )}
-              </p>
-            </div>
-            <Button className="flex h-[54px] w-[292px] items-center justify-center rounded-[19px] bg-[#FF6B00] px-4 py-4 text-sm font-medium text-white hover:bg-[#ff7a1f]">
-              <span className="flex w-[260px] items-center justify-between">
-                <span>{t('Смотреть все')}</span>
-                <EastIcon sx={{ fontSize: 22 }} />
-              </span>
-            </Button>
-          </div>
-
-          <div className="hidden grid-cols-1 gap-6 md:grid-cols-2 xl:grid">
-            {interestedTours.map((item: any, index: number) => (
-              <InterestedTourCard
-                key={item.id}
-                item={item}
-                index={index}
-                locale={locale as LanguageRoutes}
-              />
-            ))}
-          </div>
-          <div className="xl:hidden">
-            <Carousel
-              opts={{
-                align: 'start',
-                dragFree: true,
-              }}
-              className="w-full"
-            >
-              <CarouselContent className="-ml-3">
-                {interestedTours.map((item: any, index: number) => (
-                  <CarouselItem
-                    key={item.id}
-                    className="basis-[88%] pl-3 sm:basis-[60%]"
-                  >
-                    <InterestedTourCard
-                      item={item}
-                      index={index}
-                      locale={locale as LanguageRoutes}
-                    />
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-            </Carousel>
-          </div>
-        </div>
-      </section> */}
-
-
-      <div className="custom-container mt-[104px] flex w-full gap-6 max-lg:flex-col">
+      <div className="custom-container  mt-[104px] mx-auto flex w-full max-w-[1240px] gap-6 max-lg:flex-col">
         <motion.div
           initial={{ opacity: 0, x: -40 }}
           animate={{ opacity: 1, x: 0 }}
@@ -564,40 +491,56 @@ const top_duration = [
           </div>
           <div className="flex h-[56px] w-full items-center justify-between rounded-[14px] bg-white px-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
             <div className="flex items-center gap-4">
-              {/* <FilterListIcon sx={{ color: '#1A73E8', fontSize: 24 }} />
+              <FilterListIcon sx={{ color: '#1A73E8', fontSize: 24 }} />
               <p className="text-sm font-medium leading-[17px] text-[#6B7280]">
                 {t('По возрастанию цены')}
-              </p> */}
-                <Select
-                  onValueChange={(value) => {
-                    if (value === 'cheaper') {
-                      setCheaper(true);
-                      setExpensive(false);
-                    } else if (value === 'expensive') {
-                      setCheaper(false);
-                      setExpensive(true);
-                    } else if (value === 'all') {
-                      setCheaper(false);
-                      setExpensive(false);
-                    }
-                  }}
-                >
-                  <SelectTrigger  className="w-full !h-[40px] flex items-center justify-between
-             max-lg:w-full rounded-lg gap-4 bg-[#FFFFFF]">
-                    <SelectValue placeholder={t('По возрастанию цены')} />
-                    <KeyboardArrowDownIcon />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">{t('Все')}</SelectItem>
-                    <SelectItem value="cheaper">{t('Подешевле')}</SelectItem>
-                    <SelectItem value="expensive">{t('Подороже')}</SelectItem>
-                  </SelectContent>
-                </Select>
+              </p>
             </div>
-            {/* <KeyboardArrowDownIcon sx={{ color: '#6B7280', fontSize: 16 }} /> */}
+            <KeyboardArrowDownIcon sx={{ color: '#6B7280', fontSize: 16 }} />
           </div>
 
-        
+          <div className="hidden w-full rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
+          <FilterSection title={t('Стоимость')} icon={<BadgeDollarSign size={24} color="#1A73E8" />}>
+            <Slider
+              range
+              min={2500000}
+              max={100000000}
+              value={priceRange}
+              className="placeholder:!text-[#909091] !text-[#909091]"
+              onChange={(v) => {
+                setPriceRange(v as number[]);
+                setCurrentPage(1);
+              }}
+            />
+            <div className="flex justify-between mt-3 border border-[#DFDFDF] rounded-xl p-3">
+              <input
+                type="text"
+                value={formatPrice(priceRange[0])}
+                placeholder="2 500 000"
+                onChange={(e) => {
+                  handleInputChange(e.target.value, 0);
+                  setCurrentPage(1);
+                }}
+                className={clsx(
+                  'w-1/2 border-none outline-none',
+                  priceRange[0] ? 'text-[#212122]' : 'text-[#909091]',
+                )}
+              />
+              <input
+                type="text"
+                value={formatPrice(priceRange[1])}
+                onChange={(e) => {
+                  handleInputChange(e.target.value, 1);
+                  setCurrentPage(1);
+                }}
+                className={clsx(
+                  'w-1/2 border-none outline-none text-right',
+                  priceRange[1] ? 'text-[#212122]' : 'text-[#909091]',
+                )}
+              />
+            </div>
+          </FilterSection>
+          </div>
 
     
 
@@ -622,8 +565,8 @@ const top_duration = [
             />
           </FilterSection> */}
 
-          <div className="w-full rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
-          <FilterSection title={t('Продолжительность тура')} icon="/icons/time.png">
+          <div className="h-[360px] w-full overflow-hidden rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
+          <FilterSection title={t('Продолжительность тура')} icon={<Clock3 size={24} color="#1A73E8" />}>
             {top_duration &&
               [...top_duration]
                 .sort((a, b) => a.duration - b.duration)
@@ -642,8 +585,8 @@ const top_duration = [
           </FilterSection>
           </div>
 
-          <div className="w-full rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
-         <FilterSection title={t('Регионы и курорты')} icon='/icons/country.png'>
+          <div className="h-[385px] w-full overflow-hidden rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
+         <FilterSection title={t('Страна')} icon={<Flag size={24} color="#1A73E8" />}>
           {country &&
             (() => {
               // Tanlangan regionni topamiz
@@ -692,6 +635,9 @@ const top_duration = [
                         paramName="town"
                       />
                     ))}
+                  <p className="mt-3 w-full text-right text-xs font-medium text-[#6B7280] underline">
+                    {t('Еще')}
+                  </p>
                 </div>
               );
             })()}
@@ -699,7 +645,7 @@ const top_duration = [
         </div>
 
           <div className="w-full rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
-<FilterSection title={t('Категория отеля')} icon='/icons/stars.png'>
+<FilterSection title={t('Категория отеля')} defaultHidden icon={<StarIcon sx={{ fontSize: 24, color: '#1A73E8' }} />}>
   {["5","4","3","2"].map((rating) => (
     <CheckboxFilter
       key={rating}
@@ -741,7 +687,7 @@ const top_duration = [
           </FilterSection> */}
 
           <div className="w-full rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
-       <FilterSection title={t('Отель')} icon="/icons/hotel.png">
+       <FilterSection title={t('Отель')} defaultHidden icon={<Building2 size={24} color="#1A73E8" />}>
         {displayedHotels.map((hotel) => (
           <CheckboxFilter
             key={hotel.id}
@@ -783,7 +729,7 @@ const top_duration = [
 
 
           <div className="w-full rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
-          <FilterSection title={t('Питание')} icon="/icons/meal-2.png">
+          <FilterSection title={t('Питание')} defaultHidden icon={<Utensils size={24} color="#1A73E8" />}>
             {meal?.map((e) => (
               <CheckboxFilter
                 value={String(e.id)}
@@ -799,26 +745,8 @@ const top_duration = [
           </FilterSection>
           </div>
 
-          {hotel_features_by_type.map((row) => (
-            <FilterSection key={row.type} title={row.type}>
-              {row.features &&
-                row.features.length > 0 &&
-                row.features.map((feature, i) => (
-                  <CheckboxFilter
-                    key={i}
-                    value={feature}
-                    onclick={setCurrentPage}
-                    label={feature}
-                    setChecked={setHotelFeature}
-                    selectedValue={hotelFeature}
-                    exclusive
-                    paramName="feature"
-                  />
-                ))}
-            </FilterSection>
-          ))}
-            <div className="w-full rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
-          <FilterSection title={t('Стоимость')} icon="/icons/money.png">
+          <div className="w-full rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
+          <FilterSection title={t('Цена')} icon={<BadgeDollarSign size={24} color="#1A73E8" />}>
             <Slider
               range
               min={2500000}
@@ -830,7 +758,7 @@ const top_duration = [
                 setCurrentPage(1);
               }}
             />
-            <div className="flex justify-between mt-3 border border-[#DFDFDF] rounded-xl p-3">
+            <div className="mt-3 flex justify-between rounded-xl border border-[#DFDFDF] p-3">
               <input
                 type="text"
                 value={formatPrice(priceRange[0])}
@@ -840,8 +768,8 @@ const top_duration = [
                   setCurrentPage(1);
                 }}
                 className={clsx(
-                  'w-1/2 border-none outline-none',
-                  priceRange[0] ? 'text-[#212122]' : 'text-[#909091]',
+                  'w-1/2 border-none text-xs leading-3 outline-none',
+                  priceRange[0] ? 'text-[#848484]' : 'text-[#909091]',
                 )}
               />
               <input
@@ -852,29 +780,13 @@ const top_duration = [
                   setCurrentPage(1);
                 }}
                 className={clsx(
-                  'w-1/2 border-none outline-none text-right',
-                  priceRange[1] ? 'text-[#212122]' : 'text-[#909091]',
+                  'w-1/2 border-none text-right text-xs leading-3 outline-none',
+                  priceRange[1] ? 'text-[#848484]' : 'text-[#909091]',
                 )}
               />
             </div>
           </FilterSection>
           </div>
-
-          {/* <FilterSection title={t('Дополнительно')}>
-            {hotel_amenities &&
-              hotel_amenities.map((e) => (
-                <CheckboxFilter
-                  key={e}
-                  value={e}
-                  label={e}
-                  onclick={setCurrentPage}
-                  setChecked={setHotelAmenitie}
-                  selectedValue={hotelAmenities}
-                  exclusive
-                  paramName="amenitie"
-                />
-              ))}
-          </FilterSection> */}
         </motion.div>
 
         <motion.div
@@ -924,9 +836,31 @@ const top_duration = [
               </Button>
             </div>
 
-        
+            <FilterSection title={t('Стоимость')}>
+              <Slider
+                range
+                min={2500000}
+                max={100000000}
+                value={priceRange}
+                onChange={(v) => setPriceRange(v as number[])}
+              />
+              <div className="flex justify-between mt-3 border border-[#DFDFDF] rounded-xl p-3">
+                <input
+                  type="text"
+                  value={formatPrice(priceRange[0])}
+                  onChange={(e) => handleInputChange(e.target.value, 0)}
+                  className="w-1/2 border-none outline-none text-gray-600"
+                />
+                <input
+                  type="text"
+                  value={formatPrice(priceRange[1])}
+                  onChange={(e) => handleInputChange(e.target.value, 1)}
+                  className="w-1/2 border-none outline-none text-right text-gray-600"
+                />
+              </div>
+            </FilterSection>
 
-            {/* <FilterSection title={t('Название отеля')} icon="/icons/hotel.png">
+            <FilterSection title={t('Название отеля')}>
               <input
                 type="text"
                 value={hotelName}
@@ -934,7 +868,7 @@ const top_duration = [
                 onChange={(e) => setHotelName(e.target.value)}
                 className="w-full border rounded-xl px-3 py-2 outline-none"
               />
-            </FilterSection> */}
+            </FilterSection>
 
             {/* <FilterSection title={t('Условия въезда')}>
               <CheckboxFilter
@@ -957,7 +891,7 @@ const top_duration = [
               />
             </FilterSection> */}
 
-            <FilterSection title={t('Продолжительность тура')} icon="/icons/time.png">
+            <FilterSection title={t('Продолжительность тура')}>
               {durationDays &&
                 [...durationDays]
                   .sort((a, b) => a.duration - b.duration)
@@ -975,7 +909,7 @@ const top_duration = [
                   ))}
             </FilterSection>
 
-            <FilterSection title={t('Регионы и курорты')} icon="/icons/country.png">
+            <FilterSection title={t('Регионы и курорты')}>
                {country &&
             (() => {
               // Tanlangan regionni topamiz
@@ -1028,34 +962,46 @@ const top_duration = [
               );
             })()}
             </FilterSection>
-             
-              <FilterSection title={t('Категория отеля')} icon="/icons/stars.png">
-                {["5","4","3","2"].map((rating) => (
-                  <CheckboxFilter
-                    key={rating}
-                    value={rating}
-                    label={t(`${rating} звезды`)}
-                    setChecked={(val) => {
-                      setHotelRating(val ? rating : null);
-                      setCurrentPage(1);
+<FilterSection title={t('Категория отеля')}>
+  {["5","4","3","2"].map((rating) => (
+    <CheckboxFilter
+      key={rating}
+      value={rating}
+      label={t(`${rating} звезды`)}
+      setChecked={(val) => {
+        setHotelRating(val ? rating : null);
+        setCurrentPage(1);
 
-                      // URL parametrlardan hotel_id va operatorni olib tashlash
-                      const params = new URLSearchParams(window.location.search);
-                      params.delete("hotel_id");
-                      params.delete("operator");
+        // URL parametrlardan hotel_id va operatorni olib tashlash
+        const params = new URLSearchParams(window.location.search);
+        params.delete("hotel_id");
+        params.delete("operator");
 
-                      router.push(`/selectour?${params.toString()}`);
-                    }}
-                    selectedValue={hotelRating}
-                    exclusive
-                    paramName="rating"
-                  />
-                ))}
-              </FilterSection>
+        router.push(`/selectour?${params.toString()}`);
+      }}
+      selectedValue={hotelRating}
+      exclusive
+      paramName="rating"
+    />
+  ))}
+</FilterSection>
 
-         
+            <FilterSection title={t('Питание')}>
+              {meal?.map((e) => (
+                <CheckboxFilter
+                  value={String(e.id)}
+                  label={e.name}
+                  key={e.id}
+                  onclick={setCurrentPage}
+                  setChecked={setMealPlan}
+                  selectedValue={mealPlan}
+                  exclusive
+                  paramName="meal"
+                />
+              ))}
+            </FilterSection>
 
-            {/* <FilterSection title={t('Тип отеля')} icon="/icons/stars.png">
+            <FilterSection title={t('Тип отеля')}>
               {hotel_type &&
                 hotel_type.map((e) => (
                   <CheckboxFilter
@@ -1069,9 +1015,9 @@ const top_duration = [
                     paramName="type-hotel"
                   />
                 ))}
-            </FilterSection> */}
+            </FilterSection>
 
-            <FilterSection title={t('Отели')} icon="/icons/hotel.png">
+            <FilterSection title={t('Отели')}>
               {displayedHotels.map((hotel) => (
                 <CheckboxFilter
                   key={hotel.id}
@@ -1127,48 +1073,8 @@ const top_duration = [
                   ))}
               </FilterSection>
             ))}
-            
-            
-               <FilterSection title={t('Питание')} icon="/icons/meal-2.png">
-              {meal?.map((e) => (
-                <CheckboxFilter
-                  value={String(e.id)}
-                  label={e.name}
-                  key={e.id}
-                  onclick={setCurrentPage}
-                  setChecked={setMealPlan}
-                  selectedValue={mealPlan}
-                  exclusive
-                  paramName="meal"
-                />
-              ))}
-            </FilterSection>
 
-                <FilterSection title={t('Стоимость')}>
-              <Slider
-                range
-                min={2500000}
-                max={100000000}
-                value={priceRange}
-                onChange={(v) => setPriceRange(v as number[])}
-              />
-              <div className="flex justify-between mt-3 border border-[#DFDFDF] rounded-xl p-3">
-                <input
-                  type="text"
-                  value={formatPrice(priceRange[0])}
-                  onChange={(e) => handleInputChange(e.target.value, 0)}
-                  className="w-1/2 border-none outline-none text-gray-600"
-                />
-                <input
-                  type="text"
-                  value={formatPrice(priceRange[1])}
-                  onChange={(e) => handleInputChange(e.target.value, 1)}
-                  className="w-1/2 border-none outline-none text-right text-gray-600"
-                />
-              </div>
-            </FilterSection>
-
-            {/* <FilterSection title={t('Дополнительно')}>
+            <FilterSection title={t('Дополнительно')}>
               {hotel_amenities &&
                 hotel_amenities.map((e) => (
                   <CheckboxFilter
@@ -1182,7 +1088,7 @@ const top_duration = [
                     paramName="amenitie"
                   />
                 ))}
-            </FilterSection> */}
+            </FilterSection>
             <div className="sticky bottom-0 w-full left-0">
               <button
                 className="bg-[#1764FC] rounded-3xl p-3 w-full text-white cursor-pointer font-semibold"
@@ -1207,7 +1113,7 @@ const top_duration = [
                 ease: 'easeOut',
               }}
             >
-              <div className="w-full flex justify-between items-center max-lg:flex-col max-lg:items-start max-lg:gap-5">
+              <div className="w-full flex  justify-between items-center max-lg:flex-col max-lg:items-start max-lg:gap-5">
                 <h1 className="font-bold text-2xl text-start flex items-center gap-1 max-md:text-lg max-sm:text-sm">
                   {regionName ? (
                     <>
@@ -1229,7 +1135,7 @@ const top_duration = [
                   )}
                 </h1>
 
-                {/* <Select
+                <Select
                   onValueChange={(value) => {
                     if (value === 'cheaper') {
                       setCheaper(true);
@@ -1252,22 +1158,47 @@ const top_duration = [
                     <SelectItem value="cheaper">{t('Подешевле')}</SelectItem>
                     <SelectItem value="expensive">{t('Подороже')}</SelectItem>
                   </SelectContent>
-                </Select> */}
+                </Select>
               </div>
             </motion.div>
 
             <div className="mt-6">
-              {isLoading ? (
-                <div className="flex flex-col justify-center items-center min-h-screen bg-[#edeef1]">
+              {!filterLocal ? (
+                <div className="flex min-h-[420px] flex-col items-center justify-center rounded-[14px] bg-white">
                   <Player
                     autoplay
                     loop
                     src={loaderAnimation}
-                    style={{ height: '240px', width: '240px' }}
+                    style={{ height: '180px', width: '180px' }}
                   />
-                  {/* <p className="text-xl font-semibold mt-3 text-gray-700">
-                    {t('Загрузка')}
-                  </p> */}
+                  <p className="mt-2 text-base font-medium text-[#6B7280]">
+                    {t('Подготавливаем параметры поиска...')}
+                  </p>
+                </div>
+              ) : isLoading || isFetching ? (
+                <div className="flex min-h-[420px] flex-col items-center justify-center rounded-[14px] bg-white">
+                  <Player
+                    autoplay
+                    loop
+                    src={loaderAnimation}
+                    style={{ height: '180px', width: '180px' }}
+                  />
+                  <p className="mt-2 text-base font-medium text-[#6B7280]">{t('Загрузка туров...')}</p>
+                </div>
+              ) : isError ? (
+                <div className="flex min-h-[420px] flex-col items-center justify-center rounded-[14px] bg-white px-6 text-center">
+                  <p className="text-xl font-semibold text-[#121212]">
+                    {t('Не удалось загрузить туры')}
+                  </p>
+                  <p className="mt-2 text-sm text-[#6B7280]">
+                    {(error as Error)?.message || t('Проверьте интернет и попробуйте снова')}
+                  </p>
+                  <Button
+                    onClick={() => refetch()}
+                    className="mt-6 rounded-[12px] bg-[#1A73E8] px-6 py-2 text-white"
+                  >
+                    {t('Повторить')}
+                  </Button>
                 </div>
               ) : (
                 <>

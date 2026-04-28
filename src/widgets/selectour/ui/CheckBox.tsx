@@ -104,7 +104,7 @@ function CheckboxFilter<T extends string | string[] | null>({
         className="h-6 w-6 cursor-pointer rounded-[2px] border-[#6B7280] data-[state=checked]:border-[#1A73E8] data-[state=checked]:bg-[#1A73E8]"
         onCheckedChange={handleChange}
       />
-      <Label className="cursor-pointer text-sm font-normal leading-[17px] text-[#6B7280]" htmlFor={value}>
+      <Label className="cursor-pointer text-sm font-medium leading-[17px] text-[#6B7280]" htmlFor={value}>
         {label}
       </Label>
     </label>

@@ -15,12 +15,21 @@ import { Skeleton } from '@/shared/ui/skeleton';
 import Swiper from '@/shared/ui/swiper';
 import Ticket_Api from '@/widgets/selectour/lib/api';
 import EmojiObjectsOutlinedIcon from '@mui/icons-material/EmojiObjectsOutlined';
+import EastIcon from '@mui/icons-material/East';
 import ErrorIcon from '@mui/icons-material/Error';
+import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
+import Groups2OutlinedIcon from '@mui/icons-material/Groups2Outlined';
+import HotelOutlinedIcon from '@mui/icons-material/HotelOutlined';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import LocalCafeOutlinedIcon from '@mui/icons-material/LocalCafeOutlined';
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
+import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
+import StarBorderRoundedIcon from '@mui/icons-material/StarBorderRounded';
+import TimelapseOutlinedIcon from '@mui/icons-material/TimelapseOutlined';
+import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Rating from '@mui/material/Rating';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import * as LucideIcons from 'lucide-react';
@@ -43,7 +52,6 @@ import HotelInfoItem from './HotelInfoItem';
 import TourDayItem from './TourDayItem';
 import TourDetailLoading from './TourDetailLoading';
 import TourFoodItem from './TourFoodItem';
-import TourItem from './TourItem';
 import TourOffersItem from './TourOffersItem';
 import WantHelpModal from './WantHelpModal';
 import WatchTour from './WatchTour';
@@ -74,8 +82,16 @@ export default function SingleTour() {
     : tourid
       ? Number(tourid.split('-').pop())
       : undefined;
-  
-  
+
+  const formatShortDate = (value?: string) => {
+    if (!value) return '--.--.--';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '--.--.--';
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = String(date.getFullYear()).slice(-2);
+    return `${day}.${month}.${year}`;
+  };
 
   const { data, isLoading } = useQuery({
     queryKey: ['tickets_detail', tourOperatorId],
@@ -110,16 +126,37 @@ export default function SingleTour() {
     queryKey: ['get_me'],
     queryFn: () => User_Api.getMe(),
   });
+  const queryClient = useQueryClient();
+
+  const { mutate: addLike } = useMutation({
+    mutationFn: ({ ticket }: { ticket: number }) => Ticket_Api.saveTickets({ ticket }),
+    onSuccess() {
+      queryClient.refetchQueries({ queryKey: ['ticket_all'] });
+      queryClient.refetchQueries({ queryKey: ['get_saved'] });
+      queryClient.refetchQueries({ queryKey: ['tickets_detail'] });
+    },
+    onError() {
+      route.push(
+        `/auth/login?callbackUrl=${encodeURIComponent(window.location.href)}`,
+      );
+    },
+  });
+
+  const { mutate: removeLike } = useMutation({
+    mutationFn: ({ ticket }: { ticket: number }) => Ticket_Api.removeTickets({ id: ticket }),
+    onSuccess() {
+      queryClient.refetchQueries({ queryKey: ['ticket_all'] });
+      queryClient.refetchQueries({ queryKey: ['get_saved'] });
+      queryClient.refetchQueries({ queryKey: ['tickets_detail'] });
+    },
+  });
 
   const [openWatch, setOpenWatch] = useState<boolean>(false);
   const [openHelp, setOpenHelp] = useState<boolean>(false);
   const [openHelpMobile, setOpenHelpMobile] = useState<boolean>(false);
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
-  const [canScrollPrevTour, setCanScrollPrevTour] = useState(false);
-  const [canScrollNextTour, setCanScrollNextTour] = useState(false);
   const [api, setApi] = useState<CarouselApi>();
-  const [tourApi, setTourApi] = useState<CarouselApi>();
 
   useEffect(() => {
     if (!api) return;
@@ -132,18 +169,6 @@ export default function SingleTour() {
     updateButtons();
     api.on('select', updateButtons);
   }, [api]);
-
-  useEffect(() => {
-    if (!tourApi) return;
-
-    const updateButtons = () => {
-      setCanScrollNextTour(tourApi.canScrollNext());
-      setCanScrollPrevTour(tourApi.canScrollPrev());
-    };
-
-    updateButtons();
-    tourApi.on('select', updateButtons);
-  }, [tourApi]);
 
   const items = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   const STEP = 250;
@@ -194,9 +219,34 @@ export default function SingleTour() {
     return <TourDetailLoading />;
   }
 
+  const visibleIncludedServices = data?.ticket_included_services || [];
+  const includedServicesToRender =
+    visibleIncludedServices.length > 0
+      ? visibleIncludedServices
+      : [
+          { image: Hotel1.src, title: t('Трансфер'), desc: t('Включено') },
+          { image: Hotel1.src, title: t('Трансфер'), desc: t('Не включено') },
+          { image: Hotel1.src, title: t('Трансфер'), desc: t('Не включено') },
+        ];
+
+  const amenitiesToRender =
+    data.ticket_amenities?.length > 0
+      ? data.ticket_amenities
+      : [
+          { icon_name: 'Waves', name: t('Открытый бассейн') },
+          { icon_name: 'Waves', name: t('Закрытый бассейн') },
+          { icon_name: 'Flower2', name: t('Спа- и оздоровительный центр') },
+          { icon_name: 'UtensilsCrossed', name: t('Ресторан') },
+          { icon_name: 'Bell', name: t('Обслуживание номеров') },
+          { icon_name: 'Dumbbell', name: t('Фитнес зал') },
+          { icon_name: 'Wine', name: t('Бар') },
+          { icon_name: 'Wifi', name: t('Бесплатный Wi Fi') },
+          { icon_name: 'Coffee', name: t('Чай/Кофе машина') },
+        ];
+
 
   return (
-    <div className="bg-white">
+    <div className="bg-white pb-[72px]">
       <div>
         <AnimatePresence>
           <motion.div
@@ -216,20 +266,7 @@ export default function SingleTour() {
         </AnimatePresence>
         {isLoading ? (
           <Skeleton className="h-[400px] w-full bg-gray-200" />
-        ) : (
-          <>
-            {data && (
-              <div className="flex flex-col gap-[20px]">
-                <Swiper
-                  id={data.id}
-                  is_liked={data.is_liked}
-                  images={data.ticket_images}
-                  setOpenWatch={setOpenWatch}
-                />
-              </div>
-            )}
-          </>
-        )}
+        ) : null}
 
         {openWatch && data && (
           <WatchTour
@@ -247,78 +284,145 @@ export default function SingleTour() {
                 whileInView="visible"
                 viewport={{ once: false, amount: 0.2 }}
                 variants={fadeInUp}
+                className="pt-2 flex flex-col gap-6"
               >
-                <div className="flex items-center justify-between mt-5 max-lg:flex-col max-lg:items-start gap-10">
-                  <div>
-                    <div className="flex items-center gap-[4px]">
-                      <Rating
-                        name="read-only"
-                        size="medium"
-                        value={data.rating}
-                        readOnly
-                        sx={{ color: '#F08125' }}
-                        precision={0.1}
-                      />
+                <Breadcrumbs
+                  aria-label="breadcrumb"
+                  separator={<EastIcon fontSize="small" className="text-[#112211]/70" />}
+                  sx={{
+                    '& .MuiBreadcrumbs-separator': {
+                      mx: 1,
+                    },
+                  }}
+                >
+                  <Link href="/" className="text-[14px] text-[#FF6B00]">
+                    {t('Главная')}
+                  </Link>
+                  <Link href="/selectour" className="text-[14px] text-[#FF6B00]">
+                    {t('Подобрать тур')}
+                  </Link>
+                  <p className="text-[14px] text-[#112211]/70">{data.title}</p>
+                </Breadcrumbs>
+
+                <div className="flex items-end justify-between gap-8 max-lg:flex-col max-lg:items-start">
+                  <div className="flex max-w-[684px] flex-col gap-6">
+                    <div className="flex items-center gap-6 max-md:flex-col max-md:items-start max-md:gap-2">
+                      <h1 className="text-[20px] leading-[24px] font-bold text-[#112211]">
+                        {data.title}
+                      </h1>
+                      <div className="flex items-center gap-2">
+                        <Rating
+                          name="read-only"
+                          size="small"
+                          value={data.rating}
+                          readOnly
+                          sx={{ color: '#FF6B00' }}
+                          precision={0.1}
+                        />
+                        <p className="text-[14px] font-medium text-[#112211]">
+                          {Math.round(data.rating || 0)} {t('звездочный отель')}
+                        </p>
+                      </div>
                     </div>
-                    <h1 className="text-[32px] txt-[#212122] font-bold">
-                      {data.title}
-                    </h1>
 
-                    <div className="flex items-center gap-[8px]">
-                      <LocationOnIcon sx={{ color: '#084FE3' }} />
-
-                      <p className="text-[#084FE3]">{data.destination?.name}</p>
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-4">
+                        <LocationOnIcon sx={{ color: '#1A73E8', fontSize: 20 }} />
+                        <p className="text-[14px] font-medium text-[#112211]/75">
+                          {data.destination?.name}
+                        </p>
+                        <span className="rounded-[14px] bg-[#F59E0B] px-3 py-1 text-[14px] font-medium text-[#1C1C1E]/75">
+                          {t('Необходима Виза')}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <HotelOutlinedIcon sx={{ color: '#1A73E8', fontSize: 20 }} />
+                        <p className="text-[14px] font-medium text-[#112211]/75">
+                          {t('Отель')} {data.ticket_hotel?.[0]?.name}
+                        </p>
+                      </div>
                     </div>
                   </div>
 
-                  <div>
-                    <h1 className="text-[32px] text-[#212122] font-bold">
-                      {formatPrice(data.price, locale as LanguageRoutes, true)}
+                  <div className="flex w-full max-w-[301px] flex-col items-end gap-4 max-lg:items-start">
+                    <h1 className="text-right text-[24px] leading-[29px] max-lg:text-left font-bold text-[#1C1C1E]">
+                      {formatPrice(data.price, locale as LanguageRoutes, true)} /{' '}
+                      <span className="text-[24px] font-normal">
+                        1 {t('человек')}
+                      </span>
                     </h1>
-                    <div className="flex items-center gap-[8px]">
-                      <ErrorIcon sx={{ color: '#084FE3' }} />
-                      <p className="text-[#646465]">
-                        {t('Без скрытых комиссий')}
-                      </p>
+                    <div className="flex items-center gap-6">
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          if (data.is_liked) {
+                            removeLike({ ticket: data.id });
+                          } else {
+                            addLike({ ticket: data.id });
+                          }
+                        }}
+                        className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-[0_0_4px_rgba(0,0,0,0.15)]"
+                      >
+                        <FavoriteRoundedIcon
+                          sx={{ color: data.is_liked ? '#E03137' : '#9CA3AF', fontSize: 20 }}
+                        />
+                      </button>
+                      {user ? (
+                        <Link href={`/booking/${data.id}`}>
+                          <motion.button
+                            whileTap={{ scale: 0.95 }}
+                            className="h-12 w-[186px] rounded-[16px] bg-[#FF6B00] px-4 text-[14px] font-semibold text-white"
+                          >
+                            {t('Забронировать')}
+                          </motion.button>
+                        </Link>
+                      ) : (
+                        <motion.button
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => {
+                            route.push(
+                              `/auth/login?callbackUrl=${encodeURIComponent(window.location.href)}`,
+                            );
+                          }}
+                          className="h-12 w-[186px] rounded-[16px] bg-[#FF6B00] px-4 text-[14px] font-semibold text-white"
+                        >
+                          {t('Забронировать')}
+                        </motion.button>
+                      )}
                     </div>
                   </div>
                 </div>
               </motion.div>
-
               <motion.div
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: false, amount: 0.2 }}
                 variants={fadeInUp}
-                className="grid grid-cols-5 w-full items-start mt-5 gap-5 max-xl:grid-cols-2 max-md:grid-cols-1"
+                className="mt-4"
               >
-                {data.ticket_amenities?.map((info, index) => {
-                  const IconComponent =
-                    LucideIcons[
-                      info.icon_name as keyof typeof LucideIcons.icons
-                    ];
-
-                  return (
-                    <div
-                      key={index}
-                      className="flex items-center h-full gap-3 px-4 py-2 rounded-lg bg-[#EFF2F6] shadow-sm"
-                    >
-                      {IconComponent ? (
-                        <IconComponent className="w-5 h-5 text-[#232325]" />
-                      ) : null}
-                      <p className="text-[14px] flex-1 break-words text-[#232325]">
-                        {info.name}
-                      </p>
-                    </div>
-                  );
-                })}
+                <Swiper
+                  id={data.id}
+                  is_liked={data.is_liked}
+                  images={data.ticket_images}
+                  setOpenWatch={setOpenWatch}
+                />
               </motion.div>
+
               <motion.div
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: false, amount: 0.2 }}
                 variants={fadeInUp}
-                className="flex items-center gap-4 mt-5 max-lg:flex-col"
+                className="hidden"
+              />
+
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: false, amount: 0.2 }}
+                variants={fadeInUp}
+                className="hidden items-center gap-4 mt-5 max-lg:flex-col"
               >
                 {user ? (
                   <Link href={`/booking/${data.id}`} className="max-lg:w-full">
@@ -368,413 +472,251 @@ export default function SingleTour() {
                 whileInView="visible"
                 viewport={{ once: false, amount: 0.2 }}
                 // variants={slideIn}
-                className="mt-[60px]"
+                className="mt-[72px] mb-[72px] flex w-full max-w-[1240px] flex-col gap-8 h-[342px] max-xl:h-auto"
               >
-                <h1 className="text-[28px] font-bold text-[#232325]">
-                  {t('Описание отеля')}
-                </h1>
-                <p className="w-full text-md mt-5 text-[#636363]">
-                  {data.hotel_info}
-                </p>
-                <div
-                  className={clsx(
-                    'grid gap-[10px] max-lg:grid-cols-1 max-lg:w-full',
-                    data.languages.length > 0 && data.ticket_hotel.length > 0
-                      ? 'grid-cols-6'
-                      : 'grid-cols-5',
-                    data?.hotel_info.length > 0 ? 'mt-5' : 'mt-0',
-                  )}
-                >
+                <div className="flex w-full h-[165px] flex-col items-start gap-4 max-lg:h-auto">
+                  <h1 className="text-[24px] leading-[29px] font-bold text-[#1C1C1E]">
+                    {t('Описание отеля')} {data.ticket_hotel?.[0]?.name}
+                  </h1>
+                  <p className="w-full h-[120px] overflow-hidden text-[16px] leading-5 font-medium text-[#1C1C1E]/75">
+                    {data.hotel_info}
+                  </p>
+                </div>
+                <div className="flex w-full h-[145px] items-start gap-6 overflow-visible max-xl:h-auto max-xl:flex-wrap">
+                  <motion.div
+                    whileHover={{ scale: 1.03 }}
+                    className="h-[145px] w-[187px] shrink-0 rounded-[12px] bg-[#1A73E8] p-4"
+                  >
+                    <div className="flex h-full flex-col justify-between">
+                      <p className="text-[32px] leading-10 font-bold text-white">
+                        {Number(data.rating || 0).toFixed(1)}
+                      </p>
+                      <div className="flex flex-col gap-1">
+                        <p className="text-[16px] leading-5 font-bold text-white">
+                          {t('Очень хорошо')}
+                        </p>
+                        <p className="text-[14px] leading-[17px] font-medium text-white">
+                          {data.ticket_comments?.length || 0} {t('отзывов')}
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+
                   {[
-                    data.ticket_hotel.length > 0 && {
-                      id: data.ticket_hotel[0].id + '-name',
-                      img: Hotel1,
-                      title: data.ticket_hotel[0].name,
-                      name: t('Отели'),
-                    },
-                    data.ticket_hotel.length > 0 && {
-                      id: data.ticket_hotel[0].id + '-rating',
+                    {
+                      id: 'hotel-type',
                       img: Hotel_Star,
-                      title: typeof data.ticket_hotel[0].rating === 'string' &&
-                            /^\d/.test(data.ticket_hotel[0].rating) // agar 3*, 4* kabi bo‘lsa
-                        ? `${data.ticket_hotel[0].rating} ${t('yulduzli')}`
-                        : data.ticket_hotel[0].rating, // string bo‘lsa faqat o‘zini ko‘rsat
-                      name: /^\d/.test(data.ticket_hotel[0].rating)
-                        ? t('yulduzli')
-                        : data.ticket_hotel[0].rating,
+                      name: t('Тип отеля'),
+                      title: `${data.ticket_hotel?.[0]?.rating || '-'} ${t('звездочный')}`,
+                      iconNode: <StarBorderRoundedIcon sx={{ color: '#1A73E8', fontSize: 24 }} />,
                     },
                     {
                       id: 'meal',
                       img: Hotel_MEAL,
+                      name: t('Питание'),
                       title: (() => {
                         const meal = data.ticket_hotel?.[0]?.meal_plan;
                         const mealMap: Record<string, string> = {
-                            full_board: t('Полный пансион'),
-                            breakfast: t('Завтрак'),
-                            half_board: t('Полупансион'),
-                            all_inclusive: t('Все включено'),
-                            room_only: t('Без питания'),
-                          };
+                          full_board: t('Полный пансион'),
+                          breakfast: t('Завтрак'),
+                          half_board: t('Полупансион'),
+                          all_inclusive: t('Все включено'),
+                          room_only: t('Без питания'),
+                        };
                         return mealMap[meal] || t('Все включено');
                       })(),
-                      name: t('Питание'),
+                      iconNode: <LocalCafeOutlinedIcon sx={{ color: '#1A73E8', fontSize: 24 }} />,
                     },
                     {
                       id: 'duration',
                       img: Hotel2,
-                      title: t('Продолжительность'),
-                      name: `${data.duration_days} ${t('дня')}`,
+                      name: t('Длительность'),
+                      title: `${data.duration_days} ${t('дней')}`,
+                      iconNode: <TimelapseOutlinedIcon sx={{ color: '#1A73E8', fontSize: 24 }} />,
                     },
                     {
                       id: 'group_size',
                       img: Hotel3,
-                      title: t('Размер группы'),
-                      name: `${data.passenger_count} ${t('человек')}`,
+                      name: t('Количество'),
+                      title: `${data.passenger_count} ${t('человек')}`,
+                      iconNode: <Groups2OutlinedIcon sx={{ color: '#1A73E8', fontSize: 24 }} />,
                     },
-                    data.languages.length > 0 && {
-                      id: 'languages',
+                    {
+                      id: 'tour-date',
                       img: Hotel4,
-                      title: t('Языки'),
-                      name: data.languages,
+                      name: t('Дата тура'),
+                      title: (() => {
+                        const start = formatShortDate(data.departure_date);
+                        const endDate = new Date(data.departure_date);
+                        if (!Number.isNaN(endDate.getTime())) {
+                          endDate.setDate(endDate.getDate() + Math.max((data.duration_days || 1) - 1, 0));
+                        }
+                        const end = Number.isNaN(endDate.getTime())
+                          ? '--.--.--'
+                          : formatShortDate(endDate.toISOString());
+                        return `${start} - ${end}`;
+                      })(),
+                      iconNode: <CalendarMonthOutlinedIcon sx={{ color: '#1A73E8', fontSize: 24 }} />,
                     },
-                  ]
-                    .filter(Boolean)
-                    /* eslint-disable  @typescript-eslint/no-explicit-any */
-                    .map((item: any, index) => (
-                      <motion.div
-                        key={item.id}
-                        custom={index}
-                        initial="hidden"
-                        whileInView="visible"
-                        viewport={{ once: false, amount: 0.2 }}
-                        // variants={slideIn}
-                        whileHover={{ scale: 1.05 }}
-                        className="w-full max-lg:w-full h-full max-lg:h-auto cursor-pointer flex flex-col max-lg:flex-row-reverse justify-between p-[20px] bg-[#EDEEF140] border border-[#EDEEF1] shadow-md rounded-[20px] relative"
-                      >
-                        <HotelInfoItem
-                          img={item.img}
-                          title={item.title}
-                          name={item.name}
-                        />
-                      </motion.div>
-                    ))}
-                </div>
-              </motion.div>
-              {data.ticket_included_services.length > 0 && (
-                <motion.div
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: false, amount: 0.2 }}
-                  // variants={slideIn}
-                  className="custom-container mt-20"
-                >
-                  <div className="flex justify-between items-center">
-                    <p className="text-3xl text-[#031753] font-semibold">
-                      {t('Что включено в стоимость тура')}
-                    </p>
-                    <div className="flex gap-4">
-                      <Button
-                        variant={'outline'}
-                        className="rounded-full w-10 h-10 max-lg:hidden"
-                        onClick={() => tourApi?.scrollPrev()}
-                        disabled={!canScrollPrevTour}
-                      >
-                        <KeyboardBackspaceIcon sx={{ color: '#031753' }} />
-                      </Button>
-                      <Button
-                        variant={'outline'}
-                        className="rounded-full w-10 h-10 max-lg:hidden"
-                        onClick={() => tourApi?.scrollNext()}
-                        disabled={!canScrollNextTour}
-                      >
-                        <KeyboardBackspaceIcon
-                          sx={{ rotate: '180deg', color: '#031753' }}
-                        />
-                      </Button>
-                    </div>
-                  </div>
-                  <Carousel
-                    className="w-full mt-4 cursor-pointer"
-                    setApi={setTourApi}
-                  >
-                    <CarouselContent>
-                      {data.ticket_included_services?.map((item, key) => (
-                        <CarouselItem
-                          key={key}
-                          className="flex flex-col w-auto basis-1/5 max-xl:basis-1/3 max-lg:basis-1/2 
-                          max-md:basis-[60%] shrink-0 font-medium"
-                        >
-                          <TourItem key={`${item}-${key}`} data={item} />
-                        </CarouselItem>
-                      ))}
-                    </CarouselContent>
-                  </Carousel>
-                </motion.div>
-              )}
-            </div>
-          </div>
-
-          <div className="w-full bg-[#EDEEF1] rounded-[32px] mt-[60px]">
-            <div className="custom-container py-30">
-              <motion.div
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: false, amount: 0.2 }}
-                // variants={slideIn}
-                className="w-full p-[33px] max-lg:p-4 max-lg:h-[500px] rounded-[20px] text-white bg-linear-to-r from-[#1764FC] to-[#42B5CD] flex items-center max-lg:items-start justify-between relative z-10"
-              >
-                <div>
-                  <h1 className="text-[28px] font-bold">
-                    {t('План путешествия')}
-                  </h1>
-                  <p className="text-[16px]">
-                    {t('Каждый день — новые впечатления')}
-                  </p>
-                  <div className="flex items-center gap-[12px] mt-[24px] py-[12px] bg-linear-to-r from-[#347afb] to-[#1881ef] rounded-[20px] px-[20px]">
-                    <WatchLaterIcon sx={{ width: '28px', height: '28px' }} />
-                    <div className="flex max-md:flex-col gap-1">
-                      <h1 className="text-[16px] font-bold">
-                        {t('Продолжительность тура')}
-                      </h1>
-                      <p className="text-[16px]">
-                        {data.duration_days} {t('дня')}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="absolute right-[10px] lg:-top-[60px] -z-10 lg:pr-[70px] max-lg:left-1 max-lg:bottom-0">
-                  <div className="w-[345px] h-[256px] max-lg:w-[100%] max-lg:h-full relative">
-                    <Image
-                      src={Statue.src}
-                      alt={Statue.src}
-                      className="w-full h-full"
-                      width={500}
-                      height={500}
-                    />
-                  </div>
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: false, amount: 0.2 }}
-                // variants={slideIn}
-                className="mt-10 max-lg:hidden"
-              >
-                {data.ticket_itinerary?.map((item, key) => (
-                  <motion.div
-                    key={key}
-                    custom={key}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: false, amount: 0.2 }}
-                    variants={slideIn}
-                  >
-                    <TourDayItem
-                      key={key}
-                      data={item}
-                      isLast={key + 1 === data.ticket_itinerary?.length}
-                      isFirst={key + 1 === 1}
-                    />
-                  </motion.div>
-                ))}
-              </motion.div>
-
-              <div className="h-auto lg:hidden mt-10">
-                {data.ticket_itinerary && (
-                  <Carousel className="w-full cursor-pointer" setApi={setApi}>
-                    <CarouselContent>
-                      {data.ticket_itinerary?.map((item, key) => (
-                        <CarouselItem
-                          key={key}
-                          className="flex flex-col w-auto basis-[80%] shrink-0 font-medium"
-                        >
-                          <TourDayItem
-                            key={key}
-                            data={item}
-                            isLast={key + 1 === data.ticket_itinerary?.length}
-                            isFirst={key + 1 === 1}
-                          />
-                        </CarouselItem>
-                      ))}
-                    </CarouselContent>
-                  </Carousel>
-                )}
-              </div>
-              {data.ticket_hotel_meals.length > 0 && (
-                <motion.div
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: false, amount: 0.2 }}
-                  // variants={slideIn}
-                  className="mt-20"
-                >
-                  <h1 className="font-bold text-[28px] text-[#232325]">
-                    {t('Что подают в отеле')}
-                  </h1>
-                  <p className="w-[50%] max-lg:w-full text-sm text-[#636363] mt-[12px]">
-                    {data.hotel_meals}
-                  </p>
-
-                  <div className="w-full flex items-center mt-10 gap-[18px]">
-                    <Carousel
-                      opts={{
-                        align: 'start',
-                        loop: true,
-                      }}
-                      className="w-full"
+                  ].map((item) => (
+                    <motion.div
+                      key={item.id}
+                      whileHover={{ scale: 1.03 }}
+                      className="h-[145px] w-[186px] shrink-0 rounded-[12px] border border-[#1A73E8] p-4 flex flex-col items-start gap-8"
                     >
-                      <CarouselContent className="-ml-4">
-                        {data.ticket_hotel_meals?.map((item, index) => (
-                          <CarouselItem
-                            key={index}
-                            className="flex flex-col w-auto basis-1/5 max-xl:basis-1/3 max-lg:basis-1/3 max-md:basis-[50%] max-[420px]:!basis-[70%] shrink-0 font-medium"
-                          >
-                            <TourFoodItem food={item} />
-                          </CarouselItem>
-                        ))}
-                      </CarouselContent>
-                    </Carousel>
-                  </div>
-                </motion.div>
-              )}
-
-              <div className="mt-10">
+                      <HotelInfoItem
+                        img={item.img}
+                        title={item.title}
+                        name={item.name}
+                        iconNode={item.iconNode}
+                      />
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+              {includedServicesToRender.length > 0 && (
                 <motion.div
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: false, amount: 0.2 }}
-                  // variants={fadeInUp}
+                  variants={fadeInUp}
+                  className="mt-[72px]"
                 >
-                  <h1 className="font-bold text-[28px] text-[#232325]">
-                    {t('Важно знать перед поездкой')}
-                  </h1>
+                  <div className="h-px w-full bg-[#11221140]" />
+
+                  <div className="mt-[72px] flex w-full max-w-[1240px] flex-col items-start gap-8">
+                    <h3 className="text-[20px] leading-6 font-bold text-[#112211]">
+                      {t('Что включено в стоимость тура')}
+                    </h3>
+
+                    <div className="flex w-full flex-col items-start gap-4">
+                      {includedServicesToRender.slice(0, 3).map((item, index) => {
+                        const normalized = `${item.title || ''} ${item.desc || ''}`.toLowerCase();
+                        const isIncluded = normalized.includes('включ')
+                          ? true
+                          : normalized.includes('не включ')
+                            ? false
+                            : index === 0;
+
+                        return (
+                          <div key={`${item.title}-${index}`} className="w-full">
+                            <div className="flex w-full items-center justify-between gap-10 max-md:flex-col max-md:items-start max-md:gap-4">
+                              <div className="flex items-center gap-4">
+                                <div className="relative h-12 w-12 overflow-hidden rounded-[14px]">
+                                  <Image
+                                    src={item.image || Hotel1.src}
+                                    alt={item.title || 'service'}
+                                    fill
+                                    className="object-cover"
+                                  />
+                                </div>
+                                <p className="text-[16px] leading-5 font-medium text-[#112211]">
+                                  {item.title || t('Трансфер')}
+                                </p>
+                              </div>
+
+                              <div
+                                className={clsx(
+                                  'flex h-12 w-[186px] items-center justify-center rounded-[14px] border-2 px-4 text-[14px] leading-[17px] font-semibold',
+                                  isIncluded
+                                    ? 'border-[#1A73E8] text-[#1A73E8]'
+                                    : 'border-[#F59E0B] text-[#F59E0B]',
+                                )}
+                              >
+                                {isIncluded ? t('Включено') : t('Не включено')}
+                              </div>
+                            </div>
+
+                            {index !== Math.min(includedServicesToRender.length, 3) - 1 && (
+                              <div className="mt-4 h-px w-full bg-[#11221140]" />
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </motion.div>
+              )}
 
-                <div className="flex items-center justify-between mt-[24px] gap-[24px] max-lg:flex-col">
-                  <motion.div
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: false, amount: 0.2 }}
-                    // variants={{
-                    //   hidden: { opacity: 0, x: -60 },
-                    //   visible: () => ({
-                    //     opacity: 1,
-                    //     x: 0,
-                    //     transition: { delay: 0.5, duration: 0.5 },
-                    //   }),
-                    // }}
-                    className="bg-linear-to-b from-[#084FE3] text-white to-[#0A3CA9] w-[360px] h-[360px] max-lg:w-full rounded-[20px] flex flex-col justify-between p-[32px]"
-                  >
-                    <div>
-                      <h1 className="text-[24px] font-bold">
-                        {t('ID Турфирмы')}
-                      </h1>
-                      <p className="text-sm mt-[10px] text-[#EDEEF1]">
-                        {t(
-                          'Официально зарегистрированная компания в реестре туроператоров',
+              {amenitiesToRender.length > 0 && (
+                <motion.div
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: false, amount: 0.2 }}
+                  variants={fadeInUp}
+                  className="mt-[72px]"
+                >
+                  <div className="h-px w-full bg-[#11221140]" />
+
+                  <div className="mt-[72px] flex h-[272px] w-full max-w-[715px] flex-col items-start gap-8 max-lg:h-auto">
+                    <h3 className="text-[20px] leading-6 font-bold text-[#112211]">
+                      {t('Преимущества отеля размещения:')}
+                    </h3>
+
+                    <div className="flex h-[216px] w-full items-start gap-[229px] max-xl:h-auto max-xl:gap-12 max-md:flex-col">
+                      <div className="flex w-[299px] max-w-full flex-col items-start gap-6">
+                        {amenitiesToRender.slice(0, 5).map((amenity, index) => {
+                          const IconComponent =
+                            LucideIcons[
+                              amenity.icon_name as keyof typeof LucideIcons.icons
+                            ];
+
+                          return (
+                            <div key={`left-${index}`} className="flex items-center gap-2">
+                              {IconComponent ? (
+                                <IconComponent className="h-6 w-6 text-[#112211]" />
+                              ) : (
+                                <div className="h-6 w-6 rounded-full bg-[#112211]" />
+                              )}
+                              <p className="text-[16px] leading-5 font-medium text-[#112211]">
+                                {amenity.name}
+                              </p>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      <div className="flex w-[187px] max-w-full flex-col items-start gap-6">
+                        {amenitiesToRender.slice(5, 9).map((amenity, index) => {
+                          const IconComponent =
+                            LucideIcons[
+                              amenity.icon_name as keyof typeof LucideIcons.icons
+                            ];
+
+                          return (
+                            <div key={`right-${index}`} className="flex items-center gap-2">
+                              {IconComponent ? (
+                                <IconComponent className="h-6 w-6 text-[#112211]" />
+                              ) : (
+                                <div className="h-6 w-6 rounded-full bg-[#112211]" />
+                              )}
+                              <p className="text-[16px] leading-5 font-medium text-[#112211]">
+                                {amenity.name}
+                              </p>
+                            </div>
+                          );
+                        })}
+
+                        {amenitiesToRender.length > 9 && (
+                          <p className="text-[16px] leading-5 font-semibold text-[#F59E0B]">
+                            {t('еще')} +{amenitiesToRender.length - 9}
+                          </p>
                         )}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="w-[90%] rounded-[8px] bg-[#FFFFFF1F] p-[10px] text-[#FFFFFF]">
-                        {t('ID')}: {data.travel_agency_id}
-                      </div>
-
-                      <div
-                        className="w-[20%] bg-[#FFFFFF] justify-center items-center rounded-md cursor-pointer flex h-full"
-                        onClick={() => {
-                          if (navigator.clipboard) {
-                            navigator.clipboard
-                              .writeText(data.travel_agency_id)
-                              .then(() => {
-                                toast.success(t('URL nusxalandi'), {
-                                  position: 'top-center',
-                                });
-                              });
-                          }
-                        }}
-                      >
-                        <Copy color="#000" width={24} height={24} />
                       </div>
                     </div>
-                  </motion.div>
-                  <motion.div
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: false, amount: 0.2 }}
-                    // variants={{
-                    //   hidden: { opacity: 0, x: 60 },
-                    //   visible: () => ({
-                    //     opacity: 1,
-                    //     x: 0,
-                    //     transition: { delay: 0.5, duration: 0.5 },
-                    //   }),
-                    // }}
-                    className="w-full p-[32px] h-[360px] max-lg:h-full bg-[#FFFFFF] rounded-[20px]"
-                  >
-                    <h1 className="font-bold text-[24px] text-[#212122]">
-                      {t('Требование по визе')}
-                    </h1>
-                    <p className="text-sm mt-[10px] text-[#636363]">
-                      {t(
-                        'Мы поможем с оформлением и предоставим список документов',
-                      )}
-                      .
-                    </p>
-
-                    <div className="flex flex-col">
-                      <div className="flex items-center gap-5 mt-[20px]">
-                        <div className="border border-[#DFDFDF] p-[10px] rounded-[8px]">
-                          <Hourglass width={20} height={20} />
-                        </div>
-                        <div className="w-full">
-                          <p className="font-bold text-[#031753]">
-                            {t('Срок оформления: 7–10 дней')}
-                          </p>
-                          <hr />
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-5 mt-[20px]">
-                        <div className="border border-[#DFDFDF] p-[10px] rounded-[8px]">
-                          <Scroll width={20} height={20} />
-                        </div>
-                        <div className="w-full">
-                          <p className="font-bold text-[#031753]">
-                            {t(
-                              'Необходимые документы: загранпаспорт (действителен минимум 6 месяцев), фото, анкета, медицинская страховка',
-                            )}
-                          </p>
-                          <hr />
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-5 mt-[20px]">
-                        <div className="border border-[#DFDFDF] p-[10px] rounded-[8px]">
-                          <EmojiObjectsOutlinedIcon width={20} height={20} />
-                        </div>
-                        <div className="w-full">
-                          <p className="font-bold text-[#031753]">
-                            {t(
-                              'В некоторых странах виза не требуется (уточняйте при бронировании)',
-                            )}
-                          </p>
-                          <hr />
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                </div>
-              </div>
+                  </div>
+                </motion.div>
+              )}
             </div>
           </div>
 
-          <div className="mt-10 custom-container bg-[#FFFF] py-10">
-            <CommentTour data={data} />
+          <div className="custom-container">
+            <div className="mt-[72px] h-px w-full bg-[#11221140]" />
+            <div className="mt-[72px]">
+              <CommentTour data={data} />
+            </div>
             {hotTicket && hotTicket.data.results.tickets.length > 0 && (
-              <div className="mt-10">
+              <div className="mt-[72px]">
                 <div className="custom-container flex justify-between items-center">
                   <motion.h1
                     initial="hidden"

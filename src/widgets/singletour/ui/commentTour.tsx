@@ -1,20 +1,54 @@
-import { Carousel, CarouselContent, CarouselItem } from '@/shared/ui/carousel';
 import Rating from '@mui/material/Rating';
 import { useMutation } from '@tanstack/react-query';
-import { motion } from 'framer-motion';
-import { Plus, Send, XIcon } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Flag, Send } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { TicketsDetailAPi } from '../lib/api';
 import { ToursDetailData } from '../lib/data';
-import ReviewsItem from './ReviewsItem';
 
 const CommentTour = ({ data }: { data: ToursDetailData }) => {
   const t = useTranslations();
   const [showForm, setShowForm] = useState(false);
   const [rating, setRating] = useState<number>(0);
   const [comment, setComment] = useState<string>('');
+
+  const fallbackComments = [
+    {
+      user: { id: 1, username: 'Имя Фамилия' },
+      text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      rating: 5,
+    },
+    {
+      user: { id: 2, username: 'Имя Фамилия' },
+      text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      rating: 5,
+    },
+    {
+      user: { id: 3, username: 'Имя Фамилия' },
+      text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      rating: 5,
+    },
+    {
+      user: { id: 4, username: 'Имя Фамилия' },
+      text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      rating: 5,
+    },
+    {
+      user: { id: 5, username: 'Имя Фамилия' },
+      text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      rating: 5,
+    },
+  ];
+
+  const comments = data.ticket_comments?.length > 0 ? data.ticket_comments : fallbackComments;
+  const averageRating =
+    data.ticket_comments?.length > 0
+      ? data.ticket_comments.reduce((acc, item) => acc + Number(item.rating || 0), 0) /
+        data.ticket_comments.length
+      : 4.2;
+  const totalComments = data.ticket_comments?.length > 0 ? data.ticket_comments.length : 37;
+
   const { mutate } = useMutation({
     mutationFn: (body: { text: string; rating: number; ticket: number }) =>
       TicketsDetailAPi.sendCommet(body),
@@ -33,88 +67,49 @@ const CommentTour = ({ data }: { data: ToursDetailData }) => {
   });
 
   return (
-    <div className="w-full h-full relative max-lg:h-full rounded-[24px] bg-gradient-to-r from-[#ABDAFF] to-[#F5EDC7] py-[32px]">
-      <motion.h1
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: false, amount: 0.2 }}
-        // variants={{
-        //   hidden: { opacity: 0, x: -60 },
-        //   visible: () => ({
-        //     opacity: 1,
-        //     x: 0,
-        //     transition: { delay: 0.5, duration: 0.5 },
-        //   }),
-        // }}
-        className="text-[24px] font-bold text-center mb-6 text-[#232325]"
-      >
-        {t('Отзывы наших клиентов')}
-      </motion.h1>
-      <motion.button
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: false, amount: 0.2 }}
-        // variants={{
-        //   hidden: { opacity: 0, x: -60 },
-        //   visible: () => ({
-        //     opacity: 1,
-        //     x: 0,
-        //     transition: { delay: 0.5, duration: 0.5 },
-        //   }),
-        // }}
+    <div className="flex w-full max-w-[1240px] flex-col items-start gap-6 max-lg:gap-8">
+      <div className="flex h-12 w-full items-center justify-between gap-6 max-md:flex-col max-md:items-start max-md:h-auto">
+        <h3 className="text-[20px] leading-6 font-bold text-[#112211]">{t('Отзывы о гостинице')}</h3>
+        <button
+          type="button"
         onClick={() => setShowForm(!showForm)}
         disabled={!data.allow_comment}
-        className={`flex items-center gap-2 py-2 px-4 m-auto mb-10 rounded-2xl border shadow-xl
+          className={`h-12 w-[187px] rounded-[14px] border px-4 text-[14px] leading-[17px] font-semibold
     ${
       data.allow_comment
-        ? 'bg-white/40 backdrop-blur-sm cursor-pointer text-[#232325] hover:bg-white/60 hover:shadow-2xl border-white/50'
-        : 'bg-gray-200 cursor-pointer text-gray-400 border-gray-300 opacity-70 shadow-inner'
+              ? 'cursor-pointer border-[#1A73E8] text-[#1A73E8]'
+        : 'cursor-not-allowed border-gray-300 text-gray-400'
     }`}
       >
-        {showForm ? (
-          <>
-            <XIcon
-              className={`size-5 ${
-                data.allow_comment ? 'text-[#232325]' : 'text-gray-400'
-              }`}
-            />
-            {t('Bekor qilish')}
-          </>
-        ) : (
-          <>
-            <Plus
-              className={`size-5 ${
-                data.allow_comment ? 'text-[#232325]' : 'text-gray-400'
-              }`}
-            />
-            {t('Izoh qoldirish')}
-          </>
-        )}
-      </motion.button>
+          {showForm ? t('Скрыть форму') : t('Оставить отзыв')}
+        </button>
+      </div>
+
+      <div className="flex items-center gap-4 max-md:flex-wrap">
+        <p className="text-[48px] leading-[59px] font-bold text-[#112211]">
+          {Number(averageRating || 0).toFixed(1)}
+        </p>
+        <div className="flex flex-col items-start gap-2">
+          <p className="text-[20px] leading-6 font-semibold text-[#112211]">{t('Очень хорошо')}</p>
+          <p className="text-[14px] leading-[17px] font-normal text-[#112211]">
+            {totalComments} {t('отзывов')}
+          </p>
+        </div>
+      </div>
+
+      <div className="h-px w-full bg-[#11221140]" />
+
       {showForm ? (
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: false, amount: 0.2 }}
-          // variants={{
-          //   hidden: { opacity: 0, y: 40 },
-          //   visible: (i: number) => ({
-          //     opacity: 1,
-          //     y: 0,
-          //     transition: { delay: i * 0.1, duration: 0.5 },
-          //   }),
-          // }}
-          className="px-4 max-w-full mx-auto"
-        >
-          <div className="bg-white/40 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/50">
-            <h3 className="text-3xl font-bold text-[#232325] mb-8 text-center bg-gradient-to-r from-[#084FE3] to-[#0A6EFF] bg-clip-text">
+        <div className="w-full rounded-[14px] border border-[#11221126] p-6">
+          <div className="mx-auto max-w-full">
+            <h3 className="mb-8 text-center text-3xl font-bold text-[#232325]">
               {t('Sizning fikringiz')}
             </h3>
 
             <div className="space-y-8">
-              <div className="bg-white/60 rounded-xl p-6 shadow-sm">
+              <div className="rounded-xl bg-white p-6">
                 <label className="text-[#232325] font-bold mb-4 text-lg flex items-center gap-2">
-                  <span className="bg-gradient-to-r from-[#084FE3] to-[#0A6EFF] text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#1A73E8] text-sm text-white">
                     1
                   </span>
                   {t('Reytingni tanlang')}
@@ -137,9 +132,9 @@ const CommentTour = ({ data }: { data: ToursDetailData }) => {
                 </div>
               </div>
 
-              <div className="bg-white/60 rounded-xl p-6 shadow-sm">
+              <div className="rounded-xl bg-white p-6">
                 <label className="text-[#232325] font-bold mb-4 text-lg flex items-center gap-2">
-                  <span className="bg-gradient-to-r from-[#084FE3] to-[#0A6EFF] text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#1A73E8] text-sm text-white">
                     2
                   </span>
                   {t('Izohingizni yozing')}
@@ -152,9 +147,7 @@ const CommentTour = ({ data }: { data: ToursDetailData }) => {
                 />
               </div>
 
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+              <button
                 disabled={!rating || !comment.trim()}
                 onClick={() => {
                   mutate({
@@ -163,68 +156,62 @@ const CommentTour = ({ data }: { data: ToursDetailData }) => {
                     ticket: data.id,
                   });
                 }}
-                className="w-full bg-gradient-to-r cursor-pointer from-[#084FE3] to-[#0A6EFF] text-white py-5 rounded-xl font-bold text-lg hover:shadow-2xl transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
+                className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-xl bg-[#1A73E8] py-5 text-lg font-bold text-white transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <Send size={24} />
                 {t('Yuborish')}
-              </motion.button>
+              </button>
             </div>
           </div>
-        </motion.div>
+        </div>
       ) : (
-        <>
-          {data.ticket_comments?.length > 0 ? (
-            <Carousel className="w-full mt-4 cursor-pointer px-4">
-              <CarouselContent>
-                {data.ticket_comments?.map((item, key) => (
-                  <CarouselItem
-                    key={item.user.id}
-                    className={
-                      'flex flex-col w-auto basis-1/3 max-lg:basis-1/2 max-md:basis-[70%] shrink-0 font-medium'
-                    }
-                  >
-                    <motion.div
-                      key={key}
-                      custom={key}
-                      initial="hidden"
-                      whileInView="visible"
-                      viewport={{ once: false, amount: 0.2 }}
-                      // variants={{
-                      //   hidden: { opacity: 0, y: 40 },
-                      //   visible: (i: number) => ({
-                      //     opacity: 1,
-                      //     y: 0,
-                      //     transition: { delay: i * 0.1, duration: 0.5 },
-                      //   }),
-                      // }}
-                    >
-                      <ReviewsItem key={key} data={item} />
-                    </motion.div>
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-            </Carousel>
-          ) : (
-            <>
-              <motion.div
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: false, amount: 0.2 }}
-                // variants={{
-                //   hidden: { opacity: 0, y: 40 },
-                //   visible: (i: number) => ({
-                //     opacity: 1,
-                //     y: 0,
-                //     transition: { delay: i * 0.1, duration: 0.5 },
-                //   }),
-                // }}
-                className="text-xl font-medium w-full h-full flex justify-center items-center text-[#232325]"
-              >
-                {t('Пока нет комментариев')}
-              </motion.div>
-            </>
-          )}
-        </>
+        <div className="flex w-full flex-col items-start gap-6">
+          {comments.slice(0, 5).map((item, index) => (
+            <div key={`${item.user.id}-${index}`} className="w-full">
+              <div className="flex w-full items-start gap-4 max-md:flex-col">
+                <div className="flex h-[45px] w-[45px] shrink-0 items-center justify-center rounded-full bg-[#D9D9D9] text-[14px] font-semibold text-[#112211]">
+                  {(item.user.username || 'UF')
+                    .split(' ')
+                    .slice(0, 2)
+                    .map((v) => v[0] || '')
+                    .join('')
+                    .toUpperCase()}
+                </div>
+
+                <div className="flex flex-1 flex-col items-start gap-2">
+                  <div className="flex items-center gap-2 max-md:flex-wrap">
+                    <p className="text-[16px] leading-5 font-semibold text-[#112211]">
+                      {Number(item.rating || 0).toFixed(1)} {t('Превосходно')}
+                    </p>
+                    <span className="text-[16px] leading-5 font-normal text-[#112211]">|</span>
+                    <p className="text-[16px] leading-5 font-normal text-[#112211]">
+                      {item.user.username || t('Имя Фамилия')}
+                    </p>
+                  </div>
+                  <p className="break-words text-[14px] leading-[17px] font-normal text-[#112211]">
+                    {item.text}
+                  </p>
+                </div>
+
+                <Flag className="mt-0.5 h-5 w-5 shrink-0 text-[#112211BF] max-md:self-end" />
+              </div>
+
+              {index !== Math.min(comments.length, 5) - 1 && (
+                <div className="mt-6 h-px w-full bg-[#11221140]" />
+              )}
+            </div>
+          ))}
+
+          <div className="flex w-full items-center justify-center gap-6">
+            <button type="button" className="cursor-pointer text-[#6B7280]">
+              <ChevronLeft className="h-6 w-6" />
+            </button>
+            <p className="text-[16px] leading-5 font-medium text-[#1C1C1E]">1 из 9</p>
+            <button type="button" className="cursor-pointer text-[#6B7280]">
+              <ChevronRight className="h-6 w-6" />
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

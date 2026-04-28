@@ -87,10 +87,10 @@ const Navbar = () => {
                 <Image
                   src={Logo}
                   alt="Logo"
-                  width={187}
-                  height={62}
+                  width={148}
+                  height={56}
                   priority
-                  className="h-auto w-auto"
+                  className="h-auto w-37 2xl:w-41"
                 />
               </Link>
 

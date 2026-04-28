@@ -417,6 +417,12 @@ declare const messages: {
   "Banner yuklashda xatolik yuz berdi": "Banner yuklashda xatolik yuz berdi",
   "Qayta urinish": "Qayta urinish",
   "Filter uchun Kerakli davlat va shaharni tanlang": "Filter uchun Kerakli davlat va shaharni tanlang",
-  "Переходи в раздел “Подобрать тур”, чтобы ознакомиться со всеми турами": "Barcha turlarni ko'rish uchun “Tur tanlash” bo'limiga o'ting"
+  "Переходи в раздел “Подобрать тур”, чтобы ознакомиться со всеми турами": "Barcha turlarni ko'rish uchun “Tur tanlash” bo'limiga o'ting",
+  "Более 26 000 проверенных туров для вашего безупречного отдыха": "Sizning mukammal dam olishingiz uchun 26 000 dan ortiq ishonchli turlar",
+  "Лучшие предложения, отобранные вручную": "Qo'lda saralangan eng yaxshi takliflar",
+  "Настройте свой отдых": "Dam olishni moslang",
+  "Страна": "Davlat",
+  "Цена": "Narx",
+  "Подготавливаем параметры поиска...": "Qidiruv parametrlari tayyorlanmoqda..."
 };
 export default messages;

@@ -7,7 +7,7 @@ import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
-import { CalendarDays, Hotel, MapPin, Star } from 'lucide-react';
+import { CalendarDays, Coffee, Hotel, MapPin, Star } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
@@ -85,6 +85,20 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
     }
   }
 
+  const getMealShort = (meal?: string) => {
+    if (!meal) return 'BB';
+    const normalized = meal.toLowerCase().replace(/\s+/g, '_');
+    const mealMap: Record<string, string> = {
+      breakfast: 'BB',
+      bed_breakfast: 'BB',
+      half_board: 'HB',
+      full_board: 'FB',
+      all_inclusive: 'AI',
+      ultra_all_inclusive: 'UAI',
+    };
+    return mealMap[normalized] || meal.toUpperCase();
+  };
+
   return (
     <Link
       href={`/selectour/${data?.slug}?from_cache=${data?.from_cache}`}
@@ -119,67 +133,56 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
 
         <div className="flex h-full w-[627px] flex-col bg-white px-6 pb-6 pt-6 max-lg:w-full">
           <div className="flex items-start justify-between gap-6 max-lg:gap-3">
-           
             <div className="flex w-[386px] flex-col gap-4 max-lg:w-full">
               <h1 className="min-h-12 text-[20px] font-bold leading-6 text-[#1C1C1E] line-clamp-2">
                 {data.title}
               </h1>
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
-                  {/* <MapPin color="#1A73E8" className="size-6" /> */}
-                  <img src="/icons/location.png" alt="location" className="w-6 h-6" />
+                  <MapPin color="#1A73E8" className="size-6" />
                   <p className="text-sm font-medium leading-[17px] text-[#6B7280]/80">
                     {data.destination?.name}
                   </p>
                 </div>
                 {data.ticket_hotel.length > 0 && (
                   <div className="flex items-center gap-2">
-                    {/* <Hotel color="#1A73E8" className="size-6" /> */}
-                      <img src="/icons/hotel.png" alt="hotel" className="w-6 h-6" />
+                    <Hotel color="#1A73E8" className="size-6" />
                     <p className="line-clamp-1 text-sm font-medium leading-[17px] text-[#6B7280]/80">
                       {data.ticket_hotel[0].name}
                     </p>
                   </div>
                 )}
+                
+                <div className="flex items-center gap-8 max-lg:flex-wrap max-lg:gap-4">
                   {data.ticket_hotel.length > 0 && (
-                    <div className="flex items-center  gap-6">
-                      {/* Hotel rating */}
-                      <div className="flex items-center gap-2">
-                        <img src="/icons/stars.png" alt="stars" className="w-6 h-6" />
-                        <p className="text-sm font-semibold leading-[17px] text-[#1C1C1E]">
-                          {/^\d/.test(String(data.ticket_hotel[0].rating))
-                            ? `${data.ticket_hotel[0].rating} ${t('звёзды')}`
-                            : data.ticket_hotel[0].rating}
-                        </p>
-                      </div>
-
-                      {/* Meal plan */}
-                      <div className="flex items-center gap-2">
-                        <img src="/icons/meal.png" alt="meal" className="w-6 h-6" />
-                        <p className="text-sm font-semibold leading-[17px] text-[#1C1C1E]">
-                          {data.ticket_hotel[0]?.meal_plan || 'BB'}
-                        </p>
-                      </div>
-
-                      {/* Duration days */}
-                      <div className="flex items-center gap-2">
-                        <img src="/icons/time.png" alt="time" className="w-6 h-6" />
-                        <p className="text-sm font-semibold leading-[17px] text-[#1C1C1E]">
-                          {data.duration_days || '7'} {t('дней')}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
+                  <div className="flex items-center gap-2">
+                    <Star color="#1A73E8" className="size-6" />
+                    <p className="whitespace-nowrap text-sm font-semibold leading-[17px] text-[#1C1C1E]">
+                      {/^\d/.test(String(data.ticket_hotel[0].rating))
+                        ? `${data.ticket_hotel[0].rating} ${t('звёзды')}`
+                        : data.ticket_hotel[0].rating}
+                    </p>
+                  </div>
+                )}
+                  <div className="flex items-center gap-2 shrink-0">
+                    <Coffee color="#1A73E8" className="size-6" />
+                    <p className="whitespace-nowrap text-sm font-semibold leading-[17px] text-[#1C1C1E]">
+                      {getMealShort(data.ticket_hotel[0]?.meal_plan)}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <CalendarDays color="#1A73E8" className="size-6" />
+                    <p className="whitespace-nowrap text-sm font-semibold leading-[17px] text-[#1C1C1E]">
+                      {`${data.duration_days || data.nights || 7} ${t('дней')}`}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
 
-
-            <div className="flex w-[153px] flex-col items-end">
-              <p className="text-right text-sm font-medium leading-[17px] text-[#6B7280]/75 line-through">
-                {formatPrice(data.price * 1.1, locale as LanguageRoutes, true)}
-
-
+            <div className="flex w-[153px] shrink-0 flex-col items-end max-lg:w-auto max-lg:min-w-[108px]">
+              <p className="whitespace-nowrap text-right text-sm font-medium leading-[17px] text-[#6B7280]/75 line-through max-lg:text-xs">
+                {formatPrice(data.price * 1.55, locale as LanguageRoutes, true)}
               </p>
               <p className="whitespace-nowrap text-right text-2xl font-bold leading-[29px] text-[#FF6B00] max-lg:text-xl max-lg:leading-6">
                 {formatPrice(data.price, locale as LanguageRoutes, true)}
