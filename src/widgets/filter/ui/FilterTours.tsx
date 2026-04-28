@@ -793,7 +793,7 @@ const defaultitems = selectedCountry
         >
           <span className="flex items-center gap-4">
             <SearchIcon className="size-6" />
-            <p>{t('Искать тур')}</p>
+            <p>{t('Искать туры')}</p>
           </span>
         </Button>
       </div>

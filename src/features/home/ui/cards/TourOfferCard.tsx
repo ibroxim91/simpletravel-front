@@ -24,7 +24,8 @@ interface TourOfferCardProps {
   starsText: string;
 }
 
-const TourOfferCard = ({
+const 
+TourOfferCard = ({
   item,
   index = 0,
   locale,
@@ -89,7 +90,7 @@ const TourOfferCard = ({
                       {item.title}
                     </p>
                     <p className="text-sm font-medium text-[#6B7280]">
-                      {item.duration || t('9 дней') || fallbackDurationText}
+                      {item.duration_days} {t('дней')}
                     </p>
                   </div>
 
@@ -103,13 +104,15 @@ const TourOfferCard = ({
                     <div className="flex items-center gap-2">
                       <BusinessIcon sx={{ fontSize: 24, color: '#1A73E8' }} />
                       <span className="block min-w-0 truncate">
-                        {item.ticket_hotel?.[0]?.name || t('Отель hotels') || fallbackHotelText}
+                        {item.ticket_hotel?.[0]?.name  || fallbackHotelText}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <StarIcon sx={{ fontSize: 24, color: '#1A73E8' }} />
                       <span className="block min-w-0 truncate">
-                        {t('3 звездочный') || starsText}
+                       {/^\d/.test(String(item.ticket_hotel[0].rating))
+                        ? `${item.ticket_hotel[0].rating} ${t('звёзды')}`
+                        : item.ticket_hotel[0].rating}
                       </span>
                     </div>
                   </div>

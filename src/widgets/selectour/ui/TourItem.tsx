@@ -119,41 +119,58 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
 
         <div className="flex h-full w-[627px] flex-col bg-white px-6 pb-6 pt-6 max-lg:w-full">
           <div className="flex items-start justify-between gap-6 max-lg:gap-3">
+           
             <div className="flex w-[386px] flex-col gap-4 max-lg:w-full">
               <h1 className="min-h-12 text-[20px] font-bold leading-6 text-[#1C1C1E] line-clamp-2">
                 {data.title}
               </h1>
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
-                  <MapPin color="#1A73E8" className="size-6" />
+                  {/* <MapPin color="#1A73E8" className="size-6" /> */}
+                  <img src="/icons/location.png" alt="location" className="w-6 h-6" />
                   <p className="text-sm font-medium leading-[17px] text-[#6B7280]/80">
                     {data.destination?.name}
                   </p>
                 </div>
                 {data.ticket_hotel.length > 0 && (
                   <div className="flex items-center gap-2">
-                    <Hotel color="#1A73E8" className="size-6" />
+                    {/* <Hotel color="#1A73E8" className="size-6" /> */}
+                      <img src="/icons/hotel.png" alt="hotel" className="w-6 h-6" />
                     <p className="line-clamp-1 text-sm font-medium leading-[17px] text-[#6B7280]/80">
                       {data.ticket_hotel[0].name}
                     </p>
                   </div>
                 )}
-                {data.ticket_hotel.length > 0 && (
-                  <div className="flex items-center gap-2">
-                    <Star color="#1A73E8" className="size-6" />
-                    <p className="text-sm font-semibold leading-[17px] text-[#1C1C1E]">
-                      {/^\d/.test(String(data.ticket_hotel[0].rating))
-                        ? `${data.ticket_hotel[0].rating} ${t('звёзды')}`
-                        : data.ticket_hotel[0].rating}
-                    </p>
-                  </div>
-                )}
-                <div className="flex items-center gap-2">
-                  <CalendarDays color="#1A73E8" className="size-6" />
-                  <p className="text-sm font-semibold leading-[17px] text-[#1C1C1E]">
-                    {data.ticket_hotel[0]?.meal_plan || 'BB'}
-                  </p>
-                </div>
+                  {data.ticket_hotel.length > 0 && (
+                    <div className="flex items-center  gap-6">
+                      {/* Hotel rating */}
+                      <div className="flex items-center gap-2">
+                        <img src="/icons/stars.png" alt="stars" className="w-6 h-6" />
+                        <p className="text-sm font-semibold leading-[17px] text-[#1C1C1E]">
+                          {/^\d/.test(String(data.ticket_hotel[0].rating))
+                            ? `${data.ticket_hotel[0].rating} ${t('звёзды')}`
+                            : data.ticket_hotel[0].rating}
+                        </p>
+                      </div>
+
+                      {/* Meal plan */}
+                      <div className="flex items-center gap-2">
+                        <img src="/icons/meal.png" alt="meal" className="w-6 h-6" />
+                        <p className="text-sm font-semibold leading-[17px] text-[#1C1C1E]">
+                          {data.ticket_hotel[0]?.meal_plan || 'BB'}
+                        </p>
+                      </div>
+
+                      {/* Duration days */}
+                      <div className="flex items-center gap-2">
+                        <img src="/icons/time.png" alt="time" className="w-6 h-6" />
+                        <p className="text-sm font-semibold leading-[17px] text-[#1C1C1E]">
+                          {data.duration_days || '7'} {t('дней')}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
               </div>
             </div>
 

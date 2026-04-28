@@ -564,56 +564,40 @@ const top_duration = [
           </div>
           <div className="flex h-[56px] w-full items-center justify-between rounded-[14px] bg-white px-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
             <div className="flex items-center gap-4">
-              <FilterListIcon sx={{ color: '#1A73E8', fontSize: 24 }} />
+              {/* <FilterListIcon sx={{ color: '#1A73E8', fontSize: 24 }} />
               <p className="text-sm font-medium leading-[17px] text-[#6B7280]">
                 {t('По возрастанию цены')}
-              </p>
+              </p> */}
+                <Select
+                  onValueChange={(value) => {
+                    if (value === 'cheaper') {
+                      setCheaper(true);
+                      setExpensive(false);
+                    } else if (value === 'expensive') {
+                      setCheaper(false);
+                      setExpensive(true);
+                    } else if (value === 'all') {
+                      setCheaper(false);
+                      setExpensive(false);
+                    }
+                  }}
+                >
+                  <SelectTrigger  className="w-full !h-[40px] flex items-center justify-between
+             max-lg:w-full rounded-lg gap-4 bg-[#FFFFFF]">
+                    <SelectValue placeholder={t('По возрастанию цены')} />
+                    <KeyboardArrowDownIcon />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t('Все')}</SelectItem>
+                    <SelectItem value="cheaper">{t('Подешевле')}</SelectItem>
+                    <SelectItem value="expensive">{t('Подороже')}</SelectItem>
+                  </SelectContent>
+                </Select>
             </div>
-            <KeyboardArrowDownIcon sx={{ color: '#6B7280', fontSize: 16 }} />
+            {/* <KeyboardArrowDownIcon sx={{ color: '#6B7280', fontSize: 16 }} /> */}
           </div>
 
-          <div className="w-full rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
-          <FilterSection title={t('Стоимость')}>
-            <Slider
-              range
-              min={2500000}
-              max={100000000}
-              value={priceRange}
-              className="placeholder:!text-[#909091] !text-[#909091]"
-              onChange={(v) => {
-                setPriceRange(v as number[]);
-                setCurrentPage(1);
-              }}
-            />
-            <div className="flex justify-between mt-3 border border-[#DFDFDF] rounded-xl p-3">
-              <input
-                type="text"
-                value={formatPrice(priceRange[0])}
-                placeholder="2 500 000"
-                onChange={(e) => {
-                  handleInputChange(e.target.value, 0);
-                  setCurrentPage(1);
-                }}
-                className={clsx(
-                  'w-1/2 border-none outline-none',
-                  priceRange[0] ? 'text-[#212122]' : 'text-[#909091]',
-                )}
-              />
-              <input
-                type="text"
-                value={formatPrice(priceRange[1])}
-                onChange={(e) => {
-                  handleInputChange(e.target.value, 1);
-                  setCurrentPage(1);
-                }}
-                className={clsx(
-                  'w-1/2 border-none outline-none text-right',
-                  priceRange[1] ? 'text-[#212122]' : 'text-[#909091]',
-                )}
-              />
-            </div>
-          </FilterSection>
-          </div>
+        
 
     
 
@@ -639,7 +623,7 @@ const top_duration = [
           </FilterSection> */}
 
           <div className="w-full rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
-          <FilterSection title={t('Продолжительность тура')}>
+          <FilterSection title={t('Продолжительность тура')} icon="/icons/time.png">
             {top_duration &&
               [...top_duration]
                 .sort((a, b) => a.duration - b.duration)
@@ -659,7 +643,7 @@ const top_duration = [
           </div>
 
           <div className="w-full rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
-         <FilterSection title={t('Страна')}>
+         <FilterSection title={t('Регионы и курорты')} icon='/icons/country.png'>
           {country &&
             (() => {
               // Tanlangan regionni topamiz
@@ -715,7 +699,7 @@ const top_duration = [
         </div>
 
           <div className="w-full rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
-<FilterSection title={t('Категория отеля')}>
+<FilterSection title={t('Категория отеля')} icon='/icons/stars.png'>
   {["5","4","3","2"].map((rating) => (
     <CheckboxFilter
       key={rating}
@@ -757,7 +741,7 @@ const top_duration = [
           </FilterSection> */}
 
           <div className="w-full rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
-       <FilterSection title={t('Отель')}>
+       <FilterSection title={t('Отель')} icon="/icons/hotel.png">
         {displayedHotels.map((hotel) => (
           <CheckboxFilter
             key={hotel.id}
@@ -799,7 +783,7 @@ const top_duration = [
 
 
           <div className="w-full rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
-          <FilterSection title={t('Питание')}>
+          <FilterSection title={t('Питание')} icon="/icons/meal-2.png">
             {meal?.map((e) => (
               <CheckboxFilter
                 value={String(e.id)}
@@ -833,8 +817,50 @@ const top_duration = [
                 ))}
             </FilterSection>
           ))}
+            <div className="w-full rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
+          <FilterSection title={t('Стоимость')} icon="/icons/money.png">
+            <Slider
+              range
+              min={2500000}
+              max={100000000}
+              value={priceRange}
+              className="placeholder:!text-[#909091] !text-[#909091]"
+              onChange={(v) => {
+                setPriceRange(v as number[]);
+                setCurrentPage(1);
+              }}
+            />
+            <div className="flex justify-between mt-3 border border-[#DFDFDF] rounded-xl p-3">
+              <input
+                type="text"
+                value={formatPrice(priceRange[0])}
+                placeholder="2 500 000"
+                onChange={(e) => {
+                  handleInputChange(e.target.value, 0);
+                  setCurrentPage(1);
+                }}
+                className={clsx(
+                  'w-1/2 border-none outline-none',
+                  priceRange[0] ? 'text-[#212122]' : 'text-[#909091]',
+                )}
+              />
+              <input
+                type="text"
+                value={formatPrice(priceRange[1])}
+                onChange={(e) => {
+                  handleInputChange(e.target.value, 1);
+                  setCurrentPage(1);
+                }}
+                className={clsx(
+                  'w-1/2 border-none outline-none text-right',
+                  priceRange[1] ? 'text-[#212122]' : 'text-[#909091]',
+                )}
+              />
+            </div>
+          </FilterSection>
+          </div>
 
-          <FilterSection title={t('Дополнительно')}>
+          {/* <FilterSection title={t('Дополнительно')}>
             {hotel_amenities &&
               hotel_amenities.map((e) => (
                 <CheckboxFilter
@@ -848,7 +874,7 @@ const top_duration = [
                   paramName="amenitie"
                 />
               ))}
-          </FilterSection>
+          </FilterSection> */}
         </motion.div>
 
         <motion.div
@@ -898,31 +924,9 @@ const top_duration = [
               </Button>
             </div>
 
-            <FilterSection title={t('Стоимость')}>
-              <Slider
-                range
-                min={2500000}
-                max={100000000}
-                value={priceRange}
-                onChange={(v) => setPriceRange(v as number[])}
-              />
-              <div className="flex justify-between mt-3 border border-[#DFDFDF] rounded-xl p-3">
-                <input
-                  type="text"
-                  value={formatPrice(priceRange[0])}
-                  onChange={(e) => handleInputChange(e.target.value, 0)}
-                  className="w-1/2 border-none outline-none text-gray-600"
-                />
-                <input
-                  type="text"
-                  value={formatPrice(priceRange[1])}
-                  onChange={(e) => handleInputChange(e.target.value, 1)}
-                  className="w-1/2 border-none outline-none text-right text-gray-600"
-                />
-              </div>
-            </FilterSection>
+        
 
-            <FilterSection title={t('Название отеля')}>
+            {/* <FilterSection title={t('Название отеля')} icon="/icons/hotel.png">
               <input
                 type="text"
                 value={hotelName}
@@ -930,7 +934,7 @@ const top_duration = [
                 onChange={(e) => setHotelName(e.target.value)}
                 className="w-full border rounded-xl px-3 py-2 outline-none"
               />
-            </FilterSection>
+            </FilterSection> */}
 
             {/* <FilterSection title={t('Условия въезда')}>
               <CheckboxFilter
@@ -953,7 +957,7 @@ const top_duration = [
               />
             </FilterSection> */}
 
-            <FilterSection title={t('Продолжительность тура')}>
+            <FilterSection title={t('Продолжительность тура')} icon="/icons/time.png">
               {durationDays &&
                 [...durationDays]
                   .sort((a, b) => a.duration - b.duration)
@@ -971,7 +975,7 @@ const top_duration = [
                   ))}
             </FilterSection>
 
-            <FilterSection title={t('Регионы и курорты')}>
+            <FilterSection title={t('Регионы и курорты')} icon="/icons/country.png">
                {country &&
             (() => {
               // Tanlangan regionni topamiz
@@ -1024,46 +1028,34 @@ const top_duration = [
               );
             })()}
             </FilterSection>
-<FilterSection title={t('Категория отеля')}>
-  {["5","4","3","2"].map((rating) => (
-    <CheckboxFilter
-      key={rating}
-      value={rating}
-      label={t(`${rating} звезды`)}
-      setChecked={(val) => {
-        setHotelRating(val ? rating : null);
-        setCurrentPage(1);
+             
+              <FilterSection title={t('Категория отеля')} icon="/icons/stars.png">
+                {["5","4","3","2"].map((rating) => (
+                  <CheckboxFilter
+                    key={rating}
+                    value={rating}
+                    label={t(`${rating} звезды`)}
+                    setChecked={(val) => {
+                      setHotelRating(val ? rating : null);
+                      setCurrentPage(1);
 
-        // URL parametrlardan hotel_id va operatorni olib tashlash
-        const params = new URLSearchParams(window.location.search);
-        params.delete("hotel_id");
-        params.delete("operator");
+                      // URL parametrlardan hotel_id va operatorni olib tashlash
+                      const params = new URLSearchParams(window.location.search);
+                      params.delete("hotel_id");
+                      params.delete("operator");
 
-        router.push(`/selectour?${params.toString()}`);
-      }}
-      selectedValue={hotelRating}
-      exclusive
-      paramName="rating"
-    />
-  ))}
-</FilterSection>
+                      router.push(`/selectour?${params.toString()}`);
+                    }}
+                    selectedValue={hotelRating}
+                    exclusive
+                    paramName="rating"
+                  />
+                ))}
+              </FilterSection>
 
-            <FilterSection title={t('Питание')}>
-              {meal?.map((e) => (
-                <CheckboxFilter
-                  value={String(e.id)}
-                  label={e.name}
-                  key={e.id}
-                  onclick={setCurrentPage}
-                  setChecked={setMealPlan}
-                  selectedValue={mealPlan}
-                  exclusive
-                  paramName="meal"
-                />
-              ))}
-            </FilterSection>
+         
 
-            <FilterSection title={t('Тип отеля')}>
+            {/* <FilterSection title={t('Тип отеля')} icon="/icons/stars.png">
               {hotel_type &&
                 hotel_type.map((e) => (
                   <CheckboxFilter
@@ -1077,9 +1069,9 @@ const top_duration = [
                     paramName="type-hotel"
                   />
                 ))}
-            </FilterSection>
+            </FilterSection> */}
 
-            <FilterSection title={t('Отели')}>
+            <FilterSection title={t('Отели')} icon="/icons/hotel.png">
               {displayedHotels.map((hotel) => (
                 <CheckboxFilter
                   key={hotel.id}
@@ -1135,8 +1127,48 @@ const top_duration = [
                   ))}
               </FilterSection>
             ))}
+            
+            
+               <FilterSection title={t('Питание')} icon="/icons/meal-2.png">
+              {meal?.map((e) => (
+                <CheckboxFilter
+                  value={String(e.id)}
+                  label={e.name}
+                  key={e.id}
+                  onclick={setCurrentPage}
+                  setChecked={setMealPlan}
+                  selectedValue={mealPlan}
+                  exclusive
+                  paramName="meal"
+                />
+              ))}
+            </FilterSection>
 
-            <FilterSection title={t('Дополнительно')}>
+                <FilterSection title={t('Стоимость')}>
+              <Slider
+                range
+                min={2500000}
+                max={100000000}
+                value={priceRange}
+                onChange={(v) => setPriceRange(v as number[])}
+              />
+              <div className="flex justify-between mt-3 border border-[#DFDFDF] rounded-xl p-3">
+                <input
+                  type="text"
+                  value={formatPrice(priceRange[0])}
+                  onChange={(e) => handleInputChange(e.target.value, 0)}
+                  className="w-1/2 border-none outline-none text-gray-600"
+                />
+                <input
+                  type="text"
+                  value={formatPrice(priceRange[1])}
+                  onChange={(e) => handleInputChange(e.target.value, 1)}
+                  className="w-1/2 border-none outline-none text-right text-gray-600"
+                />
+              </div>
+            </FilterSection>
+
+            {/* <FilterSection title={t('Дополнительно')}>
               {hotel_amenities &&
                 hotel_amenities.map((e) => (
                   <CheckboxFilter
@@ -1150,7 +1182,7 @@ const top_duration = [
                     paramName="amenitie"
                   />
                 ))}
-            </FilterSection>
+            </FilterSection> */}
             <div className="sticky bottom-0 w-full left-0">
               <button
                 className="bg-[#1764FC] rounded-3xl p-3 w-full text-white cursor-pointer font-semibold"
@@ -1197,7 +1229,7 @@ const top_duration = [
                   )}
                 </h1>
 
-                <Select
+                {/* <Select
                   onValueChange={(value) => {
                     if (value === 'cheaper') {
                       setCheaper(true);
@@ -1220,7 +1252,7 @@ const top_duration = [
                     <SelectItem value="cheaper">{t('Подешевле')}</SelectItem>
                     <SelectItem value="expensive">{t('Подороже')}</SelectItem>
                   </SelectContent>
-                </Select>
+                </Select> */}
               </div>
             </motion.div>
 

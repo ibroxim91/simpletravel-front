@@ -67,7 +67,7 @@ const Navbar = () => {
   ];
 
   const profileHref = user ? '/profile?tabs=profile' : '/auth/register';
-  const profileLabel = user ? t('Профиль') : t('Регистрация');
+  const profileLabel = user ? t('Профиль') : t('Зарегистрироваться');
   const profileName = user
     ? `${user.data.data.first_name || ''} ${user.data.data.last_name || ''}`.trim()
     : '';

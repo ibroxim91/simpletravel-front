@@ -110,9 +110,9 @@ const HotTours = () => {
                         item={item}
                         index={index}
                         locale={locale as LanguageRoutes}
-                        fallbackDurationText={t('9 дней')}
-                        fallbackHotelText={t('Отель hotels')}
-                        starsText={t('3 звездочный')}
+                        fallbackDurationText={t('дней')}
+                        fallbackHotelText={t('Отель')}
+                        starsText={t('звёзды')}
                         onClick={() => {
                           localStorage.setItem('tourOperator', item?.operator ?? '');
                           localStorage.setItem('from_cache', item?.from_cache ?? '');
