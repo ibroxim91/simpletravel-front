@@ -21,11 +21,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/ui/select';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from '@/shared/ui/carousel';
 import FilterTours from '@/widgets/filter/ui/FilterTours';
 import FilterToursMobile from '@/widgets/filter/ui/FilterToursMobile';
 import CloseIcon from '@mui/icons-material/Close';
@@ -53,7 +48,6 @@ import { useFilterTickectsStore } from '../lib/store';
 import { TickectAll, TickectAllFilter } from '../lib/types';
 import CheckboxFilter from './CheckBox';
 import FilterSection from './FilterSection';
-import InterestedTourCard from '@/widgets/selectour/ui/InterestedTourCard';
 import TourItem from '@/widgets/selectour/ui/TourItem';
 import { useMemo } from "react";
 
@@ -420,7 +414,6 @@ const top_duration = [
 
   const regionName = regionData?.regions.find((r) => r.id === regionId)?.name;
   const countryName = regionData?.name;
-  const interestedTours = (ticket?.data?.results?.tickets ?? []).slice(0, 4);
 
   return (
     <div className="min-h-screen bg-[#FAFBFC] pb-20">
@@ -489,64 +482,6 @@ const top_duration = [
               setMealPlan={setMealPlan}
             />
           </motion.div>
-        </div>
-      </section>
-
-      <section className="mt-[104px] px-4 xl:px-0">
-        <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-9 xl:h-[488px]">
-          <div className="flex items-center gap-6 max-lg:flex-col max-lg:items-start">
-            <div className="w-full max-w-[924px] space-y-4">
-              <h2 className="text-[32px] font-bold leading-[39px] text-black">
-                {t('Вас может заинтересовать')}
-              </h2>
-              <p className="text-base font-normal leading-5 text-black">
-                {t(
-                  'Собираетесь куда-нибудь отпраздновать этот сезон? Независимо от того, едете ли вы домой или отправляетесь в путешествие, у нас есть инструменты для организации поездок, которые помогут вам добраться до места назначения.',
-                )}
-              </p>
-            </div>
-            <Button className="flex h-[54px] w-[292px] items-center justify-center rounded-[19px] bg-[#FF6B00] px-4 py-4 text-sm font-medium text-white hover:bg-[#ff7a1f]">
-              <span className="flex w-[260px] items-center justify-between">
-                <span>{t('Смотреть все')}</span>
-                <EastIcon sx={{ fontSize: 22 }} />
-              </span>
-            </Button>
-          </div>
-
-          <div className="hidden grid-cols-1 gap-6 md:grid-cols-2 xl:grid">
-            {interestedTours.map((item: any, index: number) => (
-              <InterestedTourCard
-                key={item.id}
-                item={item}
-                index={index}
-                locale={locale as LanguageRoutes}
-              />
-            ))}
-          </div>
-          <div className="xl:hidden">
-            <Carousel
-              opts={{
-                align: 'start',
-                dragFree: true,
-              }}
-              className="w-full"
-            >
-              <CarouselContent className="-ml-3">
-                {interestedTours.map((item: any, index: number) => (
-                  <CarouselItem
-                    key={item.id}
-                    className="basis-[88%] pl-3 sm:basis-[60%]"
-                  >
-                    <InterestedTourCard
-                      item={item}
-                      index={index}
-                      locale={locale as LanguageRoutes}
-                    />
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-            </Carousel>
-          </div>
         </div>
       </section>
 

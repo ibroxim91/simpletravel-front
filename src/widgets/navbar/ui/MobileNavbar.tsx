@@ -10,10 +10,8 @@ import IconButton from '@mui/material/IconButton';
 import clsx from 'clsx';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { Dispatch, SetStateAction, Suspense } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import { ChangeLang } from './ChangeLang';
-import CitySelect from './CitySelect';
-import CitySelectMobile from './CitySelectMobile';
 
 interface Props {
   setOpen: Dispatch<SetStateAction<boolean>>;
@@ -25,9 +23,8 @@ const MobileNavbar = ({ setOpen, open }: Props) => {
   const t = useTranslations();
   const links = [
     { href: '/', label: 'Главная' },
+    { href: '/selectour?page=1', label: 'Подобрать тур' },
     { href: '/about', label: 'О нас' },
-    { href: '/blogs', label: 'Блоги' },
-    { href: '/faq', label: 'Ответы на вопросы' },
     { href: '/contacts', label: 'Контакты' },
   ];
   return (
@@ -69,7 +66,12 @@ const MobileNavbar = ({ setOpen, open }: Props) => {
         </div>
       </div>
       <div className="flex gap-2 items-start mt-4 custom-container justify-start h-full flex-col">
-        <p className="text-xl text-[#212122] font-semibold">{t('Меню')}</p>
+        <div className="flex w-full items-center justify-between">
+          <p className="text-xl text-[#212122] font-semibold">{t('Меню')}</p>
+          <div className="rounded-full border border-[#E5E7EB] px-3 py-1">
+            <ChangeLang compact theme="light" />
+          </div>
+        </div>
         {links.map(({ href, label }) => (
           <Link
             href={href}
