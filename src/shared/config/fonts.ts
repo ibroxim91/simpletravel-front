@@ -1,11 +1,11 @@
-import { Golos_Text } from 'next/font/google';
+// import { Golos_Text } from 'next/font/google';
 import localFont from 'next/font/local';
 
-const golosText = Golos_Text({
-  weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-golos-text',
-  subsets: ['latin', 'cyrillic'],
-});
+// const golosText = Golos_Text({
+//   weight: ['400', '500', '600', '700', '800'],
+//   variable: '--font-golos-text',
+//   subsets: ['latin', 'cyrillic'],
+// });
 
 const sfPro = localFont({
   src: [
@@ -56,4 +56,5 @@ const monserrat = localFont({
   display: 'swap',
 });
 
-export { golosText, monserrat, sfPro };
+// golosText
+export {  monserrat, sfPro };

@@ -49,7 +49,7 @@ const HotTours = () => {
 
 
   return (
-    <section className="bg-transparent pb-8 pt-0">
+    <section className="bg-transparent pb-10 pt-0">
       <div className="custom-container">
         <div className="mx-auto w-full max-w-[1240px] rounded-[14px] bg-white px-4 pb-6 pt-6 shadow-[0_2px_20px_rgba(0,0,0,0.15)] md:px-6 xl:h-[725px]">
           <div className="flex w-full flex-col gap-1 md:gap-2">
@@ -129,7 +129,7 @@ const HotTours = () => {
             </Carousel>
           </div>
 
-          <div className="mt-4 flex justify-center">
+          <div className="mt-10 flex justify-center">
             <Button className="h-[60px] w-[292px] rounded-[14px] bg-[#E8F1FF] text-base font-normal text-[#1C1C1E] hover:bg-[#DCE8FF]">
               {t('Смотреть все туры')}
             </Button>

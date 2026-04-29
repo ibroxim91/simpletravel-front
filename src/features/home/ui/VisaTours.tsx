@@ -130,7 +130,7 @@ const VisaTours = () => {
             </Carousel>
           </div>
 
-          <div className="mt-4 flex justify-center">
+          <div className="mt-10 flex justify-center">
             <Button className="h-[60px] w-[292px] rounded-[14px] bg-[#E8F1FF] text-base font-normal text-[#1C1C1E] hover:bg-[#DCE8FF]">
               {t('Смотреть все туры')}
             </Button>

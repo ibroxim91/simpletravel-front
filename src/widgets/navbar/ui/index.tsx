@@ -6,6 +6,7 @@ import { useWelcomeStore } from '@/features/profile/lib/hook';
 import { Link, usePathname } from '@/shared/config/i18n/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import HomeIcon from '@mui/icons-material/Home';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -55,7 +56,7 @@ const Navbar = () => {
     {
       href: '/saved',
       label: 'Избранное',
-      icon: FavoriteIcon,
+      icon: FavoriteBorderIcon,
       active: '/saved',
     },
     {
@@ -67,7 +68,7 @@ const Navbar = () => {
   ];
 
   const profileHref = user ? '/profile?tabs=profile' : '/auth/register';
-  const profileLabel = user ? t('Профиль') : t('Зарегистрироваться');
+  const profileLabel = user ? t('Профиль') : t('Регистрация');
   const profileName = user
     ? `${user.data.data.first_name || ''} ${user.data.data.last_name || ''}`.trim()
     : '';
@@ -95,7 +96,7 @@ const Navbar = () => {
               </Link>
 
               <div className="flex min-w-0 items-center gap-8 2xl:gap-[68px]">
-                <div className="flex h-full items-center gap-5 whitespace-nowrap 2xl:gap-9">
+                <div className="flex h-full items-center gap-6 whitespace-nowrap 2xl:gap-9">
                 {navLinks.map(({ href, label }) => (
                   <div
                     key={label}
@@ -124,8 +125,8 @@ const Navbar = () => {
                         },
                       }}
                     >
-                      <FavoriteIcon
-                        sx={{ color: '#6B7280', width: '20px', height: '18px' }}
+                      <FavoriteBorderIcon
+                        sx={{ color: '#6B7280', width: '22px', height: '20px' }}
                       />
                     </IconButton>
                   </Link>

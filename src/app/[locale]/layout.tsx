@@ -1,5 +1,5 @@
 import Welcome from '@/features/profile/ui/welcome';
-import { sfPro } from '@/shared/config/fonts';
+// import { sfPro } from '@/shared/config/fonts';
 import { routing } from '@/shared/config/i18n/routing';
 import QueryProvider from '@/shared/config/react-query/QueryProvider';
 import { ThemeProvider } from '@/shared/config/theme-provider';
@@ -14,6 +14,10 @@ import { notFound } from 'next/navigation';
 import Script from 'next/script';
 import { ReactNode } from 'react';
 import '../globals.css';
+import { monserrat } from '@/shared/config/fonts';
+
+
+
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -72,7 +76,7 @@ export default async function RootLayout({ children, params }: Props) {
   return (
     <html lang={locale} suppressHydrationWarning>
       <body
-        className={`${sfPro.className} antialiased min-h-screen flex flex-col relative`}
+        className={`${monserrat.className} antialiased min-h-screen flex flex-col relative`}
       >
         <Script id="gtm-head" strategy="afterInteractive">
           {`
