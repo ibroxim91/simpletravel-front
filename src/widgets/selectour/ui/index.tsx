@@ -87,6 +87,8 @@ export default function Selectour() {
   const locale = params?.locale as LanguageRoutes;
   const t = useTranslations();
   const [isSearchClicked, setIsSearchClicked] = useState(false);
+   const prevRegionRef = useRef<string | null>(null);
+const prevHotelsRef = useRef<any[] | null>(null);
   const [priceRange, setPriceRange] = useState<number[] | []>([]);
   const {
     durationDays,
@@ -287,9 +289,32 @@ export default function Selectour() {
    
   });
 
+
+
 const displayedHotels = useMemo(() => {
-  return ticket?.data?.results?.hotels ?? [];
-}, [ticket]);
+  const currentRegion = filterLocal?.where ?? null;
+  const newHotels = ticket?.data?.results?.hotels ?? [];
+
+ 
+  if (
+    currentRegion !== null &&
+    prevRegionRef.current === currentRegion &&
+    Array.isArray(prevHotelsRef.current)
+  ) {
+    return prevHotelsRef.current;
+  }
+
+
+  if (Array.isArray(newHotels) && newHotels.length > 0) {
+    prevRegionRef.current = currentRegion;
+    prevHotelsRef.current = newHotels;
+    return newHotels;
+  }
+
+
+  return Array.isArray(prevHotelsRef.current) ? prevHotelsRef.current : [];
+}, [ticket, filterLocal?.where]);
+
 
 const prevCountry = useRef<string | null>(null);
 const prevRegion = useRef<string | null>(null);
