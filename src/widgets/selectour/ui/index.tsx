@@ -833,7 +833,7 @@ const top_duration = [
         >
           <div className="flex items-center gap-6">
             <div
-              className="flex h-9 w-[293px] items-center gap-4 rounded-[14px] bg-white px-4 py-2 shadow-[0_2px_4px_rgba(0,0,0,0.15)]"
+              className="flex h-9 w-[293px] items-center gap-4 rounded-[14px] bg-[#FAFBFC] px-4 py-2 shadow-[0_2px_4px_rgba(0,0,0,0.15)]"
               onClick={() => setFilter(true)}
             >
               <FilterListIcon sx={{ color: '#1A73E8', fontSize: 16 }} />
@@ -843,7 +843,7 @@ const top_duration = [
             </div>
             <button
               type="button"
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[14px] bg-white p-[10px] shadow-[0_2px_4px_rgba(0,0,0,0.15)]"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[14px] bg-[#FAFBFC] p-[10px] shadow-[0_2px_4px_rgba(0,0,0,0.15)]"
             >
               <img src="/icons/sort.png" alt="sort" className="h-4 w-4" />
             </button>

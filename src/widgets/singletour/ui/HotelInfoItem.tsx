@@ -16,13 +16,13 @@ export default function HotelInfoItem({
   iconNode,
 }: Props) {
   return (
-    <>
+    <div className="flex w-full items-start justify-between gap-4">
       {iconNode ? (
-        <div className="w-6 h-6 flex items-center justify-center">{iconNode}</div>
+        <div className="flex h-6 w-6 items-center justify-center">{iconNode}</div>
       ) : (
-        <div className="w-6 h-6">
+        <div className="h-6 w-6">
           <Image
-            className="w-full h-full"
+            className="h-full w-full"
             src={img}
             alt={'hotel'}
             width={500}
@@ -31,22 +31,22 @@ export default function HotelInfoItem({
         </div>
       )}
 
-      <div className="flex flex-col h-full justify-between gap-2">
+      <div className="flex h-full flex-col justify-between gap-2 max-lg:items-end">
         <p
-          className={`text-[16px] leading-5 font-bold line-clamp-1 ${
+          className={`line-clamp-1 text-[16px] font-bold leading-5 max-lg:text-right ${
             highlighted ? 'text-white' : 'text-[#1A73E8]'
           }`}
         >
           {name}
         </p>
         <h1
-          className={`text-[14px] leading-[17px] font-semibold line-clamp-2 ${
+          className={`line-clamp-2 text-[14px] font-medium leading-[17px] max-lg:text-[12px] max-lg:leading-[15px] max-lg:text-right ${
             highlighted ? 'text-white' : 'text-[#112211]'
           }`}
         >
           {title}
         </h1>
       </div>
-    </>
+    </div>
   );
 }

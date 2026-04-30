@@ -15,7 +15,6 @@ import { Skeleton } from '@/shared/ui/skeleton';
 import Swiper from '@/shared/ui/swiper';
 import Ticket_Api from '@/widgets/selectour/lib/api';
 import EmojiObjectsOutlinedIcon from '@mui/icons-material/EmojiObjectsOutlined';
-import EastIcon from '@mui/icons-material/East';
 import ErrorIcon from '@mui/icons-material/Error';
 import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
 import Groups2OutlinedIcon from '@mui/icons-material/Groups2Outlined';
@@ -285,11 +284,11 @@ export default function SingleTour() {
                 whileInView="visible"
                 viewport={{ once: false, amount: 0.2 }}
                 variants={fadeInUp}
-                className="pt-2 flex flex-col gap-6"
+                className="flex flex-col gap-8 pt-6"
               >
                 <Breadcrumbs
                   aria-label="breadcrumb"
-                  separator={<EastIcon fontSize="small" className="text-[#112211]/70" />}
+                  separator={<span className="text-[#112211]/70">{'>'}</span>}
                   sx={{
                     '& .MuiBreadcrumbs-separator': {
                       mx: 1,
@@ -305,9 +304,40 @@ export default function SingleTour() {
                   <p className="text-[14px] text-[#112211]/70">{data.title}</p>
                 </Breadcrumbs>
 
-                <div className="flex items-end justify-between gap-8 max-lg:flex-col max-lg:items-start">
-                  <div className="flex max-w-[684px] flex-col gap-6">
-                    <div className="flex items-center gap-6 max-md:flex-col max-md:items-start max-md:gap-2">
+                <div className="flex items-end justify-between gap-8 max-lg:flex-col max-lg:items-start max-lg:gap-6">
+                  <div className="flex max-w-[684px] flex-col gap-6 max-lg:w-full max-lg:gap-4">
+                    <div className="hidden w-full items-center justify-between max-lg:flex">
+                      <div className="flex items-center gap-2">
+                        <Rating
+                          name="read-only-mobile"
+                          size="small"
+                          value={data.rating}
+                          readOnly
+                          sx={{ color: '#FF6B00' }}
+                          precision={0.1}
+                        />
+                        <p className="text-[12px] font-medium leading-[15px] text-[#112211]">
+                          {Math.round(data.rating || 0)} {t('звездочный отель')}
+                        </p>
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          if (data.is_liked) {
+                            removeLike({ ticket: data.id });
+                          } else {
+                            addLike({ ticket: data.id });
+                          }
+                        }}
+                        className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-[0_0_4px_rgba(0,0,0,0.15)]"
+                      >
+                        <FavoriteRoundedIcon
+                          sx={{ color: data.is_liked ? '#E03137' : '#9CA3AF', fontSize: 20 }}
+                        />
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-6 max-lg:hidden max-md:flex-col max-md:items-start max-md:gap-2">
                       <h1 className="text-[20px] leading-[24px] font-bold text-[#112211]">
                         {data.title}
                       </h1>
@@ -326,26 +356,29 @@ export default function SingleTour() {
                       </div>
                     </div>
 
+                    <h1 className="hidden text-[24px] font-bold leading-[29px] text-[#1C1C1E] max-lg:block">
+                      {data.title}
+                    </h1>
                     <div className="flex flex-col gap-2">
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-4 max-lg:gap-2">
                         <LocationOnIcon sx={{ color: '#1A73E8', fontSize: 20 }} />
-                        <p className="text-[14px] font-medium text-[#112211]/75">
+                        <p className="text-[12px] font-medium leading-[15px] text-[#6B7280]/75">
                           {data.destination?.name}
                         </p>
-                        <span className="rounded-[14px] bg-[#F59E0B] px-3 py-1 text-[14px] font-medium text-[#1C1C1E]/75">
+                        <span className="rounded-[14px] bg-[#F59E0B] px-2 py-1 text-[12px] font-medium leading-[15px] text-white">
                           {t('Необходима Виза')}
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <HotelOutlinedIcon sx={{ color: '#1A73E8', fontSize: 20 }} />
-                        <p className="text-[14px] font-medium text-[#112211]/75">
+                        <p className="text-[12px] font-medium leading-[15px] text-[#6B7280]/75">
                           {t('Отель')} {data.ticket_hotel?.[0]?.name}
                         </p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex w-full max-w-[301px] flex-col items-end gap-4 max-lg:items-start">
+                  <div className="flex w-full max-w-[301px] flex-col items-end gap-4 max-lg:hidden max-lg:items-start">
                     <h1 className="text-right text-[24px] leading-[29px] max-lg:text-left font-bold text-[#1C1C1E]">
                       {formatPrice(data.price, locale as LanguageRoutes, true)} /{' '}
                       <span className="text-[24px] font-normal">
@@ -363,7 +396,7 @@ export default function SingleTour() {
                             addLike({ ticket: data.id });
                           }
                         }}
-                        className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-[0_0_4px_rgba(0,0,0,0.15)]"
+                        className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-[0_0_4px_rgba(0,0,0,0.15)] max-lg:hidden"
                       >
                         <FavoriteRoundedIcon
                           sx={{ color: data.is_liked ? '#E03137' : '#9CA3AF', fontSize: 20 }}
@@ -400,7 +433,7 @@ export default function SingleTour() {
                 whileInView="visible"
                 viewport={{ once: false, amount: 0.2 }}
                 variants={fadeInUp}
-                className="mt-4"
+                className="mt-4 max-lg:mt-6"
               >
                 <Swiper
                   id={data.id}
@@ -483,20 +516,20 @@ export default function SingleTour() {
                     {data.hotel_info}
                   </p>
                 </div>
-                <div className="flex w-full h-[145px] items-start gap-6 overflow-visible max-xl:h-auto max-xl:flex-wrap">
+                <div className="flex h-[145px] w-full items-start gap-6 overflow-visible max-xl:h-auto max-xl:flex-wrap max-lg:h-auto max-lg:flex-col max-lg:gap-4">
                   <motion.div
                     whileHover={{ scale: 1.03 }}
-                    className="h-[145px] w-[187px] shrink-0 rounded-[12px] bg-[#1A73E8] p-4"
+                    className="h-[145px] w-[187px] shrink-0 rounded-[12px] bg-[#1A73E8] p-4 max-lg:h-[59px] max-lg:w-full max-lg:px-4 max-lg:py-2"
                   >
-                    <div className="flex h-full flex-col justify-between">
-                      <p className="text-[32px] leading-10 font-bold text-white">
+                    <div className="flex h-full flex-col justify-between max-lg:flex-row max-lg:items-start">
+                      <p className="text-[32px] font-bold leading-10 text-white max-lg:text-[56px] max-lg:leading-[43px]">
                         {Number(data.rating || 0).toFixed(1)}
                       </p>
-                      <div className="flex flex-col gap-1">
+                      <div className="flex flex-col gap-1 max-lg:items-end">
                         <p className="text-[16px] leading-5 font-bold text-white">
                           {t('Очень хорошо')}
                         </p>
-                        <p className="text-[14px] leading-[17px] font-medium text-white">
+                        <p className="text-[14px] leading-[17px] font-medium text-white max-lg:text-right">
                           {data.ticket_comments?.length || 0} {t('отзывов')}
                         </p>
                       </div>
@@ -563,7 +596,7 @@ export default function SingleTour() {
                     <motion.div
                       key={item.id}
                       whileHover={{ scale: 1.03 }}
-                      className="h-[145px] w-[186px] shrink-0 rounded-[12px] border border-[#1A73E8] p-4 flex flex-col items-start gap-8"
+                      className="flex h-[145px] w-[186px] shrink-0 flex-col items-start gap-8 rounded-[12px] border border-[#1A73E8] p-4 max-lg:h-[59px] max-lg:w-full max-lg:gap-0 max-lg:px-4 max-lg:py-2"
                     >
                       <HotelInfoItem
                         img={item.img}
