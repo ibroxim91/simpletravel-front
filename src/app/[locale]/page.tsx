@@ -10,15 +10,15 @@ export default async function Home() {
     <>
       <main>
         <div className="flex flex-col">
-          <div className="bg-[#1E73E8] pb-[180px] max-lg:pb-0">
-            <div className="pt-[104px] max-lg:pt-8">
+          <div className="bg-[#1E73E8] pb-[180px] max-lg:h-[759px] max-lg:pb-0">
+            <div className="pt-[104px] max-lg:pt-0">
               <SearchTours />
             </div>
           </div>
-          <div className="-mt-[246px]  max-lg:mt-26 relative z-10">
+          <div className="-mt-[246px] max-lg:-mt-[165px] relative z-10">
             <HotTours />
           </div>
-          <div className="mt-[104px] flex flex-col gap-[104px]">
+          <div className="mt-[104px] flex flex-col gap-[104px] max-lg:mt-[64px] max-lg:gap-[64px]">
             <Populardestinations />
             {/* <PopulardestinationsMboile /> */}
             <VisaTours />     

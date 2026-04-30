@@ -85,6 +85,7 @@ declare const messages: {
   "Продолжительность тура": "Sayohat davomiyligi",
   "Регионы и курорты": "Hududlar va kurortlar",
   "Категория отеля": "Mehmonxona toifasi",
+  "Длительность": "Davomiylik",
   "5 звезды": "5 yulduz",
   "4 звезды": "4 yulduz",
   "3 звезды": "3 yulduz",
@@ -295,8 +296,8 @@ declare const messages: {
   "Адрес:": "Manzil:",
   "Бронирование:": "Bron qilish:",
   "Компания:": "Kompaniya:",
-  "Более 26 000 проверенных туров для вашего безупречного отдыха": "Sizning mukammal dam olish uchun 26 000 dan ortiq tekshirilgan turlar",
-  "Лучшие предложения, отобранные вручную": "Qo‘l bilan tanlangan eng yaxshi takliflar",
+  "Более 26 000 проверенных туров для вашего безупречного отдыха": "Sizning mukammal dam olishingiz uchun 26 000 dan ortiq tekshirilgan turlar",
+  "Лучшие предложения, отобранные вручную": "Qo'l bilan tanlangan eng yaxshi takliflar",
   "Настройте свой отдых": "Dam olishni o‘zingiz sozlang",
   "Смотреть тур": "Turni ko‘rish",
   "фото": "foto",
@@ -423,6 +424,9 @@ declare const messages: {
   "Настройте свой отдых": "Dam olishni moslang",
   "Страна": "Davlat",
   "Цена": "Narx",
-  "Подготавливаем параметры поиска...": "Qidiruv parametrlari tayyorlanmoqda..."
+  "Подготавливаем параметры поиска": "Qidiruv parametrlari tayyorlanmoqda...",
+  "Загрузка туров": "Turlar yuklanmoqda...",
+  "Включено": "Kiritilgan",
+  "Не включено": "Kiritilmagan"
 };
 export default messages;

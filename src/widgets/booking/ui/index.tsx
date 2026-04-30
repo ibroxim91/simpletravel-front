@@ -26,8 +26,9 @@ import TourInfoStep from './TourInfoStep';
 import { TicketsDetailAPi } from '@/widgets/singletour/lib/api';
 
 export default function Booking() {
-  const tourOperatorId = localStorage.getItem("tourOperatorId") 
- const t = useTranslations();
+  const tourOperatorId =
+    typeof window !== 'undefined' ? localStorage.getItem('tourOperatorId') : null;
+const t = useTranslations();
   const [orderId, setOrderId] = useState<number>();
   const route = useRouter();
   const { id } = useParams();
@@ -80,7 +81,9 @@ export default function Booking() {
   };
 
  const data = {status:true, data:null}
- const LocalData =  JSON.parse( localStorage.getItem("tour") )
+ const localTour =
+   typeof window !== 'undefined' ? localStorage.getItem('tour') : null;
+ const LocalData = localTour ? JSON.parse(localTour) : null;
  data.data = LocalData
  console.log("BOOKING TOUR DATA ",data)
 

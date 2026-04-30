@@ -18,6 +18,7 @@ import AirplanemodeActiveIcon from '@mui/icons-material/AirplanemodeActive';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import CloseIcon from '@mui/icons-material/Close';
 import DoneIcon from '@mui/icons-material/Done';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import RemoveIcon from '@mui/icons-material/Remove';
 import SearchIcon from '@mui/icons-material/Search';
@@ -192,18 +193,25 @@ const FilterToursMobile = ({ selectedDestRegions, setSelectedDestRegions,setSele
     route.push(`/selectour?page=1&${params.toString()}`,  { scroll: false });
   };
 
+  const departureRegionName = selectedRegion?.name ?? '';
+  const departureCode = departureRegionName
+    ? departureRegionName.toLowerCase() === 'ташкент'
+      ? 'TAS'
+      : departureRegionName.slice(0, 3).toUpperCase()
+    : '';
+
   return (
-    <div className="mt-10 bg-white shadow-sm py-4 gap-4 w-full rounded-3xl grid grid-cols-1 items-center px-10 min-lg:hidden font-medium">
-      <div className="relative flex flex-col gap-2">
+    <div className="w-full min-lg:hidden font-medium">
+      <div className="grid w-full grid-cols-2 overflow-hidden rounded-[14px] bg-white shadow-sm">
+      <div className="relative col-span-2 flex flex-col gap-0">
         <div
           onClick={() => {
             setOpenDrawer(true);
             setSearchCountry('');
             setSearchRegion('');
           }}
-          className="cursor-pointer flex flex-col w-full gap-2"
+          className="cursor-pointer w-full"
         >
-          <label className="font-semibold text-md">{t('Откуда')}</label>
           <div className="relative w-full">
             <Button
               type="button"
@@ -211,29 +219,18 @@ const FilterToursMobile = ({ selectedDestRegions, setSelectedDestRegions,setSele
               role="combobox"
               aria-expanded={openDrawer}
               className={cn(
-                'w-full h-14 cursor-pointer relative min-w-0',
-                selectedCountry
-                  ? 'text-black hover:text-black'
+                'h-12 w-full min-w-0 cursor-pointer rounded-none border-0 border-b border-[#E5E7EB] px-5 py-4',
+                departureRegionName
+                  ? 'text-[#1C1C1E] hover:text-[#1C1C1E]'
                   : 'text-muted-foreground hover:text-muted-foreground',
               )}
             >
               <span className="flex-1 min-w-0 pr-5">
                 <MarqueeText speed={3}>
-                  {selectedCountry ? (
+                  {departureRegionName ? (
                     <div className="flex gap-1.5 items-center">
-                      {selectedCountry.name}
-                      {selectedRegion && (
-                        <>
-                          <MoveRight />
-                          {
-                            ticket
-                              ?.find((e) => e.name === selectedCountry.name)
-                              ?.regions.find(
-                                (e) => e.id === Number(selectedRegion.id),
-                              )?.name
-                          }
-                        </>
-                      )}
+                      <span className="text-[#7B8DA1]">{departureCode} ·</span>
+                      <span className="text-[#1C1C1E]">{departureRegionName}</span>
                     </div>
                   ) : (
                     <div className="flex gap-1.5">{t('Mamlakat tanlang')}</div>
@@ -244,9 +241,9 @@ const FilterToursMobile = ({ selectedDestRegions, setSelectedDestRegions,setSele
               <LocationOnIcon
                 sx={{
                   position: 'absolute',
-                  color: '#121212',
+                  color: '#1A73E8',
                   top: '50%',
-                  right: '10px',
+                  right: '20px',
                   transform: 'translateY(-50%)',
                   pointerEvents: 'none',
                 }}
@@ -327,16 +324,15 @@ const FilterToursMobile = ({ selectedDestRegions, setSelectedDestRegions,setSele
         </Drawer>
       </div>
 
-      <div className="relative flex flex-col gap-2">
+      <div className="relative col-span-2 flex flex-col gap-0">
         <div
           onClick={() => {
             setOpenDrawerDes(true);
             setSearchCountryDes('');
             setSearchRegionDes('');
           }}
-          className="cursor-pointer flex flex-col w-full gap-2"
+          className="cursor-pointer w-full"
         >
-          <label className="font-semibold text-md">{t('Куда')}</label>
           <div className="relative w-full">
             <Button
               type="button"
@@ -344,10 +340,10 @@ const FilterToursMobile = ({ selectedDestRegions, setSelectedDestRegions,setSele
               role="combobox"
               aria-expanded={openDrawerDes}
               className={cn(
-                'w-full h-14 cursor-pointer relative min-w-0',
+                'h-12 w-full min-w-0 cursor-pointer rounded-none border-0 border-b border-[#E5E7EB] px-5 py-4',
                 selectedCountryDes
-                  ? 'text-black hover:text-black'
-                  : 'text-muted-foreground hover:text-muted-foreground',
+                  ? 'text-[#1C1C1E] hover:text-[#1C1C1E]'
+                  : 'text-[#7B8DA1] hover:text-[#7B8DA1]',
               )}
             >
               <span className="flex-1 min-w-0 pr-5">
@@ -377,9 +373,9 @@ const FilterToursMobile = ({ selectedDestRegions, setSelectedDestRegions,setSele
               <AirplanemodeActiveIcon
                 sx={{
                   position: 'absolute',
-                  color: 'black',
+                  color: '#1A73E8',
                   top: '50%',
-                  right: '10px',
+                  right: '20px',
                   transform: 'translateY(-50%)',
                   pointerEvents: 'none',
                 }}
@@ -522,19 +518,16 @@ const FilterToursMobile = ({ selectedDestRegions, setSelectedDestRegions,setSele
         </Drawer>
       </div>
 
-      <div className="relative flex gap-2 h-full">
+      <div className="relative h-full border-r border-[#E5E7EB]">
         <div
           onClick={() => {
             setDataOpenMobile(!dataOpenMobile);
           }}
-          className="cursor-pointer flex flex-col gap-2 w-full"
+          className="cursor-pointer w-full"
         >
-          <Label className="font-semibold text-md">
-            {t('Дата отправления')}
-          </Label>
           <div className="relative">
             <Input
-              className="h-[60px] text-md placeholder:text-md"
+              className="h-12 rounded-none border-0 px-5 text-[14px] font-medium text-[#7B8DA1] placeholder:text-[14px] placeholder:text-[#7B8DA1]"
               placeholder={t('Когда')}
               value={selectData}
               readOnly
@@ -542,9 +535,9 @@ const FilterToursMobile = ({ selectedDestRegions, setSelectedDestRegions,setSele
             <CalendarMonthIcon
               sx={{
                 position: 'absolute',
-                color: 'black',
+                color: '#1A73E8',
                 top: '50%',
-                right: '10px',
+                right: '20px',
                 transform: 'translateY(-50%)',
                 pointerEvents: 'none',
               }}
@@ -659,18 +652,29 @@ const FilterToursMobile = ({ selectedDestRegions, setSelectedDestRegions,setSele
         </Sheet>
       </div>
 
-      <div className="relative flex gap-2 h-full">
+      <div className="relative h-full">
         <div
           onClick={() => setAgeOpen(!ageOpen)}
-          className="cursor-pointer flex flex-col w-full gap-2"
+          className="cursor-pointer w-full"
         >
-          <Label className="font-semibold text-md">{t('Туристы')}</Label>
           <div className="relative">
             <Input
-              className="h-[60px] text-md placeholder:text-md"
+              className="h-12 rounded-none border-0 px-5 text-[14px] font-medium text-[#1C1C1E] placeholder:text-[14px] placeholder:text-[#1C1C1E]"
               placeholder={t('Вызрослых')}
-              value={selectAge === 0 ? '' : selectAge}
+              value={selectAge === 0 ? t('1 пассажир') : `${selectAge} ${t('пассажир')}`}
               readOnly
+            />
+            <KeyboardArrowDownIcon
+              sx={{
+                position: 'absolute',
+                right: '18px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: '#1A73E8',
+                width: '18px',
+                height: '18px',
+                pointerEvents: 'none',
+              }}
             />
           </div>
         </div>
@@ -774,9 +778,11 @@ const FilterToursMobile = ({ selectedDestRegions, setSelectedDestRegions,setSele
           </div>
         </Drawer>
       </div>
-      <div className="flex flex-col gap-2">
+      </div>
+
+      <div className="mt-6 flex flex-col gap-2">
         <Button
-          className="bg-blue-600 text-lg text-white h-[60px] flex items-center justify-center rounded-4xl text-center font-semibold cursor-pointer"
+          className="flex h-12 items-center justify-center rounded-[14px] bg-[#FF6B00] text-center text-[14px] font-medium text-white hover:bg-[#ff7a1f]"
          onClick={() => {
             saveFilter();
             // sahifani pastga siljitish
@@ -786,8 +792,11 @@ const FilterToursMobile = ({ selectedDestRegions, setSelectedDestRegions,setSele
             });
           }}
         >
-          <p>{t('Искать туры')}</p>
+          <p>{t('Искать тур')}</p>
         </Button>
+        <p className="mt-4 text-right text-[12px] font-normal leading-[100%] text-white">
+          {t('Переходи в раздел “Подобрать тур”, чтобы ознакомиться со всеми турами')}
+        </p>
       </div>
     </div>
   );

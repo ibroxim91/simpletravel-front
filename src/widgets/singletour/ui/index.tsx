@@ -76,7 +76,8 @@ export default function SingleTour() {
   const t = useTranslations();
   const route = useRouter();
   const { tourid, locale } = useParams();
-  const tourOperatorId = localStorage.getItem("tourOperatorId") 
+  const tourOperatorId =
+    typeof window !== 'undefined' ? localStorage.getItem('tourOperatorId') : null;
  const idFromSlug = Array.isArray(tourid)
     ? Number(tourid[tourid.length - 1].split('-').pop())
     : tourid
@@ -230,7 +231,7 @@ export default function SingleTour() {
         ];
 
   const amenitiesToRender =
-    data.ticket_amenities?.length > 0
+    data?.ticket_amenities?.length > 0
       ? data.ticket_amenities
       : [
           { icon_name: 'Waves', name: t('Открытый бассейн') },

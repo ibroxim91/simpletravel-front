@@ -1,6 +1,7 @@
 'use client';
 
 import Logo from '@/assets/navLogo.png';
+import LogoWhite from '@/assets/LogoWhite.png';
 import { User_Api } from '@/features/profile/lib/api';
 import { useWelcomeStore } from '@/features/profile/lib/hook';
 import { Link, usePathname } from '@/shared/config/i18n/navigation';
@@ -80,8 +81,8 @@ const Navbar = () => {
 
   return (
     <>
-      <section className="sticky top-0 z-50 w-full bg-[#FAFBFC]">
-        <div className="custom-container h-[102px]">
+      <section className="sticky top-0 z-50 w-full bg-[#1A73E8] xl:bg-[#FAFBFC]">
+        <div className="custom-container h-[72px] xl:h-[102px]">
           <div className="mx-auto flex h-full w-full max-w-[1240px] items-center">
             <div className="hidden h-full w-full items-center justify-between xl:flex">
               <Link href="/" className="shrink-0">
@@ -91,7 +92,7 @@ const Navbar = () => {
                   width={148}
                   height={56}
                   priority
-                  className="h-auto w-37 2xl:w-41"
+                  className="h-auto w-[148px] 2xl:w-[164px]"
                 />
               </Link>
 
@@ -193,68 +194,67 @@ const Navbar = () => {
               </div>
             </div>
 
-            <div className="flex h-full w-full items-center justify-between xl:hidden">
+            <div className="flex h-full w-full items-center justify-between xl:hidden px-1">
               <Link href="/" className="shrink-0">
                 <Image
-                  src={Logo}
+                  src={LogoWhite}
                   alt="Logo"
-                  width={187}
-                  height={62}
+                  width={98}
+                  height={32}
                   priority
-                  className="h-auto w-[160px]"
+                  className="h-auto w-[98px]"
                 />
               </Link>
-              <IconButton
-                onClick={() => setOpenMobile(true)}
-                sx={{ border: '1px solid gray' }}
-                aria-label="Open-menu"
-              >
-                <MenuIcon
-                  sx={{ color: 'black', width: '20px', height: '20px' }}
-                />
-              </IconButton>
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-4">
+                  <Link href="/saved" aria-label="Saved tours">
+                    <IconButton
+                      sx={{
+                        p: 0,
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '20px',
+                        color: '#FFFFFF',
+                      }}
+                    >
+                      <FavoriteBorderIcon sx={{ width: '20px', height: '18px' }} />
+                    </IconButton>
+                  </Link>
+                  <Link href={profileHref} aria-label="Profile">
+                    <IconButton
+                      sx={{
+                        p: 0,
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '20px',
+                        color: '#FFFFFF',
+                      }}
+                    >
+                      <PersonIcon sx={{ width: '22px', height: '22px' }} />
+                    </IconButton>
+                  </Link>
+                </div>
+                <IconButton
+                  onClick={() => setOpenMobile(true)}
+                  aria-label="Open menu"
+                  sx={{
+                    width: '40px',
+                    height: '40px',
+                    border: '2px solid #FFFFFF',
+                    borderRadius: '4px',
+                    color: '#FFFFFF',
+                    p: 0,
+                  }}
+                >
+                  <MenuIcon sx={{ width: '24px', height: '24px' }} />
+                </IconButton>
+              </div>
             </div>
           </div>
         </div>
         <MobileNavbar open={openMobie} setOpen={setOpenMobile} />
       </section>
-      <div className="bg-white shadow-2xl border-1 rounded-t-2xl grid grid-cols-4 justify-center items-center py-3 h-auto w-full fixed bottom-0 z-30 lg:hidden">
-        {linksMobile.map((e) => (
-          <Link
-            href={e.href}
-            key={e.label}
-            className="flex flex-col justify-center items-center"
-          >
-            <e.icon
-              sx={{
-                width: '34px',
-                height: '34px',
-                color: e.active === pathname ? '#084FE3' : '#646465',
-              }}
-            />
-            <p
-              className={clsx(
-                'max-md:text-sm text-center max-sm:text-xs',
-                e.active === pathname ? 'text-[#084FE3]' : 'text-[#646465]',
-              )}
-            >
-              {t(e.label)}
-            </p>
-          </Link>
-        ))}
-        {/* <div className="flex flex-col justify-center items-center">
-          <SearchIcon sx={{ width: '36px', height: '36px' }} />
-          <p className="max-md:text-[12px]">Найти тур</p>
-        </div>
-        <div className="flex flex-col justify-center items-center">
-          <FavoriteIcon sx={{ width: '36px', height: '36px' }} />
-          <p className="max-md:text-[12px]">Избранное</p>
-        </div>
-        <div className="flex flex-col justify-center items-center">
-          <PersonIcon sx={{ width: '36px', height: '36px' }} />
-          <p className="max-md:text-[12px]">Профиль</p>
-        </div> */}
-      </div>
+      {/* Mobile bottom navigation temporarily disabled */}
     </>
   );
 };

@@ -1,5 +1,6 @@
 import type { NextConfig } from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
+import bundleAnalyzer from '@next/bundle-analyzer';
 
 const apiHost = process.env.NEXT_PUBLIC_IMAGE_API_HOST;
 
@@ -78,4 +79,8 @@ const withNextIntl = createNextIntlPlugin({
   },
 });
 
-export default withNextIntl(nextConfig);
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+});
+
+export default withBundleAnalyzer(withNextIntl(nextConfig));

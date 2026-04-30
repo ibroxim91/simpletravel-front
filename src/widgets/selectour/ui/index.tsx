@@ -83,9 +83,8 @@ const isEqualState = (a: unknown, b: unknown) =>
   JSON.stringify(a) === JSON.stringify(b);
 
 export default function Selectour() {
-  const { locale:any } = useParams();
-  const prevRegionRef = useRef<string | null>(null);
-const prevHotelsRef = useRef<any[] | null>(null);
+  const params = useParams<{ locale: LanguageRoutes }>();
+  const locale = params?.locale as LanguageRoutes;
   const t = useTranslations();
   const [isSearchClicked, setIsSearchClicked] = useState(false);
   const [priceRange, setPriceRange] = useState<number[] | []>([]);
@@ -120,6 +119,8 @@ const prevHotelsRef = useRef<any[] | null>(null);
   const [hotelAmenities, setHotelAmenitie] = useState<string | null>(null);
   const [hotelFeature, setHotelFeature] = useState<string[]>([]);
   const [openFilter, setFilter] = useState(false);
+  const searchParamsString = searchParams?.toString() ?? '';
+  const getSearchParam = (key: string) => searchParams?.get(key) ?? '';
 
 
   const handleInputChange = (value: string, index: number) => {
@@ -132,20 +133,20 @@ const prevHotelsRef = useRef<any[] | null>(null);
 
 
   useEffect(() => {
-    const departure = searchParams.get('departure') || selectedDefaulDestination || '';
-    const destination = searchParams.get('destination') || '';
-    const dateFrom = searchParams.get('dateFrom') || '';
-    const dateTo = searchParams.get('dateTo') || '';
-    const adultsParam = searchParams.get('adults') || '0';
-    const childrenParam = searchParams.get('children') || '0';
-    const town = searchParams.get('town') || '';
-    const hotel_id = searchParams.get('hotel_id') || '';
-    const operator = searchParams.get('operator') || '';
-    const mealPlan = searchParams.get('meal') || '';
-    const rating = searchParams.get('rating') || '';
-    const duration = searchParams.get('duration') || '';
-    const from_cache = searchParams.get('from_cache') || '';
-    const hotelIdParam = searchParams.get("hotel_id");
+    const departure = getSearchParam('departure') || selectedDefaulDestination || '';
+    const destination = getSearchParam('destination') || '';
+    const dateFrom = getSearchParam('dateFrom') || '';
+    const dateTo = getSearchParam('dateTo') || '';
+    const adultsParam = getSearchParam('adults') || '0';
+    const childrenParam = getSearchParam('children') || '0';
+    const town = getSearchParam('town') || '';
+    const hotel_id = getSearchParam('hotel_id') || '';
+    const operator = getSearchParam('operator') || '';
+    const mealPlan = getSearchParam('meal') || '';
+    const rating = getSearchParam('rating') || '';
+    const duration = getSearchParam('duration') || '';
+    const from_cache = getSearchParam('from_cache') || '';
+    const hotelIdParam = getSearchParam('hotel_id');
   if (hotelIdParam) {
     setHotelID(hotelIdParam); // statega yozib qo‘yish
   } else {
@@ -247,7 +248,7 @@ const prevHotelsRef = useRef<any[] | null>(null);
         children: filterLocal?.children,
         operator: filterLocal?.operator,
         departure: filterLocal ? filterLocal.from : '',
-        destination: selectedDestinations === null ? '' : selectedDestinations,
+        destination: filterLocal?.where ?? '',
         hotel_amenity: hotelAmenities ?? '',
         hotel_id: filterLocal?.hotel_id ?? '',
         town: filterLocal?.town ?? '',
@@ -287,28 +288,8 @@ const prevHotelsRef = useRef<any[] | null>(null);
   });
 
 const displayedHotels = useMemo(() => {
-  const currentRegion = filterLocal?.where ?? null;
-  const newHotels = ticket?.data?.results?.hotels ?? [];
-
- 
-  if (
-    currentRegion !== null &&
-    prevRegionRef.current === currentRegion &&
-    Array.isArray(prevHotelsRef.current)
-  ) {
-    return prevHotelsRef.current;
-  }
-
-
-  if (Array.isArray(newHotels) && newHotels.length > 0) {
-    prevRegionRef.current = currentRegion;
-    prevHotelsRef.current = newHotels;
-    return newHotels;
-  }
-
-
-  return Array.isArray(prevHotelsRef.current) ? prevHotelsRef.current : [];
-}, [ticket, filterLocal?.where]);
+  return ticket?.data?.results?.hotels ?? [];
+}, [ticket]);
 
 const prevCountry = useRef<string | null>(null);
 const prevRegion = useRef<string | null>(null);
@@ -381,15 +362,16 @@ const top_duration = [
   ]);
 
   useEffect(() => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParamsString);
     params.set('page', currentPage.toString());
 
     router.replace(`/selectour?${params.toString()}`, { scroll: false });
   }, [currentPage, router, searchParams]);
 
   useEffect(() => {
-    if (searchParams.get('page')) {
-      setCurrentPage(Number(searchParams.get('page')));
+    const pageParam = getSearchParam('page');
+    if (pageParam) {
+      setCurrentPage(Number(pageParam));
     }
   
   }, [searchParams]);
@@ -636,10 +618,10 @@ const top_duration = [
 
                   {Array.isArray(selectedRegionObj.towns) &&
                     selectedRegionObj.towns.length > 0 &&
-                    selectedRegionObj.towns.map((town) => (
+                    selectedRegionObj.towns.map((town, townIndex) => (
                       <CheckboxFilter
                        onclick={setCurrentPage}
-                        key={town.id}
+                        key={`${town.id}-${townIndex}`}
                         value={String(town.id)}
                         label={<span className="pl-6">{town.name}</span>}
 
@@ -647,7 +629,7 @@ const top_duration = [
                           setChecked={(val) => {
                               setSelectedTown(val);
 
-                              const params = new URLSearchParams(searchParams.toString());
+                              const params = new URLSearchParams(searchParamsString);
                               if (val) {
                                 params.set("town", typeof val === 'string' ? val : '');
                               } else {
@@ -713,9 +695,9 @@ const top_duration = [
 
           <div className="w-full rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
        <FilterSection title={t('Отель')} defaultHidden icon="/icons/hotel.png">
-        {displayedHotels.map((hotel) => (
+        {displayedHotels.map((hotel, hotelIndex) => (
           <CheckboxFilter
-            key={hotel.id}
+            key={`${hotel.id}-${hotelIndex}`}
             value={String(hotel.id)}
             label={
               <span className="flex flex-wrap items-center gap-2">
@@ -734,7 +716,7 @@ const top_duration = [
                 setHotelID(String(hotel.id));
                 
                 params.set('hotel_id', String(hotel.id));
-                params.set('operator', String(hotel.operator));
+                params.set('operator', String((hotel as any).operator ?? ''));
               }else{
                 setHotelID(null);
                 params.delete('hotel_id');
@@ -755,11 +737,11 @@ const top_duration = [
 
           <div className="w-full rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
           <FilterSection title={t('Питание')} defaultHidden icon="/icons/meal-2.png">
-            {meal?.map((e) => (
+            {meal?.map((e, mealIndex) => (
               <CheckboxFilter
                 value={String(e.id)}
                 label={e.name}
-                key={e.id}
+                key={`${e.id}-${mealIndex}`}
                 onclick={setCurrentPage}
                 setChecked={setMealPlan}
                 selectedValue={mealPlan}
@@ -959,9 +941,9 @@ const top_duration = [
 
                   {Array.isArray(selectedRegionObj.towns) &&
                     selectedRegionObj.towns.length > 0 &&
-                    selectedRegionObj.towns.map((town) => (
+                    selectedRegionObj.towns.map((town, townIndex) => (
                       <CheckboxFilter
-                        key={town.id}
+                        key={`${town.id}-${townIndex}`}
                         value={String(town.id)}
                         label={<span className="pl-6">{town.name}</span>}
                         
@@ -970,7 +952,7 @@ const top_duration = [
                           setChecked={(val) => {
                               setSelectedTown(val);
 
-                              const params = new URLSearchParams(searchParams.toString());
+                              const params = new URLSearchParams(searchParamsString);
                               if (val) {
                                 params.set("town", typeof val === 'string' ? val : '');
                               } else {
@@ -1012,11 +994,11 @@ const top_duration = [
 </FilterSection>
 
             <FilterSection title={t('Питание')} icon="/icons/meal-2.png">
-              {meal?.map((e) => (
+              {meal?.map((e, mealIndex) => (
                 <CheckboxFilter
                   value={String(e.id)}
                   label={e.name}
-                  key={e.id}
+                  key={`${e.id}-${mealIndex}`}
                   onclick={setCurrentPage}
                   setChecked={setMealPlan}
                   selectedValue={mealPlan}
@@ -1043,9 +1025,9 @@ const top_duration = [
             </FilterSection>
 
             <FilterSection title={t('Отели')} icon="/icons/hotel.png">
-              {displayedHotels.map((hotel) => (
+              {displayedHotels.map((hotel, hotelIndex) => (
                 <CheckboxFilter
-                  key={hotel.id}
+                  key={`${hotel.id}-${hotelIndex}`}
                   value={String(hotel.id)}
                   label={
                     <span className="flex flex-wrap items-center gap-2">
@@ -1065,7 +1047,7 @@ const top_duration = [
                      if(val){
                       setHotelID(String(hotel.id));
                        params.set('hotel_id', String(hotel.id));
-                       params.set('operator', String(hotel.operator));
+                      params.set('operator', String((hotel as any).operator ?? ''));
                       }else{
                           setHotelID(null);
                           params.delete('hotel_id');
@@ -1200,7 +1182,7 @@ const top_duration = [
                     style={{ height: '180px', width: '180px' }}
                   />
                   <p className="mt-2 text-base font-medium text-[#6B7280]">
-                    {t('Подготавливаем параметры поиска...')}
+                    {t('Подготавливаем параметры поиска')}
                   </p>
                 </div>
               ) : isLoading || isFetching ? (
@@ -1211,7 +1193,7 @@ const top_duration = [
                     src={loaderAnimation}
                     style={{ height: '180px', width: '180px' }}
                   />
-                  <p className="mt-2 text-base font-medium text-[#6B7280]">{t('Загрузка туров...')}</p>
+                  <p className="mt-2 text-base font-medium text-[#6B7280]">{t('Загрузка туров')}</p>
                 </div>
               ) : isError ? (
                 <div className="flex min-h-[420px] flex-col items-center justify-center rounded-[14px] bg-white px-6 text-center">
@@ -1234,8 +1216,8 @@ const top_duration = [
                   {ticket && ticket?.data?.results.tickets.length > 0 ? (
                    
                     <div className="flex flex-col gap-6">
-                    {ticket?.data?.results.tickets.map((item: any) => (
-                      <TourItem key={item.id} data={item} />
+                    {ticket?.data?.results.tickets.map((item: any, itemIndex: number) => (
+                      <TourItem key={`${item.id}-${itemIndex}`} data={item} />
                     ))}
                     </div>
                   ) : (

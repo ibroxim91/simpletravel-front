@@ -170,7 +170,7 @@ const Footer = () => {
                       alt={logo.alt}
                       width={logo.width}
                       height={32}
-                      className="h-8 w-[54px] object-contain"
+                      className="h-8 w-auto max-w-[54px] object-contain"
                     />
                   </div>
                 ))}
