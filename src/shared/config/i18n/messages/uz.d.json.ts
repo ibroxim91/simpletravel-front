@@ -40,6 +40,7 @@ declare const messages: {
   "Дети": "Bolalar",
   "до 13 лет": "13 yoshgacha",
   "Искать туры": "Sayohatlarni qidirish",
+  "Искать тур": "Sayohat qidirish",
   "Qidirish": "Qidirish",
   "Davlat topilmadi": "Davlat topilmadi",
   "Shahar topilmadi": "Shahar topilmadi",
