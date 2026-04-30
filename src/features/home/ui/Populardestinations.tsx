@@ -62,7 +62,42 @@ const Populardestinations = () => {
               ))}
         </div>
 
-        <div className="mt-6 overflow-x-auto xl:hidden">
+        <div className="mt-6 hidden grid-cols-3 gap-3 md:grid xl:hidden">
+          {isLoading
+            ? Array.from({ length: 6 }).map((_, idx) => (
+                <Skeleton key={idx} className="h-[220px] rounded-[14px]" />
+              ))
+            : popular.map((item: any) => (
+                <Link
+                  key={item.id}
+                  href={`/selectour/${item.slug}/?from_cache=${item?.from_cache ?? ''}`}
+                  className="relative h-[220px] w-full overflow-hidden rounded-[14px]"
+                  onClick={() => {
+                    localStorage.setItem('tourOperator', item?.operator ?? '');
+                    localStorage.setItem('tourOperatorId', String(item?.tour_operator_id ?? ''));
+                    localStorage.setItem('from_cache', String(item?.from_cache ?? ''));
+                  }}
+                >
+                  <Image
+                    src={BASE_URL + item.ticket_images}
+                    alt={item.title}
+                    fill
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/25" />
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <p className="line-clamp-1 text-[20px] font-semibold leading-6 text-white">
+                      {item.destination?.name || item.title}
+                    </p>
+                    <p className="mt-1 text-[12px] font-medium leading-[15px] text-white">
+                      {t('от')} {formatPrice(item.price, locale as LanguageRoutes, true)}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+        </div>
+
+        <div className="mt-6 overflow-x-auto md:hidden">
           <div className="grid w-max grid-flow-col grid-rows-2 gap-3 pr-2">
           {isLoading
             ? Array.from({ length: 8 }).map((_, idx) => (

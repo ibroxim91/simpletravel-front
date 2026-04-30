@@ -831,66 +831,87 @@ const top_duration = [
           }}
           className="lg:hidden"
         >
-          <div
-            className="bg-white shadow-sm flex items-center justify-between px-4 py-4 rounded-xl"
-            onClick={() => setFilter(true)}
-          >
-            <p className="font-semibold text-lg text-[#212122]">
-              {t('Фильтры')}
-            </p>
-            <FilterListIcon />
+          <div className="flex items-center gap-6">
+            <div
+              className="flex h-9 w-[293px] items-center gap-4 rounded-[14px] bg-white px-4 py-2 shadow-[0_2px_4px_rgba(0,0,0,0.15)]"
+              onClick={() => setFilter(true)}
+            >
+              <FilterListIcon sx={{ color: '#1A73E8', fontSize: 16 }} />
+              <p className="text-[14px] font-bold leading-[17px] text-[#1A73E8]">
+                {t('Настройте свой отдых')}
+              </p>
+            </div>
+            <button
+              type="button"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[14px] bg-white p-[10px] shadow-[0_2px_4px_rgba(0,0,0,0.15)]"
+            >
+              <img src="/icons/sort.png" alt="sort" className="h-4 w-4" />
+            </button>
           </div>
           <Drawer
             anchor="bottom"
             open={openFilter}
             onClose={() => setFilter(false)}
+            ModalProps={{
+              keepMounted: true,
+            }}
+            BackdropProps={{
+              sx: {
+                backgroundColor: 'rgba(238, 238, 238, 0.4)',
+                backdropFilter: 'blur(5.43656px)',
+                WebkitBackdropFilter: 'blur(5.43656px)',
+              },
+            }}
             PaperProps={{
               sx: {
                 borderTopLeftRadius: 16,
                 borderTopRightRadius: 16,
-                padding: 2,
                 width: '100%',
-                overflow: 'auto',
-                maxHeight: '70%',
+                height: 'calc(100vh - 84px)',
+                maxHeight: 'calc(100vh - 84px)',
+                overflow: 'hidden',
+                backgroundColor: '#FAFBFC',
               },
             }}
           >
-            <div className="mb-5 flex items-center justify-between sticky">
-              <h2 className="text-lg font-semibold text-[#121212]">
-                {t('Фильтры')}
-              </h2>
-              <Button
-                variant={'outline'}
-                className="rounded-full h-[40px] w-[40px] cursor-pointer"
-                onClick={() => setFilter(false)}
-              >
-                <CloseIcon sx={{ color: 'black' }} />
-              </Button>
-            </div>
-
-            <FilterSection title={t('Стоимость')} icon="/icons/money.png">
-              <Slider
-                range
-                min={2500000}
-                max={100000000}
-                value={priceRange}
-                onChange={(v) => setPriceRange(v as number[])}
-              />
-              <div className="flex justify-between mt-3 border border-[#DFDFDF] rounded-xl p-3">
-                <input
-                  type="text"
-                  value={formatPrice(priceRange[0])}
-                  onChange={(e) => handleInputChange(e.target.value, 0)}
-                  className="w-1/2 border-none outline-none text-gray-600"
-                />
-                <input
-                  type="text"
-                  value={formatPrice(priceRange[1])}
-                  onChange={(e) => handleInputChange(e.target.value, 1)}
-                  className="w-1/2 border-none outline-none text-right text-gray-600"
-                />
+            <div className="flex h-full flex-col">
+              <div className="sticky top-0 z-10 mb-1 flex items-center justify-between border-b border-[#E5E7EB] bg-[#FAFBFC] px-4 py-4">
+                <h2 className="text-[18px] font-semibold leading-6 text-[#121212]">
+                  {t('Настройте свой отдых')}
+                </h2>
+                <Button
+                  variant={'outline'}
+                  className="h-[40px] w-[40px] cursor-pointer rounded-full"
+                  onClick={() => setFilter(false)}
+                >
+                  <CloseIcon sx={{ color: 'black' }} />
+                </Button>
               </div>
-            </FilterSection>
+
+              <div className="flex-1 space-y-4 overflow-y-auto px-4 pb-28 pt-3">
+                <FilterSection title={t('Стоимость')} icon="/icons/money.png">
+                  <Slider
+                    range
+                    min={2500000}
+                    max={100000000}
+                    value={priceRange}
+                    onChange={(v) => setPriceRange(v as number[])}
+                  />
+                  <div className="mt-3 flex justify-between rounded-xl border border-[#DFDFDF] p-3">
+                    <input
+                      type="text"
+                      value={formatPrice(priceRange[0])}
+                      onChange={(e) => handleInputChange(e.target.value, 0)}
+                      className="w-1/2 border-none text-gray-600 outline-none"
+                    />
+                    <input
+                      type="text"
+                      value={formatPrice(priceRange[1])}
+                      onChange={(e) => handleInputChange(e.target.value, 1)}
+                      className="w-1/2 border-none text-right text-gray-600 outline-none"
+                    />
+                  </div>
+                </FilterSection>
 
             {/* <FilterSection title={t('Название отеля')} icon="/icons/hotel.png">
               <input
@@ -1121,15 +1142,24 @@ const top_duration = [
                   />
                 ))}
             </FilterSection> */}
-            <div className="sticky bottom-0 w-full left-0">
-              <button
-                className="bg-[#1764FC] rounded-3xl p-3 w-full text-white cursor-pointer font-semibold"
-                onClick={() => {
-                  setFilter(false);
-                }}
-              >
-                {t('Применять')}
-              </button>
+              </div>
+
+              <div className="sticky bottom-0 left-0 z-10 grid w-full grid-cols-2 gap-3 border-t border-[#E5E7EB] bg-white px-4 py-4">
+                <button
+                  className="h-12 w-full rounded-[14px] border border-[#1A73E8] bg-white text-[14px] font-medium text-[#1A73E8]"
+                  onClick={() => setFilter(false)}
+                >
+                  {t('Отмена')}
+                </button>
+                <button
+                  className="h-12 w-full rounded-[14px] bg-[#1A73E8] text-[14px] font-medium text-white"
+                  onClick={() => {
+                    setFilter(false);
+                  }}
+                >
+                  {t('Применять')}
+                </button>
+              </div>
             </div>
           </Drawer>
         </motion.div>
@@ -1145,8 +1175,8 @@ const top_duration = [
                 ease: 'easeOut',
               }}
             >
-              <div className="w-full flex  justify-between items-center max-lg:flex-col max-lg:items-start max-lg:gap-5">
-                <h1 className="font-bold text-2xl text-start flex items-center gap-1 max-md:text-lg max-sm:text-sm">
+              <div className="w-full flex justify-between items-center max-lg:flex-col max-lg:items-start max-lg:gap-5">
+                <h1 className="flex items-center gap-1 text-start text-2xl font-bold max-lg:hidden">
                   {regionName ? (
                     <>
                       <span>{countryName}</span>
@@ -1166,6 +1196,15 @@ const top_duration = [
                     ''
                   )}
                 </h1>
+
+                <div className="flex flex-col items-start gap-2 lg:hidden">
+                  <p className="text-[20px] font-bold leading-6 text-[#1C1C1E]">
+                    {t('Горящие туры: успейте забронировать!')}
+                  </p>
+                  <p className="text-[14px] font-normal leading-[17px] text-[#1C1C1E]">
+                    {t('Лучшие направления по минимальным ценам')}
+                  </p>
+                </div>
 
                 {/* <Select
                   onValueChange={(value) => {
