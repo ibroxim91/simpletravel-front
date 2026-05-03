@@ -9,10 +9,8 @@ import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import BusinessIcon from '@mui/icons-material/Business';
 import FmdGoodOutlinedIcon from '@mui/icons-material/FmdGoodOutlined';
 import StarIcon from '@mui/icons-material/Star';
-import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-import { useEffect, useState } from 'react';
 
 interface TourOfferCardProps {
   item: any;
@@ -27,7 +25,7 @@ interface TourOfferCardProps {
 const 
 TourOfferCard = ({
   item,
-  index = 0,
+  index: _index = 0,
   locale,
   onClick,
   fallbackHotelText,
@@ -35,35 +33,10 @@ TourOfferCard = ({
   starsText,
 }: TourOfferCardProps) => {
   const t = useTranslations();
-  const [enableAnimation, setEnableAnimation] = useState(false);
   const oldPrice = Math.round(Number(item.price || 0) * 1.23);
-  const fadeUp = {
-    hidden: { opacity: 0, y: 60 },
-    visible: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.8, delay: i * 0.2, ease: 'easeOut' as const },
-    }),
-  };
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const mediaQuery = window.matchMedia('(min-width: 768px)');
-    const syncAnimationMode = () => setEnableAnimation(mediaQuery.matches);
-    syncAnimationMode();
-    mediaQuery.addEventListener('change', syncAnimationMode);
-    return () => mediaQuery.removeEventListener('change', syncAnimationMode);
-  }, []);
 
   return (
-    <motion.div
-      variants={fadeUp}
-      initial={enableAnimation ? 'hidden' : false}
-      animate={enableAnimation ? undefined : 'visible'}
-      whileInView={enableAnimation ? 'visible' : undefined}
-      viewport={enableAnimation ? { once: false, amount: 0.2 } : undefined}
-      custom={index}
-    >
+    <div>
       <Link
         href={`/selectour/${item.slug}/?from_cache=${item?.from_cache ?? ''}`}
         prefetch
@@ -132,7 +105,7 @@ TourOfferCard = ({
                   </div>
                 </div>
       </Link>
-    </motion.div>
+    </div>
   );
 };
 
