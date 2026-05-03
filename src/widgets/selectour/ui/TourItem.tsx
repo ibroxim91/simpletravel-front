@@ -109,7 +109,7 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
       }}
       prefetch
     >
-      <div className="relative flex h-[296.5px] w-full items-stretch overflow-hidden rounded-[12px] bg-white shadow-[0_4px_16px_rgba(17,34,17,0.05)] max-lg:min-h-[189px] max-lg:h-auto max-lg:rounded-[14px]">
+      <div className="relative flex h-[296.5px] w-full items-stretch overflow-hidden rounded-[12px] bg-[#FAFBFC] max-lg:min-h-[189px] max-lg:h-auto max-lg:rounded-[14px]">
         <div className="relative h-full max-lg:h-auto w-[297px] shrink-0 overflow-hidden max-lg:min-h-[189px] max-lg:w-[126px] max-lg:self-stretch">
           <Image
             src={BASE_URL + data.ticket_images}
@@ -131,7 +131,7 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
               else mutate({ ticket: data.id });
             }}
             className={clsx(
-              'absolute left-2 top-2 z-10 hidden size-8 cursor-pointer rounded-[28px] border-0 p-0 drop-shadow-[0_0_2.66667px_rgba(0,0,0,0.15)] max-lg:flex max-lg:items-center max-lg:justify-center',
+              'absolute left-2 top-2 z-10 hidden size-8 cursor-pointer rounded-[28px] border-0 p-0 max-lg:flex max-lg:items-center max-lg:justify-center',
               data.is_liked
                 ? 'border-[#E0313733] bg-[#FFE4E5] hover:bg-[#FFE4E5]'
                 : 'bg-transparent hover:bg-transparent',
@@ -150,7 +150,7 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
           </Button>
         </div>
 
-        <div className="flex h-full w-[627px] flex-col bg-white px-6 pb-6 pt-6 max-lg:w-auto max-lg:min-w-0 max-lg:flex-1 max-lg:gap-0 max-lg:pl-2 max-lg:pr-2 max-lg:pb-2 max-lg:pt-2">
+        <div className="flex h-full w-[627px] flex-col bg-[#FAFBFC] px-6 pb-6 pt-6 max-lg:w-auto max-lg:min-w-0 max-lg:flex-1 max-lg:gap-0 max-lg:pb-0 max-lg:pl-2 max-lg:pr-2 max-lg:pt-2">
           <div className="flex items-start justify-between gap-6 max-lg:hidden">
             <div className="flex w-[386px] flex-col gap-4 max-lg:w-full">
               <h1 className="min-h-12 text-[20px] font-bold leading-6 text-[#1C1C1E] line-clamp-2">
@@ -232,10 +232,10 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
                 else mutate({ ticket: data.id });
               }}
               className={clsx(
-                'h-12 w-12 cursor-pointer rounded-full border shadow-[0_0_4px_rgba(0,0,0,0.15)]',
+                'h-12 w-12 cursor-pointer rounded-full border',
                 data.is_liked
                   ? 'border-[#E0313733] bg-[#FFE4E5] hover:bg-[#FFE4E5]'
-                  : 'border-[#DFDFDF] bg-white hover:bg-white',
+                  : 'border-[#DFDFDF] bg-[#FAFBFC] hover:bg-[#FAFBFC]',
               )}
             >
               <FavoriteRoundedIcon sx={{ color: '#E03137', fontSize: 20 }} />
@@ -295,8 +295,8 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
               )}
             </div>
 
-            {/* Frame 1984078221 — tepadan 16px (pt-4); margin overflow bilan yo‘qolmasin */}
-            <div className="flex min-h-[49px] w-[219px] max-w-full shrink-0 items-center gap-2 pt-4">
+            {/* Pastga qotadi (mt-auto); tepadan 16px */}
+            <div className="mt-auto flex min-h-[49px] w-[219px] max-w-full shrink-0 items-end gap-2 pt-4">
               <div className="flex w-[163px] shrink-0 flex-col items-start justify-center gap-0 p-0">
                 <p className="w-full min-w-0 shrink-0 text-left text-[12px] font-medium leading-[15px] text-[#112211]/75">
                   {formatPrice(data.price * 1.55, locale as LanguageRoutes, true)}

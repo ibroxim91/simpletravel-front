@@ -469,13 +469,13 @@ const top_duration = [
 
       <div className="custom-container mx-auto flex w-full max-w-[1240px] gap-6 max-lg:mt-8 max-lg:flex-col max-lg:px-5 lg:mt-[104px]">
         <div className="hidden h-max w-[292px] shrink-0 flex-col gap-4 max-lg:hidden lg:flex">
-          <div className="flex h-[72px] w-full items-center gap-4 rounded-[14px] bg-white px-4 py-6 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
+          <div className="flex h-[72px] w-full items-center gap-4 rounded-[14px] bg-[#FAFBFC] px-4 py-6">
             <FilterListIcon sx={{ color: '#1A73E8', fontSize: 24 }} />
             <p className="text-base font-bold leading-5 text-[#1A73E8]">
               {t('Настройте свой отдых')}
             </p>
           </div>
-          <div className="flex h-[56px] w-full items-center justify-between rounded-[14px] bg-white px-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
+          <div className="flex h-[56px] w-full items-center justify-between rounded-[14px] bg-[#FAFBFC] px-4">
             <div className="flex items-center gap-4">
               <img src="/icons/sort.png" width="24px" alt="" />
                <Select
@@ -494,7 +494,7 @@ const top_duration = [
                     setCurrentPage(1);
                   }}
                 >
-                  <SelectTrigger className="w-full !h-[40px] flex items-center justify-between rounded-lg gap-4 bg-[#FFFFFF] border-none">
+                  <SelectTrigger className="w-full !h-[40px] flex items-center justify-between rounded-lg gap-4 border-none bg-[#FAFBFC]">
                     <SelectValue placeholder={t('По возрастанию цены')} />
                     <KeyboardArrowDownIcon />
                   </SelectTrigger>
@@ -512,7 +512,7 @@ const top_duration = [
             {/* <KeyboardArrowDownIcon sx={{ color: '#6B7280', fontSize: 16 }} /> */}
           </div>
 
-          <div className="hidden w-full rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
+          <div className="hidden w-full rounded-[14px] bg-[#FAFBFC] p-4">
           <FilterSection title={t('Стоимость')} icon='/icons/money.png'>
             <Slider
               range
@@ -578,7 +578,7 @@ const top_duration = [
             />
           </FilterSection> */}
 
-          <div className=" w-full overflow-hidden rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
+          <div className=" w-full overflow-hidden rounded-[14px] bg-[#FAFBFC] p-4">
           <FilterSection title={t('Длительность')} icon='/icons/time.png'>
             {top_duration &&
               [...top_duration]
@@ -598,7 +598,7 @@ const top_duration = [
           </FilterSection>
           </div>
 
-          <div className=" w-full overflow-hidden rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
+          <div className=" w-full overflow-hidden rounded-[14px] bg-[#FAFBFC] p-4">
          <FilterSection title={t('Регионы и курорты')} icon="/icons/country.png">
           {country &&
             (() => {
@@ -657,7 +657,7 @@ const top_duration = [
         </FilterSection>
         </div>
 
-          <div className="w-full rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
+          <div className="w-full rounded-[14px] bg-[#FAFBFC] p-4">
           <FilterSection title={t('Категория отеля')} defaultHidden icon="/icons/stars.png">
             {["5","4","3","2"].map((rating) => (
               <CheckboxFilter
@@ -699,7 +699,7 @@ const top_duration = [
               ))}
           </FilterSection> */}
 
-          <div className="w-full rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
+          <div className="w-full rounded-[14px] bg-[#FAFBFC] p-4">
        <FilterSection title={t('Отель')} defaultHidden icon="/icons/hotel.png">
         {displayedHotels.map((hotel, hotelIndex) => (
           <CheckboxFilter
@@ -741,7 +741,7 @@ const top_duration = [
       </div>
 
 
-          <div className="w-full rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
+          <div className="w-full rounded-[14px] bg-[#FAFBFC] p-4">
           <FilterSection title={t('Питание')} defaultHidden icon="/icons/meal-2.png">
             {meal?.map((e, mealIndex) => (
               <CheckboxFilter
@@ -758,7 +758,7 @@ const top_duration = [
           </FilterSection>
           </div>
 
-          <div className="w-full rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
+          <div className="w-full rounded-[14px] bg-[#FAFBFC] p-4">
           <FilterSection title={t('Цена')}  icon="/icons/money.png">
             <Slider
               range
@@ -871,7 +871,7 @@ const top_duration = [
               <div className="flex w-full items-center justify-between gap-3 max-lg:mt-[24px]">
                 <button
                   type="button"
-                  className="flex h-9 min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-[14px] bg-white px-4 py-2 text-left shadow-[0_2px_4px_rgba(0,0,0,0.15)]"
+                  className="flex h-9 min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-[14px] bg-[#FAFBFC] px-4 py-2 text-left"
                   onClick={() => setFilter(true)}
                 >
                   <FilterListIcon sx={{ color: '#1A73E8', fontSize: 18 }} className="shrink-0" />
@@ -884,7 +884,7 @@ const top_duration = [
                     <button
                       type="button"
                       aria-label={t('По возрастанию цены')}
-                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[14px] bg-white p-[10px] shadow-[0_2px_4px_rgba(0,0,0,0.15)] outline-none focus-visible:ring-2 focus-visible:ring-[#1A73E8]/40"
+                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[14px] bg-[#FAFBFC] p-[10px] outline-none focus-visible:ring-2 focus-visible:ring-[#1A73E8]/40"
                     >
                       <img src="/icons/sort.png" alt="" className="h-4 w-4" width={16} height={16} />
                     </button>
@@ -1219,9 +1219,9 @@ const top_duration = [
             </FilterSection> */}
               </div>
 
-              <div className="sticky bottom-0 left-0 z-10 grid w-full grid-cols-2 gap-3 border-t border-[#E5E7EB] bg-white px-4 py-4">
+              <div className="sticky bottom-0 left-0 z-10 grid w-full grid-cols-2 gap-3 border-t border-[#E5E7EB] bg-[#FAFBFC] px-4 py-4">
                 <button
-                  className="h-12 w-full rounded-[14px] border border-[#1A73E8] bg-white text-[14px] font-medium text-[#1A73E8]"
+                  className="h-12 w-full rounded-[14px] border border-[#1A73E8] bg-[#FAFBFC] text-[14px] font-medium text-[#1A73E8]"
                   onClick={() => setFilter(false)}
                 >
                   {t('Отмена')}
@@ -1241,7 +1241,7 @@ const top_duration = [
 
             <div className="max-lg:mt-[31px] lg:mt-6">
               {!filterLocal ? (
-                <div className="flex min-h-[420px] flex-col items-center justify-center rounded-[14px] bg-white">
+                <div className="flex min-h-[420px] flex-col items-center justify-center rounded-[14px] bg-[#FAFBFC]">
                   <Player
                     autoplay
                     loop
@@ -1253,7 +1253,7 @@ const top_duration = [
                   </p>
                 </div>
               ) : isLoading || isFetching ? (
-                <div className="flex min-h-[420px] flex-col items-center justify-center rounded-[14px] bg-white">
+                <div className="flex min-h-[420px] flex-col items-center justify-center rounded-[14px] bg-[#FAFBFC]">
                   <Player
                     autoplay
                     loop
@@ -1263,7 +1263,7 @@ const top_duration = [
                   <p className="mt-2 text-base font-medium text-[#6B7280]">{t('Загрузка туров')}</p>
                 </div>
               ) : isError ? (
-                <div className="flex min-h-[420px] flex-col items-center justify-center rounded-[14px] bg-white px-6 text-center">
+                <div className="flex min-h-[420px] flex-col items-center justify-center rounded-[14px] bg-[#FAFBFC] px-6 text-center">
                   <p className="text-xl font-semibold text-[#121212]">
                     {t('Не удалось загрузить туры')}
                   </p>
@@ -1306,7 +1306,7 @@ const top_duration = [
                   <Button
                     onClick={() => setCurrentPage((prev) => prev - 1)}
                     disabled={currentPage === 1}
-                    className="bg-[#ECF2FF] rounded-full w-10 hover:bg-[#ECF2FF] h-10 shadow-sm flex justify-center items-center cursor-pointer"
+                    className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-[#ECF2FF] hover:bg-[#ECF2FF]"
                   >
                     <ChevronLeft color="#084FE3" />
                   </Button>
@@ -1329,7 +1329,7 @@ const top_duration = [
                               }}
                               href={`/selectour?page=${page}`}
                               className={clsx(
-                                'rounded-full w-10 h-10 flex items-center justify-center shadow-sm',
+                                'flex h-10 w-10 items-center justify-center rounded-full',
                                 currentPage === page
                                   ? 'bg-[#084FE3] text-white'
                                   : 'bg-[#ECF2FF] text-[#084FE3]',
@@ -1359,7 +1359,7 @@ const top_duration = [
                   <Button
                     onClick={() => setCurrentPage((prev) => prev + 1)}
                     disabled={currentPage === ticket.data.total_pages}
-                    className="bg-[#ECF2FF] rounded-full w-10 hover:bg-[#ECF2FF] h-10 shadow-sm flex justify-center items-center cursor-pointer"
+                    className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-[#ECF2FF] hover:bg-[#ECF2FF]"
                   >
                     <ChevronRight color="#084FE3" />
                   </Button>
