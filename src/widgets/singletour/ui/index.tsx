@@ -4,13 +4,6 @@ import { User_Api } from '@/features/profile/lib/api';
 import { Link, useRouter } from '@/shared/config/i18n/navigation';
 import { LanguageRoutes } from '@/shared/config/i18n/types';
 import { formatPrice } from '@/shared/lib/formatPrice';
-import { Button } from '@/shared/ui/button';
-import {
-  Carousel,
-  CarouselApi,
-  CarouselContent,
-  CarouselItem,
-} from '@/shared/ui/carousel';
 import { Skeleton } from '@/shared/ui/skeleton';
 import Swiper from '@/shared/ui/swiper';
 import Ticket_Api from '@/widgets/selectour/lib/api';
@@ -19,7 +12,7 @@ import ErrorIcon from '@mui/icons-material/Error';
 import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
 import Groups2OutlinedIcon from '@mui/icons-material/Groups2Outlined';
 import HotelOutlinedIcon from '@mui/icons-material/HotelOutlined';
-import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import LocalCafeOutlinedIcon from '@mui/icons-material/LocalCafeOutlined';
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
@@ -142,20 +135,6 @@ const data = typeof window !== 'undefined'
 
 
   
-  const { data: hotTicket } = useQuery({
-    queryKey: ['ticket_hot'],
-    queryFn: () =>
-      Ticket_Api.GetAllTickets({
-        params: {
-          page: 1,
-          page_size: 8,
-          rating: 3.5,
-        },
-      }),
-    enabled: !!data,
-  });
- 
-
   const { data: user } = useQuery({
     queryKey: ['get_me'],
     queryFn: () => User_Api.getMe(),
@@ -188,22 +167,6 @@ const data = typeof window !== 'undefined'
   const [openWatch, setOpenWatch] = useState<boolean>(false);
   const [openHelp, setOpenHelp] = useState<boolean>(false);
   const [openHelpMobile, setOpenHelpMobile] = useState<boolean>(false);
-  const [canScrollPrev, setCanScrollPrev] = useState(false);
-  const [canScrollNext, setCanScrollNext] = useState(false);
-  const [api, setApi] = useState<CarouselApi>();
-
-  useEffect(() => {
-    if (!api) return;
-
-    const updateButtons = () => {
-      setCanScrollNext(api.canScrollNext());
-      setCanScrollPrev(api.canScrollPrev());
-    };
-
-    updateButtons();
-    api.on('select', updateButtons);
-  }, [api]);
-
   const items = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   const STEP = 250;
   const originalLength = items.length;
@@ -312,7 +275,7 @@ const data = typeof window !== 'undefined'
       </div>
       {data && (
         <>
-          <div className="custom-container">
+          <div className="custom-container max-lg:px-5">
             <div>
               <motion.div
                 initial="hidden"
@@ -323,10 +286,17 @@ const data = typeof window !== 'undefined'
               >
                 <Breadcrumbs
                   aria-label="breadcrumb"
-                  separator={<span className="text-[#112211]/70">{'>'}</span>}
+                  separator={
+                    <KeyboardArrowRightIcon
+                      sx={{ fontSize: 18, color: 'rgba(17, 34, 17, 0.7)' }}
+                      aria-hidden
+                    />
+                  }
                   sx={{
                     '& .MuiBreadcrumbs-separator': {
                       mx: 1,
+                      display: 'inline-flex',
+                      alignItems: 'center',
                     },
                   }}
                 >
@@ -400,7 +370,7 @@ const data = typeof window !== 'undefined'
                         <p className="text-[12px] font-medium leading-[15px] text-[#6B7280]/75">
                           {data.destination?.name}
                         </p>
-                        <span className="rounded-[14px] bg-[#F59E0B] px-2 py-1 text-[12px] font-medium leading-[15px] text-white">
+                        <span className="rounded-[14px] bg-[#F59E0B] px-2 py-1 text-[12px] font-medium leading-[15px] text-white max-lg:hidden">
                           {t('Необходима Виза')}
                         </span>
                       </div>
@@ -468,7 +438,7 @@ const data = typeof window !== 'undefined'
                 whileInView="visible"
                 viewport={{ once: false, amount: 0.2 }}
                 variants={fadeInUp}
-                className="mt-4 max-lg:mt-6"
+                className="mt-4 max-lg:mt-6 max-lg:mb-0"
               >
                 <Swiper
                   id={data.id}
@@ -477,6 +447,17 @@ const data = typeof window !== 'undefined'
                   setOpenWatch={setOpenWatch}
                 />
               </motion.div>
+
+              <div className="hidden w-full max-lg:block max-lg:my-8">
+                <div className="flex min-h-[151px] w-full flex-col gap-[10px] rounded-[14px] bg-[#F59E0B] p-4">
+                  <p className="text-[14px] font-medium leading-[100%] text-white">
+                    {t('Singletour_visa_notice_title')}
+                  </p>
+                  <p className="text-[14px] font-medium leading-[100%] text-white">
+                    {t('Singletour_visa_notice_body')}
+                  </p>
+                </div>
+              </div>
 
               <motion.div
                 initial="hidden"
@@ -534,40 +515,36 @@ const data = typeof window !== 'undefined'
                 </button>
               </motion.div>
 
-              <hr className="mt-[60px]" />
-
               <motion.div
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: false, amount: 0.2 }}
                 // variants={slideIn}
-                className="mt-[72px] mb-[72px] flex w-full max-w-[1240px] flex-col gap-8 h-[342px] max-xl:h-auto"
+                className="mb-[72px] mt-[72px] flex w-full max-w-[1240px] flex-col gap-6 max-lg:mt-0 max-xl:h-auto"
               >
-                <div className="flex w-full h-[165px] flex-col items-start gap-4 max-lg:h-auto">
-                  <h1 className="text-[24px] leading-[29px] font-bold text-[#1C1C1E]">
+                <div className="flex w-full flex-col items-start gap-4 max-lg:max-w-full">
+                  <h1 className="w-full text-[20px] font-semibold leading-6 text-[#1C1C1E]">
                     {t('Описание отеля')} {data.ticket_hotel?.[0]?.name}
                   </h1>
-                  <p className="w-full h-[120px] overflow-hidden text-[16px] leading-5 font-medium text-[#1C1C1E]/75">
+                  <p className="w-full text-[14px] font-medium leading-[17px] text-[#1C1C1E] opacity-75 max-lg:h-auto max-lg:overflow-visible lg:h-[120px] lg:overflow-hidden">
                     {data.hotel_info}
                   </p>
                 </div>
-                <div className="flex h-[145px] w-full items-start gap-6 overflow-visible max-xl:h-auto max-xl:flex-wrap max-lg:h-auto max-lg:flex-col max-lg:gap-4">
+                <div className="flex w-full flex-col items-stretch gap-2 overflow-visible max-lg:gap-2 max-xl:flex-wrap lg:h-[145px] lg:flex-row lg:items-start lg:gap-6">
                   <motion.div
                     whileHover={{ scale: 1.03 }}
-                    className="h-[145px] w-[187px] shrink-0 rounded-[12px] bg-[#1A73E8] p-4 max-lg:h-[59px] max-lg:w-full max-lg:px-4 max-lg:py-2"
+                    className="flex w-full shrink-0 rounded-[12px] bg-[#1A73E8] px-4 py-2 max-lg:min-h-[56px] max-lg:flex-row max-lg:items-center max-lg:justify-between lg:h-[145px] lg:w-[187px] lg:flex-col lg:justify-between lg:p-4"
                   >
-                    <div className="flex h-full flex-col justify-between max-lg:flex-row max-lg:items-start">
-                      <p className="text-[32px] font-bold leading-10 text-white max-lg:text-[56px] max-lg:leading-[43px]">
-                        {Number(data.rating || 0).toFixed(1)}
+                    <p className="text-[32px] font-bold leading-10 text-white tabular-nums">
+                      {Number(data.rating || 0).toFixed(1)}
+                    </p>
+                    <div className="flex flex-col items-end gap-1 max-lg:shrink-0">
+                      <p className="text-right text-[16px] font-bold leading-5 text-white">
+                        {t('Очень хорошо')}
                       </p>
-                      <div className="flex flex-col gap-1 max-lg:items-end">
-                        <p className="text-[16px] leading-5 font-bold text-white">
-                          {t('Очень хорошо')}
-                        </p>
-                        <p className="text-[14px] leading-[17px] font-medium text-white max-lg:text-right">
-                          {data.ticket_comments?.length || 0} {t('отзывов')}
-                        </p>
-                      </div>
+                      <p className="text-right text-[12px] font-normal leading-[15px] text-white">
+                        {data.ticket_comments?.length || 0} {t('отзывов')}
+                      </p>
                     </div>
                   </motion.div>
 
@@ -632,7 +609,7 @@ const data = typeof window !== 'undefined'
                     <motion.div
                       key={item.id}
                       whileHover={{ scale: 1.03 }}
-                      className="flex h-[145px] w-[186px] shrink-0 flex-col items-start gap-8 rounded-[12px] border border-[#1A73E8] p-4 max-lg:h-[59px] max-lg:w-full max-lg:gap-0 max-lg:px-4 max-lg:py-2"
+                      className="flex min-h-[59px] w-full shrink-0 flex-col items-stretch justify-center rounded-[12px] border border-[#1A73E8] px-4 py-2 max-lg:min-h-[59px] max-lg:w-full lg:h-[145px] lg:w-[186px] lg:gap-0 lg:p-4"
                     >
                       <HotelInfoItem
                         img={item.img}
@@ -644,13 +621,45 @@ const data = typeof window !== 'undefined'
                   ))}
                 </div>
               </motion.div>
+
+              <div className="mt-12 mb-12 flex w-full flex-col gap-4 lg:hidden">
+                <p className="w-full text-left text-[20px] font-bold leading-6 text-[#1C1C1E]">
+                  {formatPrice(data.price, locale as LanguageRoutes, true)} /{' '}
+                  <span className="font-normal">1 {t('человек')}</span>
+                </p>
+                {user ? (
+                  <Link href={`/booking/${data.id}`} className="block w-full">
+                    <motion.button
+                      type="button"
+                      whileTap={{ scale: 0.95 }}
+                      className="flex h-12 w-full items-center justify-center rounded-2xl bg-[#FF6B00] px-4 text-[14px] font-semibold leading-[17px] text-white"
+                    >
+                      {t('Забронировать')}
+                    </motion.button>
+                  </Link>
+                ) : (
+                  <motion.button
+                    type="button"
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      route.push(
+                        `/auth/login?callbackUrl=${encodeURIComponent(window.location.href)}`,
+                      );
+                    }}
+                    className="flex h-12 w-full items-center justify-center rounded-2xl bg-[#FF6B00] px-4 text-[14px] font-semibold leading-[17px] text-white"
+                  >
+                    {t('Забронировать')}
+                  </motion.button>
+                )}
+              </div>
+
               {includedServicesToRender.length > 0 && (
                 <motion.div
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: false, amount: 0.2 }}
                   variants={fadeInUp}
-                  className="mt-[72px]"
+                  className="mt-[72px] max-lg:mt-0"
                 >
                   <div className="h-px w-full bg-[#11221140]" />
 
@@ -780,82 +789,11 @@ const data = typeof window !== 'undefined'
             </div>
           </div>
 
-          <div className="custom-container">
+          <div className="custom-container max-lg:px-5">
             <div className="mt-[72px] h-px w-full bg-[#11221140]" />
             <div className="mt-[72px]">
               <CommentTour data={data} />
             </div>
-            {hotTicket && hotTicket.data.results.tickets.length > 0 && (
-              <div className="mt-[72px]">
-                <div className="custom-container flex justify-between items-center">
-                  <motion.h1
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: false, amount: 0.2 }}
-                    variants={{
-                      hidden: { opacity: 0, x: -60 },
-                      visible: () => ({
-                        opacity: 1,
-                        x: 0,
-                        transition: { delay: 0.5, duration: 0.5 },
-                      }),
-                    }}
-                    className="text-3xl text-[#232325] font-semibold"
-                  >
-                    {t('Откройте новые направления')}
-                  </motion.h1>
-                  <motion.div
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: false, amount: 0.2 }}
-                    // variants={{
-                    //   hidden: { opacity: 0, x: 60 },
-                    //   visible: () => ({
-                    //     opacity: 1,
-                    //     x: 0,
-                    //     transition: { delay: 0.5, duration: 0.5 },
-                    //   }),
-                    // }}
-                    className="flex gap-2"
-                  >
-                    <Button
-                      variant={'outline'}
-                      className="rounded-xl w-10 h-10 max-lg:hidden bg-[#F8F8F8] border-[#CBD5E0]"
-                      onClick={() => api?.scrollPrev()}
-                      disabled={!canScrollPrev}
-                    >
-                      <KeyboardBackspaceIcon sx={{ color: '#939BA4' }} />
-                    </Button>
-                    <Button
-                      variant={'outline'}
-                      className="rounded-xl w-10 h-10 max-lg:hidden border-[#CBD5E0]"
-                      onClick={() => api?.scrollNext()}
-                      disabled={!canScrollNext}
-                    >
-                      <KeyboardBackspaceIcon
-                        sx={{ rotate: '180deg', color: '#939BA4' }}
-                      />
-                    </Button>
-                  </motion.div>
-                </div>
-                <Carousel
-                  className="w-full mt-4 cursor-pointer"
-                  setApi={setApi}
-                >
-                  <CarouselContent>
-                    {hotTicket &&
-                      hotTicket.data.results.tickets?.map((item, key) => (
-                        <CarouselItem
-                          key={key}
-                          className="basis-1/4 max-lg:basis-1/2 max-md:basis-[80%]"
-                        >
-                          <TourOffersItem data={item} />
-                        </CarouselItem>
-                      ))}
-                  </CarouselContent>
-                </Carousel>
-              </div>
-            )}
           </div>
         </>
       )}

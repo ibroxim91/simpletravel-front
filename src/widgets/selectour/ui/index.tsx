@@ -15,6 +15,12 @@ import {
   PaginationLink,
 } from '@/shared/ui/pagination';
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/shared/ui/dropdown-menu';
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -237,8 +243,9 @@ const prevHotelsRef = useRef<any[] | null>(null);
       filterLocal?.mealPlan,
       currentPage,
       selectedDurations,
-      hotelRating, 
-    
+      hotelRating,
+      cheaper,
+      expensive,
     ],
     queryFn: () => {
       
@@ -479,7 +486,7 @@ const top_duration = [
         </div>
       </section>
 
-      <div className="custom-container  mt-[104px] mx-auto flex w-full max-w-[1240px] gap-6 max-lg:flex-col">
+      <div className="custom-container mx-auto flex w-full max-w-[1240px] gap-6 max-lg:mt-8 max-lg:flex-col max-lg:px-5 lg:mt-[104px]">
         <motion.div
           initial={{ opacity: 0, x: -40 }}
           animate={{ opacity: 1, x: 0 }}
@@ -500,6 +507,7 @@ const top_duration = [
             <div className="flex items-center gap-4">
               <img src="/icons/sort.png" width="24px" alt="" />
                <Select
+                  value={cheaper ? 'cheaper' : expensive ? 'expensive' : 'all'}
                   onValueChange={(value) => {
                     if (value === 'cheaper') {
                       setCheaper(true);
@@ -511,6 +519,7 @@ const top_duration = [
                       setCheaper(false);
                       setExpensive(false);
                     }
+                    setCurrentPage(1);
                   }}
                 >
                   <SelectTrigger className="w-full !h-[40px] flex items-center justify-between rounded-lg gap-4 bg-[#FFFFFF] border-none">
@@ -821,61 +830,172 @@ const top_duration = [
           </div>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, x: -40 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{
-            duration: 0.5,
-            delay: 0.3,
-            ease: 'easeOut',
-          }}
-          className="lg:hidden"
-        >
-          <div className="flex items-center gap-6">
-            <div
-              className="flex h-9 w-[293px] items-center gap-4 rounded-[14px] bg-[#FAFBFC] px-4 py-2 shadow-[0_2px_4px_rgba(0,0,0,0.15)]"
-              onClick={() => setFilter(true)}
+
+        <div className="flex w-full max-w-[924px] flex-col justify-between">
+          <div>
+            <motion.div
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{
+                duration: 0.5,
+                delay: 0.3,
+                ease: 'easeOut',
+              }}
             >
-              <FilterListIcon sx={{ color: '#1A73E8', fontSize: 16 }} />
-              <p className="text-[14px] font-bold leading-[17px] text-[#1A73E8]">
-                {t('Настройте свой отдых')}
-              </p>
-            </div>
-            <button
-              type="button"
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[14px] bg-[#FAFBFC] p-[10px] shadow-[0_2px_4px_rgba(0,0,0,0.15)]"
+              <div className="flex w-full items-center justify-between max-lg:flex-col max-lg:items-start max-lg:gap-0">
+                <h1 className="flex items-center gap-1 text-start text-2xl font-bold max-lg:hidden">
+                  {regionName ? (
+                    <>
+                      <span>{countryName}</span>
+                      <KeyboardArrowRightIcon />
+                      <span>
+                        {regionName} {ticket && ticket ? t('ga tegishli') : ''}
+                      </span>
+                    </>
+                  ) : (
+                    t('Filter uchun Kerakli davlat va shaharni tanlang')
+                  )}{' '}
+                  {ticket && (regionName || ticket?.data?.total_items > 0) ? (
+                    <>
+                      {ticket.data.total_items} {t('ta tur topildi')}
+                    </>
+                  ) : (
+                    ''
+                  )}
+                </h1>
+
+                <div className="flex flex-col items-start gap-2 lg:hidden">
+                  <p className="text-[20px] font-bold leading-6 text-[#1C1C1E]">
+                    {t('Горящие туры: успейте забронировать!')}
+                  </p>
+                  <p className="text-[14px] font-normal leading-[17px] text-[#1C1C1E]">
+                    {t('Лучшие направления по минимальным ценам')}
+                  </p>
+                </div>
+
+                {/* <Select
+                  onValueChange={(value) => {
+                    if (value === 'cheaper') {
+                      setCheaper(true);
+                      setExpensive(false);
+                    } else if (value === 'expensive') {
+                      setCheaper(false);
+                      setExpensive(true);
+                    } else if (value === 'all') {
+                      setCheaper(false);
+                      setExpensive(false);
+                    }
+                  }}
+                >
+                  <SelectTrigger className="w-[180px] !h-[40px] flex items-center justify-between max-lg:w-full rounded-lg border border-[#DFDFDF] gap-4 bg-[#FFFFFF]">
+                    <SelectValue placeholder={t('По возрастанию цены')} />
+                    <KeyboardArrowDownIcon />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t('Все')}</SelectItem>
+                    <SelectItem value="cheaper">{t('Подешевле')}</SelectItem>
+                    <SelectItem value="expensive">{t('Подороже')}</SelectItem>
+                  </SelectContent>
+                </Select> */}
+
+
+
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: -40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{
+                duration: 0.5,
+                delay: 0.3,
+                ease: 'easeOut',
+              }}
+              className="lg:hidden"
             >
-              <img src="/icons/sort.png" alt="sort" className="h-4 w-4" />
-            </button>
-          </div>
-          <Drawer
-            anchor="bottom"
-            open={openFilter}
-            onClose={() => setFilter(false)}
-            ModalProps={{
-              keepMounted: true,
-            }}
-            BackdropProps={{
-              sx: {
-                backgroundColor: 'rgba(238, 238, 238, 0.4)',
-                backdropFilter: 'blur(5.43656px)',
-                WebkitBackdropFilter: 'blur(5.43656px)',
-              },
-            }}
-            PaperProps={{
-              sx: {
-                borderTopLeftRadius: 16,
-                borderTopRightRadius: 16,
-                width: '100%',
-                height: 'calc(100vh - 84px)',
-                maxHeight: 'calc(100vh - 84px)',
-                overflow: 'hidden',
-                backgroundColor: '#FAFBFC',
-              },
-            }}
-          >
-            <div className="flex h-full flex-col">
-              <div className="sticky top-0 z-10 mb-1 flex items-center justify-between border-b border-[#E5E7EB] bg-[#FAFBFC] px-4 py-4">
+              <div className="flex w-full items-center justify-between gap-3 max-lg:mt-[24px]">
+                <button
+                  type="button"
+                  className="flex h-9 min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-[14px] bg-white px-4 py-2 text-left shadow-[0_2px_4px_rgba(0,0,0,0.15)]"
+                  onClick={() => setFilter(true)}
+                >
+                  <FilterListIcon sx={{ color: '#1A73E8', fontSize: 18 }} className="shrink-0" />
+                  <span className="truncate text-[14px] font-bold leading-[17px] text-[#1A73E8]">
+                    {t('Настройте свой отдых')}
+                  </span>
+                </button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      aria-label={t('По возрастанию цены')}
+                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[14px] bg-white p-[10px] shadow-[0_2px_4px_rgba(0,0,0,0.15)] outline-none focus-visible:ring-2 focus-visible:ring-[#1A73E8]/40"
+                    >
+                      <img src="/icons/sort.png" alt="" className="h-4 w-4" width={16} height={16} />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="min-w-[10rem]">
+                    <DropdownMenuItem
+                      className={clsx(!cheaper && !expensive && 'bg-accent')}
+                      onSelect={() => {
+                        setCheaper(false);
+                        setExpensive(false);
+                        setCurrentPage(1);
+                      }}
+                    >
+                      {t('Все')}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className={clsx(cheaper && !expensive && 'bg-accent')}
+                      onSelect={() => {
+                        setCheaper(true);
+                        setExpensive(false);
+                        setCurrentPage(1);
+                      }}
+                    >
+                      {t('Подешевле')}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className={clsx(!cheaper && expensive && 'bg-accent')}
+                      onSelect={() => {
+                        setCheaper(false);
+                        setExpensive(true);
+                        setCurrentPage(1);
+                      }}
+                    >
+                      {t('Подороже')}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+              <Drawer
+                anchor="bottom"
+                open={openFilter}
+                onClose={() => setFilter(false)}
+                ModalProps={{
+                  keepMounted: true,
+                }}
+                BackdropProps={{
+                  sx: {
+                    backgroundColor: 'rgba(238, 238, 238, 0.4)',
+                    backdropFilter: 'blur(5.43656px)',
+                    WebkitBackdropFilter: 'blur(5.43656px)',
+                  },
+                }}
+                PaperProps={{
+                  sx: {
+                    borderTopLeftRadius: 16,
+                    borderTopRightRadius: 16,
+                    width: '100%',
+                    height: 'calc(100vh - 84px)',
+                    maxHeight: 'calc(100vh - 84px)',
+                    overflow: 'hidden',
+                    backgroundColor: '#FAFBFC',
+                  },
+                }}
+              >
+                <div className="flex h-full flex-col">
+                  <div className="sticky top-0 z-10 mb-1 flex items-center justify-between border-b border-[#E5E7EB] bg-[#FAFBFC] px-4 py-4">
                 <h2 className="text-[18px] font-semibold leading-6 text-[#121212]">
                   {t('Настройте свой отдых')}
                 </h2>
@@ -1161,82 +1281,10 @@ const top_duration = [
                 </button>
               </div>
             </div>
-          </Drawer>
-        </motion.div>
-
-        <div className="flex w-full max-w-[924px] flex-col justify-between">
-          <div>
-            <motion.div
-              initial={{ opacity: 0, x: 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{
-                duration: 0.5,
-                delay: 0.3,
-                ease: 'easeOut',
-              }}
-            >
-              <div className="w-full flex justify-between items-center max-lg:flex-col max-lg:items-start max-lg:gap-5">
-                <h1 className="flex items-center gap-1 text-start text-2xl font-bold max-lg:hidden">
-                  {regionName ? (
-                    <>
-                      <span>{countryName}</span>
-                      <KeyboardArrowRightIcon />
-                      <span>
-                        {regionName} {ticket && ticket ? t('ga tegishli') : ''}
-                      </span>
-                    </>
-                  ) : (
-                    t('Filter uchun Kerakli davlat va shaharni tanlang')
-                  )}{' '}
-                  {ticket && (regionName || ticket?.data?.total_items > 0) ? (
-                    <>
-                      {ticket.data.total_items} {t('ta tur topildi')}
-                    </>
-                  ) : (
-                    ''
-                  )}
-                </h1>
-
-                <div className="flex flex-col items-start gap-2 lg:hidden">
-                  <p className="text-[20px] font-bold leading-6 text-[#1C1C1E]">
-                    {t('Горящие туры: успейте забронировать!')}
-                  </p>
-                  <p className="text-[14px] font-normal leading-[17px] text-[#1C1C1E]">
-                    {t('Лучшие направления по минимальным ценам')}
-                  </p>
-                </div>
-
-                {/* <Select
-                  onValueChange={(value) => {
-                    if (value === 'cheaper') {
-                      setCheaper(true);
-                      setExpensive(false);
-                    } else if (value === 'expensive') {
-                      setCheaper(false);
-                      setExpensive(true);
-                    } else if (value === 'all') {
-                      setCheaper(false);
-                      setExpensive(false);
-                    }
-                  }}
-                >
-                  <SelectTrigger className="w-[180px] !h-[40px] flex items-center justify-between max-lg:w-full rounded-lg border border-[#DFDFDF] gap-4 bg-[#FFFFFF]">
-                    <SelectValue placeholder={t('По возрастанию цены')} />
-                    <KeyboardArrowDownIcon />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">{t('Все')}</SelectItem>
-                    <SelectItem value="cheaper">{t('Подешевле')}</SelectItem>
-                    <SelectItem value="expensive">{t('Подороже')}</SelectItem>
-                  </SelectContent>
-                </Select> */}
-
-
-
-              </div>
+              </Drawer>
             </motion.div>
 
-            <div className="mt-6">
+            <div className="max-lg:mt-[31px] lg:mt-6">
               {!filterLocal ? (
                 <div className="flex min-h-[420px] flex-col items-center justify-center rounded-[14px] bg-white">
                   <Player

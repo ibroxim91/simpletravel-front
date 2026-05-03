@@ -121,7 +121,7 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
         whileInView={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.8, delay: 0.1, ease: 'easeOut' }}
         viewport={{ once: false, amount: 0.1 }}
-        className="relative flex h-[296.5px] w-full overflow-hidden rounded-[12px] bg-white shadow-[0_4px_16px_rgba(17,34,17,0.05)] max-lg:mx-auto max-lg:h-[247px] max-lg:max-w-[353px] max-lg:rounded-[14px]"
+        className="relative flex h-[296.5px] w-full overflow-hidden rounded-[12px] bg-white shadow-[0_4px_16px_rgba(17,34,17,0.05)] max-lg:h-[247px] max-lg:rounded-[14px]"
       >
         <div className="relative h-full w-[297px] shrink-0 max-lg:w-[126px]">
           <Image
@@ -154,7 +154,7 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
           </Button>
         </div>
 
-        <div className="flex h-full w-[627px] flex-col bg-white px-6 pb-6 pt-6 max-lg:w-[227px] max-lg:px-1 max-lg:pb-1 max-lg:pt-0">
+        <div className="flex h-full w-[627px] flex-col bg-white px-6 pb-6 pt-6 max-lg:w-auto max-lg:min-w-0 max-lg:flex-1 max-lg:px-3 max-lg:pb-2 max-lg:pt-2">
           <div className="flex items-start justify-between gap-6 max-lg:hidden">
             <div className="flex w-[386px] flex-col gap-4 max-lg:w-full">
               <h1 className="min-h-12 text-[20px] font-bold leading-6 text-[#1C1C1E] line-clamp-2">
