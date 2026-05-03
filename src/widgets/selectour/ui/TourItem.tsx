@@ -7,7 +7,7 @@ import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
-import { CalendarDays, Coffee, Hotel, MapPin, Star } from 'lucide-react';
+import { ArrowRight, Heart } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
@@ -115,15 +115,15 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
         whileInView={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.8, delay: 0.1, ease: 'easeOut' }}
         viewport={{ once: false, amount: 0.1 }}
-        className="relative flex h-[296.5px] w-full overflow-hidden rounded-[12px] bg-white shadow-[0_4px_16px_rgba(17,34,17,0.05)] max-lg:h-[247px] max-lg:rounded-[14px]"
+        className="relative flex h-[296.5px] w-full items-stretch overflow-hidden rounded-[12px] bg-white shadow-[0_4px_16px_rgba(17,34,17,0.05)] max-lg:min-h-[189px] max-lg:h-auto max-lg:rounded-[14px]"
       >
-        <div className="relative h-full w-[297px] shrink-0 max-lg:w-[126px]">
+        <div className="relative h-full max-lg:h-auto w-[297px] shrink-0 overflow-hidden max-lg:min-h-[189px] max-lg:w-[126px] max-lg:self-stretch">
           <Image
             src={BASE_URL + data.ticket_images}
             alt={data.title}
-            className="h-full w-full object-cover"
-            width={297}
-            height={297}
+            fill
+            className="object-cover"
+            sizes="(max-width: 1023px) 126px, 297px"
             quality={100}
           />
           <div className="absolute right-2 top-2 rounded-lg bg-white/50 px-4 py-2 text-xs font-medium leading-4 text-[#112211] backdrop-blur-[2px] max-lg:hidden">
@@ -138,17 +138,26 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
               else mutate({ ticket: data.id });
             }}
             className={clsx(
-              'absolute left-2 top-2 hidden h-8 w-8 cursor-pointer rounded-full border p-0 shadow-[0_0_4px_rgba(0,0,0,0.15)] max-lg:flex',
+              'absolute left-2 top-2 z-10 hidden size-8 cursor-pointer rounded-[28px] border-0 p-0 drop-shadow-[0_0_2.66667px_rgba(0,0,0,0.15)] max-lg:flex max-lg:items-center max-lg:justify-center',
               data.is_liked
                 ? 'border-[#E0313733] bg-[#FFE4E5] hover:bg-[#FFE4E5]'
-                : 'border-[#DFDFDF] bg-white hover:bg-white',
+                : 'bg-transparent hover:bg-transparent',
             )}
           >
-            <FavoriteRoundedIcon sx={{ color: '#E03137', fontSize: 20 }} />
+            {data.is_liked ? (
+              <FavoriteRoundedIcon sx={{ color: '#E03137', fontSize: 20 }} />
+            ) : (
+              <Heart
+                className="size-5 shrink-0 stroke-[#FFFFFF]"
+                fill="none"
+                strokeWidth={1.23}
+                aria-hidden
+              />
+            )}
           </Button>
         </div>
 
-        <div className="flex h-full w-[627px] flex-col bg-white px-6 pb-6 pt-6 max-lg:w-auto max-lg:min-w-0 max-lg:flex-1 max-lg:px-3 max-lg:pb-2 max-lg:pt-2">
+        <div className="flex h-full w-[627px] flex-col bg-white px-6 pb-6 pt-6 max-lg:w-auto max-lg:min-w-0 max-lg:flex-1 max-lg:gap-0 max-lg:pl-2 max-lg:pr-2 max-lg:pb-2 max-lg:pt-2">
           <div className="flex items-start justify-between gap-6 max-lg:hidden">
             <div className="flex w-[386px] flex-col gap-4 max-lg:w-full">
               <h1 className="min-h-12 text-[20px] font-bold leading-6 text-[#1C1C1E] line-clamp-2">
@@ -221,7 +230,7 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
 
           <div className="mt-auto h-px w-full bg-[rgba(17,34,17,0.25)]/25 max-lg:hidden" />
 
-          <div className="mt-6 flex items-center gap-4 max-lg:hidden">
+          <div className="mt-6 flex w-full items-center justify-between max-lg:hidden">
             <Button
               onClick={(e) => {
                 e.preventDefault();
@@ -239,35 +248,44 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
               <FavoriteRoundedIcon sx={{ color: '#E03137', fontSize: 20 }} />
             </Button>
 
+            {/*
             <button className="flex h-12 w-[434px] items-center justify-center rounded-[14px] bg-[#1A73E8] text-sm font-semibold leading-[17px] text-white">
               {t('Смотреть тур')}
             </button>
+            */}
+            <span
+              className="flex size-12 shrink-0 items-center justify-center rounded-[76px] bg-[#1A73E8]/75 text-white"
+              aria-hidden
+            >
+              <ArrowRight className="size-6" strokeWidth={2} />
+            </span>
           </div>
 
-          <div className="hidden h-full flex-col max-lg:flex lg:hidden">
-            <h1 className="line-clamp-2 min-h-10 text-[16px] font-semibold leading-5 text-[#112211]">
+          {/* Mobil: Figma Group 4 — 353×189 (proportsiya), Montserrat — layout */}
+          <div className="hidden min-h-0 min-w-0 flex-1 flex-col overflow-visible max-lg:flex lg:hidden">
+            <h1 className="line-clamp-2 break-words text-[16px] font-semibold leading-5 text-[#112211] [overflow-wrap:anywhere]">
               {data.title}
             </h1>
 
-            <div className="mt-2 flex flex-col gap-1">
+            <div className="mt-2 flex min-h-0 flex-col gap-1">
               <div className="flex items-center gap-2">
-                <img src="/icons/location.png" alt="location" className="h-4 w-4" />
+                <img src="/icons/location.png" alt="" className="size-4 shrink-0" />
                 <p className="line-clamp-1 text-[12px] font-medium leading-[15px] text-[#6B7280]/75">
                   {data.destination?.name}
                 </p>
               </div>
               {data.ticket_hotel.length > 0 && (
                 <div className="flex items-center gap-2">
-                  <img src="/icons/hotel.png" alt="hotel" className="h-4 w-4" />
+                  <img src="/icons/hotel.png" alt="" className="size-4 shrink-0" />
                   <p className="line-clamp-1 text-[12px] font-medium leading-[15px] text-[#6B7280]/75">
                     {data.ticket_hotel[0].name}
                   </p>
                 </div>
               )}
               {data.ticket_hotel.length > 0 && (
-                <>
+                <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-2">
-                    <img src="/icons/stars.png" alt="stars" className="h-4 w-4" />
+                    <img src="/icons/stars.png" alt="" className="size-4 shrink-0" />
                     <p className="text-[12px] font-medium leading-[15px] text-[#1C1C1E]">
                       {/^\d/.test(String(data.ticket_hotel[0].rating))
                         ? `${data.ticket_hotel[0].rating} ${t('звёзды')}`
@@ -275,27 +293,40 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <img src="/icons/meal.png" alt="meal" className="h-4 w-4" />
+                    <img src="/icons/meal.png" alt="" className="size-4 shrink-0" />
                     <p className="text-[12px] font-medium leading-[15px] text-[#1C1C1E]">
                       {getMealShort(data.ticket_hotel[0]?.meal_plan)}
                     </p>
                   </div>
-                </>
+                </div>
               )}
             </div>
 
-            <div className="mt-2 flex flex-col">
-              <p className="text-[12px] font-medium leading-[15px] text-[#112211]/75 line-through">
-                {formatPrice(data.price * 1.55, locale as LanguageRoutes, true)}
-              </p>
-              <p className="text-[16px] font-bold leading-5 text-[#FF6B00]">
-                {formatPrice(data.price, locale as LanguageRoutes, true)}
-              </p>
+            {/* Frame 1984078221 — tepadan 16px (pt-4); margin overflow bilan yo‘qolmasin */}
+            <div className="flex min-h-[49px] w-[219px] max-w-full shrink-0 items-center gap-2 pt-4">
+              <div className="flex w-[163px] shrink-0 flex-col items-start justify-center gap-0 p-0">
+                <p className="w-full min-w-0 shrink-0 text-left text-[12px] font-medium leading-[15px] text-[#112211]/75">
+                  {formatPrice(data.price * 1.55, locale as LanguageRoutes, true)}
+                </p>
+                <div className="flex min-h-[34px] w-[163px] flex-col justify-center gap-0 text-[#FF6B00]">
+                  <p className="text-[16px] font-bold leading-5">
+                    {formatPrice(data.price, locale as LanguageRoutes, true)}
+                  </p>
+                  <p className="text-[12px] font-medium leading-[15px]">{t('за человека')}</p>
+                </div>
+              </div>
+              {/*
+              <button className="mt-auto flex h-12 w-full items-center justify-center rounded-[14px] bg-[#1A73E8] text-[14px] font-medium leading-[17px] text-white">
+                {t('Смотреть тур')}
+              </button>
+              */}
+              <span
+                className="flex size-12 shrink-0 items-center justify-center rounded-[76px] bg-[#1A73E8]/75 text-white"
+                aria-hidden
+              >
+                <ArrowRight className="size-6" strokeWidth={2} />
+              </span>
             </div>
-
-            <button className="mt-auto flex h-12 w-full items-center justify-center rounded-[14px] bg-[#1A73E8] text-[14px] font-medium leading-[17px] text-white">
-              {t('Смотреть тур')}
-            </button>
           </div>
         </div>
       </motion.div>
