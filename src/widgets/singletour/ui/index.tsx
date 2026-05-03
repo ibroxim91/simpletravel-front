@@ -70,13 +70,17 @@ const slideIn = {
     transition: { delay: i * 0.05, duration: 0.5 },
   }),
 };
-
 export default function SingleTour() {
   const t = useTranslations();
+  const [tourOperatorId, setTourOperatorId] = useState<string | null>(null);
+  
+  useEffect(() => {
+    setTourOperatorId(localStorage.getItem('tourOperatorId'));
+  }, []);
   const route = useRouter();
   const { tourid, locale } = useParams();
-  const tourOperatorId =
-    typeof window !== 'undefined' ? localStorage.getItem('tourOperatorId') : null;
+  // const tourOperatorId =
+  //   typeof window !== 'undefined' ? localStorage.getItem('tourOperatorId') : null;
  const idFromSlug = Array.isArray(tourid)
     ? Number(tourid[tourid.length - 1].split('-').pop())
     : tourid
@@ -84,28 +88,58 @@ export default function SingleTour() {
       : undefined;
 
   const formatShortDate = (value?: string) => {
-    if (!value) return '--.--.--';
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return '--.--.--';
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = String(date.getFullYear()).slice(-2);
-    return `${day}.${month}.${year}`;
-  };
+  if (!value) return '--.--.--';
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['tickets_detail', tourOperatorId],
-    queryFn: () =>
-      TicketsDetailAPi.getTicketsDetail({ id: String(tourOperatorId) }),
-    select(data) {
-      console.log("data.data.data ",data.data.data)
-      localStorage.setItem("tour", JSON.stringify(data.data.data));
-      return data.data.data;
-    },
-     enabled: !!tourOperatorId, // faqat ID mavjud bo‘lsa ishlaydi
-    staleTime: 0,              // har safar yangi fetch
-    cacheTime: 0,
-  });
+  let date: Date | null = null;
+
+  // Agar format YYYYMMDD bo'lsa (masalan: 20260517)
+  if (/^\d{8}$/.test(value)) {
+    const year = value.slice(0, 4);
+    const month = value.slice(4, 6);
+    const day = value.slice(6, 8);
+    date = new Date(`${year}-${month}-${day}`);
+  } else {
+    // Oddiy ISO yoki boshqa format
+    date = new Date(value);
+  }
+
+  if (!date || Number.isNaN(date.getTime())) return '--.--.--';
+
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = String(date.getFullYear()).slice(-2);
+
+  return `${day}.${month}.${year}`;
+};
+    
+  // const formatShortDate = (value?: string) => {
+  //   if (!value) return '--.--.--';
+  //   const date = new Date(value);
+  //   if (Number.isNaN(date.getTime())) return '--.--.--';
+  //   const day = String(date.getDate()).padStart(2, '0');
+  //   const month = String(date.getMonth() + 1).padStart(2, '0');
+  //   const year = String(date.getFullYear()).slice(-2);
+  //   return `${day}.${month}.${year}`;
+  // };
+
+  // const { data, isLoading } = useQuery({
+  //   queryKey: ['tickets_detail', tourOperatorId],
+  //   queryFn: () =>
+  //     TicketsDetailAPi.getTicketsDetail({ id: String(tourOperatorId) }),
+  //   select(data) {
+  //     console.log("data.data.data ",data.data.data)
+  //     localStorage.setItem("tour", JSON.stringify(data.data.data));
+  //     return data.data.data;
+  //   },
+  //    enabled: !!tourOperatorId, // faqat ID mavjud bo‘lsa ishlaydi
+  //   staleTime: 0,              // har safar yangi fetch
+  //   cacheTime: 0,
+  // });
+
+const data = typeof window !== 'undefined'
+  ? JSON.parse(localStorage.getItem("tour") || "null")
+  : null;
+
 
   
   const { data: hotTicket } = useQuery({
@@ -215,9 +249,9 @@ export default function SingleTour() {
     }
   }, [isAnimating]);
 
-  if (isLoading) {
-    return <TourDetailLoading />;
-  }
+ if (!data) {
+  return <TourDetailLoading />
+ }
 
   const visibleIncludedServices = data?.ticket_included_services || [];
   const includedServicesToRender =
@@ -264,15 +298,16 @@ export default function SingleTour() {
             />
           </motion.div>
         </AnimatePresence>
-        {isLoading ? (
+        {!data ? (
           <Skeleton className="h-[400px] w-full bg-gray-200" />
         ) : null}
 
         {openWatch && data && (
-          <WatchTour
-            onClose={() => setOpenWatch(false)}
-            images={data.ticket_images}
-          />
+         <WatchTour
+        onClose={() => setOpenWatch(false)}
+        images={Array.isArray(data.ticket_images) ? data.ticket_images : [data.ticket_images]}
+      />
+
         )}
       </div>
       {data && (
@@ -438,7 +473,7 @@ export default function SingleTour() {
                 <Swiper
                   id={data.id}
                   is_liked={data.is_liked}
-                  images={data.ticket_images}
+                  images={Array.isArray(data.ticket_images) ? data.ticket_images : [data.ticket_images]}
                   setOpenWatch={setOpenWatch}
                 />
               </motion.div>
@@ -581,14 +616,15 @@ export default function SingleTour() {
                       name: t('Дата тура'),
                       title: (() => {
                         const start = formatShortDate(data.departure_date);
-                        const endDate = new Date(data.departure_date);
-                        if (!Number.isNaN(endDate.getTime())) {
-                          endDate.setDate(endDate.getDate() + Math.max((data.duration_days || 1) - 1, 0));
-                        }
-                        const end = Number.isNaN(endDate.getTime())
-                          ? '--.--.--'
-                          : formatShortDate(endDate.toISOString());
-                        return `${start} - ${end}`;
+                        const endDate = formatShortDate(data.travel_time);
+                        // const endDate = new Date(start);
+                        // if (!Number.isNaN(endDate.getTime())) {
+                        //   endDate.setDate(endDate.getDate() + Math.max((data.duration_days || 1) - 1, 0));
+                        // }
+                        // const end = Number.isNaN(endDate.getTime())
+                        //   ? '--.--.--'
+                        //   : formatShortDate(endDate.toISOString());
+                        return `${start} - ${endDate}`;
                       })(),
                       iconNode: <CalendarMonthOutlinedIcon sx={{ color: '#1A73E8', fontSize: 24 }} />,
                     },
