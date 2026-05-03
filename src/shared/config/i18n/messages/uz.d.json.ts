@@ -428,6 +428,8 @@ declare const messages: {
   "Подготавливаем параметры поиска": "Qidiruv parametrlari tayyorlanmoqda...",
   "Загрузка туров": "Turlar yuklanmoqda...",
   "Включено": "Kiritilgan",
-  "Не включено": "Kiritilmagan"
+  "Не включено": "Kiritilmagan",
+  "Singletour_visa_notice_title": "Ha, ushbu davlatga kirish uchun viza talab qilinadi.",
+  "Singletour_visa_notice_body": "Lekin xavotir olmang — buni yolg‘iz hal qilishingiz shart emas! Agentligimiz barcha mijozlarimizga hujjatlarni rasmiylashtirishda to‘liq yordam ko‘rsatadi."
 };
 export default messages;

@@ -101,7 +101,7 @@ export default function ImageSwiper({
   return (
     <div className="w-full mx-auto square relative">
       <div
-        className="custom-container mt-10 mb-[72px] h-[550px] max-lg:mt-0 max-lg:h-[235px]"
+        className="mt-10 mb-[72px] h-[550px] w-full max-lg:mt-0 max-lg:mb-0 max-lg:h-[235px]"
         onClick={() => setOpenWatch(true)}
       >
         <div className="relative h-full w-full overflow-hidden rounded-[16px] max-lg:rounded-[14px]">

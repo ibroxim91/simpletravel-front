@@ -68,21 +68,8 @@ const CommentTour = ({ data }: { data: ToursDetailData }) => {
 
   return (
     <div className="flex w-full max-w-[1240px] flex-col items-start gap-6 max-lg:gap-8">
-      <div className="flex h-12 w-full items-center justify-between gap-6 max-md:flex-col max-md:items-start max-md:h-auto">
+      <div className="flex h-12 w-full items-center justify-between gap-6">
         <h3 className="text-[20px] leading-6 font-bold text-[#112211]">{t('Отзывы о гостинице')}</h3>
-        <button
-          type="button"
-        onClick={() => setShowForm(!showForm)}
-        disabled={!data.allow_comment}
-          className={`h-12 w-[187px] rounded-[14px] border px-4 text-[14px] leading-[17px] font-semibold
-    ${
-      data.allow_comment
-              ? 'cursor-pointer border-[#1A73E8] text-[#1A73E8]'
-        : 'cursor-not-allowed border-gray-300 text-gray-400'
-    }`}
-      >
-          {showForm ? t('Скрыть форму') : t('Оставить отзыв')}
-        </button>
       </div>
 
       <div className="flex items-center gap-4 max-md:flex-wrap">
@@ -209,6 +196,21 @@ const CommentTour = ({ data }: { data: ToursDetailData }) => {
             <p className="text-[16px] leading-5 font-medium text-[#1C1C1E]">1 из 9</p>
             <button type="button" className="cursor-pointer text-[#6B7280]">
               <ChevronRight className="h-6 w-6" />
+            </button>
+          </div>
+
+          <div className="mt-12 mb-16 flex w-full justify-center">
+            <button
+              type="button"
+              onClick={() => setShowForm(!showForm)}
+              disabled={!data.allow_comment}
+              className={`h-12 w-full rounded-[16px] border px-4 text-[14px] leading-[17px] font-semibold ${
+                data.allow_comment
+                  ? 'cursor-pointer border-[#1A73E8] text-[#1A73E8]'
+                  : 'cursor-not-allowed border-gray-300 text-gray-400'
+              }`}
+            >
+              {showForm ? t('Скрыть форму') : t('Оставить отзыв')}
             </button>
           </div>
         </div>
