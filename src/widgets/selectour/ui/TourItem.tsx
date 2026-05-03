@@ -105,7 +105,13 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
         localStorage.setItem('tourOperator', data?.operator ?? '');
         localStorage.setItem('tourOperatorId', String(data?.tour_operator_id ?? ''));
         localStorage.setItem('from_cache', String(data?.from_cache));
+        localStorage.setItem('tour', JSON.stringify(data));
         saveQueryParamsToLocalStorage();
+        // TourItem.tsx
+
+        // queryClient.setQueryData(['tickets_detail', data.tour_operator_id], data);
+
+
       }}
       prefetch
     >
