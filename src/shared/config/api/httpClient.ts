@@ -17,7 +17,7 @@ import {
 
 const httpClient = axios.create({
   baseURL: BASE_URL,
-  timeout: 10000,
+  timeout: 60000,
 });
 
 let isRefreshing = false;

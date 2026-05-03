@@ -36,6 +36,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/resources/media/ticket-included-services-images/**',
       },
+      {   // for localhost
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '8081',
+        pathname: '/resources/**',
+      },
     ],
   },
 
