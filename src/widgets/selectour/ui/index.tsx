@@ -39,7 +39,6 @@ import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Drawer from '@mui/material/Drawer';
 import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
-import { motion } from 'framer-motion';
 import {
   BadgeDollarSign,
   Building2,
@@ -444,16 +443,7 @@ const top_duration = [
             </p>
           </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.5,
-              delay: 0.3,
-              ease: 'easeOut',
-            }}
-            className="mt-16 xl:mt-[68px]"
-          >
+          <div className="mt-16 xl:mt-[68px]">
             <FilterTours
               selectedDestRegions={selectedDestinations}
               setSelectedDestRegions={setSelectedDestinations}
@@ -463,17 +453,8 @@ const top_duration = [
               setMealPlan={setMealPlan}
               setIsSearchClicked={setIsSearchClicked}
             />
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.5,
-              delay: 0.3,
-              ease: 'easeOut',
-            }}
-            className="mt-6"
-          >
+          </div>
+          <div className="mt-6">
             <FilterToursMobile
               selectedDestRegions={selectedDestinations}
               setSelectedDestRegions={setSelectedDestinations}
@@ -482,21 +463,12 @@ const top_duration = [
               setSelectedDurations={setSelectedDurations}
               setMealPlan={setMealPlan}
             />
-          </motion.div>
+          </div>
         </div>
       </section>
 
       <div className="custom-container mx-auto flex w-full max-w-[1240px] gap-6 max-lg:mt-8 max-lg:flex-col max-lg:px-5 lg:mt-[104px]">
-        <motion.div
-          initial={{ opacity: 0, x: -40 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{
-            duration: 0.5,
-            delay: 0.3,
-            ease: 'easeOut',
-          }}
-          className="hidden h-max w-[292px] shrink-0 flex-col gap-4 max-lg:hidden lg:flex"
-        >
+        <div className="hidden h-max w-[292px] shrink-0 flex-col gap-4 max-lg:hidden lg:flex">
           <div className="flex h-[72px] w-full items-center gap-4 rounded-[14px] bg-white px-4 py-6 shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
             <FilterListIcon sx={{ color: '#1A73E8', fontSize: 24 }} />
             <p className="text-base font-bold leading-5 text-[#1A73E8]">
@@ -828,20 +800,12 @@ const top_duration = [
             </div>
           </FilterSection>
           </div>
-        </motion.div>
+        </div>
 
 
         <div className="flex w-full max-w-[924px] flex-col justify-between">
           <div>
-            <motion.div
-              initial={{ opacity: 0, x: 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{
-                duration: 0.5,
-                delay: 0.3,
-                ease: 'easeOut',
-              }}
-            >
+            <div>
               <div className="flex w-full items-center justify-between max-lg:flex-col max-lg:items-start max-lg:gap-0">
                 <h1 className="flex items-center gap-1 text-start text-2xl font-bold max-lg:hidden">
                   {regionName ? (
@@ -901,18 +865,9 @@ const top_duration = [
 
 
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0, x: -40 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{
-                duration: 0.5,
-                delay: 0.3,
-                ease: 'easeOut',
-              }}
-              className="lg:hidden"
-            >
+            <div className="lg:hidden">
               <div className="flex w-full items-center justify-between gap-3 max-lg:mt-[24px]">
                 <button
                   type="button"
@@ -1282,7 +1237,7 @@ const top_duration = [
               </div>
             </div>
               </Drawer>
-            </motion.div>
+            </div>
 
             <div className="max-lg:mt-[31px] lg:mt-6">
               {!filterLocal ? (
@@ -1333,38 +1288,18 @@ const top_duration = [
                     ))}
                     </div>
                   ) : (
-                    <motion.div
-                      initial={{ opacity: 0, x: 30 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{
-                        duration: 0.8,
-                        delay: 0.1,
-                        ease: 'easeOut',
-                      }}
-                      viewport={{ once: false, amount: 0.1 }}
-                      className="flex flex-col justify-center items-center h-screen mt-10"
-                    >
+                    <div className="mt-10 flex h-screen flex-col items-center justify-center">
                       <p className="text-2xl font-semibold text-[#121212]">
                         {t('Не найдено')}
                       </p>
-                    </motion.div>
+                    </div>
                   )}
                 </>
               )}
             </div>
           </div>
           {ticket && ticket.data.total_pages > 1 && (
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{
-                duration: 0.8,
-                delay: 0.1,
-                ease: 'easeOut',
-              }}
-              viewport={{ once: false, amount: 0.1 }}
-              className="flex justify-end items-end w-full mt-10"
-            >
+            <div className="mt-10 flex w-full items-end justify-end">
              
               <Pagination className="flex justify-end">
                 <PaginationContent>
@@ -1430,7 +1365,7 @@ const top_duration = [
                   </Button>
                 </PaginationContent>
               </Pagination>
-            </motion.div>
+            </div>
           )}
         </div>
       </div>

@@ -5,7 +5,6 @@ import { Link } from '@/shared/config/i18n/navigation';
 import { LanguageRoutes } from '@/shared/config/i18n/types';
 import { formatPrice } from '@/shared/lib/formatPrice';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 
@@ -18,18 +17,12 @@ interface InterestedTourCardProps {
 export default function InterestedTourCard({
   item,
   locale,
-  index,
+  index: _index,
 }: InterestedTourCardProps) {
   const t = useTranslations();
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.5, delay: index * 0.08, ease: 'easeOut' }}
-      className="h-[340px]"
-    >
+    <div className="h-[340px]">
       <Link
         href={`/selectour/${item.slug}?from_cache=${item?.from_cache ?? ''}`}
         className="group relative block h-full overflow-hidden rounded-[14px]"
@@ -55,6 +48,6 @@ export default function InterestedTourCard({
           </span>
         </div>
       </Link>
-    </motion.div>
+    </div>
   );
 }

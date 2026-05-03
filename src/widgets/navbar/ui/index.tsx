@@ -1,7 +1,6 @@
 'use client';
 
 import Logo from '@/assets/navLogo.png';
-import LogoWhite from '@/assets/LogoWhite.png';
 import { User_Api } from '@/features/profile/lib/api';
 import { useWelcomeStore } from '@/features/profile/lib/hook';
 import { Link, usePathname } from '@/shared/config/i18n/navigation';
@@ -78,16 +77,9 @@ const Navbar = () => {
     : 'ST';
   const isActiveLink = (href: string) =>
     href === '/' ? pathname === '/' : pathname.startsWith(href);
-  const isSelectourPage = pathname.startsWith('/selectour');
-
   return (
     <>
-      <section
-        className={clsx(
-          'sticky top-0 z-50 w-full xl:bg-[#FAFBFC]',
-          isSelectourPage ? 'bg-[#FAFBFC]' : 'bg-[#1A73E8]',
-        )}
-      >
+      <section className="sticky top-0 z-50 w-full bg-[#FAFBFC]">
         <div className="custom-container h-[72px] xl:h-[102px]">
           <div className="mx-auto flex h-full w-full max-w-[1240px] items-center">
             <div className="hidden h-full w-full items-center justify-between xl:flex">
@@ -203,7 +195,7 @@ const Navbar = () => {
             <div className="flex h-full w-full items-center justify-between px-1 xl:hidden">
               <Link href="/" className="shrink-0">
                 <Image
-                  src={isSelectourPage ? Logo : LogoWhite}
+                  src={Logo}
                   alt="Logo"
                   width={98}
                   height={32}
@@ -220,7 +212,7 @@ const Navbar = () => {
                         width: '36px',
                         height: '36px',
                         borderRadius: '20px',
-                        color: isSelectourPage ? '#1A73E8' : '#FFFFFF',
+                        color: '#1A73E8',
                       }}
                     >
                       <FavoriteBorderIcon sx={{ width: '20px', height: '18px' }} />
@@ -233,7 +225,7 @@ const Navbar = () => {
                         width: '36px',
                         height: '36px',
                         borderRadius: '20px',
-                        color: isSelectourPage ? '#1A73E8' : '#FFFFFF',
+                        color: '#1A73E8',
                       }}
                     >
                       <PersonIcon sx={{ width: '22px', height: '22px' }} />
@@ -246,9 +238,9 @@ const Navbar = () => {
                   sx={{
                     width: '40px',
                     height: '40px',
-                    border: `2px solid ${isSelectourPage ? '#1A73E8' : '#FFFFFF'}`,
+                    border: '2px solid #1A73E8',
                     borderRadius: '12px',
-                    color: isSelectourPage ? '#1A73E8' : '#FFFFFF',
+                    color: '#1A73E8',
                     p: 0,
                   }}
                 >

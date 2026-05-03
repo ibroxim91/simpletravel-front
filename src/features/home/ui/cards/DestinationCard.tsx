@@ -5,7 +5,6 @@ import { Link } from '@/shared/config/i18n/navigation';
 import { LanguageRoutes } from '@/shared/config/i18n/types';
 import { formatPrice } from '@/shared/lib/formatPrice';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import { motion } from 'framer-motion';
 import Image from 'next/image';
 
 interface DestinationCardProps {
@@ -18,28 +17,13 @@ interface DestinationCardProps {
 
 const DestinationCard = ({
   item,
-  index = 0,
+  index: _index = 0,
   locale,
   fromLabel,
   onClick,
 }: DestinationCardProps) => {
-  const fadeUp = {
-    hidden: { opacity: 0, y: 60 },
-    visible: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.8, delay: i * 0.2, ease: 'easeOut' as const },
-    }),
-  };
-
   return (
-    <motion.div
-      variants={fadeUp}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: false, amount: 0.2 }}
-      custom={index}
-    >
+    <div>
       <Link
         href={`/selectour/${item.slug}/?from_cache=${item?.from_cache ?? ''}`}
         className="group relative block h-[340px] overflow-hidden rounded-[14px]"
@@ -67,7 +51,7 @@ const DestinationCard = ({
           </span>
         </div>
       </Link>
-    </motion.div>
+    </div>
   );
 };
 

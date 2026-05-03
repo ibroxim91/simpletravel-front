@@ -6,7 +6,6 @@ import { Button } from '@/shared/ui/button';
 import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
-import { motion } from 'framer-motion';
 import { ArrowRight, Heart } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
@@ -110,13 +109,7 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
       }}
       prefetch
     >
-      <motion.div
-        initial={{ opacity: 0, x: 30 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.8, delay: 0.1, ease: 'easeOut' }}
-        viewport={{ once: false, amount: 0.1 }}
-        className="relative flex h-[296.5px] w-full items-stretch overflow-hidden rounded-[12px] bg-white shadow-[0_4px_16px_rgba(17,34,17,0.05)] max-lg:min-h-[189px] max-lg:h-auto max-lg:rounded-[14px]"
-      >
+      <div className="relative flex h-[296.5px] w-full items-stretch overflow-hidden rounded-[12px] bg-white shadow-[0_4px_16px_rgba(17,34,17,0.05)] max-lg:min-h-[189px] max-lg:h-auto max-lg:rounded-[14px]">
         <div className="relative h-full max-lg:h-auto w-[297px] shrink-0 overflow-hidden max-lg:min-h-[189px] max-lg:w-[126px] max-lg:self-stretch">
           <Image
             src={BASE_URL + data.ticket_images}
@@ -329,7 +322,7 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
     </Link>
   );
 }
