@@ -79,7 +79,7 @@ export default function ImageSwiper({
   const fallbackImage = '/Logo_blue.png';
   const sliderImages = useMemo(() => {
     const prepared = (images || [])
-      .map((item) => item?.image)
+      .map((item) => item)
       .filter((item): item is string => Boolean(item));
     return prepared.length > 0 ? prepared : [fallbackImage];
   }, [images]);

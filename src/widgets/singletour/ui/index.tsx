@@ -563,11 +563,12 @@ const data = typeof window !== 'undefined'
                       title: (() => {
                         const meal = data.ticket_hotel?.[0]?.meal_plan;
                         const mealMap: Record<string, string> = {
-                          full_board: t('Полный пансион'),
-                          breakfast: t('Завтрак'),
-                          half_board: t('Полупансион'),
-                          all_inclusive: t('Все включено'),
-                          room_only: t('Без питания'),
+                          FB: t('Полный пансион'),
+                          BB: t('Завтрак'),
+                          HB: t('Полупансион'),
+                          AI: t('Все включено'),
+                          UAI: t('Все включено'),
+                          RO: t('Без питания'),
                         };
                         return mealMap[meal] || t('Все включено');
                       })(),
