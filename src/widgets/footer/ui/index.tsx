@@ -92,7 +92,7 @@ const Footer = () => {
   ];
 
   return (
-    <section className="bg-[#1A73E8] pb-10 pt-[56px] max-lg:mb-16 max-lg:pt-10">
+    <section className="bg-[#1A73E8] pb-10 pt-[56px] max-lg:pt-10">
       <div className="mx-auto w-full max-w-[1241px] px-4">
         <div className="flex items-start justify-between gap-10 max-lg:hidden">
           <div className="w-full max-w-[398px]">
