@@ -625,7 +625,7 @@ const data = typeof window !== 'undefined'
               <div className="mt-12 mb-12 flex w-full flex-col gap-4 lg:hidden">
                 <p className="w-full text-left text-[20px] font-bold leading-6 text-[#1C1C1E]">
                   {formatPrice(data.price, locale as LanguageRoutes, true)} /{' '}
-                  <span className="font-normal">1 {t('человек')}</span>
+                  <span className="font-normal">{data.passenger_count || 1} {t('человек')}</span>
                 </p>
                 {user ? (
                   <Link href={`/booking/${data.id}`} className="block w-full">

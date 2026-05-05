@@ -306,9 +306,9 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
             </div>
 
             {/* Pastga qotadi (mt-auto); tepadan 16px */}
-            <div className="mt-auto flex min-h-[49px] w-[219px] max-w-full shrink-0 items-end gap-2 pt-4">
+            <div className="mt-auto flex min-h-[49px] w-full shrink-0 items-end justify-between gap-2 pt-4">
               <div className="flex w-[163px] shrink-0 flex-col items-start justify-center gap-0 p-0">
-                <p className="w-full min-w-0 shrink-0 text-left text-[12px] font-medium leading-[15px] text-[#112211]/75">
+                <p className="w-full min-w-0 shrink-0 text-left text-[12px] font-medium leading-[15px] text-[#112211]/75 line-through">
                   {formatPrice(data.price * 1.55, locale as LanguageRoutes, true)}
                 </p>
                 <div className="flex min-h-[34px] w-[163px] flex-col justify-center gap-0 text-[#FF6B00]">
