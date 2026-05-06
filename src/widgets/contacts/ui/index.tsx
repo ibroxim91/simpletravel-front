@@ -116,13 +116,14 @@ export default function Contacts() {
   //   'https://maps.google.com/maps?q=Simple%20Travel%20Company&t=&z=13&ie=UTF8&iwloc=&output=embed';
 
   return (
-    <div className="custom-container mt-10">
+    <div className="custom-container pt-6 lg:pt-10">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
         <Breadcrumbs
+          className="text-sm"
           aria-label="breadcrumb"
           separator={<EastIcon fontSize="small" className="text-[#646465]" />}
           sx={{
@@ -138,11 +139,11 @@ export default function Contacts() {
         </Breadcrumbs>
       </motion.div>
 
-      <h1 className="font-bold text-[#031753] text-[32px] my-5">
+      <h1 className="mb-6 mt-4 text-[28px] font-bold text-[#031753] lg:mb-5 lg:mt-5 lg:text-[32px]">
         {t('Контакты')}
       </h1>
 
-      <div className="grid grid-cols-2 gap-6 justify-between max-lg:grid-cols-1">
+      <div className="grid grid-cols-1 justify-between gap-6 lg:grid-cols-2 lg:gap-8">
         <div className="h-full">
           <motion.div
             initial={{ opacity: 0, x: -40 }}
