@@ -216,7 +216,7 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
 
             <div className="flex w-[153px] shrink-0 flex-col items-end max-lg:w-auto max-lg:min-w-[108px]">
               <p className="whitespace-nowrap text-right text-sm font-medium leading-[17px] text-[#6B7280]/75 line-through max-lg:text-xs">
-                {formatPrice(data.price * 1.55, locale as LanguageRoutes, true)}
+                {formatPrice(data.price * 1.1, locale as LanguageRoutes, true)}
               </p>
               <p className="whitespace-nowrap text-right text-2xl font-bold leading-[29px] text-[#FF6B00] max-lg:text-xl max-lg:leading-6">
                 {formatPrice(data.price, locale as LanguageRoutes, true)}
