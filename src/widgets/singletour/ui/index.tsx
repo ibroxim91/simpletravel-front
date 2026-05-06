@@ -370,9 +370,11 @@ const data = typeof window !== 'undefined'
                         <p className="text-[12px] font-medium leading-[15px] text-[#6B7280]/75">
                           {data.destination?.name}
                         </p>
-                        <span className="rounded-[14px] bg-[#F59E0B] px-2 py-1 text-[12px] font-medium leading-[15px] text-white max-lg:hidden">
-                          {t('Необходима Виза')}
-                        </span>
+                        {data.visa_required && (
+                          <span className="rounded-[14px] bg-[#F59E0B] px-2 py-1 text-[12px] font-medium leading-[15px] text-white max-lg:hidden">
+                            {t('Необходима Виза')}
+                          </span>
+                        )}
                       </div>
                       <div className="flex items-center gap-2">
                         <HotelOutlinedIcon sx={{ color: '#1A73E8', fontSize: 20 }} />
@@ -387,7 +389,7 @@ const data = typeof window !== 'undefined'
                     <h1 className="text-right text-[24px] leading-[29px] max-lg:text-left font-bold text-[#1C1C1E]">
                       {formatPrice(data.price, locale as LanguageRoutes, true)} /{' '}
                       <span className="text-[24px] font-normal">
-                        1 {t('человек')}
+                        {data?.passenger_count} {t('человек')}
                       </span>
                     </h1>
                     <div className="flex items-center gap-6">
@@ -447,7 +449,7 @@ const data = typeof window !== 'undefined'
                   setOpenWatch={setOpenWatch}
                 />
               </motion.div>
-
+               {data.visa_required && (     
               <div className="hidden w-full max-lg:block max-lg:my-8">
                 <div className="flex min-h-[151px] w-full flex-col gap-[10px] rounded-[14px] bg-[#F59E0B] p-4">
                   <p className="text-[14px] font-medium leading-[100%] text-white">
@@ -458,6 +460,7 @@ const data = typeof window !== 'undefined'
                   </p>
                 </div>
               </div>
+              )}
 
               <motion.div
                 initial="hidden"
