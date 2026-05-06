@@ -118,7 +118,7 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
       <div className="relative flex h-[296.5px] w-full items-stretch overflow-hidden rounded-[12px] bg-[#FAFBFC] max-lg:min-h-[189px] max-lg:h-auto max-lg:rounded-[14px] lg:bg-white lg:shadow-[0_4px_16px_rgba(17,34,17,0.05)]">
         <div className="relative h-full max-lg:h-auto w-[297px] shrink-0 overflow-hidden max-lg:min-h-[189px] max-lg:w-[126px] max-lg:self-stretch">
           <Image
-            src={BASE_URL + data.ticket_images}
+            src={data.ticket_images}
             alt={data.title}
             fill
             className="object-cover"
