@@ -350,13 +350,13 @@ const data = typeof window !== 'undefined'
                         <Rating
                           name="read-only"
                           size="small"
-                          value={data.rating}
+                          value={data.ticket_hotel?.[0]?.rating || 0}
                           readOnly
                           sx={{ color: '#FF6B00' }}
                           precision={0.1}
                         />
                         <p className="text-[14px] font-medium text-[#112211]">
-                          {Math.round(data.rating || 0)} {t('звездочный отель')}
+                          {Math.round(data.ticket_hotel?.[0]?.rating || 0)} {t('звездочный отель')}
                         </p>
                       </div>
                     </div>
