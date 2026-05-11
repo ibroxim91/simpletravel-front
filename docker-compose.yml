@@ -9,12 +9,13 @@ services:
       args:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
     ports:
-      - "${PORT:-3000}:3000"
+      - "3000:3000"
     environment:
       NODE_ENV: ${NODE_ENV}
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
       PORT: ${PORT}
-      HOSTNAME: ${HOSTNAME}
+      HOSTNAME: ${HOST}
+      HOST: ${HOST}
     restart: unless-stopped
     env_file:
       - .env.production

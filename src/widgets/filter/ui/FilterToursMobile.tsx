@@ -490,7 +490,7 @@ const FilterToursMobile = ({ selectedDestRegions, setSelectedDestRegions,setSele
 
                 <div className="flex flex-col gap-2 max-h-[50vh] overflow-y-auto">
                   {filteredCountriesDes.length ? (
-                    filteredCountriesDes.map((country) => (
+                     filteredCountriesDes.filter((item) => !item.default_country).map((country) => (
                       <div
                         key={country.id}
                         className="p-2 hover:bg-gray-200 rounded-lg cursor-pointer flex justify-between"

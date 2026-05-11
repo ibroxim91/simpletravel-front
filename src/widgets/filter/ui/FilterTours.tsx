@@ -524,7 +524,7 @@ const defaultitems = selectedCountry
                     )}
                     <CommandList className="px-1 gap-2">
                       {itemsDes?.length ? (
-                        itemsDes.map((item) => (
+                         itemsDes.filter((item) => !item.default_country).map((item) => (
                           <AnimatePresence key={selectedDestCountry + item.id}>
                             <motion.div
                               key={selectedDestCountry + item.id}

@@ -222,7 +222,7 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
                 {formatPrice(data.price, locale as LanguageRoutes, true)}
               </p>
               <p className="text-right text-sm font-medium leading-[17px] text-[#FF6B00]">
-                {t('за человека')}
+                {data.passenger_count} {" "} {data.passenger_count === 1 ? t('человек') : t('человекa')}
               </p>
               <p className="text-right text-xs font-medium leading-[15px] text-[#6B7280]/75 max-lg:text-[10px]">
                 {t('с учетом налогов')}
@@ -315,7 +315,12 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
                   <p className="text-[16px] font-bold leading-5">
                     {formatPrice(data.price, locale as LanguageRoutes, true)}
                   </p>
-                  <p className="text-[12px] font-medium leading-[15px]">{t('за человека')}</p>
+
+                  <p className="text-[12px] font-medium leading-[15px]">
+                   {/* If data.passenger-count is 1, show "человек", otherwise show "человекa"  */}
+                   {data.passenger_count} {" "} {data.passenger_count === 1 ? t('человек') : t('человекa')}
+                    </p>
+
                 </div>
               </div>
               {/*
