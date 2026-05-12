@@ -38,6 +38,9 @@ import Hotel3 from '../../../../public/images/hotel3.png';
 import Hotel4 from '../../../../public/images/hotel4.png';
 import Hotel_MEAL from '../../../../public/images/hotel_meal.png';
 import Hotel1 from '../../../../public/images/hotel_name.png';
+import Food from '../../../../public/images/hotel_meal.png';
+import Insurance from '../../../../public/images/approved.png';
+import Bus from '../../../../public/images/bus.png';
 import Hotel_Star from '../../../../public/images/hotel_star.png';
 import Statue from '../../../../public/images/statue.png';
 import { TicketsDetailAPi } from '../lib/api';
@@ -250,14 +253,39 @@ console.log("hotelData ", hotelData)
   return <TourDetailLoading />
  }
 
-  const visibleIncludedServices = data?.ticket_included_services || [];
+  const meal = data.ticket_hotel?.[0]?.meal_plan;
+                        const mealMap: Record<string, string> = {
+                          FB: t('Полный пансион'),
+                          BB: t('Завтрак'),
+                          HB: t('Полупансион'),
+                          AI: t('Все включено'),
+                          UAI: t('Все включено'),
+                          RO: t('Без питания'),
+                        };
+  const mealLabel = mealMap[meal] || t('Все включено');
+
+ const visibleIncludedServices = [...(data?.ticket_included_services || [])];
+
+const defaultServices = [
+  { image: Bus.src, title: t('Трансфер'), desc: t('Включено') },
+  { image: Food.src, title: mealLabel, desc: t('Включено') },
+  { image: Insurance.src, title: t('Страхование'), desc: t('Включено') },
+];
+
+if (visibleIncludedServices.length === 0) {
+  visibleIncludedServices.push(...defaultServices);
+} else if (visibleIncludedServices.length === 1) {
+  // Agar faqat bitta bo‘lsa, Transferni qo‘shmaymiz
+  visibleIncludedServices.push(...defaultServices.slice(1));
+}
+
   const includedServicesToRender =
     visibleIncludedServices.length > 0
       ? visibleIncludedServices
       : [
-          { image: Hotel1.src, title: t('Трансфер'), desc: t('Включено') },
-          { image: Hotel1.src, title: t('Трансфер'), desc: t('Не включено') },
-          { image: Hotel1.src, title: t('Трансфер'), desc: t('Не включено') },
+          { image: Bus.src, title: t('Трансфер'), desc: t('Включено') },
+          { image: Food.src, title: mealLabel, desc: t('Включено') },
+          { image: Insurance.src, title: t('Страхование'), desc: t('Включено') },
         ];
 
   const amenitiesToRender =
@@ -350,19 +378,28 @@ console.log("hotelData ", hotelData)
                 <div className="flex items-end justify-between gap-8 max-lg:flex-col max-lg:items-start max-lg:gap-6">
                   <div className="flex max-w-[684px] flex-col gap-6 max-lg:w-full max-lg:gap-4">
                     <div className="hidden w-full items-center justify-between max-lg:flex">
-                      <div className="flex items-center gap-2">
-                        <Rating
-                          name="read-only-mobile"
-                          size="small"
-                          value={data.rating}
-                          readOnly
-                          sx={{ color: '#FF6B00' }}
-                          precision={0.1}
-                        />
-                        <p className="text-[12px] font-medium leading-[15px] text-[#112211]">
-                          {Math.round(data.rating || 0)} {t('звездочный отель')}
-                        </p>
+                     <div className="flex items-center gap-2">
+                        {typeof data.ticket_hotel?.[0]?.rating === "number" ? (
+                          <>
+                            <Rating
+                              name="read-only-mobile"
+                              size="small"
+                              value={data.ticket_hotel?.[0]?.rating || 0}
+                              readOnly
+                              sx={{ color: '#FF6B00' }}
+                              precision={0.1}
+                            />
+                            <p className="text-[12px] font-medium leading-[15px] text-[#112211]">
+                              {Math.round(data.ticket_hotel?.[0]?.rating || 0)} {t('звездочный отель')}
+                            </p>
+                          </>
+                        ) : (
+                          <p className="text-[12px] font-medium leading-[15px] text-[#112211]">
+                            {data.ticket_hotel?.[0]?.rating}
+                          </p>
+                        )}
                       </div>
+
                       <button
                         onClick={(e) => {
                           e.preventDefault();
@@ -385,18 +422,27 @@ console.log("hotelData ", hotelData)
                         {data.title}
                       </h1>
                       <div className="flex items-center gap-2">
-                        <Rating
-                          name="read-only"
-                          size="small"
-                          value={data.ticket_hotel?.[0]?.rating || 0}
-                          readOnly
-                          sx={{ color: '#FF6B00' }}
-                          precision={0.1}
-                        />
-                        <p className="text-[14px] font-medium text-[#112211]">
-                          {Math.round(data.ticket_hotel?.[0]?.rating || 0)} {t('звездочный отель')}
-                        </p>
-                      </div>
+                          {typeof data.ticket_hotel?.[0]?.rating === "number" ? (
+                            <>
+                              <Rating
+                                name="read-only"
+                                size="small"
+                                value={data.ticket_hotel?.[0]?.rating || 0}
+                                readOnly
+                                sx={{ color: '#FF6B00' }}
+                                precision={0.1}
+                              />
+                              <p className="text-[14px] font-medium text-[#112211]">
+                                {Math.round(data.ticket_hotel?.[0]?.rating || 0)} {t('звездочный отель')}
+                              </p>
+                            </>
+                          ) : (
+                            <p className="text-[14px] font-medium text-[#112211]">
+                              {data.ticket_hotel?.[0]?.rating}
+                            </p>
+                          )}
+                        </div>
+
                     </div>
 
                     <h1 className="hidden text-[24px] font-bold leading-[29px] text-[#1C1C1E] max-lg:block">
@@ -646,12 +692,15 @@ console.log("hotelData ", hotelData)
 
                   {[
                     {
-                      id: 'hotel-type',
-                      img: Hotel_Star,
-                      name: t('Тип отеля'),
-                      title: `${data.ticket_hotel?.[0]?.rating || '-'} ${t('звездочный')}`,
-                      iconNode: <StarBorderRoundedIcon sx={{ color: '#1A73E8', fontSize: 24 }} />,
-                    },
+                        id: 'hotel-type',
+                        img: Hotel_Star,
+                        name: t('Тип отеля'),
+                        title:
+                          typeof data.ticket_hotel?.[0]?.rating === "number"
+                            ? `${data.ticket_hotel?.[0]?.rating || '-'} ${t('звездочный')}`
+                            : `${data.ticket_hotel?.[0]?.rating || '-'}`,
+                        iconNode: <StarBorderRoundedIcon sx={{ color: '#1A73E8', fontSize: 24 }} />,
+                      },
                     {
                       id: 'meal',
                       img: Hotel_MEAL,
@@ -767,21 +816,16 @@ console.log("hotelData ", hotelData)
                     </h3>
 
                     <div className="flex w-full flex-col items-start gap-4">
-                      {includedServicesToRender.slice(0, 3).map((item, index) => {
-                        const normalized = `${item.title || ''} ${item.desc || ''}`.toLowerCase();
-                        const isIncluded = normalized.includes('включ')
-                          ? true
-                          : normalized.includes('не включ')
-                            ? false
-                            : index === 0;
+                      {includedServicesToRender.slice(0, 5).map((item, index) => {
+                        const isIncluded = true
 
                         return (
                           <div key={`${item.title}-${index}`} className="w-full">
-                            <div className="flex w-full items-center justify-between gap-10 max-md:flex-col max-md:items-start max-md:gap-4">
-                              <div className="flex items-center gap-4">
-                                <div className="relative h-12 w-12 overflow-hidden rounded-[14px]">
+                            <div className="flex w-full items-center justify-between gap-10 max-md:items-start max-md:gap-4">
+                              <div className="flex items-center gap-4 ">
+                                <div className="relative  h-8 w-8 text-sm  overflow-hidden rounded-[14px]">
                                   <Image
-                                    src={item.image || Hotel1.src}
+                                    src={item.image || Bus.src}
                                     alt={item.title || 'service'}
                                     fill
                                     className="object-cover"
@@ -792,9 +836,10 @@ console.log("hotelData ", hotelData)
                                 </p>
                               </div>
 
-                              <div
+                            <div
                                 className={clsx(
-                                  'flex h-12 w-[186px] items-center justify-center rounded-[14px] border-2 px-4 text-[14px] leading-[17px] font-semibold',
+                                  'flex items-center justify-center rounded-md border-2',
+                                  'px-3 py-1 text-sm md:px-4 md:py-2 md:text-base font-semibold',
                                   isIncluded
                                     ? 'border-[#1A73E8] text-[#1A73E8]'
                                     : 'border-[#F59E0B] text-[#F59E0B]',
@@ -802,6 +847,7 @@ console.log("hotelData ", hotelData)
                               >
                                 {isIncluded ? t('Включено') : t('Не включено')}
                               </div>
+
                             </div>
 
                             {index !== Math.min(includedServicesToRender.length, 3) - 1 && (
@@ -810,6 +856,46 @@ console.log("hotelData ", hotelData)
                           </div>
                         );
                       })}
+                    </div>
+
+
+                  </div>
+                </motion.div>
+              )}
+
+              {data && (
+                <motion.div
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: false, amount: 0.2 }}
+                  variants={fadeInUp}
+                  className="mt-[72px]"
+                >
+                  <div className="h-px w-full bg-[#11221140]" />
+
+                  <div className="mt-[72px] flex w-full max-w-[1240px] flex-col items-start gap-8">
+                    <h3 className="text-[20px] leading-6 font-bold text-[#112211]">
+                      {t('Информация о номере')}
+                    </h3>
+
+                    <div className="flex w-full flex-col items-start gap-6">
+                      <div className="flex items-center justify-between w-full gap-4">
+                        <p className="text-[16px] font-medium text-[#112211]">
+                          {t('Категория номера')}:
+                        </p>
+                        <p className="text-[16px] font-semibold text-[#1A73E8]">
+                          {data.room_type || '--'}
+                        </p>
+                      </div>
+                      
+                      <div className="flex items-center justify-between w-full gap-4">
+                        <p className="text-[16px] font-medium text-[#112211]">
+                          {t('Тип размещения')}:
+                        </p>
+                        <p className="text-[16px] font-semibold text-[#1A73E8]">
+                          {data.place || '--'}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </motion.div>

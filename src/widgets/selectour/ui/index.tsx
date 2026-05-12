@@ -325,39 +325,25 @@ const displayedHotels = useMemo(() => {
 const prevCountry = useRef<string | null>(null);
 const prevRegion = useRef<string | null>(null);
 const top_duration = [
-                {
-                    "duration": 7,
-                    "count": 123
-                },
-                {
-                    "duration": 8,
-                    "count": 73
-                },
-                {
-                    "duration": 9,
-                    "count": 47
-                },
-                {
-                    "duration": 10,
-                    "count": 23
-                },
-                {
-                    "duration": 11,
-                    "count": 17
-                },
-               
-                {
-                    "duration": 12,
-                    "count": 6
-                },
-                {
-                    "duration": 13,
-                    "count": 5
-                },
-                {
-                    "duration": 14,
-                    "count": 5
-                }
+                {"duration": 3},
+                {"duration": 4},
+                {"duration": 5},
+                {"duration": 6},
+                {"duration": 7},
+                {"duration": 8},
+                {"duration": 9},
+                {"duration": 10},
+                {"duration": 11},
+                {"duration": 12},
+                {"duration": 13},
+                {"duration": 14},
+                {"duration": 15},
+                {"duration": 16},
+                {"duration": 17},
+                {"duration": 18},
+                {"duration": 19},
+                {"duration": 20},
+                {"duration": 21}
             ]
   // const initialized = useRef(false);
   useEffect(() => {
@@ -578,7 +564,7 @@ const top_duration = [
             />
           </FilterSection> */}
 
-          <div className=" w-full overflow-hidden rounded-[14px] bg-[#FAFBFC] p-4">
+          {/* <div className=" w-full overflow-hidden rounded-[14px] bg-[#FAFBFC] p-4">
           <FilterSection title={t('Длительность')} icon='/icons/time.png'>
             {top_duration &&
               [...top_duration]
@@ -593,10 +579,45 @@ const top_duration = [
                     onclick={setCurrentPage}
                     exclusive
                     paramName="duration"
-                  />
+                    />
                 ))}
           </FilterSection>
-          </div>
+          </div> */}
+                    <div className=" w-full overflow-hidden rounded-[14px] bg-[#FAFBFC] p-4">
+                    <FilterSection title={t('Длительность')} icon='/icons/time.png'>
+                        {top_duration && (
+                          <select
+                            value={selectedDurations}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              setSelectedDurations(value);
+                              setCurrentPage(1);
+
+                              // URL paramName="duration" ni yangilash
+                              const params = new URLSearchParams(window.location.search);
+                              if (value) {
+                                params.set("duration", value);
+                              } else {
+                                params.delete("duration");
+                              }
+                              window.history.replaceState({}, "", `${window.location.pathname}?${params.toString()}`);
+                            }}
+                            className="w-full h-[40px] px-2 rounded bg-transparent border-none outline-none focus:ring-0"
+                          >
+                            <option value="">---</option>
+                            {[...top_duration]
+                              .sort((a, b) => a.duration - b.duration)
+                              .map((e) => (
+                                <option key={e.duration} value={String(e.duration)}>
+                                  {e.duration} {t('ночей')}
+                                </option>
+                              ))}
+                          </select>
+                        )}
+                      </FilterSection>
+
+
+                    </div>
 
           <div className=" w-full overflow-hidden rounded-[14px] bg-[#FAFBFC] p-4">
          <FilterSection title={t('Регионы и курорты')} icon="/icons/country.png">
