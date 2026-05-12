@@ -51,7 +51,7 @@ import WatchTour from './WatchTour';
 import CommentTour from './commentTour';
 import HotelRooms from './HotelRooms';
 import InterestPoints from './InterestPoints';
-
+import { BASE_URL } from '@/shared/config/api/URLs';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 40 },
@@ -143,7 +143,7 @@ const { data: hotelData, isLoading, error } = useQuery({
   queryKey: ["hotel_detail", data.ticket_hotel[0].id],
   queryFn: async () => {
     const hotel = data.ticket_hotel[0];
-    const url = new URL("http://localhost:8081/api/v1/hotels/");
+    const url = new URL(`${BASE_URL}/api/v1/hotels/`);
 
     url.searchParams.append("hotel_name", hotel.name);
     url.searchParams.append("hotel_id", hotel.id.toString());
