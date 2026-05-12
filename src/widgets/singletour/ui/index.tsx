@@ -26,6 +26,7 @@ import clsx from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import * as LucideIcons from 'lucide-react';
 import { Copy, Hourglass, Scroll } from 'lucide-react';
+import { Check } from "lucide-react";
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
@@ -48,6 +49,8 @@ import TourOffersItem from './TourOffersItem';
 import WantHelpModal from './WantHelpModal';
 import WatchTour from './WatchTour';
 import CommentTour from './commentTour';
+import HotelRooms from './HotelRooms';
+import InterestPoints from './InterestPoints';
 
 
 const fadeInUp = {
@@ -134,7 +137,38 @@ const data = typeof window !== 'undefined'
   : null;
 
 
-  
+
+
+const { data: hotelData, isLoading, error } = useQuery({
+  queryKey: ["hotel_detail", data.ticket_hotel[0].id],
+  queryFn: async () => {
+    const hotel = data.ticket_hotel[0];
+    const url = new URL("http://localhost:8081/api/v1/hotels/");
+
+    url.searchParams.append("hotel_name", hotel.name);
+    url.searchParams.append("hotel_id", hotel.id.toString());
+    url.searchParams.append("operator", data.operator);
+    url.searchParams.append("country_id", data.destination.country.id.toString());
+    url.searchParams.append("meal_plan", hotel.meal_plan);
+
+    const res = await fetch(url.toString(), {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch hotel data");
+    }
+
+    return res.json();
+  },
+  enabled: !!data?.ticket_hotel?.length, // faqat hotel mavjud bo‘lsa so‘rov yuboriladi
+});
+
+console.log("hotelData ", hotelData)
+
   const { data: user } = useQuery({
     queryKey: ['get_me'],
     queryFn: () => User_Api.getMe(),
@@ -265,10 +299,14 @@ const data = typeof window !== 'undefined'
           <Skeleton className="h-[400px] w-full bg-gray-200" />
         ) : null}
 
-        {openWatch && data && (
+        {/* {console.log("DATA IN SINGLE TOUR", data)}
+        {console.log("openWatch IN SINGLE TOUR", openWatch)}
+        {console.log("HOTEL DATA IN SINGLE TOUR", hotelData?.data?.photos.length)} */}
+
+        {openWatch && data && hotelData?.data?.photos?.length > 0 &&(
          <WatchTour
         onClose={() => setOpenWatch(false)}
-        images={Array.isArray(data.ticket_images) ? data.ticket_images : [data.ticket_images]}
+        images={hotelData?.data?.photos}
       />
 
         )}
@@ -435,6 +473,7 @@ const data = typeof window !== 'undefined'
                   </div>
                 </div>
               </motion.div>
+              
               <motion.div
                 initial="hidden"
                 whileInView="visible"
@@ -442,13 +481,64 @@ const data = typeof window !== 'undefined'
                 variants={fadeInUp}
                 className="mt-4 max-lg:mt-6 max-lg:mb-0"
               >
-                <Swiper
-                  id={data.id}
-                  is_liked={data.is_liked}
-                  images={Array.isArray(data.ticket_images) ? data.ticket_images : [data.ticket_images]}
-                  setOpenWatch={setOpenWatch}
-                />
+                {/* Agar rasmlar soni < 5 bo‘lsa yoki 0 bo‘lsa → har doim Swiper */}
+                {(!hotelData?.data?.photos || hotelData.data.photos.length < 5) ? (
+                  <Swiper
+                    id={data.id}
+                    is_liked={data.is_liked}
+                    images={[{"image": data.ticket_images }]} // Agar photos bo‘sh bo‘lsa, main_photo ni bering
+                    setOpenWatch={setOpenWatch}
+                  />
+                ) : (
+                  <>
+                    {/* Mobil ekranda Swiper */}
+                    <div className="block lg:hidden">
+                      <Swiper
+                        id={data.id}
+                        is_liked={data.is_liked}
+                        images={hotelData.data.photos}
+                        setOpenWatch={setOpenWatch}
+                      />
+                    </div>
+
+                    {/* Katta ekranda grid layout */}
+                    <div className="hidden lg:flex gap-4">
+                      <div className="w-1/2 relative aspect-video">
+                        <Image
+                          src={hotelData.data.photos[0].image}
+                          alt="Hotel main"
+                          fill
+                          className="object-cover rounded-lg cursor-pointer"
+                          onClick={() => setOpenWatch(true)}
+                        />
+                      </div>
+                      <div className="w-1/2 relative">
+                        <div className="grid grid-cols-2 gap-2 h-full">
+                          {hotelData.data.photos.slice(1, 5).map((img: { image: string }, idx: number) => (
+                            <div key={idx} className="relative aspect-square">
+                              <Image
+                                src={img.image}
+                                alt={`Hotel ${idx + 1}`}
+                                fill
+                                className="object-cover rounded-lg cursor-pointer"
+                                onClick={() => setOpenWatch(true)}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                        <button
+                          onClick={() => setOpenWatch(true)}
+                          className="absolute bottom-2 right-2 bg-[#1A73E8] text-white px-4 py-2 rounded text-sm"
+                        >
+                          Barcha rasmlarni ko'rish
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
               </motion.div>
+
+
                {data.visa_required && (     
               <div className="hidden w-full max-lg:block max-lg:my-8">
                 <div className="flex min-h-[151px] w-full flex-col gap-[10px] rounded-[14px] bg-[#F59E0B] p-4">
@@ -527,11 +617,14 @@ const data = typeof window !== 'undefined'
               >
                 <div className="flex w-full flex-col items-start gap-4 max-lg:max-w-full">
                   <h1 className="w-full text-[20px] font-semibold leading-6 text-[#1C1C1E]">
-                    {t('Описание отеля')} {data.ticket_hotel?.[0]?.name}
+                    {t('Описание отеля')} 
                   </h1>
-                  <p className="w-full text-[14px] font-medium leading-[17px] text-[#1C1C1E] opacity-75 max-lg:h-auto max-lg:overflow-visible lg:h-[120px] lg:overflow-hidden">
-                    {data.hotel_info}
+                 <p className="w-full text-[14px] font-medium leading-[17px] text-[#1C1C1E] opacity-75 max-lg:h-auto max-lg:overflow-visible lg:h-[120px] lg:overflow-hidden">
+                    {hotelData?.data?.description 
+                      ? hotelData.data.description 
+                      : t('default_hotel_description')}
                   </p>
+
                 </div>
                 <div className="flex w-full flex-col items-stretch gap-2 overflow-visible max-lg:gap-2 max-xl:flex-wrap lg:h-[145px] lg:flex-row lg:items-start lg:gap-6">
                   <motion.div
@@ -613,7 +706,8 @@ const data = typeof window !== 'undefined'
                     <motion.div
                       key={item.id}
                       whileHover={{ scale: 1.03 }}
-                      className="flex min-h-[59px] w-full shrink-0 flex-col items-stretch justify-center rounded-[12px] border border-[#1A73E8] px-4 py-2 max-lg:min-h-[59px] max-lg:w-full lg:h-[145px] lg:w-[186px] lg:gap-0 lg:p-4"
+                      className="flex min-h-[59px] w-full shrink-0 flex-col items-stretch justify-center rounded-[12px] border border-[#1A73E8] px-4 
+                      py-2 max-lg:min-h-[59px] max-lg:w-full lg:h-[145px] lg:w-[186px] lg:gap-0 lg:p-4"
                     >
                       <HotelInfoItem
                         img={item.img}
@@ -721,7 +815,7 @@ const data = typeof window !== 'undefined'
                 </motion.div>
               )}
 
-              {amenitiesToRender.length > 0 && (
+              {hotelData?.data?.facilities && hotelData.data.facilities.length > 0 && (
                 <motion.div
                   initial="hidden"
                   whileInView="visible"
@@ -737,58 +831,48 @@ const data = typeof window !== 'undefined'
                     </h3>
 
                     <div className="flex h-[216px] w-full items-start gap-[229px] max-xl:h-auto max-xl:gap-12 max-md:flex-col">
+                      
                       <div className="flex w-[299px] max-w-full flex-col items-start gap-6">
-                        {amenitiesToRender.slice(0, 5).map((amenity, index) => {
-                          const IconComponent =
-                            LucideIcons[
-                              amenity.icon_name as keyof typeof LucideIcons.icons
-                            ];
-
-                          return (
+                          {hotelData.data.facilities.slice(0, 5).map((amenity, index) => (
                             <div key={`left-${index}`} className="flex items-center gap-2">
-                              {IconComponent ? (
-                                <IconComponent className="h-6 w-6 text-[#112211]" />
-                              ) : (
-                                <div className="h-6 w-6 rounded-full bg-[#112211]" />
-                              )}
+                              <Check className="h-6 w-6 text-[#112211]" />
                               <p className="text-[16px] leading-5 font-medium text-[#112211]">
-                                {amenity.name}
+                                {amenity.description_ru}
                               </p>
                             </div>
-                          );
-                        })}
-                      </div>
+                          ))}
+                        </div>
 
-                      <div className="flex w-[187px] max-w-full flex-col items-start gap-6">
-                        {amenitiesToRender.slice(5, 9).map((amenity, index) => {
-                          const IconComponent =
-                            LucideIcons[
-                              amenity.icon_name as keyof typeof LucideIcons.icons
-                            ];
+                   <div className="flex w-[299px] max-w-full flex-col items-start gap-6">
+                      {hotelData.data.facilities.slice(5, 10).map((amenity, index) => (
+                        <div key={`left-${index}`} className="flex items-center gap-2">
+                          <Check className="h-6 w-6 text-[#112211]" />
+                          <p className="text-[16px] leading-5 font-medium text-[#112211]">
+                            {amenity.description_ru}
+                          </p>
+                        </div>
+                      ))}
+                
 
-                          return (
-                            <div key={`right-${index}`} className="flex items-center gap-2">
-                              {IconComponent ? (
-                                <IconComponent className="h-6 w-6 text-[#112211]" />
-                              ) : (
-                                <div className="h-6 w-6 rounded-full bg-[#112211]" />
-                              )}
-                              <p className="text-[16px] leading-5 font-medium text-[#112211]">
-                                {amenity.name}
-                              </p>
-                            </div>
-                          );
-                        })}
-
-                        {amenitiesToRender.length > 9 && (
+                        {hotelData.data.facilities.length > 10 && (
                           <p className="text-[16px] leading-5 font-semibold text-[#F59E0B]">
-                            {t('еще')} +{amenitiesToRender.length - 9}
+                            {t('еще')} +{hotelData.data .facilities.length - 10}
                           </p>
                         )}
                       </div>
+
+
                     </div>
                   </div>
                 </motion.div>
+              )}
+
+              {hotelData?.data?.rooms && hotelData.data.rooms.length > 0 && (
+                <HotelRooms rooms={hotelData.data.rooms} />
+              )}
+
+              {hotelData?.data?.interest_points && hotelData.data.interest_points.length > 0 && (
+                <InterestPoints points={hotelData.data.interest_points} />
               )}
             </div>
           </div>
@@ -804,3 +888,5 @@ const data = typeof window !== 'undefined'
     </div>
   );
 }
+
+

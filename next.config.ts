@@ -30,6 +30,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/resources/**',
       },
+       {
+        protocol: 'https',
+        hostname: 'static.tourvisor.ru',
+        port: '',
+        pathname: '/hotel_pics/**',
+      },
       {
         protocol: 'http',
         hostname: 'simple-travel.felixits.uz',

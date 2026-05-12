@@ -86,6 +86,7 @@ const PopulardestinationsMboile = () => {
                         localStorage.setItem("tourOperator", e?.operator ?? "");
                         localStorage.setItem("tourOperatorId", String(e?.tour_operator_id ?? ""));
                            localStorage.setItem("from_cache", String(e?.from_cache ?? "") );
+                           localStorage.setItem("tour", JSON.stringify(e));
                         // updateData(e)
                       }} 
                 prefetch={true}

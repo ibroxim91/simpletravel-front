@@ -77,12 +77,15 @@ export default function ImageSwiper({
   });
 
   const fallbackImage = '/Logo_blue.png';
+ 
   const sliderImages = useMemo(() => {
     const prepared = (images || [])
       .map((item) => item)
       .filter((item): item is string => Boolean(item));
     return prepared.length > 0 ? prepared : [fallbackImage];
   }, [images]);
+
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const primaryImage = sliderImages[currentIndex];
 
@@ -98,6 +101,10 @@ export default function ImageSwiper({
     setCurrentIndex((prev) => (prev === sliderImages.length - 1 ? 0 : prev + 1));
   };
 
+  console.log("SLIDER IMAGES", sliderImages);
+  console.log("SLIDER IMAGES currentIndex ", currentIndex);
+  console.log("SLIDER IMAGES primaryImage ", primaryImage);
+
   return (
     <div className="w-full mx-auto square relative">
       <div
@@ -106,7 +113,7 @@ export default function ImageSwiper({
       >
         <div className="relative h-full w-full overflow-hidden rounded-[16px] max-lg:rounded-[14px]">
           <Image
-            src={primaryImage}
+            src={primaryImage.image}
             alt="Tour main image"
             fill
             quality={100}
