@@ -101,9 +101,7 @@ export default function ImageSwiper({
     setCurrentIndex((prev) => (prev === sliderImages.length - 1 ? 0 : prev + 1));
   };
 
-  console.log("SLIDER IMAGES", sliderImages);
-  console.log("SLIDER IMAGES currentIndex ", currentIndex);
-  console.log("SLIDER IMAGES primaryImage ", primaryImage);
+
 
   return (
     <div className="w-full mx-auto square relative">

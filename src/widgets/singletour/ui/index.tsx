@@ -38,11 +38,12 @@ import Hotel3 from '../../../../public/images/hotel3.png';
 import Hotel4 from '../../../../public/images/hotel4.png';
 import Hotel_MEAL from '../../../../public/images/hotel_meal.png';
 import Hotel1 from '../../../../public/images/hotel_name.png';
+import Support from '../../../../public/images/support.png';
 import Food from '../../../../public/images/hotel_meal.png';
 import Insurance from '../../../../public/images/approved.png';
 import Bus from '../../../../public/images/bus.png';
 import Hotel_Star from '../../../../public/images/hotel_star.png';
-import Statue from '../../../../public/images/statue.png';
+import Flight from '../../../../public/images/flight.png';
 import { TicketsDetailAPi } from '../lib/api';
 import HotelInfoItem from './HotelInfoItem';
 import TourDayItem from './TourDayItem';
@@ -252,6 +253,17 @@ console.log("hotelData ", hotelData)
  if (!data) {
   return <TourDetailLoading />
  }
+      const hotelRating = (() => {
+        const rating = data.ticket_hotel?.[0]?.rating;
+        if (!rating) return "";
+
+        if (!isNaN(Number(rating))) {
+          return `${rating} ★`; // string qaytadi
+        }
+        return rating;
+      })();
+
+
 
   const meal = data.ticket_hotel?.[0]?.meal_plan;
                         const mealMap: Record<string, string> = {
@@ -264,44 +276,36 @@ console.log("hotelData ", hotelData)
                         };
   const mealLabel = mealMap[meal] || t('Все включено');
 
- const visibleIncludedServices = [...(data?.ticket_included_services || [])];
+ const visibleIncludedServices = [];
 
 const defaultServices = [
-  { image: Bus.src, title: t('Трансфер'), desc: t('Включено') },
-  { image: Food.src, title: mealLabel, desc: t('Включено') },
-  { image: Insurance.src, title: t('Страхование'), desc: t('Включено') },
+  { image: Flight.src, title: t('Авиаперелёт'), desc: t('Включено'), included: true },
+  { image: Bus.src, title: t('Трансфер'), desc: t('Включено'), included: true },
+  { image: Hotel1.src, title: `${t('Проживание')} (${t('гостиница')} ${hotelRating})`, desc: t('Включено'), included: true },
+  {image: Food.src, title: `${ t('Питание')} (${t(meal)})`, desc: meal === 'RO' ? t('Не включено') : t('Включено'), included: meal === 'RO' ? false : true},
+  { image: Insurance.src, title: t('Страхование'), desc: t('Включено'), included: true },
+  { image: Support.src, title: t('24/7 техподдержка'), desc: t('Включено'), included: true },
 ];
 
 if (visibleIncludedServices.length === 0) {
   visibleIncludedServices.push(...defaultServices);
-} else if (visibleIncludedServices.length === 1) {
-  // Agar faqat bitta bo‘lsa, Transferni qo‘shmaymiz
-  visibleIncludedServices.push(...defaultServices.slice(1));
-}
+} 
 
-  const includedServicesToRender =
-    visibleIncludedServices.length > 0
-      ? visibleIncludedServices
-      : [
-          { image: Bus.src, title: t('Трансфер'), desc: t('Включено') },
-          { image: Food.src, title: mealLabel, desc: t('Включено') },
-          { image: Insurance.src, title: t('Страхование'), desc: t('Включено') },
-        ];
-
-  const amenitiesToRender =
-    data?.ticket_amenities?.length > 0
-      ? data.ticket_amenities
-      : [
-          { icon_name: 'Waves', name: t('Открытый бассейн') },
-          { icon_name: 'Waves', name: t('Закрытый бассейн') },
-          { icon_name: 'Flower2', name: t('Спа- и оздоровительный центр') },
-          { icon_name: 'UtensilsCrossed', name: t('Ресторан') },
-          { icon_name: 'Bell', name: t('Обслуживание номеров') },
-          { icon_name: 'Dumbbell', name: t('Фитнес зал') },
-          { icon_name: 'Wine', name: t('Бар') },
-          { icon_name: 'Wifi', name: t('Бесплатный Wi Fi') },
-          { icon_name: 'Coffee', name: t('Чай/Кофе машина') },
-        ];
+  const includedServicesToRender = visibleIncludedServices 
+  // const amenitiesToRender =
+  //   data?.ticket_amenities?.length > 0
+  //     ? data.ticket_amenities
+  //     : [
+  //         { icon_name: 'Waves', name: t('Открытый бассейн') },
+  //         { icon_name: 'Waves', name: t('Закрытый бассейн') },
+  //         { icon_name: 'Flower2', name: t('Спа- и оздоровительный центр') },
+  //         { icon_name: 'UtensilsCrossed', name: t('Ресторан') },
+  //         { icon_name: 'Bell', name: t('Обслуживание номеров') },
+  //         { icon_name: 'Dumbbell', name: t('Фитнес зал') },
+  //         { icon_name: 'Wine', name: t('Бар') },
+  //         { icon_name: 'Wifi', name: t('Бесплатный Wi Fi') },
+  //         { icon_name: 'Coffee', name: t('Чай/Кофе машина') },
+  //       ];
 
 
   return (
@@ -817,8 +821,6 @@ if (visibleIncludedServices.length === 0) {
 
                     <div className="flex w-full flex-col items-start gap-4">
                       {includedServicesToRender.slice(0, 5).map((item, index) => {
-                        const isIncluded = true
-
                         return (
                           <div key={`${item.title}-${index}`} className="w-full">
                             <div className="flex w-full items-center justify-between gap-10 max-md:items-start max-md:gap-4">
@@ -840,17 +842,17 @@ if (visibleIncludedServices.length === 0) {
                                 className={clsx(
                                   'flex items-center justify-center rounded-md border-2',
                                   'px-3 py-1 text-sm md:px-4 md:py-2 md:text-base font-semibold',
-                                  isIncluded
+                                  item.included
                                     ? 'border-[#1A73E8] text-[#1A73E8]'
                                     : 'border-[#F59E0B] text-[#F59E0B]',
                                 )}
                               >
-                                {isIncluded ? t('Включено') : t('Не включено')}
+                                {item.included ? t('Включено') : t('Не включено')}
                               </div>
 
                             </div>
 
-                            {index !== Math.min(includedServicesToRender.length, 3) - 1 && (
+                            {index !== Math.min(includedServicesToRender.length, 5) - 1 && (
                               <div className="mt-4 h-px w-full bg-[#11221140]" />
                             )}
                           </div>
