@@ -98,6 +98,32 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
     return mealMap[normalized] || meal.toUpperCase();
   };
 
+  const formatDepartureDate = (dateStr: string) => {
+  if (!dateStr || dateStr.length !== 8) return "";
+
+  const year = dateStr.slice(0, 4);
+  const month = dateStr.slice(4, 6);
+  const day = dateStr.slice(6, 8);
+
+  // Oy mapping
+  const months: Record<string, string> = {
+    "01": "Yanvar",
+    "02": "Fevral",
+    "03": "Mart",
+    "04": "Aprel",
+    "05": "May",
+    "06": "Iyun",
+    "07": "Iyul",
+    "08": "Avgust",
+    "09": "Sentabr",
+    "10": "Oktabr",
+    "11": "Noyabr",
+    "12": "Dekabr",
+  };
+  const montName = months[month]
+  return `${Number(day)}‑${t(montName)}`;
+};
+
   return (
     <Link
       href={`/selectour/${data?.slug}?from_cache=${data?.from_cache}`}
@@ -228,6 +254,17 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
               <p className="text-right text-xs font-medium leading-[15px] text-[#6B7280]/75 max-lg:text-[10px]">
                 {t('с учетом налогов')}
               </p>
+
+             <div className="mt-12 flex items-center gap-4 mt-2">
+                <div className="flex items-center gap-2">
+                  <img src="/icons/airplan.png" alt="airplane" className="w-6 h-6" />
+                  <span className="text-xs font-medium leading-[15px] text-[#6B7280]/75 max-lg:text-[10px]">
+                    {formatDepartureDate(data.departure_time)}
+                  </span>
+                </div>
+              </div>
+
+
             </div>
           </div>
 
@@ -296,12 +333,28 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
                         : data.ticket_hotel[0].rating}
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <img src="/icons/meal.png" alt="" className="size-4 shrink-0" />
-                    <p className="text-[12px] font-medium leading-[15px] text-[#1C1C1E]">
-                      {getMealShort(data.ticket_hotel[0]?.meal_plan)}
-                    </p>
+  
+                    
+                   <div className="flex items-center gap-6">
+                    {/* Meal plan */}
+                    <div className="flex items-center gap-2">
+                      <img src="/icons/meal.png" alt="meal" className="w-4 h-4 shrink-0" />
+                      <p className="text-[12px] font-medium leading-[15px] text-[#1C1C1E]">
+                        {getMealShort(data.ticket_hotel[0]?.meal_plan)}
+                      </p>
+                    </div>
+
+                    {/* Departure date */}
+                    <div className="flex items-center gap-2 ml-3">
+                      <img src="/icons/airplan.png" alt="airplane" className="w-4 h-4 shrink-0" />
+                      <p className="text-[12px] font-medium leading-[15px] text-[#1C1C1E]">
+                        {formatDepartureDate(data.departure_time)}
+                      </p>
+                    </div>
                   </div>
+
+
+                  
                 </div>
               )}
             </div>
