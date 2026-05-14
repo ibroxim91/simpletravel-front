@@ -137,6 +137,13 @@ const prevHotelsRef = useRef<any[] | null>(null);
     setPriceRange(newRange);
   };
 
+useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  const ratingParam = params.get("rating");
+  if (ratingParam) {
+    setHotelRating(ratingParam);
+  }
+}, []);
 
 
   useEffect(() => {
