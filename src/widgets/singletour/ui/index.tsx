@@ -276,22 +276,17 @@ console.log("hotelData ", hotelData)
                         };
   const mealLabel = mealMap[meal] || t('Все включено');
 
- const visibleIncludedServices = [];
 
-const defaultServices = [
+const includedServicesToRender = [
   { image: Flight.src, title: t('Авиаперелёт'), desc: t('Включено'), included: true },
   { image: Bus.src, title: t('Трансфер'), desc: t('Включено'), included: true },
   { image: Hotel1.src, title: `${t('Проживание')} (${t('гостиница')} ${hotelRating})`, desc: t('Включено'), included: true },
   {image: Food.src, title: `${ t('Питание')} (${t(meal)})`, desc: meal === 'RO' ? t('Не включено') : t('Включено'), included: meal === 'RO' ? false : true},
   { image: Insurance.src, title: t('Страхование'), desc: t('Включено'), included: true },
-  { image: Support.src, title: t('24/7 техподдержка'), desc: t('Включено'), included: true },
+  { image: Support.src, title: t('24/7 техподдержка'), desc: t('Включено'), included: true }
 ];
 
-if (visibleIncludedServices.length === 0) {
-  visibleIncludedServices.push(...defaultServices);
-} 
 
-  const includedServicesToRender = visibleIncludedServices 
   // const amenitiesToRender =
   //   data?.ticket_amenities?.length > 0
   //     ? data.ticket_amenities
@@ -820,7 +815,7 @@ if (visibleIncludedServices.length === 0) {
                     </h3>
 
                     <div className="flex w-full flex-col items-start gap-4">
-                      {includedServicesToRender.slice(0, 5).map((item, index) => {
+                      {includedServicesToRender.slice(0, 10).map((item, index) => {
                         return (
                           <div key={`${item.title}-${index}`} className="w-full">
                             <div className="flex w-full items-center justify-between gap-10 max-md:items-start max-md:gap-4">
@@ -852,7 +847,7 @@ if (visibleIncludedServices.length === 0) {
 
                             </div>
 
-                            {index !== Math.min(includedServicesToRender.length, 5) - 1 && (
+                            {index !== Math.min(includedServicesToRender.length, 10) - 1 && (
                               <div className="mt-4 h-px w-full bg-[#11221140]" />
                             )}
                           </div>
