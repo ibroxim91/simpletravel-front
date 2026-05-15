@@ -74,6 +74,18 @@ export default function TimeStep({ onNext, data }: Props) {
     }
   }, []);
 
+function parseApiDate(dateStr) {
+  if (!dateStr || dateStr.length !== 8) return null;
+
+  const year = parseInt(dateStr.slice(0, 4), 10);
+  const month = parseInt(dateStr.slice(4, 6), 10) - 1; // JSda oy 0-based
+  const day = parseInt(dateStr.slice(6, 8), 10);
+
+  return new Date(year, month, day);
+}
+
+
+
   function onSubmit(values: z.infer<typeof TimesStepForm>) {
     onNext();
     setWhere(values.where);
@@ -84,18 +96,18 @@ export default function TimeStep({ onNext, data }: Props) {
     localStorage.setItem('timesStepForm', JSON.stringify(values));
   }
 
-  useEffect(() => {
-    if (data.data?.departure) {
-      const departure = new Date(data.data?.departure_time);
-      console.log()
-      console.log("data.data.departure?.name ", data.data?.departure?.name )
-      console.log()
-      form.setValue('where', String(data.data?.departure?.name));
-      form.setValue('whereTo', String(data.data?.destination?.name));
-      form.setValue('dispatch', departure);
-      form.setValue('returned', new Date(data.data?.travel_time));
-    }
-  }, [data, form]);
+useEffect(() => {
+  if (data.data?.departure) {
+    const departureDate = parseApiDate(data.data?.departure_time);
+    const returnDate = parseApiDate(data.data?.travel_time);
+
+    form.setValue('where', String(data.data?.departure?.name));
+    form.setValue('whereTo', String(data.data?.destination?.name));
+    form.setValue('dispatch', departureDate);
+    form.setValue('returned', returnDate);
+  }
+}, [data, form]);
+
 
   return (
     <div className="relative">
