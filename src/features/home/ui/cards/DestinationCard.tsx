@@ -31,7 +31,7 @@ const DestinationCard = ({
         onClick={onClick}
       >
         <Image
-          src={BASE_URL + item.ticket_images}
+          src={item.ticket_images}
           alt={item.title}
           fill
           className="object-cover transition-transform duration-300 group-hover:scale-105"

@@ -93,7 +93,7 @@ const PopulardestinationsMboile = () => {
                 className="rounded-3xl w-full relative h-full"
               >
                 <Image
-                  src={BASE_URL + e.ticket_images}
+                  src={e.ticket_images}
                   width={528}
                   height={352}
                   quality={100}
