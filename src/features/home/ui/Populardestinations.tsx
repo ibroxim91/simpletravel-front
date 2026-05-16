@@ -80,7 +80,7 @@ const Populardestinations = () => {
                   }}
                 >
                   <Image
-                    src={BASE_URL + item.ticket_images}
+                    src={item.ticket_images}
                     alt={item.title}
                     fill
                     className="object-cover"
@@ -116,7 +116,7 @@ const Populardestinations = () => {
                   }}
                 >
                   <Image
-                    src={BASE_URL + item.ticket_images}
+                    src={item.ticket_images}
                     alt={item.title}
                     fill
                     className="object-cover"
