@@ -36,6 +36,25 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/hotel_pics/**',
       },
+
+      { 
+        protocol: 'https',
+        hostname: 'pix8.agoda.net',
+        port: '',
+        pathname: '/**',
+      },
+        { 
+        protocol: 'https',
+        hostname: 'pix6.agoda.net',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'q-xx.bstatic.com',
+        port: '',
+        pathname: '/**',
+      },
       {
         protocol: 'http',
         hostname: 'simple-travel.felixits.uz',
