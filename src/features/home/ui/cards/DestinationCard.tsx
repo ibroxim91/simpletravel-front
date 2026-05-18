@@ -25,7 +25,7 @@ const DestinationCard = ({
   return (
     <div>
       <Link
-        href={`/selectour/${item.slug}/?from_cache=${item?.from_cache ?? ''}`}
+        href={`/selectour/?page=1&departure=${item?.departure_id ?? ''}&destination=${item?.destination_id ?? ''}`}
         className="group relative block h-[340px] overflow-hidden rounded-[14px]"
         prefetch
         // onClick={onClick},

@@ -9,7 +9,7 @@ const AboutClient = () => {
       <div className="bg-white p-4">
         <Partner />
       </div>
-      <Sertificat />
+      {/* <Sertificat /> */}
     </div>
   );
 };

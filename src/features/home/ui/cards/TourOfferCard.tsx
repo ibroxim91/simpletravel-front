@@ -38,7 +38,7 @@ TourOfferCard = ({
   return (
     <div>
       <Link
-        href={`/selectour/${item.slug}/?from_cache=${item?.from_cache ?? ''}`}
+       href={`/selectour/?page=1&departure=${item?.departure_id ?? ''}&destination=${item?.destination_id ?? ''}`}
         prefetch
         className="group flex h-[356px] w-full flex-col rounded-[14px] bg-white p-0 md:h-auto md:border md:border-[#E5E7EB] xl:h-120.75"
         onClick={() => {
