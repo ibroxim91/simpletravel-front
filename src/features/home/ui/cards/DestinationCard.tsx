@@ -28,7 +28,16 @@ const DestinationCard = ({
         href={`/selectour/${item.slug}/?from_cache=${item?.from_cache ?? ''}`}
         className="group relative block h-[340px] overflow-hidden rounded-[14px]"
         prefetch
-        onClick={onClick}
+        // onClick={onClick},
+        onClick={() => {
+                    localStorage.setItem('tourOperator', item?.operator ?? '');
+                    localStorage.setItem('tour', JSON.stringify(item));
+                    localStorage.setItem(
+                      'tourOperatorId',
+                      String(item?.tour_operator_id ?? ''),
+                    );
+                    localStorage.setItem('from_cache', String(item?.from_cache ?? ''));
+                  }}
       >
         <Image
           src={item.ticket_images}

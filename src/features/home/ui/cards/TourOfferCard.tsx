@@ -41,7 +41,15 @@ TourOfferCard = ({
         href={`/selectour/${item.slug}/?from_cache=${item?.from_cache ?? ''}`}
         prefetch
         className="group flex h-[356px] w-full flex-col rounded-[14px] bg-white p-0 md:h-auto md:border md:border-[#E5E7EB] xl:h-120.75"
-        onClick={onClick}
+        onClick={() => {
+                          localStorage.setItem('tourOperator', item?.operator ?? '');
+                          localStorage.setItem('from_cache', item?.from_cache ?? '');
+                          localStorage.setItem('tour', JSON.stringify(item));
+                          localStorage.setItem(
+                            'tourOperatorId',
+                            String(item?.tour_operator_id ?? ''),
+                          );
+                        }}
       >
                 <div className="relative h-[153px] w-full overflow-hidden rounded-[14px] sm:h-[210px] xl:h-[233px]">
                   <Image

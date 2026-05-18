@@ -16,6 +16,7 @@ import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { getBanner } from '../lib/api';
+import { useEffect } from 'react';
 
 const PopulardestinationsMboile = () => {
   const { locale } = useParams();
@@ -29,6 +30,9 @@ const PopulardestinationsMboile = () => {
       return data.data.results.tickets;
     },
   });
+
+
+
 
   const {
     data: banner,
@@ -83,11 +87,12 @@ const PopulardestinationsMboile = () => {
               <Link
                 href={`/selectour/${e.slug}/?from_cache=${e?.from_cache}`}
                 onClick={() => {
+                        localStorage.setItem("tour", JSON.stringify(e));
                         localStorage.setItem("tourOperator", e?.operator ?? "");
                         localStorage.setItem("tourOperatorId", String(e?.tour_operator_id ?? ""));
-                           localStorage.setItem("from_cache", String(e?.from_cache ?? "") );
-                           localStorage.setItem("tour", JSON.stringify(e));
-                        // updateData(e)
+                        localStorage.setItem("from_cache", String(e?.from_cache ?? "") );
+                        console.log("Selected tour:", e);
+                      
                       }} 
                 prefetch={true}
                 className="rounded-3xl w-full relative h-full"
@@ -105,11 +110,11 @@ const PopulardestinationsMboile = () => {
                   <p className="text-white text-3xl font-semibold">{e.title}</p>
                   <p className="text-white text-md">
                     {formatPrice(
-                      ticket[0].price,
+                     e.price,
                       locale as LanguageRoutes,
                       true,
                     )}{' '}
-                    / {ticket[0].passenger_count} {t('чел')}
+                    / {e.passenger_count} {t('чел')}
                   </p>
                 </div>
               </Link>

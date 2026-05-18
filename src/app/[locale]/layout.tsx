@@ -136,7 +136,18 @@ export default async function RootLayout({ children, params }: Props) {
 
 {/* Yandex Metrika END */}
 
+{/* Clarity Code START */}
+<Script id="clarity" strategy="afterInteractive">
+  {`
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "wsy0tpxsom");
+`}
+</Script>
 
+<Script src='https://t.contentsquare.net/uxa/f510ff1cc302b.js' strategy="afterInteractive"></Script>
        
         
         <NextIntlClientProvider locale={locale}>

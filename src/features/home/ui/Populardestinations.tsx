@@ -50,14 +50,7 @@ const Populardestinations = () => {
                   index={index}
                   locale={locale as LanguageRoutes}
                   fromLabel={t('от')}
-                  onClick={() => {
-                    localStorage.setItem('tourOperator', item?.operator ?? '');
-                    localStorage.setItem(
-                      'tourOperatorId',
-                      String(item?.tour_operator_id ?? ''),
-                    );
-                    localStorage.setItem('from_cache', String(item?.from_cache ?? ''));
-                  }}
+                  
                 />
               ))}
         </div>
@@ -113,6 +106,7 @@ const Populardestinations = () => {
                     localStorage.setItem('tourOperator', item?.operator ?? '');
                     localStorage.setItem('tourOperatorId', String(item?.tour_operator_id ?? ''));
                     localStorage.setItem('from_cache', String(item?.from_cache ?? ''));
+                    localStorage.setItem('tour', JSON.stringify(item));
                   }}
                 >
                   <Image
