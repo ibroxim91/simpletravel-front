@@ -63,7 +63,7 @@ const Populardestinations = () => {
             : popular.map((item: any) => (
                 <Link
                   key={item.id}
-                  href={`/selectour/?page=1&departure_id=${item?.departure_id ?? ''}&destination_id=${item?.destination_id ?? ''}`}
+                  href={`/selectour/?page=1&departure=${item?.departure_id ?? ''}&destination=${item?.destination_id ?? ''}`}
                   className="relative h-[220px] w-full overflow-hidden rounded-[14px]"
                   onClick={() => {
                     localStorage.setItem('tourOperator', item?.operator ?? '');
@@ -100,7 +100,7 @@ const Populardestinations = () => {
             : popular.map((item: any) => (
                 <Link
                   key={item.id}
-                 href={`/selectour/?page=1&departure_id=${item?.departure_id ?? ''}&destination_id=${item?.destination_id ?? ''}`}
+                 href={`/selectour/?page=1&departure=${item?.departure_id ?? ''}&destination=${item?.destination_id ?? ''}`}
                   className="relative h-[200px] w-[157px] overflow-hidden rounded-[14px]"
                   onClick={() => {
                     localStorage.setItem('tourOperator', item?.operator ?? '');
