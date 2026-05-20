@@ -47,7 +47,8 @@ httpClient.interceptors.request.use(
     }
 
     // ✅ headers.set orqali to‘g‘ri yozish
-    config.headers.set('Accept-Language', language);
+     const locale = localStorage.getItem('locale') || 'uz';
+    config.headers.set('Accept-Language', locale);
 
     const accessToken = getToken();
     if (accessToken) {

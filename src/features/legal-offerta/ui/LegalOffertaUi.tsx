@@ -40,6 +40,8 @@ const LegalOffertaUi = ({ type }: { type: 'individual' | 'legal_entity' }) => {
               <h1 className="text-2xl font-bold mb-6 text-center">{e.title}</h1>
 
               <div
+               style={{ userSelect: 'none' }} 
+                onCopy={(e) => e.preventDefault()}
                 className="prose max-w-none"
                 dangerouslySetInnerHTML={{ __html: e.content }}
               />

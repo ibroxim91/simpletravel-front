@@ -17,7 +17,7 @@ import { useTranslations } from 'next-intl';
 import Image, { StaticImageData } from 'next/image';
 import { useParams, usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
-
+import { useEffect } from 'react';
 type ChangeLangProps = {
   compact?: boolean;
   theme?: 'dark' | 'light';
@@ -30,6 +30,13 @@ export function ChangeLang({ compact = false, theme = 'dark' }: ChangeLangProps)
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const isLight = theme === 'light';
+
+
+    useEffect(() => {
+    if (locale) {
+      localStorage.setItem('locale', locale);
+    }
+  }, [locale]);
 
   const languages: {
     code: LanguageRoutes;
@@ -44,6 +51,8 @@ export function ChangeLang({ compact = false, theme = 'dark' }: ChangeLangProps)
   const changeLocale = (newLocale: LanguageRoutes) => {
     const segments = pathname.split('/');
     segments[1] = newLocale;
+    localStorage.setItem('locale', newLocale);
+
     const newPath = segments.join('/');
     router.push(newPath);
   };

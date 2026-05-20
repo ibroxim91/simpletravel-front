@@ -14,13 +14,22 @@ import {
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
+import { Checkbox } from '@/shared/ui/checkbox';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/shared/ui/dialog';
+import LegalOffertaUi from '@/features/legal-offerta/ui/LegalOffertaUi';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { LoaderCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import z from 'zod';
@@ -36,6 +45,7 @@ const OneStep = ({ setStep }: Props) => {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl');
   const { setEmail, setPhone } = useLoginPhoneStore();
+  const [agreeOffer, setAgreeOffer] = useState(false);
   const phoneFormSchema = z.object({
     phone: z.string().min(17, { message: 'Введите корректный номер телефона' }),
   });
@@ -108,6 +118,46 @@ const OneStep = ({ setStep }: Props) => {
       phone: onlyNumber(values.phone),
     });
   }
+
+  const publicOfferAgreement = (
+    <div className="space-y-4">
+     
+      <Dialog>
+        <DialogTrigger asChild>
+          <button
+            type="button"
+            className="text-sm font-medium text-[#084FE3] underline decoration-dashed underline-offset-2"
+          >
+            {t('offerta')}
+          </button>
+        </DialogTrigger>
+        <DialogContent className="w-screen h-screen !max-w-screen !max-h-screen  p-6">
+          <DialogHeader>
+            <DialogTitle>{t('offerta')}</DialogTitle>
+          </DialogHeader>
+          <div className="max-h-[70vh] overflow-y-auto pt-4">
+            <LegalOffertaUi type="individual" />
+          </div>
+        </DialogContent>
+      </Dialog>
+
+       <div className="flex items-start gap-3">
+        <Checkbox
+          checked={agreeOffer}
+          onCheckedChange={(value) => setAgreeOffer(Boolean(value))}
+          id="public-offer-checkbox"
+          className="mt-1"
+        />
+        <label
+          htmlFor="public-offer-checkbox"
+          className="text-sm leading-6 text-[#646465]"
+        >
+           {t('accept_offerta')} 
+        </label>
+      </div>
+    </div>
+  );
+
   return (
     <Tabs
       defaultValue="phone"
@@ -160,9 +210,10 @@ const OneStep = ({ setStep }: Props) => {
                 </FormItem>
               )}
             />
+            {publicOfferAgreement}
             <Button
               type="submit"
-              disabled={isPending}
+              disabled={!agreeOffer || isPending}
               className="w-full py-8 text-lg bg-[#1764FC] hover:bg-[#1764FC] rounded-full cursor-pointer"
             >
               {isPending ? (
@@ -199,8 +250,10 @@ const OneStep = ({ setStep }: Props) => {
                 </FormItem>
               )}
             />
+            {publicOfferAgreement}
             <Button
               type="submit"
+              disabled={!agreeOffer || emailPending}
               className="w-full py-8 text-lg bg-[#1764FC] hover:bg-[#1764FC] rounded-full cursor-pointer"
             >
               {emailPending ? (
