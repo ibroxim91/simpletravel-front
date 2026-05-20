@@ -205,20 +205,17 @@ const averageRating =
                                 key={`${username}-${idx}`}
                                 className="md:w-1/2 w-full rounded-xl border p-4 bg-white max-md:w-full"
                               >
-                                {/** optional image */}
-                                {(item as any).image && (
-                                      <div className="mb-3 flex items-center">
-                                    <img
-                                      src={(item as any).image}
-                                      alt={username}
-                                      className="h-10 w-10 rounded-full object-cover"
-                                    />
-                                  </div>
-                                )}
-
                                 <div className="flex items-start gap-4">
-                                  <div className="flex h-[45px] w-[45px] shrink-0 items-center justify-center rounded-full bg-[#D9D9D9] text-[14px] font-semibold text-[#112211]">
-                                    {initials}
+                                  <div className="flex h-[45px] w-[45px] shrink-0 items-center justify-center rounded-full bg-[#D9D9D9] text-[14px] font-semibold text-[#112211] overflow-hidden">
+                                    {it.image ? (
+                                      <img
+                                        src={it.image}
+                                        alt={username}
+                                        className="h-full w-full object-cover"
+                                      />
+                                    ) : (
+                                      initials
+                                    )}
                                   </div>
                                   <div className="flex flex-1 flex-col items-start gap-1">
                                     <div className="flex items-center gap-2">
