@@ -126,6 +126,33 @@ export const hotelAdditionalInfo: IHotel[] = [
   { title: 'Языки', name: 'Английский, Испанский', icon: Hotel4.src },
 ];
 
+
+export interface TicketCommentData {
+
+}
+export interface TicketComment {
+  username: string;
+  text: string;
+  rating: number;
+  image?: string;
+  created_at: string;
+
+}
+export interface TicketCommentListResponse {
+  status: boolean;
+   data: {
+    links: {
+      previous: string;
+      next: string;
+    };
+    total_items: number;
+    total_pages: number;
+    page_size: number;
+    current_page: number;
+    results:TicketComment[]
+  }
+}
+
 export interface ToursDetail {
   status: boolean;
   data: ToursDetailData;

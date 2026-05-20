@@ -1,6 +1,6 @@
 "use client";
 import httpClient from '@/shared/config/api/httpClient';
-import { GET_TICKETS, SEND_COMMENT } from '@/shared/config/api/URLs';
+import { GET_TICKETS, GET_TICKET_COMMENTS, SEND_COMMENT } from '@/shared/config/api/URLs';
 import { ToursDetail } from './data';
 // import { useSearchParams } from 'next/navigation';
 
@@ -51,6 +51,11 @@ export const TicketsDetailAPi = {
     
 
      const res = await httpClient.get<ToursDetail>(url);
+    return res;
+  },
+
+  async getTicketComments({ ticketId, page }: { ticketId: number; page: number }) {
+    const res = await httpClient.get(`${GET_TICKET_COMMENTS}?ticket=${ticketId}&page=${page}`);
     return res;
   },
 

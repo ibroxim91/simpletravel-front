@@ -1,53 +1,53 @@
+'use client';
+
+
 import Rating from '@mui/material/Rating';
-import { useMutation } from '@tanstack/react-query';
-import { ChevronLeft, ChevronRight, Flag, Send } from 'lucide-react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { AxiosResponse } from 'axios';
+import { ChevronLeft, ChevronRight, Flag, Send, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { TicketsDetailAPi } from '../lib/api';
-import { ToursDetailData } from '../lib/data';
+import { TicketComment, TicketCommentListResponse, ToursDetailData } from '../lib/data';
+import { User_Api } from '@/features/profile/lib/api';
+import { useRouter } from 'next/navigation';
 
 const CommentTour = ({ data }: { data: ToursDetailData }) => {
   const t = useTranslations();
   const [showForm, setShowForm] = useState(false);
   const [rating, setRating] = useState<number>(0);
   const [comment, setComment] = useState<string>('');
+  const [page, setPage] = useState(1);
+  const [carouselIndex, setCarouselIndex] = useState(0);
+  const queryClient = useQueryClient();
+  const router = useRouter();
 
-  const fallbackComments = [
-    {
-      user: { id: 1, username: 'Имя Фамилия' },
-      text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-      rating: 5,
-    },
-    {
-      user: { id: 2, username: 'Имя Фамилия' },
-      text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-      rating: 5,
-    },
-    {
-      user: { id: 3, username: 'Имя Фамилия' },
-      text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-      rating: 5,
-    },
-    {
-      user: { id: 4, username: 'Имя Фамилия' },
-      text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-      rating: 5,
-    },
-    {
-      user: { id: 5, username: 'Имя Фамилия' },
-      text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-      rating: 5,
-    },
-  ];
+  const { data: userData } = useQuery({
+    queryKey: ['get_me'],
+    queryFn: () => User_Api.getMe(),
+    staleTime: 1000 * 60 * 5,
+  });
 
-  const comments = data.ticket_comments?.length > 0 ? data.ticket_comments : fallbackComments;
-  const averageRating =
-    data.ticket_comments?.length > 0
-      ? data.ticket_comments.reduce((acc, item) => acc + Number(item.rating || 0), 0) /
-        data.ticket_comments.length
-      : 4.2;
-  const totalComments = data.ticket_comments?.length > 0 ? data.ticket_comments.length : 37;
+  const { data: commentsData, isLoading: isCommentsLoading } = useQuery<
+    AxiosResponse<TicketCommentListResponse>
+  >({
+    queryKey: ['ticket-comments', data.id, page],
+    queryFn: () => TicketsDetailAPi.getTicketComments({ ticketId: data.id, page }),
+    enabled: Boolean(data.id),
+  });
+
+  const comments: TicketComment[] = commentsData?.data?.data?.results ?? [];
+  const totalComments = commentsData?.data?.data?.total_items ?? comments.length;
+  const totalPages = commentsData?.data?.data?.total_pages ?? 1;
+  const currentPage = commentsData?.data?.data?.current_page ?? page;
+  const averageRating = Number(data.rating || 0);
+
+  useEffect(() => {
+    setCarouselIndex(0);
+  }, [currentPage, comments.length]);
+
+  const slidesCount = Math.max(1, Math.ceil(comments.length / 2));
 
   const { mutate } = useMutation({
     mutationFn: (body: { text: string; rating: number; ticket: number }) =>
@@ -57,6 +57,10 @@ const CommentTour = ({ data }: { data: ToursDetailData }) => {
         position: 'top-center',
         richColors: true,
       });
+      setRating(0);
+      setComment('');
+      setShowForm(false);
+      queryClient.invalidateQueries({ queryKey: ['ticket-comments', data.id] });
     },
     onError: () => {
       toast.error('Xatolik yuz berdi', {
@@ -77,7 +81,7 @@ const CommentTour = ({ data }: { data: ToursDetailData }) => {
           {Number(averageRating || 0).toFixed(1)}
         </p>
         <div className="flex flex-col items-start gap-2">
-          <p className="text-[20px] leading-6 font-semibold text-[#112211]">{t('Очень хорошо')}</p>
+          {/* <p className="text-[20px] leading-6 font-semibold text-[#112211]">{t('Очень хорошо')}</p> */}
           <p className="text-[14px] leading-[17px] font-normal text-[#112211]">
             {totalComments} {t('отзывов')}
           </p>
@@ -94,6 +98,15 @@ const CommentTour = ({ data }: { data: ToursDetailData }) => {
             </h3>
 
             <div className="space-y-8">
+              <div className="flex w-full justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowForm(false)}
+                  className="rounded-full p-2 text-[#6B7280] hover:bg-[#F3F4F6]"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
               <div className="rounded-xl bg-white p-6">
                 <label className="text-[#232325] font-bold mb-4 text-lg flex items-center gap-2">
                   <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#1A73E8] text-sm text-white">
@@ -153,56 +166,111 @@ const CommentTour = ({ data }: { data: ToursDetailData }) => {
         </div>
       ) : (
         <div className="flex w-full flex-col items-start gap-6">
-          {comments.slice(0, 5).map((item, index) => (
-            <div key={`${item.user.id}-${index}`} className="w-full">
-              <div className="flex w-full items-start gap-4 max-md:flex-col">
-                <div className="flex h-[45px] w-[45px] shrink-0 items-center justify-center rounded-full bg-[#D9D9D9] text-[14px] font-semibold text-[#112211]">
-                  {(item.user.username || 'UF')
-                    .split(' ')
-                    .slice(0, 2)
-                    .map((v) => v[0] || '')
-                    .join('')
-                    .toUpperCase()}
-                </div>
-
-                <div className="flex flex-1 flex-col items-start gap-2">
-                  <div className="flex items-center gap-2 max-md:flex-wrap">
-                    <p className="text-[16px] leading-5 font-semibold text-[#112211]">
-                      {Number(item.rating || 0).toFixed(1)} {t('Превосходно')}
-                    </p>
-                    <span className="text-[16px] leading-5 font-normal text-[#112211]">|</span>
-                    <p className="text-[16px] leading-5 font-normal text-[#112211]">
-                      {item.user.username || t('Имя Фамилия')}
+          <div className="w-full rounded-[28px] border border-[#11221126] bg-white p-8 shadow-sm">
+            {isCommentsLoading ? (
+              <div className="flex h-60 w-full items-center justify-center text-[#6B7280]">
+                {t('Загрузка отзывов...')}
+              </div>
+            ) : comments.length > 0 ? (
+              <div className="flex flex-col gap-5">
+                <div className="flex items-center gap-4 max-md:flex-col">
+                  <div className="flex h-[45px] w-[45px] shrink-0 items-center justify-center rounded-full bg-[#D9D9D9] text-[14px] font-semibold text-[#112211]">
+                    {(comments[carouselIndex]?.username || 'UF')
+                      .split(' ')
+                      .slice(0, 2)
+                      .map((v) => v[0] || '')
+                      .join('')
+                      .toUpperCase()}
+                  </div>
+                  <div className="flex flex-1 flex-col items-start gap-2">
+                    <div className="flex items-center gap-2 max-md:flex-wrap">
+                      <p className="text-[16px] leading-5 font-semibold text-[#112211]">
+                        {Number(comments[carouselIndex]?.rating || 0).toFixed(1)} {t('Превосходно')}
+                      </p>
+                      <span className="text-[16px] leading-5 font-normal text-[#112211]">|</span>
+                      <p className="text-[16px] leading-5 font-normal text-[#112211]">
+                        {comments[carouselIndex]?.username || t('Имя Фамилия')}
+                      </p>
+                    </div>
+                    <p className="break-words text-[14px] leading-[17px] font-normal text-[#112211]">
+                      {comments[carouselIndex]?.text}
                     </p>
                   </div>
-                  <p className="break-words text-[14px] leading-[17px] font-normal text-[#112211]">
-                    {item.text}
-                  </p>
+                  <Flag className="mt-0.5 h-5 w-5 shrink-0 text-[#112211BF] max-md:self-end" />
                 </div>
 
-                <Flag className="mt-0.5 h-5 w-5 shrink-0 text-[#112211BF] max-md:self-end" />
+                <div className="flex items-center justify-between gap-4 border-t border-[#11221120] pt-5 text-[#4B5563] max-md:flex-col">
+                  <p className="text-sm font-medium">
+                    {t('Слайд')} {carouselIndex + 1} / {comments.length}
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      disabled={comments.length <= 1}
+                      onClick={() =>
+                        setCarouselIndex((prev) => (prev === 0 ? comments.length - 1 : prev - 1))
+                      }
+                      className="rounded-full border border-[#D1D5DB] p-3 text-[#6B7280] transition hover:border-[#1A73E8] hover:text-[#1A73E8] disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      <ChevronLeft className="h-5 w-5" />
+                    </button>
+                    <button
+                      type="button"
+                      disabled={comments.length <= 1}
+                      onClick={() =>
+                        setCarouselIndex((prev) => (prev === comments.length - 1 ? 0 : prev + 1))
+                      }
+                      className="rounded-full border border-[#D1D5DB] p-3 text-[#6B7280] transition hover:border-[#1A73E8] hover:text-[#1A73E8] disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      <ChevronRight className="h-5 w-5" />
+                    </button>
+                  </div>
+                </div>
               </div>
-
-              {index !== Math.min(comments.length, 5) - 1 && (
-                <div className="mt-6 h-px w-full bg-[#11221140]" />
-              )}
-            </div>
-          ))}
-
-          <div className="flex w-full items-center justify-center gap-6">
-            <button type="button" className="cursor-pointer text-[#6B7280]">
-              <ChevronLeft className="h-6 w-6" />
-            </button>
-            <p className="text-[16px] leading-5 font-medium text-[#1C1C1E]">1 из 9</p>
-            <button type="button" className="cursor-pointer text-[#6B7280]">
-              <ChevronRight className="h-6 w-6" />
-            </button>
+            ) : (
+              <div className="flex h-60 w-full items-center justify-center text-[#6B7280]">
+                {t('Отзывов пока нет')}
+              </div>
+            )}
           </div>
+
+          {totalPages > 1 && (
+            <div className="flex flex-col items-center gap-3 pt-6">
+              <div className="flex items-center gap-4">
+                <button
+                  type="button"
+                  onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={page <= 1}
+                  className="rounded-full border border-[#D1D5DB] px-4 py-2 text-sm font-semibold text-[#1A73E8] disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {t('Предыдущая')}
+                </button>
+                <p className="text-sm font-medium text-[#1C1C1E]">
+                  {t('Страница')} {currentPage} / {totalPages}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+                  disabled={page >= totalPages}
+                  className="rounded-full border border-[#D1D5DB] px-4 py-2 text-sm font-semibold text-[#1A73E8] disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {t('Следующая')}
+                </button>
+              </div>
+            </div>
+          )}
 
           <div className="mt-12 mb-16 flex w-full justify-center">
             <button
               type="button"
-              onClick={() => setShowForm(!showForm)}
+              onClick={() => {
+                const isAuth = Boolean(userData && userData.data && userData.data.data);
+                if (!isAuth) {
+                  router.push('/auth/register');
+                  return;
+                }
+                setShowForm(!showForm);
+              }}
               disabled={!data.allow_comment}
               className={`h-12 w-full rounded-[16px] border px-4 text-[14px] leading-[17px] font-semibold ${
                 data.allow_comment

@@ -45,6 +45,7 @@ const PAYMENTS = '/api/v1/payments_link/';
 const DONWLOAD_PDF = '/api/v1/get-order-pdf/';
 
 const SEND_COMMENT = '/api/v1/ticket-comment/';
+const GET_TICKET_COMMENTS = '/api/v1/ticket-comment/';
 
 const GET_BANNER = '/api/v1/banner/';
 
@@ -99,4 +100,5 @@ export {
   TICKETORDER,
   TICKETORDER_INFO,
   UPDATE_USER,
+  GET_TICKET_COMMENTS,
 };
