@@ -10,6 +10,13 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { TicketsDetailAPi } from '../lib/api';
 import { TicketComment, TicketCommentListResponse, ToursDetailData } from '../lib/data';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+} from '@/shared/ui/carousel';
 import { User_Api } from '@/features/profile/lib/api';
 import { useRouter } from 'next/navigation';
 
@@ -41,8 +48,13 @@ const CommentTour = ({ data }: { data: ToursDetailData }) => {
   const totalComments = commentsData?.data?.data?.total_items ?? comments.length;
   const totalPages = commentsData?.data?.data?.total_pages ?? 1;
   const currentPage = commentsData?.data?.data?.current_page ?? page;
-  const averageRating = Number(data.rating || 0);
 
+
+// Agar commentlar bo‘lsa, ularning ratinglarini yig‘ib o‘rtacha chiqaramiz
+const averageRating =
+  totalComments > 0
+    ? comments.reduce((sum, c) => sum + Number(c.rating || 0), 0) / totalComments
+    : 0;
   useEffect(() => {
     setCarouselIndex(0);
   }, [currentPage, comments.length]);
@@ -166,65 +178,74 @@ const CommentTour = ({ data }: { data: ToursDetailData }) => {
         </div>
       ) : (
         <div className="flex w-full flex-col items-start gap-6">
-          <div className="w-full rounded-[28px] border border-[#11221126] bg-white p-8 shadow-sm">
+          <div className="w-full">
             {isCommentsLoading ? (
               <div className="flex h-60 w-full items-center justify-center text-[#6B7280]">
                 {t('Загрузка отзывов...')}
               </div>
             ) : comments.length > 0 ? (
-              <div className="flex flex-col gap-5">
-                <div className="flex items-center gap-4 max-md:flex-col">
-                  <div className="flex h-[45px] w-[45px] shrink-0 items-center justify-center rounded-full bg-[#D9D9D9] text-[14px] font-semibold text-[#112211]">
-                    {(comments[carouselIndex]?.username || 'UF')
-                      .split(' ')
-                      .slice(0, 2)
-                      .map((v) => v[0] || '')
-                      .join('')
-                      .toUpperCase()}
-                  </div>
-                  <div className="flex flex-1 flex-col items-start gap-2">
-                    <div className="flex items-center gap-2 max-md:flex-wrap">
-                      <p className="text-[16px] leading-5 font-semibold text-[#112211]">
-                        {Number(comments[carouselIndex]?.rating || 0).toFixed(1)} {t('Превосходно')}
-                      </p>
-                      <span className="text-[16px] leading-5 font-normal text-[#112211]">|</span>
-                      <p className="text-[16px] leading-5 font-normal text-[#112211]">
-                        {comments[carouselIndex]?.username || t('Имя Фамилия')}
-                      </p>
-                    </div>
-                    <p className="break-words text-[14px] leading-[17px] font-normal text-[#112211]">
-                      {comments[carouselIndex]?.text}
-                    </p>
-                  </div>
-                  <Flag className="mt-0.5 h-5 w-5 shrink-0 text-[#112211BF] max-md:self-end" />
-                </div>
+              <div className="relative">
+                <Carousel opts={{ align: 'start', containScroll: 'trimSnaps' }}>
+                  <CarouselContent className="px-0">
+                    {Array.from({ length: slidesCount }).map((_, slideIdx) => (
+                      <CarouselItem key={slideIdx}>
+                        <div className="flex gap-6">
+                          {comments.slice(slideIdx * 2, slideIdx * 2 + 2).map((item, idx) => {
+                            const it: any = item;
+                            const username = it.username || it.user?.username || 'UF';
+                            const initials = (username as string)
+                              .split(' ')
+                              .slice(0, 2)
+                              .map((v: string) => v[0] || '')
+                              .join('')
+                              .toUpperCase();
 
-                <div className="flex items-center justify-between gap-4 border-t border-[#11221120] pt-5 text-[#4B5563] max-md:flex-col">
-                  <p className="text-sm font-medium">
-                    {t('Слайд')} {carouselIndex + 1} / {comments.length}
+                            return (
+                              <div
+                                key={`${username}-${idx}`}
+                                className="md:w-1/2 w-full rounded-xl border p-4 bg-white max-md:w-full"
+                              >
+                                {/** optional image */}
+                                {(item as any).image && (
+                                      <div className="mb-3 flex items-center">
+                                    <img
+                                      src={(item as any).image}
+                                      alt={username}
+                                      className="h-10 w-10 rounded-full object-cover"
+                                    />
+                                  </div>
+                                )}
+
+                                <div className="flex items-start gap-4">
+                                  <div className="flex h-[45px] w-[45px] shrink-0 items-center justify-center rounded-full bg-[#D9D9D9] text-[14px] font-semibold text-[#112211]">
+                                    {initials}
+                                  </div>
+                                  <div className="flex flex-1 flex-col items-start gap-1">
+                                    <div className="flex items-center gap-2">
+                                      <p className="text-[16px] leading-5 font-semibold text-[#112211]">
+                                        {Number(item.rating || 0).toFixed(1)} {t('Превосходно')}
+                                      </p>
+                                      <span className="text-[16px] leading-5 font-normal text-[#112211]">|</span>
+                                      <p className="text-[16px] leading-5 font-normal text-[#112211]">{username}</p>
+                                    </div>
+                                    <p className="break-words text-[14px] leading-[17px] font-normal text-[#112211]">{item.text}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious />
+                  <CarouselNext />
+                </Carousel>
+
+                <div className="flex items-center justify-center gap-4 pt-5">
+                  <p className="text-sm font-medium text-[#1C1C1E]">
+                    {t('Страница')} {currentPage} / {totalPages}
                   </p>
-                  <div className="flex items-center gap-3">
-                    <button
-                      type="button"
-                      disabled={comments.length <= 1}
-                      onClick={() =>
-                        setCarouselIndex((prev) => (prev === 0 ? comments.length - 1 : prev - 1))
-                      }
-                      className="rounded-full border border-[#D1D5DB] p-3 text-[#6B7280] transition hover:border-[#1A73E8] hover:text-[#1A73E8] disabled:cursor-not-allowed disabled:opacity-40"
-                    >
-                      <ChevronLeft className="h-5 w-5" />
-                    </button>
-                    <button
-                      type="button"
-                      disabled={comments.length <= 1}
-                      onClick={() =>
-                        setCarouselIndex((prev) => (prev === comments.length - 1 ? 0 : prev + 1))
-                      }
-                      className="rounded-full border border-[#D1D5DB] p-3 text-[#6B7280] transition hover:border-[#1A73E8] hover:text-[#1A73E8] disabled:cursor-not-allowed disabled:opacity-40"
-                    >
-                      <ChevronRight className="h-5 w-5" />
-                    </button>
-                  </div>
                 </div>
               </div>
             ) : (
