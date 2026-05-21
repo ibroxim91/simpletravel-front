@@ -84,7 +84,7 @@ const HomeCommentTour = () => {
         </div>
 
         <div className="mt-6">
-          <div className="flex items-center gap-4 max-md:flex-wrap">
+          {/* <div className="flex items-center gap-4 max-md:flex-wrap">
             <p className="text-[48px] leading-[59px] font-bold text-[#112211]">
               {Number(averageRating || 0).toFixed(1)}
             </p>
@@ -93,7 +93,7 @@ const HomeCommentTour = () => {
                 {totalComments} {t('отзывов')}
               </p>
             </div>
-          </div>
+          </div> */}
 
           <div className="h-px w-full bg-[#11221140] mt-6" />
 
@@ -130,7 +130,7 @@ const HomeCommentTour = () => {
                             return (
                               <div
                                 key={`${username}-${idx}`}
-                                className="md:w-1/2 w-full rounded-xl border p-4 bg-white max-md:w-full "
+                                className="md:w-1/2 w-full rounded-xl border p-4 bg-white max-md:w-full min-h-[200px]"
                               >
                                 <div className="flex items-start gap-4">
                                   <div className="flex h-[45px] w-[45px] shrink-0 items-center justify-center rounded-full bg-[#D9D9D9] text-[14px] font-semibold text-[#112211] overflow-hidden">
@@ -148,16 +148,16 @@ const HomeCommentTour = () => {
                                     <div className="flex items-center gap-2">
                                       <p className="text-[16px] leading-5 font-semibold text-[#112211]">
                                         {Number(item.rating || 0).toFixed(1)}{' '}
-                                        {t('Превосходно')}
+                                        {/* {t('Превосходно')} */}
                                       </p>
                                       <span className="text-[16px] leading-5 font-normal text-[#112211]">
                                         |
                                       </span>
-                                      <p className="text-[16px] leading-5 font-normal text-[#112211]">
+                                      <p className="text-[16px] leading-5 font-semibold text-[#112211]">
                                         {username}
                                       </p>
                                     </div>
-                                    <p className="break-words text-[14px] leading-[17px] font-normal text-[#112211]">
+                                    <p className="mt-2 break-words text-[14px] leading-[17px] font-normal text-[#112211]">
                                       {item.text}
                                     </p>
                                   </div>
