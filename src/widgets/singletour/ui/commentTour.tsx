@@ -221,7 +221,7 @@ const averageRating =
                             return (
                               <div
                                 key={`${username}-${idx}`}
-                                className="md:w-1/2 w-full rounded-xl border p-4 bg-white max-md:w-full"
+                                className="md:w-1/2 w-full rounded-xl border p-4 bg-white max-md:w-full min-h-[250px]"
                               >
                                 <div className="flex items-start gap-4">
                                   <div className="flex h-[45px] w-[45px] shrink-0 items-center justify-center rounded-full bg-[#D9D9D9] text-[14px] font-semibold text-[#112211] overflow-hidden">

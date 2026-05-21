@@ -1,9 +1,10 @@
 import HomeBenefits from '@/features/home/ui/HomeBenefits';
 import HotTours from '@/features/home/ui/HotTours';
 import Populardestinations from '@/features/home/ui/Populardestinations';
-import PopulardestinationsMboile from '@/features/home/ui/PopulardestinationsMboile';
+// import PopulardestinationsMboile from '@/features/home/ui/PopulardestinationsMboile';
 import SearchTours from '@/features/home/ui/SearchTours';
 import VisaTours from '@/features/home/ui/VisaTours';
+import HomeCommentTour from '@/features/home/ui/commentTour';
 
 export default async function Home() {
   return (
@@ -19,6 +20,7 @@ export default async function Home() {
             <HotTours />
           </div>
           <div className="mt-[104px] flex flex-col gap-[104px] max-lg:mt-[64px] max-lg:gap-[64px]">
+            <HomeCommentTour />
             <Populardestinations />
             {/* <PopulardestinationsMboile /> */}
             <VisaTours />     

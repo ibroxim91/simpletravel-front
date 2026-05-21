@@ -1,0 +1,15 @@
+export { default as HomeCommentTour } from './commentTour';
+export { default as BannerCarousel } from './BannerCarousel';
+export { default as BannerCarouselMobile } from './BannerCarouselMobile';
+export { default as HomeBenefits } from './HomeBenefits';
+export { default as HotTours } from './HotTours';
+export { default as News } from './News';
+export { default as Populardestinations } from './Populardestinations';
+export { default as PopulardestinationsMboile } from './PopulardestinationsMboile';
+export { default as SearchTours } from './SearchTours';
+export { default as TabsHotel } from './TabsHotel';
+export { default as TabsHotelMobile } from './TabsHotelMobile';
+export { default as TabsTourMobile } from './TabsTourMobile';
+export { default as TabsTours } from './TabsTours';
+export { default as TourOffersSection } from './TourOffersSection';
+export { default as VisaTours } from './VisaTours';
