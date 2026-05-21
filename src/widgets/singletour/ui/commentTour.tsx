@@ -20,6 +20,9 @@ import {
 import { User_Api } from '@/features/profile/lib/api';
 import { useRouter } from 'next/navigation';
 
+
+
+
 const CommentTour = ({ data }: { data: ToursDetailData }) => {
   const t = useTranslations();
   const [showForm, setShowForm] = useState(false);
@@ -35,6 +38,18 @@ const CommentTour = ({ data }: { data: ToursDetailData }) => {
     queryFn: () => User_Api.getMe(),
     staleTime: 1000 * 60 * 5,
   });
+
+  const [isMobile, setIsMobile] = useState(false);
+
+useEffect(() => {
+  const handleResize = () => {
+    setIsMobile(window.innerWidth < 768); // Tailwind sm breakpoint
+  };
+
+  handleResize(); // birinchi renderda chaqirish
+  window.addEventListener('resize', handleResize);
+  return () => window.removeEventListener('resize', handleResize);
+}, []);
 
   const { data: commentsData, isLoading: isCommentsLoading } = useQuery<
     AxiosResponse<TicketCommentListResponse>
@@ -85,7 +100,7 @@ const averageRating =
   return (
     <div className="flex w-full max-w-[1240px] flex-col items-start gap-6 max-lg:gap-8">
       <div className="flex h-12 w-full items-center justify-between gap-6">
-        <h3 className="text-[20px] leading-6 font-bold text-[#112211]">{t('Отзывы о гостинице')}</h3>
+        <h3 className="text-[20px] leading-6 font-bold text-[#112211]">{t('Отзывы')}</h3>
       </div>
 
       <div className="flex items-center gap-4 max-md:flex-wrap">
@@ -185,12 +200,15 @@ const averageRating =
               </div>
             ) : comments.length > 0 ? (
               <div className="relative">
-                <Carousel opts={{ align: 'start', containScroll: 'trimSnaps' }}>
+               <Carousel opts={{ align: 'start', containScroll: 'trimSnaps', loop: true }}>
+
                   <CarouselContent className="px-0">
                     {Array.from({ length: slidesCount }).map((_, slideIdx) => (
                       <CarouselItem key={slideIdx}>
                         <div className="flex gap-6">
-                          {comments.slice(slideIdx * 2, slideIdx * 2 + 2).map((item, idx) => {
+                          
+
+                          {comments.slice(slideIdx * (isMobile ? 1 : 2), slideIdx * (isMobile ? 1 : 2) + (isMobile ? 1 : 2)).map((item, idx) => {
                             const it: any = item;
                             const username = it.username || it.user?.username || 'UF';
                             const initials = (username as string)
