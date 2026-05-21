@@ -208,7 +208,7 @@ const averageRating =
                         <div className="flex gap-6">
                           
 
-                          {comments.slice(slideIdx * (isMobile ? 1 : 2), slideIdx * (isMobile ? 1 : 2) + (isMobile ? 1 : 2)).map((item, idx) => {
+                          {comments.slice(slideIdx * (isMobile ? 1 : 3), slideIdx * (isMobile ? 1 : 3) + (isMobile ? 1 : 3)).map((item, idx) => {
                             const it: any = item;
                             const username = it.username || it.user?.username || 'UF';
                             const initials = (username as string)
