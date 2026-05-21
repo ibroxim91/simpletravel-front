@@ -104,9 +104,9 @@ const averageRating =
       </div>
 
       <div className="flex items-center gap-4 max-md:flex-wrap">
-        <p className="text-[48px] leading-[59px] font-bold text-[#112211]">
+        {/* <p className="text-[48px] leading-[59px] font-bold text-[#112211]">
           {Number(averageRating || 0).toFixed(1)}
-        </p>
+        </p> */}
         <div className="flex flex-col items-start gap-2">
           {/* <p className="text-[20px] leading-6 font-semibold text-[#112211]">{t('Очень хорошо')}</p> */}
           <p className="text-[14px] leading-[17px] font-normal text-[#112211]">
