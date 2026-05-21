@@ -69,7 +69,10 @@ const HomeCommentTour = () => {
       ? comments.reduce((sum, c) => sum + Number(c.rating || 0), 0) / totalComments
       : 0;
 
-  const slidesCount = Math.max(1, Math.ceil(comments.length / 2));
+ const slidesCount = Math.max(
+  1,
+  Math.ceil(comments.length / (isMobile ? 1 : 2))
+);
 
   return (
     <section className="custom-container">
@@ -109,13 +112,12 @@ const HomeCommentTour = () => {
                   {Array.from({ length: slidesCount }).map((_, slideIdx) => (
                     <CarouselItem key={slideIdx}>
                       <div className="flex gap-6">
-                        {comments
-                          .slice(
-                            slideIdx * (isMobile ? 1 : 2),
-                            slideIdx * (isMobile ? 1 : 2) + (isMobile ? 1 : 2)
-                          )
-                          .map((item, idx) => {
-                            const it: any = item;
+                       {comments
+                        .slice(
+                        slideIdx * (isMobile ? 1 : 2),
+                        slideIdx * (isMobile ? 1 : 2) + (isMobile ? 1 : 2)
+                        ).map((item, idx) => {
+                                            const it: any = item;
                             const username =
                               it.username || it.user?.username || 'UF';
                             const initials = (username as string)
