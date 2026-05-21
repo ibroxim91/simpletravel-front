@@ -221,7 +221,7 @@ const averageRating =
                             return (
                               <div
                                 key={`${username}-${idx}`}
-                                className="md:w-1/2 w-full rounded-xl border p-4 bg-white max-md:w-full min-h-[250px]"
+                                className="md:w-1/2 w-full rounded-xl border p-4 bg-white max-md:w-full min-h-[200px]"
                               >
                                 <div className="flex items-start gap-4">
                                   <div className="flex h-[45px] w-[45px] shrink-0 items-center justify-center rounded-full bg-[#D9D9D9] text-[14px] font-semibold text-[#112211] overflow-hidden">
@@ -238,12 +238,13 @@ const averageRating =
                                   <div className="flex flex-1 flex-col items-start gap-1">
                                     <div className="flex items-center gap-2">
                                       <p className="text-[16px] leading-5 font-semibold text-[#112211]">
-                                        {Number(item.rating || 0).toFixed(1)} {t('Превосходно')}
+                                        {Number(item.rating || 0).toFixed(1)} 
+                                        {/* {t('Превосходно')} */}
                                       </p>
                                       <span className="text-[16px] leading-5 font-normal text-[#112211]">|</span>
-                                      <p className="text-[16px] leading-5 font-normal text-[#112211]">{username}</p>
+                                      <p className="text-[16px] leading-5 font-semibold text-[#112211]">{username}</p>
                                     </div>
-                                    <p className="break-words text-[14px] leading-[17px] font-normal text-[#112211]">{item.text}</p>
+                                    <p className="mt-2 break-words text-[14px] leading-[17px] font-normal text-[#112211]">{item.text}</p>
                                   </div>
                                 </div>
                               </div>
