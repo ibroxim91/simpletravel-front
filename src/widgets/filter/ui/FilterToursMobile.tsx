@@ -296,12 +296,12 @@ const FilterToursMobile = ({ selectedDestRegions, setSelectedDestRegions,setSele
                 }}
               />
             </div>
-            <div className="flex flex-col gap-2 max-h-[30vh] overflow-y-auto">
+            <div className="flex flex-col gap-2 max-h-[30vh] overflow-y-auto scroll-visible">
               {filteredRegions.length ? (
                 filteredRegions.map((region) => (
                   <div
                     key={region.id}
-                    className="p-2 hover:bg-gray-200 rounded-lg cursor-pointer flex justify-between"
+                    className="p-2 hover:bg-gray-200 rounded-lg cursor-pointer flex justify-between border-b border-gray-300"
                     onClick={() => {
                       setSelectedRegion(region);
                       setSearchRegion(region.name);
