@@ -296,12 +296,12 @@ const FilterToursMobile = ({ selectedDestRegions, setSelectedDestRegions,setSele
                 }}
               />
             </div>
-            <div className="flex flex-col gap-2 max-h-[30vh] overflow-y-auto scroll-visible">
+            <div className="flex flex-col gap-2 max-h-[30vh] overflow-y-auto ">
               {filteredRegions.length ? (
                 filteredRegions.map((region) => (
                   <div
                     key={region.id}
-                    className="p-2 hover:bg-gray-200 rounded-lg cursor-pointer flex justify-between border-b border-gray-300"
+                    className="p-2 hover:bg-gray-200 rounded-lg cursor-pointer flex justify-between "
                     onClick={() => {
                       setSelectedRegion(region);
                       setSearchRegion(region.name);
@@ -430,7 +430,7 @@ const FilterToursMobile = ({ selectedDestRegions, setSelectedDestRegions,setSele
                     }}
                   />
                 </div>
-                <div className="flex flex-col gap-2 max-h-[30vh] overflow-y-auto">
+                <div className="flex flex-col gap-2 max-h-[30vh] overflow-y-auto scroll-visible">
                   <Button
                     variant={'ghost'}
                     onClick={() => {
@@ -448,7 +448,7 @@ const FilterToursMobile = ({ selectedDestRegions, setSelectedDestRegions,setSele
                     filteredRegionsDes.map((region) => (
                       <div
                         key={region.id}
-                        className="p-2 hover:bg-gray-200 rounded-lg cursor-pointer flex justify-between"
+                        className="p-2 hover:bg-gray-200 rounded-lg cursor-pointer flex justify-between "
                         onClick={() => {
                           setSelectedRegionDes(region);
                           setSearchRegionDes(region.name);
@@ -488,7 +488,7 @@ const FilterToursMobile = ({ selectedDestRegions, setSelectedDestRegions,setSele
                   />
                 </div>
 
-                <div className="flex flex-col gap-2 max-h-[50vh] overflow-y-auto">
+                <div className="flex flex-col gap-2 max-h-[50vh] overflow-y-auto scroll-visible">
                   {filteredCountriesDes.length ? (
                      filteredCountriesDes.filter((item) => !item.default_country).map((country) => (
                       <div

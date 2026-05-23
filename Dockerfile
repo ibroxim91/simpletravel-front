@@ -9,8 +9,9 @@ RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
 # Copy package files
 COPY package.json pnpm-lock.yaml ./
 
-# Install dependencies
-RUN pnpm install --frozen-lockfile
+# PNPM do'konini keshda saqlash orqali har safar internetdan yuklashni oldini olamiz
+RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store \
+    pnpm install --frozen-lockfile --prefer-offline
 
 # Stage 2: Builder
 FROM node:20-alpine AS builder
@@ -32,8 +33,9 @@ ENV NODE_ENV=production
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
-# Build the application
-RUN pnpm run build
+# NEXT.JS keshini saqlab qolish uchun build jarayoniga cache mount qo'shamiz
+RUN --mount=type=cache,id=nextjs,target=/app/.next/cache \
+    pnpm run build
 
 # Stage 3: Runner
 FROM node:20-alpine AS runner
@@ -46,7 +48,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Copy standalone output (bu ichida server.js, public va .next/static ham bor)
+# Copy standalone output
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
