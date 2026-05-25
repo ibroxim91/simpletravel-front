@@ -63,6 +63,7 @@ import CheckboxFilter from './CheckBox';
 import FilterSection from './FilterSection';
 import TourItem from '@/widgets/selectour/ui/TourItem';
 import { useMemo } from "react";
+import CircleLoader from './TourLoader';
 
 const Player = dynamic(
   () => import('@lottiefiles/react-lottie-player').then((mod) => mod.Player),
@@ -1281,12 +1282,13 @@ const top_duration = [
                 </div>
               ) : isLoading || isFetching ? (
                 <div className="flex min-h-[420px] flex-col items-center justify-center rounded-[14px] bg-[#FAFBFC]">
-                  <Player
+                  {/* <Player
                     autoplay
                     loop
                     src={loaderAnimation}
                     style={{ height: '180px', width: '180px' }}
-                  />
+                  /> */}
+                  <CircleLoader />
                   <p className="mt-2 text-base font-medium text-[#6B7280]">{t('Загрузка туров')}</p>
                 </div>
               ) : isError ? (

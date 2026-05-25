@@ -784,6 +784,11 @@ const defaultitems = selectedCountry
           // onClick={saveFilter}
             onClick={() => {
               saveFilter()
+               // sahifani pastga siljitish
+            window.scrollTo({
+              top: 500, // kerakli balandlikka moslab qo‘y
+              behavior: 'smooth',
+            });
               if (selectedDestRegion && selectedRegion) {
                 setIsSearchClicked(true);
               } else {

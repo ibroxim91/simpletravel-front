@@ -430,7 +430,7 @@ const FilterToursMobile = ({ selectedDestRegions, setSelectedDestRegions,setSele
                     }}
                   />
                 </div>
-                <div className="flex flex-col gap-2 max-h-[30vh] overflow-y-auto scroll-visible">
+                <div className="flex flex-col gap-2 max-h-[50vh] overflow-y-auto scroll-visible">
                   <Button
                     variant={'ghost'}
                     onClick={() => {
