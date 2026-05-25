@@ -786,7 +786,7 @@ const defaultitems = selectedCountry
               saveFilter()
                // sahifani pastga siljitish
             window.scrollTo({
-              top: 500, // kerakli balandlikka moslab qo‘y
+              top: 700, // kerakli balandlikka moslab qo‘y
               behavior: 'smooth',
             });
               if (selectedDestRegion && selectedRegion) {

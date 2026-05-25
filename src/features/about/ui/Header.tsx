@@ -56,7 +56,7 @@ const Header = () => {
               visible: { opacity: 1, y: 0 },
             }}
           >
-            {t('Откройте для себя новые горизонты')}
+            {t('Simple Travel — sayohat yugur-yugurlarini soddalashtiruvchi, zamonaviy platforma')}
           </motion.p>
 
           <motion.div
@@ -66,7 +66,7 @@ const Header = () => {
             }}
             className="flex flex-col gap-2"
           >
-            <motion.p
+            {/* <motion.p
               className="text-center text-xl leading-relaxed max-md:text-lg text-[#646465] mx-auto"
               variants={{
                 hidden: { opacity: 0, y: 20 },
@@ -74,7 +74,7 @@ const Header = () => {
               }}
             >
               {t('Ваш идеальный отпуск начинается здесь и сейчас')}
-            </motion.p>
+            </motion.p> */}
             <motion.p
               className="text-center text-xl w-[70%] leading-relaxed max-md:text-lg max-md:w-full text-[#646465] mx-auto"
               variants={{
@@ -82,7 +82,7 @@ const Header = () => {
                 visible: { opacity: 1, y: 0 },
               }}
             >
-              {t('Солнечные рассветы, вечера у моря и приключения')}
+              {t('Biz turli operatorlarning takliflarini bir joyga jamlab')}
             </motion.p>
           </motion.div>
         </motion.div>

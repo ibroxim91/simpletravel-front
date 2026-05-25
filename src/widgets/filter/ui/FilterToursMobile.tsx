@@ -787,7 +787,7 @@ const FilterToursMobile = ({ selectedDestRegions, setSelectedDestRegions,setSele
             saveFilter();
             // sahifani pastga siljitish
             window.scrollTo({
-              top: 700, // kerakli balandlikka moslab qo‘y
+              top: 960, // kerakli balandlikka moslab qo‘y
               behavior: 'smooth',
             });
           }}
