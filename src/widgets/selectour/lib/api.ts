@@ -1,6 +1,8 @@
 import httpClient from '@/shared/config/api/httpClient';
+import httpClientTickets from '@/shared/config/api/httpClientTickets';
 import {
   GET_TICKETS,
+  GET_TICKETS_FROM_GO,
   HOTEL_MEAL_PLAN,
   SAVE_TICKETS,
   HOMETICKETS,
@@ -23,7 +25,7 @@ const Ticket_Api = {
     params: TickectAllFilter;
     paramsSerializer?: (params: TickectAllFilter) => string;
   }) {
-    const res = await httpClient.get<TickectAll>(GET_TICKETS, {
+    const res = await httpClientTickets.get<TickectAll>(GET_TICKETS_FROM_GO, {
       params,
       paramsSerializer: (params: Record<string, null>) =>
         qs.stringify(params, { arrayFormat: 'repeat' }),
@@ -50,3 +52,5 @@ export const hotel_meal_plan = async (): Promise<
 };
 
 export default Ticket_Api;
+
+

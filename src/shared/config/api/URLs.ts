@@ -1,8 +1,12 @@
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || 'https://simple-travel.felixits.uz';
+const BASE_URL_TICKETS =
+  process.env.NEXT_PUBLIC_TICKETS_API_URL ||
+  'https://search.simpletravel.uz';
 
 const ENDP_POSTS = '/posts/';
 const GET_TICKETS = '/api/v1/samo-tour/tickets/';
+const GET_TICKETS_FROM_GO = '/async-samo/tickets';
 const GET_BLOGS = '/api/v1/post/';
 const GET_TAGS = '/api/v1/category/';
 
@@ -57,6 +61,7 @@ const LOCATIONS = '/api/v1/locations/';
 const HOMETICKETS = '/api/v1/home-tours/';
 export {
   BASE_URL,
+  BASE_URL_TICKETS,
   HOMETICKETS,
   COUNTRIES,
   DONWLOAD_PDF,
@@ -101,4 +106,5 @@ export {
   TICKETORDER_INFO,
   UPDATE_USER,
   GET_TICKET_COMMENTS,
+  GET_TICKETS_FROM_GO,
 };
