@@ -25,7 +25,7 @@ const Ticket_Api = {
     params: TickectAllFilter;
     paramsSerializer?: (params: TickectAllFilter) => string;
   }) {
-    const res = await httpClientTickets.get<TickectAll>(GET_TICKETS_FROM_GO, {
+    const res = await httpClientTickets.get<TickectAll>(GET_TICKETS, {
       params,
       paramsSerializer: (params: Record<string, null>) =>
         qs.stringify(params, { arrayFormat: 'repeat' }),
