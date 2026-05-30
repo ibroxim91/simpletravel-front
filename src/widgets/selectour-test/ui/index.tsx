@@ -294,7 +294,7 @@ useEffect(() => {
         ...(hotelFeature.length > 0 && { hotel_feature: hotelFeature }),
       });
 
-      const streamUrl = `${process.env.NEXT_PUBLIC_TICKETS_API_URL}/stream-samo/tickets?${params}`;
+      const streamUrl = `https://search.simpletravel.uz/stream-samo/tickets?${params}`;
       
       es = new EventSource(streamUrl);
 
