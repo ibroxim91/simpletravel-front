@@ -26,7 +26,7 @@ import Drawer from '@mui/material/Drawer';
 import { useQuery } from '@tanstack/react-query';
 import { MoveLeft, MoveRight, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, usePathname } from 'next/navigation';
 import { toast } from 'sonner';
 import { useEffect, useState } from 'react';
 import { DateRange } from 'react-day-picker';
@@ -39,12 +39,15 @@ const FilterToursMobile = ({ selectedDestRegions, setSelectedDestRegions,setSele
       return data.data.data;
     },
   });
-
+ const pathname = usePathname();
     const changeDeparture= (newDep: string) => {
       if (window.location.pathname === '/selectour') {
         const params = new URLSearchParams(searchParams.toString());
         params.set('departure', newDep);
-       route.replace(`/selectour?${params.toString()}`, { scroll: false });
+          const basePath = pathname.includes('/selectour-test')
+      ? '/selectour-test'
+      : '/selectour';
+        route.replace(`${basePath}?${params.toString()}`, { scroll: false });
   } 
    
 };
@@ -189,8 +192,11 @@ const FilterToursMobile = ({ selectedDestRegions, setSelectedDestRegions,setSele
     if (searchParams.get("rating")) params.set('rating',  "");
     if (searchParams.get("duration")) params.set('duration',  "");
     if (searchParams.get("meal")) params.set('meal',  "");
-
-    route.push(`/selectour?page=1&${params.toString()}`,  { scroll: false });
+const basePath = pathname.includes('/selectour-test')
+      ? '/selectour-test'
+      : '/selectour';
+  
+    route.push(`${basePath}?page=1&${params.toString()}`,  { scroll: false });
   };
 
   const departureRegionName = selectedRegion?.name ?? '';

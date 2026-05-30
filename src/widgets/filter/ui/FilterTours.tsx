@@ -28,7 +28,7 @@ import clsx from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Loader2, MoveLeft, SearchIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, usePathname } from 'next/navigation';
 import { toast } from 'sonner';
 import { useEffect, useState } from 'react';
 import { DateRange } from 'react-day-picker';
@@ -57,7 +57,7 @@ const FilterTours = ({ selectedDestRegions, setSelectedDestRegions,setSelectedDe
   const [selectedDestRegion, setSelectedDestRegion] = useState<string>('');
   const [searchDestCountry, setSearchDestCountry] = useState('');
   const [searchDestRegion, setSearchDestRegion] = useState('');
-
+ const pathname = usePathname();
   const { data: countries, isLoading } = useQuery({
     queryKey: ['country_list'],
     queryFn: () => country_api.list(),
@@ -67,10 +67,14 @@ const FilterTours = ({ selectedDestRegions, setSelectedDestRegions,setSelectedDe
   });
 
       const changeDeparture= (newDep: string) => {
+        
       if (window.location.pathname === '/selectour') {
         const params = new URLSearchParams(searchParams.toString());
         params.set('departure', newDep);
-       route.replace(`/selectour?${params.toString()}`, { scroll: false });
+         const basePath = pathname.includes('/selectour-test')
+      ? '/selectour-test'
+      : '/selectour';
+       route.replace(`${basePath}?${params.toString()}`, { scroll: false });
   } 
    
 };
@@ -263,8 +267,11 @@ useEffect(() => {
     if (searchParams.get('rating')) params.delete('rating');
     if (searchParams.get('duration')) params.delete('duration');
     if (searchParams.get('meal')) params.delete('meal');
-
-    route.push(`/selectour?page=1&${params.toString()}`);
+    const basePath = pathname.includes('/selectour-test')
+      ? '/selectour-test'
+      : '/selectour';
+  
+    route.push(`${basePath}?page=1&${params.toString()}`);
   };
 
   const items = selectedCountry ? filteredRegions : filteredCountries;

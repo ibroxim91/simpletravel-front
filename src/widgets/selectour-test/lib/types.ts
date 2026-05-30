@@ -1,0 +1,116 @@
+export interface TickectAll {
+  status: true;
+  data: {
+    links: {
+      previous: string;
+      next: string;
+    };
+    total_items: number;
+    total_pages: number;
+    page_size: number;
+    current_page: number;
+    results: {
+      tickets: TickectAllResults[];
+      min_price: number;
+      max_price: number;
+      hotel_amenities: string[];
+      hotel_features_by_type: {
+        type: string;
+        features: string[];
+      }[];
+      hotel_types: string[];
+      hotels?: {
+        id: number;
+        name: string;
+        meal_plan: string;
+        rating: number | string;
+      }[];
+      top_destinations: {
+        destination: string;
+      }[];
+      top_duration: {
+        duration: number;
+      }[];
+    };
+  };
+}
+
+export interface TickectAllResults {
+  id: number;
+  title: string;
+  slug: string;
+  price: number;
+  departure_time: string;
+  departure: {
+    id: number;
+    name: string;
+    country: {
+      id: number;
+      name: string;
+    };
+  };
+  passenger_count: number;
+  rating: number;
+  duration_days: number;
+  destination: {
+    id: number;
+    name: string;
+    country: {
+      id: number;
+      name: string;
+    };
+  };
+  ticket_images: string;
+  ticket_amenities: { name: string }[];
+  badge: { id: number; name: string; color: string }[];
+  visa_required: boolean;
+  is_liked: boolean;
+  ticket_hotel: {
+    id: number;
+    name: string;
+    meal_plan: string;
+    rating: number;
+  }[];
+}
+
+export interface TickectAllFilter {
+  departure?: string;
+  featured_tickets?: boolean;
+  departure_date?: string;
+  departure_time?: string;
+  town?: string;
+  destination?: string;
+  hotel_id?: string;
+  operator?: string;
+  dateTo?: string;
+  dateFrom?: string;
+  hotel_feature?: string[];
+  duration_days?: string;
+  rating?: number;
+  hotel_rating?: string;
+  hotel_type?: string;
+  max_price?: number;
+  hotel_amenity?: string;
+  meal_plan?: string;
+  min_price?: number;
+  most_expensive?: boolean;
+  max_departure_date?: string;
+  min_departure_date?: string;
+  adults?: number;
+  children?: number;
+  passenger_count?: number;
+  page: number;
+  page_size: number;
+  ticket_amenities?: string;
+  title?: string;
+  visa_required?: boolean | string;
+  cheapest?: boolean;
+}
+
+export interface HotelMealPlan {
+  status: boolean;
+  data: {
+    id: number;
+    name: string;
+  }[];
+}
