@@ -1,7 +1,7 @@
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || 'https://simple-travel.felixits.uz';
 const BASE_URL_TICKETS =
-  process.env.NEXT_PUBLIC_TICKETS_API_URL ||
+  process.env.NEXT_PUBLIC_TICKETS_API_URL || 
   'https://search.simpletravel.uz';
 
 const ENDP_POSTS = '/posts/';

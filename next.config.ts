@@ -36,6 +36,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/hotel_pics/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'img.poehalisnami.uz',
+        port: '',
+        pathname: '/static/**',
+      },
 
       { 
         protocol: 'https',
