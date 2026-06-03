@@ -114,3 +114,101 @@ export interface HotelMealPlan {
     name: string;
   }[];
 }
+
+type Departure = {
+  id: number
+  name: string
+  country: string
+}
+
+type DestinationCountry = {
+  id: number
+  name: string
+}
+
+type Destination = {
+  id: number
+  name: string
+  country: DestinationCountry
+}
+
+type TicketHotel = {
+  id: number
+  name: string
+  meal_plan: string
+  rating: number
+}
+
+type TicketIncludedService = {
+  image: string
+  title: string
+  desc: string
+}
+
+type TicketHotelMeal = {
+  image: string
+  name: string
+  desc: string
+}
+
+type Tariff = {
+  name: string
+}
+
+type Transport = {
+  id: number
+  name: string
+}
+
+export type Tour = {
+  tour_operator_id: string
+  id: number
+  title: string
+  slug: string
+  nights: number
+  price: string
+  price_full: number
+  operator: string
+  departure_id: number
+  destination_id: number
+  country_id: number
+  departure_time: string
+  hotel_photo: string
+  currency: string
+  hotelAvailability: string
+  hotel_photo_count: number
+  departure: Departure
+  passenger_count: number
+  rating: number
+  duration_days: number
+  destination: Destination
+  ticket_images: string
+  ticket_amenities: any[] // agar structure bo'lsa alohida type qilsa bo'ladi
+  badge: any[]
+  visa_required: boolean
+  from_cache: boolean
+  is_liked: boolean
+  ticket_hotel: TicketHotel[]
+  departure_date: string
+  room_type: string
+  place: string
+  freight_external: string
+  travel_time: string
+  languages: string
+  min_person: number
+  max_person: number
+  image_banner: string
+  hotel_info: string
+  hotel_meals: string
+  allow_comment: boolean
+  bron: boolean
+  ticket_included_services: TicketIncludedService[]
+  ticket_itinerary: any[]
+  ticket_hotel_meals: TicketHotelMeal[]
+  travel_agency_id: string
+  ticket_comments: any[]
+  tariff: Tariff[]
+  transports: Transport[]
+  extra_service: any[]
+  paid_extra_service: any[]
+}

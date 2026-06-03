@@ -140,6 +140,42 @@ const data = typeof window !== 'undefined'
   ? JSON.parse(localStorage.getItem("tour") || "null")
   : null;
 
+    const [likedIds, setLikedIds] = useState<string[]>([])
+   
+  
+  useEffect(() => {
+    const saved = localStorage.getItem("likedTours")
+    if (saved) {
+      try {
+        const parsed: Tour[] = JSON.parse(saved)
+        setLikedIds(parsed.map((t) => t.tour_operator_id))
+      } catch {
+        setLikedIds([])
+      }
+    }
+  }, [])
+  
+  
+  const toggleLike = (tour: Tour) => {
+    const saved = localStorage.getItem("likedTours")
+    let liked: Tour[] = saved ? JSON.parse(saved) : []
+  
+    if (likedIds.includes(tour.tour_operator_id)) {
+      // unlike
+      liked = liked.filter((t) => t.tour_operator_id !== tour.tour_operator_id)
+    } else {
+      // like (agar 10 tadan oshmagan bo‘lsa)
+      if (liked.length < 10) {
+        liked.push(tour)
+      }
+    }
+  
+    localStorage.setItem("likedTours", JSON.stringify(liked))
+    setLikedIds(liked.map((t) => t.tour_operator_id)) 
+  }
+  
+  const isLiked = likedIds.includes(data.tour_operator_id)
+  
 
 
 
@@ -403,16 +439,12 @@ const includedServicesToRender = [
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
-                          if (data.is_liked) {
-                            removeLike({ ticket: data.id });
-                          } else {
-                            addLike({ ticket: data.id });
-                          }
+                          toggleLike(data);
                         }}
                         className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-[0_0_4px_rgba(0,0,0,0.15)]"
                       >
                         <FavoriteRoundedIcon
-                          sx={{ color: data.is_liked ? '#E03137' : '#9CA3AF', fontSize: 20 }}
+                          sx={{ color: isLiked ? '#E03137' : '#9CA3AF', fontSize: 20 }}
                         />
                       </button>
                     </div>
@@ -480,16 +512,13 @@ const includedServicesToRender = [
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
-                          if (data.is_liked) {
-                            removeLike({ ticket: data.id });
-                          } else {
-                            addLike({ ticket: data.id });
-                          }
+                          toggleLike(data);
+                          
                         }}
                         className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-[0_0_4px_rgba(0,0,0,0.15)] max-lg:hidden"
                       >
                         <FavoriteRoundedIcon
-                          sx={{ color: data.is_liked ? '#E03137' : '#9CA3AF', fontSize: 20 }}
+                          sx={{ color: isLiked ? '#E03137' : '#9CA3AF', fontSize: 20 }}
                         />
                       </button>
                       {user ? (
@@ -506,7 +535,7 @@ const includedServicesToRender = [
                           whileTap={{ scale: 0.95 }}
                           onClick={() => {
                             route.push(
-                              `/auth/login?callbackUrl=${encodeURIComponent(window.location.href)}`,
+                              `/auth/register?callbackUrl=${encodeURIComponent(window.location.href)}`,
                             );
                           }}
                           className="h-12 w-[186px] rounded-[16px] bg-[#FF6B00] px-4 text-[14px] font-semibold text-white"
@@ -626,7 +655,7 @@ const includedServicesToRender = [
                     whileTap={{ scale: 0.95 }}
                     onClick={() => {
                       route.push(
-                        `/auth/login?callbackUrl=${encodeURIComponent(window.location.href)}`,
+                        `/auth/register?callbackUrl=${encodeURIComponent(window.location.href)}`,
                       );
                     }}
                     className="bg-[#1764FC] rounded-[43px] px-[70px] py-[14px] text-white cursor-pointer text-sm max-lg:w-full"
@@ -789,7 +818,7 @@ const includedServicesToRender = [
                     whileTap={{ scale: 0.95 }}
                     onClick={() => {
                       route.push(
-                        `/auth/login?callbackUrl=${encodeURIComponent(window.location.href)}`,
+                        `/auth/register?callbackUrl=${encodeURIComponent(window.location.href)}`,
                       );
                     }}
                     className="flex h-12 w-full items-center justify-center rounded-2xl bg-[#FF6B00] px-4 text-[14px] font-semibold leading-[17px] text-white"

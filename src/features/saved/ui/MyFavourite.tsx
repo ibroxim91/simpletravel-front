@@ -36,6 +36,7 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Get_Likes_Api } from '../lib/api';
+import { Tour } from '@/widgets/selectour/lib/types';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -69,27 +70,33 @@ const MyFavourite = () => {
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const page = searchParams.get('page');
+  const [savedTours, setSavedTours] = useState<Tour[]>([]);
+  const isLoading = false;
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['get_saved', currentPage],
-    queryFn: () =>
-      Get_Likes_Api.getAllSavedProduct({
-        page: currentPage,
-        page_size: itemsPerPage,
-      }),
-  });
 
-  const { data: hotTicket, isLoading: hotLoading } = useQuery({
-    queryKey: ['ticket_hot'],
-    queryFn: () =>
-      Ticket_Api.GetAllTickets({
-        params: {
-          page: 1,
-          page_size: 8,
-          rating: 3.3,
-        },
-      }),
-  });
+  // const { data, isLoading } = useQuery({
+  //   queryKey: ['get_saved', currentPage],
+  //   queryFn: () =>
+  //     Get_Likes_Api.getAllSavedProduct({
+  //       page: currentPage,
+  //       page_size: itemsPerPage,
+  //     }),
+  // });
+
+  // const { data: hotTicket, isLoading: hotLoading } = useQuery({
+  //   queryKey: ['ticket_hot'],
+  //   queryFn: () =>
+  //     Ticket_Api.GetAllTickets({
+  //       params: {
+  //         page: 1,
+  //         page_size: 8,
+  //         rating: 3.3,
+  //       },
+  //     }),
+  // });
+
+  const hotTicket = null;
+  const hotLoading = false;
 
   const { mutate: deletLike } = useMutation({
     mutationFn: ({ ticket }: { ticket: number }) => {
@@ -125,11 +132,48 @@ const MyFavourite = () => {
     hot.on('select', updateButtons);
   }, [hot]);
 
-  const rows = [];
-  if (data?.data.data.results) {
-    for (let i = 0; i < data.data.data.results.length; i += 4) {
-      rows.push(data.data.data.results.slice(i, i + 4));
+  
+    // localStorage dan savedToursni olish
+  useEffect(() => {
+    const saved = localStorage.getItem("likedTours");
+    if (saved) {
+      try {
+        const parsed: Tour[] = JSON.parse(saved);
+        setSavedTours(parsed);
+      } catch {
+        setSavedTours([]);
+      }
     }
+  }, []);
+
+  const toggleUnlike = ( tourOperatorId: string) => {
+      const saved = localStorage.getItem("likedTours")
+      let liked: Tour[] = saved ? JSON.parse(saved) : []
+
+      // filter orqali o‘chiramiz
+      liked = liked.filter((t) =>  t.tour_operator_id !== tourOperatorId)
+
+      // localStorage yangilash
+      localStorage.setItem("likedTours", JSON.stringify(liked))
+
+      // state yangilash
+      setSavedTours(liked)
+}
+
+
+  // pagination
+  useEffect(() => {
+    setCurrentPage(Number(page) || 1);
+  }, [page]);
+
+  // rowsni tayyorlash (12 ta per page)
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedTours = savedTours.slice(startIndex, endIndex);
+
+  const rows: Tour[][] = [];
+  for (let i = 0; i < paginatedTours.length; i += 4) {
+    rows.push(paginatedTours.slice(i, i + 4));
   }
 
   const handleTabClick = (item: number) => {
@@ -138,6 +182,23 @@ const MyFavourite = () => {
     params.set('page', String(item));
     router.push(`?${params.toString()}`, { scroll: false });
   };
+ 
+  
+
+const totalPages = Math.ceil(savedTours.length / itemsPerPage)
+  // const rows = [];
+  // if (data?.data.data.results) {
+  //   for (let i = 0; i < data.data.data.results.length; i += 4) {
+  //     rows.push(data.data.data.results.slice(i, i + 4));
+  //   }
+  // }
+
+  // const handleTabClick = (item: number) => {
+  //   setCurrentPage(item);
+  //   const params = new URLSearchParams(window.location.search);
+  //   params.set('page', String(item));
+  //   router.push(`?${params.toString()}`, { scroll: false });
+  // };
 
   return (
     <div className="custom-container mt-5">
@@ -167,7 +228,7 @@ const MyFavourite = () => {
             </div>
           ))}
         </div>
-      ) : data && data.data.data.results.length > 0 ? (
+      ) : rows && rows.length > 0 ? (
         <div className="mt-10">
           <p className="text-3xl font-semibold text-[#031753]">
             {t('Избранное')}
@@ -189,17 +250,24 @@ const MyFavourite = () => {
                     className="flex flex-col w-auto"
                   >
                     <Link
-                      href={`/selectour/${e.ticket.slug}`}
+                      href={`/selectour/${e.slug}`}
+                        onClick={() => {
+                              localStorage.setItem('tourOperator', e?.operator ?? '');
+                              localStorage.setItem('tourOperatorId', String(e?.tour_operator_id ?? ''));
+                              localStorage.setItem('from_cache', String(e?.from_cache));
+                              localStorage.setItem('tour', JSON.stringify(e));
+                            }}
                       className="w-full aspect-square relative group overflow-hidden rounded-3xl shadow-lg"
                     >
-                      <Image
-                        src={BASE_URL + e.ticket.ticket_images}
-                        alt={e.ticket.title}
+                    <Image
+                        src={e?.hotel_photo && e.hotel_photo.trim() !== "" ? e.hotel_photo : e?.ticket_images}
+                        alt={e.title}
                         fill
                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                       />
+
                       <div className="flex flex-col absolute top-2 left-4 gap-2 z-20">
-                        {e.ticket.badge.map((b) => (
+                        {e?.badge.map((b) => (
                           <Badge
                             key={b.id}
                             variant="destructive"
@@ -214,9 +282,7 @@ const MyFavourite = () => {
                         onClick={(btn) => {
                           btn.preventDefault();
                           btn.stopPropagation();
-                          deletLike({
-                            ticket: e.ticket.id,
-                          });
+                          toggleUnlike(e.tour_operator_id)
                         }}
                         className="absolute bg-[#FFE4E5] border-[#E0313733] cursor-pointer z-20 hover:bg-[#FFE4E5] border-2 w-10 h-10 rounded-full right-4 top-2"
                       >
@@ -230,37 +296,37 @@ const MyFavourite = () => {
                         name="read-only"
                         size="medium"
                         sx={{ color: '#F08125' }}
-                        value={e.ticket.rating}
+                        value={e.rating}
                         readOnly
                       />
                       <p className="text-xl font-semibold text-[#031753]">
-                        {e.ticket.title}
+                        {e.title}
                       </p>
                       <div className="flex gap-2 mt-2">
                         <MapPin className="size-6" color="#084FE3" />
                         <p className="line-clamp-1 w-fit text-md text-[#031753]">
-                          {e.ticket.destination}
+                          {e.destination.name}
                         </p>
                       </div>
-                      {e.ticket.ticket_hotel.length > 0 && (
+                      {e.ticket_hotel.length > 0 && (
                         <div className="flex gap-2 mt-2">
                           <HotelIcon className="size-6" color="#084FE3" />
                           <p className="line-clamp-1 w-fit text-md text-[#031753]">
-                            {e.ticket.ticket_hotel[0].name}
+                            {e.ticket_hotel[0].name}
                           </p>
                         </div>
                       )}
-                      {e.ticket.ticket_hotel.length > 0 && (
+                      {e.ticket_hotel.length > 0 && (
                         <div className="flex gap-2 mt-2">
                           <Star className="size-6" color="#084FE3" />
                           <p className="line-clamp-1 w-fit text-md text-[#031753]">
-                            {e.ticket.ticket_hotel[0].rating} {t('звёзды')}
+                            {e.ticket_hotel[0].rating} {t('звёзды')}
                           </p>
                         </div>
                       )}
                       <p className="mt-2 text-[#084FE3] font-semibold">
                         {formatPrice(
-                          e.ticket.price,
+                          e.price,
                           locale as LanguageRoutes,
                           true,
                         )}
@@ -271,7 +337,8 @@ const MyFavourite = () => {
               </div>
             ))}
           </div>
-          <div className="flex justify-end gap-2 mt-6">
+         <div className="flex justify-end gap-2 mt-6">
+  {/* Previous button */}
             <Button
               className="cursor-pointer"
               variant="outline"
@@ -281,7 +348,8 @@ const MyFavourite = () => {
               <ChevronLeftIcon />
             </Button>
 
-            {Array.from({ length: data.data.data.total_pages }).map((_, i) => (
+            {/* Page numbers */}
+            {Array.from({ length: totalPages }).map((_, i) => (
               <Button
                 key={i}
                 onClick={() => handleTabClick(i + 1)}
@@ -292,9 +360,10 @@ const MyFavourite = () => {
               </Button>
             ))}
 
+            {/* Next button */}
             <Button
               variant="outline"
-              disabled={currentPage === data.data.data.total_pages}
+              disabled={currentPage === totalPages}
               className="cursor-pointer"
               onClick={() => handleTabClick(currentPage + 1)}
             >

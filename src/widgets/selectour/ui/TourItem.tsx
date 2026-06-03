@@ -12,13 +12,50 @@ import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { toast } from 'sonner';
 import Ticket_Api from '../lib/api';
-import { TickectAllResults } from '../lib/types';
+import { TickectAllResults, Tour } from '../lib/types';
+import { useEffect,  useState } from 'react';
 
-export default function TourItem({ data }: { data: TickectAllResults }) {
+
+export default function TourItem({ data }: { data: TickectAllResults; isLiked: boolean }) {
   const { locale } = useParams();
   const t = useTranslations();
   const route = useRouter();
   const queryClient = useQueryClient();
+  const [likedIds, setLikedIds] = useState<string[]>([])
+ 
+
+useEffect(() => {
+  const saved = localStorage.getItem("likedTours")
+  if (saved) {
+    try {
+      const parsed: Tour[] = JSON.parse(saved)
+      setLikedIds(parsed.map((t) => t.tour_operator_id))
+    } catch {
+      setLikedIds([])
+    }
+  }
+}, [])
+
+
+const toggleLike = (tour: Tour) => {
+  const saved = localStorage.getItem("likedTours")
+  let liked: Tour[] = saved ? JSON.parse(saved) : []
+
+  if (likedIds.includes(tour.tour_operator_id)) {
+    // unlike
+    liked = liked.filter((t) => t.tour_operator_id !== tour.tour_operator_id)
+  } else {
+    // like (agar 10 tadan oshmagan bo‘lsa)
+    if (liked.length < 10) {
+      liked.push(tour)
+    }
+  }
+
+  localStorage.setItem("likedTours", JSON.stringify(liked))
+  setLikedIds(liked.map((t) => t.tour_operator_id)) 
+}
+
+const isLiked = likedIds.includes(data.tour_operator_id)
 
   const { mutate } = useMutation({
     mutationFn: ({ ticket }: { ticket: number }) => Ticket_Api.saveTickets({ ticket }),
@@ -160,17 +197,16 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              if (data.is_liked) deletLike({ ticket: data.id });
-              else mutate({ ticket: data.id });
+               toggleLike(data)
             }}
             className={clsx(
               'absolute left-2 top-2 z-10 hidden size-8 cursor-pointer rounded-[28px] border-0 p-0 max-lg:flex max-lg:items-center max-lg:justify-center',
-              data.is_liked
+              isLiked
                 ? 'border-[#E0313733] bg-[#FFE4E5] hover:bg-[#FFE4E5]'
                 : 'bg-transparent hover:bg-transparent',
             )}
           >
-            {data.is_liked ? (
+            {isLiked ? (
               <FavoriteRoundedIcon sx={{ color: '#E03137', fontSize: 20 }} />
             ) : (
               <Heart
@@ -275,17 +311,16 @@ export default function TourItem({ data }: { data: TickectAllResults }) {
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                if (data.is_liked) deletLike({ ticket: data.id });
-                else mutate({ ticket: data.id });
+                toggleLike(data)
               }}
               className={clsx(
                 'size-12 shrink-0 cursor-pointer rounded-[42px] p-0 shadow-[0_0_4px_rgba(0,0,0,0.15)]',
-                data.is_liked
+                isLiked
                   ? 'border border-[#E0313733] bg-[#FFE4E5] hover:bg-[#FFE4E5]'
                   : 'border-0 bg-white hover:bg-white',
               )}
             >
-              {data.is_liked ? (
+              {isLiked ? (
                 <FavoriteRoundedIcon sx={{ color: '#E03137', fontSize: 20 }} />
               ) : (
                 <Heart

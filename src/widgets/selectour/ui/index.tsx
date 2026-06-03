@@ -65,6 +65,7 @@ import TourItem from '@/widgets/selectour/ui/TourItem';
 import { useMemo } from "react";
 import CircleLoader from './TourLoader';
 
+
 const Player = dynamic(
   () => import('@lottiefiles/react-lottie-player').then((mod) => mod.Player),
   { ssr: false },
@@ -137,13 +138,21 @@ const prevHotelsRef = useRef<any[] | null>(null);
     setPriceRange(newRange);
   };
 
+
+
+
 useEffect(() => {
   const params = new URLSearchParams(window.location.search);
   const ratingParam = params.get("rating");
   if (ratingParam) {
     setHotelRating(ratingParam);
   }
+
+
+
 }, []);
+
+
 
 
   useEffect(() => {
@@ -1313,7 +1322,8 @@ const top_duration = [
                    
                     <div className="flex flex-col gap-6">
                     {ticket?.data?.results.tickets.map((item: any, itemIndex: number) => (
-                      <TourItem key={`${item.id}-${itemIndex}`} data={item} />
+                      
+                      <TourItem key={`${item.id}-${itemIndex}`}   data={item} />
                     ))}
                     </div>
                   ) : (
