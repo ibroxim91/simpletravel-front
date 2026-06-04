@@ -996,26 +996,37 @@ const top_duration = [
           <div>
             <div>
               <div className="flex w-full items-center justify-between max-lg:flex-col max-lg:items-start max-lg:gap-0">
-                <h1 className="flex items-center gap-1 text-start text-2xl font-bold max-lg:hidden">
-                  {regionName ? (
-                    <>
-                      <span>{countryName}</span>
-                      <KeyboardArrowRightIcon />
-                      <span>
-                        {regionName} {ticket && ticket ? t('ga tegishli') : ''}
-                      </span>
-                    </>
-                  ) : (
-                    t('Filter uchun Kerakli davlat va shaharni tanlang')
-                  )}{' '}
-                  {ticket && (regionName || ticket?.data?.total_items > 0) ? (
-                    <>
-                      {ticket.data.total_items} {t('ta tur topildi')}
-                    </>
-                  ) : (
-                    ''
-                  )}
-                </h1>
+              <h1 className="flex items-center gap-1 text-start text-2xl font-bold max-lg:hidden">
+                {regionName ? (
+                  <>
+                    <span>{countryName}</span>
+                    <KeyboardArrowRightIcon />
+                    <span>{regionName}</span>
+
+                    <span>
+                      {isLoading ? (
+                        <span className="text-gray-400 animate-pulse ml-2">
+                          {t('run_search')}
+                        </span>
+                      ) : (
+                        <>
+                          {t('ga tegishli')} 
+                        </>
+                      )}
+                    </span>
+                  </>
+                ) : (
+                  t('Filter uchun Kerakli davlat va shaharni tanlang')
+                )}
+
+                {/* TOTAL ITEMS faqat loading bo'lmaganda */}
+                {!isLoading  && (
+                  <>
+                    {" "}
+                    {ticket?.data?.total_items || 0} {t('ta tur topildi')}
+                  </>
+                )}
+              </h1>
 
                <div className="flex flex-col items-start gap-2 lg:hidden">
                   <p className="text-[20px] font-bold leading-6 text-[#1C1C1E]">
