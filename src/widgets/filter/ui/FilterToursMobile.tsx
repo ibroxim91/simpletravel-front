@@ -66,7 +66,7 @@ const changeDeparture= (newDep: string) => {
     if (defaultRegion) {
       setSelectedDefaulDestination(String(defaultRegion.id));
       changeDeparture(String(defaultRegion.id));
-      localStorage.setItem("dest_id", String(defaultRegion.id));
+      // localStorage.setItem("dest_id", String(defaultRegion.id));
     
     }
   }
@@ -129,32 +129,62 @@ const changeDeparture= (newDep: string) => {
       r.name.toLowerCase().includes(searchRegionDes.toLowerCase()),
     ) || [];
 
+    useEffect(() => {
+  if (!defaultCountry) return;
+
+  const departure = searchParams.get('departure');
+
+  setSelectedCountry(defaultCountry);
+
+  if (departure) {
+    const regionId = Number(departure);
+
+    const region = defaultCountry.regions.find(
+      r => r.id === regionId
+    );
+
+    if (region) {
+      setSelectedRegion(region);
+      return;
+    }
+  }
+
+  const defaultRegion =
+    defaultCountry.regions.find(r => r?.default_region) ??
+    defaultCountry.regions[0];
+
+  if (defaultRegion) {
+    setSelectedRegion(defaultRegion);
+  }
+}, [defaultCountry, searchParams]);
+
 useEffect(() => {
   const departure = searchParams.get('departure');
   // ❗️ Agar URL’da destination bo‘lmasa, localStorage’dan olamiz
-  const destination = searchParams.get('destination') || localStorage.getItem('dest_id');
+  const destination = searchParams.get('destination');
   const dateFrom = searchParams.get('dateFrom');
   const dateTo = searchParams.get('dateTo');
   const adultsParam = searchParams.get('adults');
   const childrenParam = searchParams.get('children');
 
-  // Departure
-  if (departure && ticket) {
-    const regionId = parseInt(departure, 10);
-    const region = defaultCountry?.regions.find((r) => r.id === regionId);
-    if (region) {
-      setSelectedCountry(defaultCountry);
-      setSelectedRegion(region);
-    }
-  } else if (defaultCountry && !selectedCountry && !destination) {
-    // ❗️ faqat destination ham bo‘sh bo‘lsa defaultga qayt
-    setSelectedCountry(defaultCountry);
-    const defaultRegion = defaultCountry.regions?.find((r) => r.default_region === true);
-    if (defaultRegion) {
-      setSelectedRegion(defaultRegion);
-    }
-  }
+  // // Departure
+  // if (departure && ticket) {
+  //   const regionId = parseInt(departure, 10);
+  //   const region = defaultCountry?.regions.find((r) => r.id === regionId);
+  //   if (region) {
+  //     setSelectedCountry(defaultCountry);
+  //     setSelectedRegion(region);
+  //   }
+  // } else if (defaultCountry && !selectedCountry && !destination) {
+  //   // ❗️ faqat destination ham bo‘sh bo‘lsa defaultga qayt
+  //   setSelectedCountry(defaultCountry);
+  //   const defaultRegion = defaultCountry.regions?.find((r) => r.default_region === true);
+  //   if (defaultRegion) {
+  //     setSelectedRegion(defaultRegion);
+  //   }
+  // }
 
+ 
   // Destination
   if (destination && ticket) {
     const regionId = parseInt(destination, 10);
@@ -164,7 +194,7 @@ useEffect(() => {
         setSelectedCountryDes(country);
         setSelectedRegionDes(region);
         // ❗️ localStorage’da ham saqlab qo‘yamiz
-        localStorage.setItem("dest_id", String(region.id));
+        // localStorage.setItem("dest_id", String(region.id));
         break;
       }
     }
