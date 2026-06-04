@@ -129,6 +129,13 @@ const prevHotelsRef = useRef<any[] | null>(null);
   const [openFilter, setFilter] = useState(false);
   const searchParamsString = searchParams?.toString() ?? '';
   const getSearchParam = (key: string) => searchParams?.get(key) ?? '';
+const [ticket, setTicket] = useState<TickectAll | null>(null);
+
+const [isLoading, setLoading] = useState(false);
+const [isFetching, setFetching] = useState(false);
+
+const [isError, setIsError] = useState(false);
+const [error, setError] = useState<Error | null>(null);
 
 
   const handleInputChange = (value: string, index: number) => {
@@ -139,7 +146,153 @@ const prevHotelsRef = useRef<any[] | null>(null);
   };
 
 
+type TicketCache = {
+  key: string;
+  data: TickectAll;
+  createdAt: number;
+};
 
+function generateSearchKey(params: TickectAllFilter) {
+  return JSON.stringify({
+    page: params.page,
+    adults: params.adults,
+    children: params.children,
+    departure: params.departure,
+    dateTo: params.dateTo,
+    dateFrom: params.dateFrom,
+    operator: params.operator,
+    destination: params.destination,
+    hotel_id: params.hotel_id,
+    town: params.town,
+    meal_plan: params.meal_plan,
+    hotel_rating: params.hotel_rating,
+    duration_days: params.duration_days,
+    cheapest: params.cheapest,
+    most_expensive: params.most_expensive,
+  });
+}
+function getTicketCache(): TicketCache | null {
+  try {
+    const raw = localStorage.getItem("ticket_cache");
+
+    if (!raw) {
+      return null;
+    }
+
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+function saveTicketCache(
+  key: string,
+  data: TickectAll
+) {
+  const payload: TicketCache = {
+    key,
+    data,
+    createdAt: Date.now(),
+  };
+
+  localStorage.setItem(
+    "ticket_cache",
+    JSON.stringify(payload)
+  );
+}
+
+const loadTickets = async () => {
+  if (!filterLocal) return;
+
+  const params: TickectAllFilter = {
+    page: currentPage,
+    page_size: 10,
+    adults: filterLocal?.adults,
+    children: filterLocal?.children,
+    operator: filterLocal?.operator,
+    dateTo: filterLocal?.toDate,
+    dateFrom: filterLocal?.date,
+    departure: filterLocal?.from ?? '',
+    destination: filterLocal?.where ?? '',
+    hotel_amenity: hotelAmenities ?? '',
+    hotel_id: filterLocal?.hotel_id ?? '',
+    town: filterLocal?.town ?? '',
+    hotel_type: hotelType ?? '',
+    cheapest: cheaper,
+    most_expensive: expensive,
+    hotel_rating: hotelRating ?? '',
+    duration_days: selectedDurations ?? '',
+    meal_plan: filterLocal?.mealPlan ?? '',
+  };
+
+  const currentKey = generateSearchKey(params);
+
+  const cache = getTicketCache();
+
+  if (
+    cache &&
+    cache.key === currentKey
+  ) {
+    console.log("LOCALSTORAGE CACHE");
+    setTicket(cache.data);
+    return;
+  }
+
+  console.log("API REQUEST");
+
+  setLoading(true);
+setFetching(true);
+setIsError(false);
+setError(null);
+
+  try {
+    const response =
+      await Ticket_Api.GetAllTickets({
+        params,
+        paramsSerializer: (
+          params: TickectAllFilter
+        ) =>
+          qs.stringify(params, {
+            arrayFormat: 'repeat',
+          }),
+      });
+
+    setTicket(response);
+
+    const tickets = response?.data?.results?.tickets;
+    const totalItems = response?.data?.total_items;
+
+    if (Array.isArray(tickets) && tickets.length > 0 && totalItems > 0) {
+      saveTicketCache(currentKey, response);
+    } else {
+      console.log("EMPTY RESPONSE - CACHE SKIPPED");
+    }
+  } catch (err) {
+        setIsError(true);
+        setError(err as Error);
+    } finally {
+  setLoading(false);
+  setFetching(false);
+}
+};
+
+useEffect(() => {
+  loadTickets();
+}, [
+  filterLocal?.from,
+  filterLocal?.where,
+  filterLocal?.adults,
+  filterLocal?.children,
+  filterLocal?.date,
+  filterLocal?.toDate,
+  filterLocal?.town,
+  filterLocal?.hotel_id,
+  filterLocal?.mealPlan,
+  currentPage,
+  selectedDurations,
+  hotelRating,
+  cheaper,
+  expensive,
+]);
 
 useEffect(() => {
   const params = new URLSearchParams(window.location.search);
@@ -243,100 +396,96 @@ useEffect(() => {
     },
   });
 
-  // let toastShown = false;
- const { data: ticket, isLoading, isFetching, isError, error, refetch } = useQuery<TickectAll>({
-    queryKey: [
-      'ticket_all',
-      filterLocal?.from,
-      filterLocal?.where,
-      filterLocal?.adults,
-      filterLocal?.children,
-      filterLocal?.date,
-      filterLocal?.toDate,
-      filterLocal?.town,
-      filterLocal?.hotel_id,
-      filterLocal?.mealPlan,
-      currentPage,
-      selectedDurations,
-      hotelRating,
-      cheaper,
-      expensive,
-    ],
-    queryFn: () => {
+//   // let toastShown = false;
+//  const { data: ticket, isLoading, isFetching, isError, error, refetch } = useQuery<TickectAll>({
+//     queryKey: [
+//       'ticket_all',
+//       filterLocal?.from,
+//       filterLocal?.where,
+//       filterLocal?.adults,
+//       filterLocal?.children,
+//       filterLocal?.date,
+//       filterLocal?.toDate,
+//       filterLocal?.town,
+//       filterLocal?.hotel_id,
+//       filterLocal?.mealPlan,
+//       currentPage,
+//       selectedDurations,
+//       hotelRating,
+//       cheaper,
+//       expensive,
+//     ],
+//     queryFn: () => {
       
 
-      const params: TickectAllFilter = {
-        page: currentPage,
-        page_size: 10,
-        adults: filterLocal?.adults,
-        children: filterLocal?.children,
-        operator: filterLocal?.operator,
-        departure: filterLocal ? filterLocal.from : '',
-        destination: filterLocal?.where ?? '',
-        hotel_amenity: hotelAmenities ?? '',
-        hotel_id: filterLocal?.hotel_id ?? '',
-        town: filterLocal?.town ?? '',
-        hotel_type: hotelType ?? '',
-        cheapest: cheaper,
+//       const params: TickectAllFilter = {
+//         page: currentPage,
+//         page_size: 10,
+//         adults: filterLocal?.adults,
+//         children: filterLocal?.children,
+//         operator: filterLocal?.operator,
+//         departure: filterLocal ? filterLocal.from : '',
+//         destination: filterLocal?.where ?? '',
+//         hotel_amenity: hotelAmenities ?? '',
+//         hotel_id: filterLocal?.hotel_id ?? '',
+//         town: filterLocal?.town ?? '',
+//         hotel_type: hotelType ?? '',
+//         cheapest: cheaper,
       
-        most_expensive: expensive,
-        min_departure_date: filterLocal?.date
-          ? formatDate.format(filterLocal?.date, 'YYYY-MM-DD')
-          : '',
-        max_departure_date: filterLocal?.toDate
-          ? formatDate.format(filterLocal.toDate, 'YYYY-MM-DD')
-          : '',
-        passenger_count: filterLocal
-          ? filterLocal?.children + filterLocal?.adults
-          : undefined,
-        min_price: priceRange[0],
-        max_price: priceRange[1],
-        visa_required: visa === 'visa' ? true : visa === 'no_visa' ? false : '',
-        hotel_rating: hotelRating ?? '',
-        duration_days: selectedDurations ?? '',
-        meal_plan: filterLocal?.mealPlan ?? '',
-        hotel_feature: hotelFeature,
-      };
+//         most_expensive: expensive,
+//         min_departure_date: filterLocal?.date
+//           ? formatDate.format(filterLocal?.date, 'YYYY-MM-DD')
+//           : '',
+//         max_departure_date: filterLocal?.toDate
+//           ? formatDate.format(filterLocal.toDate, 'YYYY-MM-DD')
+//           : '',
+//         passenger_count: filterLocal
+//           ? filterLocal?.children + filterLocal?.adults
+//           : undefined,
+//         min_price: priceRange[0],
+//         max_price: priceRange[1],
+//         visa_required: visa === 'visa' ? true : visa === 'no_visa' ? false : '',
+//         hotel_rating: hotelRating ?? '',
+//         duration_days: selectedDurations ?? '',
+//         meal_plan: filterLocal?.mealPlan ?? '',
+//         hotel_feature: hotelFeature,
+//       };
 
-      return Ticket_Api.GetAllTickets({
-        params,
-        paramsSerializer: (params: TickectAllFilter) =>
-          qs.stringify(params, { arrayFormat: 'repeat' }),
-      });
-    },
-    staleTime: 0,
-    gcTime: 0,
-    placeholderData: undefined,
-    enabled: Boolean(filterLocal),
+//       return Ticket_Api.GetAllTickets({
+//         params,
+//         paramsSerializer: (params: TickectAllFilter) =>
+//           qs.stringify(params, { arrayFormat: 'repeat' }),
+//       });
+//     },
+//     staleTime: 0,
+//     gcTime: 0,
+//     placeholderData: undefined,
+//     enabled: Boolean(filterLocal),
    
-  });
+//   });
 
 
+const isHotelLocked = Boolean(
+      searchParams.get('hotel_id') && searchParams.get('operator')
+    );
 
-const displayedHotels = useMemo(() => {
-  const currentRegion = filterLocal?.where ?? null;
-  const newHotels = ticket?.data?.results?.hotels ?? [];
-
- 
-  if (
-    currentRegion !== null &&
-    prevRegionRef.current === currentRegion &&
-    Array.isArray(prevHotelsRef.current)
-  ) {
-    return prevHotelsRef.current;
+const hotels = useMemo(() => {
+  const apiHotels = ticket?.data?.results?.hotels ?? [];
+  // 🧠 lock mode
+  if (isHotelLocked) {
+    return prevHotelsRef.current?.length
+      ? prevHotelsRef.current
+      : apiHotels;
   }
 
-
-  if (Array.isArray(newHotels) && newHotels.length > 0) {
-    prevRegionRef.current = currentRegion;
-    prevHotelsRef.current = newHotels;
-    return newHotels;
+  // 🧠 update mode
+  if (apiHotels.length > 0) {
+    prevHotelsRef.current = apiHotels;
+    return apiHotels;
   }
 
-
-  return Array.isArray(prevHotelsRef.current) ? prevHotelsRef.current : [];
-}, [ticket, filterLocal?.where]);
-
+  return prevHotelsRef.current ?? [];
+}, [ticket, isHotelLocked]);
 
 const prevCountry = useRef<string | null>(null);
 const prevRegion = useRef<string | null>(null);
@@ -737,43 +886,46 @@ const top_duration = [
           </FilterSection> */}
 
           <div className="w-full rounded-[14px] bg-[#FAFBFC] p-4">
-       <FilterSection title={t('Отель')} defaultHidden icon="/icons/hotel.png">
-        {displayedHotels.map((hotel, hotelIndex) => (
-          <CheckboxFilter
-            key={`${hotel.id}-${hotelIndex}`}
-            value={String(hotel.id)}
-            label={
-              <span className="flex flex-wrap items-center gap-2">
-                <span>{hotel.name}</span>
-                <span className="text-sm text-[#909091]">
-                  {typeof hotel.rating === 'number' ? `${hotel.rating}★` : hotel.rating}
+     <FilterSection title={t('Отель')} defaultHidden icon="/icons/hotel.png">
+        {hotels.length > 0 ? (
+          hotels.map((hotel, hotelIndex) => (
+            <CheckboxFilter
+              key={`${hotel.id}-${hotelIndex}`}
+              value={String(hotel.id)}
+              label={
+                <span className="flex flex-wrap items-center gap-2">
+                  <span>{hotel.name}</span>
+                  <span className="text-sm text-[#909091]">
+                    {typeof hotel.rating === 'number'
+                      ? `${hotel.rating}★`
+                      : hotel.rating}
+                  </span>
                 </span>
-              </span>
-            }
-            setChecked={(val) => {
-              console.log("VAL ", val)
-              
-              // URL parametrlarga qo‘shish
-              const params = new URLSearchParams(window.location.search);
-              if (val) {
-                setHotelID(String(hotel.id));
-                
-                params.set('hotel_id', String(hotel.id));
-                params.set('operator', String((hotel as any).operator ?? ''));
-              }else{
-                setHotelID(null);
-                params.delete('hotel_id');
-                params.delete('operator');
-
               }
+              setChecked={(val) => {
+                const params = new URLSearchParams(window.location.search);
 
-              router.push(`/selectour?${params.toString()}`);
-            }}
-            selectedValue={hotelID}
-            exclusive
-            // paramName="hotel_name"
-          />
-        ))}
+                if (val) {
+                  setHotelID(String(hotel.id));
+                  params.set('hotel_id', String(hotel.id));
+                  params.set('operator', String((hotel as any).operator ?? ''));
+                } else {
+                  setHotelID(null);
+                  params.delete('hotel_id');
+                  params.delete('operator');
+                }
+
+                router.push(`/selectour?${params.toString()}`);
+              }}
+              selectedValue={hotelID}
+              exclusive
+            />
+          ))
+        ) : (
+          <p className="text-sm text-gray-500">
+            {t('Отели не найдены')}
+          </p>
+        )}
       </FilterSection>
       </div>
 
@@ -865,40 +1017,34 @@ const top_duration = [
                   )}
                 </h1>
 
-                <div className="flex flex-col items-start gap-2 lg:hidden">
+               <div className="flex flex-col items-start gap-2 lg:hidden">
                   <p className="text-[20px] font-bold leading-6 text-[#1C1C1E]">
-                    {t('Горящие туры: успейте забронировать!')}
+                    {regionName ? (
+                      <>
+                        <span>{countryName}</span>
+                        <KeyboardArrowRightIcon />
+                        <span>
+                          {regionName} 
+                        </span>
+                      </>
+                    ) : (
+                      t('Filter uchun Kerakli davlat va shaharni tanlang')
+                    )}
                   </p>
-                  <p className="text-[14px] font-normal leading-[17px] text-[#1C1C1E]">
-                    {t('Лучшие направления по минимальным ценам')}
-                  </p>
-                </div>
-
-                {/* <Select
-                  onValueChange={(value) => {
-                    if (value === 'cheaper') {
-                      setCheaper(true);
-                      setExpensive(false);
-                    } else if (value === 'expensive') {
-                      setCheaper(false);
-                      setExpensive(true);
-                    } else if (value === 'all') {
-                      setCheaper(false);
-                      setExpensive(false);
-                    }
-                  }}
-                >
-                  <SelectTrigger className="w-[180px] !h-[40px] flex items-center justify-between max-lg:w-full rounded-lg border border-[#DFDFDF] gap-4 bg-[#FFFFFF]">
-                    <SelectValue placeholder={t('По возрастанию цены')} />
-                    <KeyboardArrowDownIcon />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">{t('Все')}</SelectItem>
-                    <SelectItem value="cheaper">{t('Подешевле')}</SelectItem>
-                    <SelectItem value="expensive">{t('Подороже')}</SelectItem>
-                  </SelectContent>
-                </Select> */}
-
+                <p className="text-[14px] font-normal leading-[17px] text-[#1C1C1E]">
+                      {isLoading ? (
+                        <span className="animate-pulse">
+                          {t('run_search')}
+                        </span>
+                      ) : ticket && (regionName || ticket?.data?.total_items > 0) ? (
+                        <>
+                          {ticket.data.total_items} {t('ta tur topildi')}
+                        </>
+                      ) : (
+                        ''
+                      )}
+                    </p>
+                                    </div>
 
 
               </div>
@@ -1182,43 +1328,42 @@ const top_duration = [
                 ))}
             </FilterSection>
 
-            <FilterSection title={t('Отели')} icon="/icons/hotel.png">
-              {displayedHotels.map((hotel, hotelIndex) => (
-                <CheckboxFilter
-                  key={`${hotel.id}-${hotelIndex}`}
-                  value={String(hotel.id)}
-                  label={
-                    <span className="flex flex-wrap items-center gap-2">
-                      <span>{hotel.name}</span>
-                      <span className="text-sm text-[#909091]">
-                        {typeof hotel.rating === 'number' ? `${hotel.rating}★` : hotel.rating}
-                      </span>
-                    </span>
-                  }
-                  onclick={setCurrentPage}
-                  // setChecked={setHotelName}
-                  selectedValue={hotelID}
-                  exclusive
-                   setChecked={(val) => {
-                     console.log("VAL ", val)
-                     const params = new URLSearchParams(window.location.search);
-                     if(val){
-                      setHotelID(String(hotel.id));
-                       params.set('hotel_id', String(hotel.id));
-                      params.set('operator', String((hotel as any).operator ?? ''));
-                      }else{
-                          setHotelID(null);
-                          params.delete('hotel_id');
-                          params.delete('operator');
+        <FilterSection title={t('Отели')} icon="/icons/hotel.png">
+  {hotels.map((hotel, hotelIndex) => (
+    <CheckboxFilter
+      key={`${hotel.id}-${hotelIndex}`}
+      value={String(hotel.id)}
+      label={
+        <span className="flex flex-wrap items-center gap-2">
+          <span>{hotel.name}</span>
+          <span className="text-sm text-[#909091]">
+            {typeof hotel.rating === 'number' ? `${hotel.rating}★` : hotel.rating}
+          </span>
+        </span>
+      }
+      onclick={setCurrentPage}
+      selectedValue={hotelID}
+      exclusive
+      setChecked={(val) => {
+        console.log("VAL ", val);
+        const params = new URLSearchParams(window.location.search);
 
-                        }
+        if (val) {
+          setHotelID(String(hotel.id));
+          params.set('hotel_id', String(hotel.id));
+          params.set('operator', String((hotel as any).operator ?? ''));
+        } else {
+          setHotelID(null);
+          params.delete('hotel_id');
+          params.delete('operator');
+        }
 
-                        router.push(`/selectour?${params.toString()}`);
-                      }}
-                  // paramName="hotel_name"
-                />
-              ))}
-            </FilterSection>
+        router.push(`/selectour?${params.toString()}`);
+      }}
+    />
+  ))}
+</FilterSection>
+
 
             {hotel_features_by_type.map((row) => (
               <FilterSection key={row.type} title={row.type}>
@@ -1329,7 +1474,7 @@ const top_duration = [
                   ) : (
                     <div className="mt-10 flex h-screen flex-col items-center justify-center">
                       <p className="text-2xl font-semibold text-[#121212]">
-                        {t('Не найдено')}
+                        {t('Не найдено')} - { t('change_filter_params')}
                       </p>
                     </div>
                   )}
@@ -1340,70 +1485,76 @@ const top_duration = [
           {ticket && ticket.data.total_pages > 1 && (
             <div className="mt-10 flex w-full items-end justify-end">
              
-              <Pagination className="flex justify-end">
-                <PaginationContent>
-                  <Button
-                    onClick={() => setCurrentPage((prev) => prev - 1)}
-                    disabled={currentPage === 1}
-                    className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-[#ECF2FF] hover:bg-[#ECF2FF]"
-                  >
-                    <ChevronLeft color="#084FE3" />
-                  </Button>
+              {selectedDestinations ? (
+  <Pagination className="flex justify-end">
+    <PaginationContent>
+      <Button
+        onClick={() => setCurrentPage((prev) => prev - 1)}
+        disabled={currentPage === 1}
+        className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-[#ECF2FF] hover:bg-[#ECF2FF]"
+      >
+        <ChevronLeft color="#084FE3" />
+      </Button>
 
-                  {Array.from({ length: ticket.data.total_pages }).map(
-                    (_, i) => {
-                      const page = i + 1;
+      {Array.from({ length: ticket.data.total_pages }).map((_, i) => {
+        const page = i + 1;
 
-                      if (
-                        page === 1 ||
-                        page === ticket.data.total_pages ||
-                        (page >= currentPage - 1 && page <= currentPage + 1)
-                      ) {
-                        return (
-                          <PaginationItem key={page}>
-                            <PaginationLink
-                              onClick={(e) => {
-                                e.preventDefault();
-                                setCurrentPage(page);
-                              }}
-                              href={`/selectour?page=${page}`}
-                              className={clsx(
-                                'flex h-10 w-10 items-center justify-center rounded-full',
-                                currentPage === page
-                                  ? 'bg-[#084FE3] text-white'
-                                  : 'bg-[#ECF2FF] text-[#084FE3]',
-                              )}
-                            >
-                              {page}
-                            </PaginationLink>
-                          </PaginationItem>
-                        );
-                      }
+        if (
+          page === 1 ||
+          page === ticket.data.total_pages ||
+          (page >= currentPage - 1 && page <= currentPage + 1)
+        ) {
+          return (
+            <PaginationItem key={page}>
+              <PaginationLink
+                onClick={(e) => {
+                  e.preventDefault();
+                  setCurrentPage(page);
+                }}
+                href={`/selectour?page=${page}`}
+                className={clsx(
+                  'flex h-10 w-10 items-center justify-center rounded-full',
+                  currentPage === page
+                    ? 'bg-[#084FE3] text-white'
+                    : 'bg-[#ECF2FF] text-[#084FE3]',
+                )}
+              >
+                {page}
+              </PaginationLink>
+            </PaginationItem>
+          );
+        }
 
-                      if (
-                        page === currentPage - 2 ||
-                        page === currentPage + 2
-                      ) {
-                        return (
-                          <PaginationItem key={`ellipsis-${page}`}>
-                            <PaginationEllipsis />
-                          </PaginationItem>
-                        );
-                      }
+        if (
+          page === currentPage - 2 ||
+          page === currentPage + 2
+        ) {
+          return (
+            <PaginationItem key={`ellipsis-${page}`}>
+              <PaginationEllipsis />
+            </PaginationItem>
+          );
+        }
 
-                      return null;
-                    },
-                  )}
+        return null;
+      })}
 
-                  <Button
-                    onClick={() => setCurrentPage((prev) => prev + 1)}
-                    disabled={currentPage === ticket.data.total_pages}
-                    className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-[#ECF2FF] hover:bg-[#ECF2FF]"
-                  >
-                    <ChevronRight color="#084FE3" />
-                  </Button>
-                </PaginationContent>
-              </Pagination>
+      <Button
+        onClick={() => setCurrentPage((prev) => prev + 1)}
+        disabled={currentPage === ticket.data.total_pages}
+        className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-[#ECF2FF] hover:bg-[#ECF2FF]"
+      >
+        <ChevronRight color="#084FE3" />
+      </Button>
+    </PaginationContent>
+  </Pagination>
+) : (
+    <div className="text-center text-sm text-gray-500 mt-4">
+      <small className="text-gray-400">
+        { t('Filter uchun Kerakli davlat va shaharni tanlang')}
+        </small> 
+    </div>
+)}
             </div>
           )}
         </div>

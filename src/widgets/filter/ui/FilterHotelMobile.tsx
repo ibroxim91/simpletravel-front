@@ -50,6 +50,7 @@ const FilterHotelMobile = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [searchCountry, setSearchCountry] = useState('');
   const [searchRegion, setSearchRegion] = useState('');
+
   const [selectedCountry, setSelectedCountry] =
     useState<CountryListData | null>(null);
   const [selectedRegion, setSelectedRegion] = useState<{
@@ -63,6 +64,8 @@ const FilterHotelMobile = () => {
         c.name.toLowerCase().includes(searchCountry.toLowerCase()),
       )) ||
     [];
+
+
 
   const filteredRegions =
     selectedCountry?.regions.filter((r) =>

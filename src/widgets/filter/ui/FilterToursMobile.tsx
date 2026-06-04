@@ -39,8 +39,12 @@ const FilterToursMobile = ({ selectedDestRegions, setSelectedDestRegions,setSele
       return data.data.data;
     },
   });
- const pathname = usePathname();
-    const changeDeparture= (newDep: string) => {
+
+  const pathname = usePathname();
+
+const hideText = pathname.includes('/selectour') || pathname.includes('/selectour-test');
+
+const changeDeparture= (newDep: string) => {
       if (window.location.pathname === '/selectour') {
         const params = new URLSearchParams(searchParams.toString());
         params.set('departure', newDep);
@@ -125,47 +129,77 @@ const FilterToursMobile = ({ selectedDestRegions, setSelectedDestRegions,setSele
       r.name.toLowerCase().includes(searchRegionDes.toLowerCase()),
     ) || [];
 
-  useEffect(() => {
-    const departure = searchParams.get('departure');
-    const destination = searchParams.get('destination');
-    const dateFrom = searchParams.get('dateFrom');
-    const dateTo = searchParams.get('dateTo');
-    const adultsParam = searchParams.get('adults');
-    const childrenParam = searchParams.get('children');
+useEffect(() => {
+  const departure = searchParams.get('departure');
+  // ❗️ Agar URL’da destination bo‘lmasa, localStorage’dan olamiz
+  const destination = searchParams.get('destination') || localStorage.getItem('dest_id');
+  const dateFrom = searchParams.get('dateFrom');
+  const dateTo = searchParams.get('dateTo');
+  const adultsParam = searchParams.get('adults');
+  const childrenParam = searchParams.get('children');
 
-    if (departure && ticket) {
-      const regionId = parseInt(departure, 10);
-      const region = defaultCountry?.regions.find((r) => r.id === regionId);
-      if (region) {
-        setSelectedCountry(defaultCountry);
-        setSelectedRegion(region);
-      }
-    } else if (defaultCountry && !selectedCountry) {
+  // Departure
+  if (departure && ticket) {
+    const regionId = parseInt(departure, 10);
+    const region = defaultCountry?.regions.find((r) => r.id === regionId);
+    if (region) {
       setSelectedCountry(defaultCountry);
-      const defaultRegion = defaultCountry.regions?.find((r) => r.default_region === true);
-      if (defaultRegion) {
-        setSelectedRegion(defaultRegion);
+      setSelectedRegion(region);
+    }
+  } else if (defaultCountry && !selectedCountry && !destination) {
+    // ❗️ faqat destination ham bo‘sh bo‘lsa defaultga qayt
+    setSelectedCountry(defaultCountry);
+    const defaultRegion = defaultCountry.regions?.find((r) => r.default_region === true);
+    if (defaultRegion) {
+      setSelectedRegion(defaultRegion);
+    }
+  }
+
+  // Destination
+  if (destination && ticket) {
+    const regionId = parseInt(destination, 10);
+    for (const country of ticket) {
+      const region = country.regions.find((r) => r.id === regionId);
+      if (region) {
+        setSelectedCountryDes(country);
+        setSelectedRegionDes(region);
+        // ❗️ localStorage’da ham saqlab qo‘yamiz
+        localStorage.setItem("dest_id", String(region.id));
+        break;
       }
     }
+  }
 
-    if (destination && ticket) {
-      const regionId = parseInt(destination, 10);
-      for (const country of ticket) {
-        const region = country.regions.find((r) => r.id === regionId);
-        if (region) {
-          setSelectedCountryDes(country);
-          setSelectedRegionDes(region);
-          break;
+
+
+  // Dates & passengers
+  setFromDate(dateFrom ? new Date(dateFrom) : undefined);
+  setToDate(dateTo ? new Date(dateTo) : undefined);
+  setAdults(adultsParam ? parseInt(adultsParam) : 0);
+  setChildren(childrenParam ? parseInt(childrenParam) : 0);
+}, [searchParams, ticket, defaultCountry]);
+
+
+    function getPassengerText(count: number) {
+        const lastTwo = count % 100;
+        const lastOne = count % 10;
+
+        if (lastTwo >= 11 && lastTwo <= 14) {
+          return t('пассажиров');
         }
-      }
+
+        if (lastOne === 1) {
+          return t('пассажир');
+        }
+
+        if (lastOne >= 2 && lastOne <= 4) {
+          return t('пассажира');
+        }
+
+        return t('пассажиров');
     }
 
-    setFromDate(dateFrom ? new Date(dateFrom) : undefined);
-    setToDate(dateTo ? new Date(dateTo) : undefined);
-    setAdults(adultsParam ? parseInt(adultsParam) : 0);
-    setChildren(childrenParam ? parseInt(childrenParam) : 0);
-  }, [searchParams, ticket, defaultCountry, selectedCountry]);
-
+    
   const saveFilter = () => {
     if (!selectedRegion || !selectedRegionDes) {
       toast.error("Avval davlat va shaharni tanlang!");
@@ -667,7 +701,11 @@ const basePath = pathname.includes('/selectour-test')
             <Input
               className="h-12 rounded-none border-0 px-5 text-[14px] font-medium text-[#1C1C1E] placeholder:text-[14px] placeholder:text-[#1C1C1E]"
               placeholder={t('Вызрослых')}
-              value={selectAge === 0 ? t('1 пассажир') : `${selectAge} ${t('пассажир')}`}
+              value={
+                selectAge === 0
+                  ? ''
+                  : `${selectAge} ${getPassengerText(selectAge)}`
+              }
               readOnly
             />
             <KeyboardArrowDownIcon
@@ -793,16 +831,21 @@ const basePath = pathname.includes('/selectour-test')
             saveFilter();
             // sahifani pastga siljitish
             window.scrollTo({
-              top: 960, // kerakli balandlikka moslab qo‘y
+              top: 700, // kerakli balandlikka moslab qo‘y
               behavior: 'smooth',
             });
           }}
         >
           <p>{t('Искать тур')}</p>
         </Button>
-        <p className="mt-4 text-right text-[12px] font-normal leading-[100%] text-white">
+        
+     {!hideText && (
+        <p className="absolute right-1 top-[84px] text-right text-[14px] font-normal leading-[17px] text-white">
           {t('Переходи в раздел “Подобрать тур”, чтобы ознакомиться со всеми турами')}
         </p>
+      )}
+
+
       </div>
     </div>
   );

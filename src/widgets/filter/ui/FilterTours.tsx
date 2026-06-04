@@ -44,7 +44,7 @@ const FilterTours = ({ selectedDestRegions, setSelectedDestRegions,setSelectedDe
   const [selectData, setSelectData] = useState<string>('');
   const [adults, setAdults] = useState<number>(0);
   const [children, setChildren] = useState<number>(0);
-  const selectAge = adults + children;
+  const selectAll = adults + children;
   const [range, setRange] = useState<DateRange | undefined>();
   const [selectedCountry, setSelectedCountry] = useState<string>('');
 
@@ -58,13 +58,35 @@ const FilterTours = ({ selectedDestRegions, setSelectedDestRegions,setSelectedDe
   const [searchDestCountry, setSearchDestCountry] = useState('');
   const [searchDestRegion, setSearchDestRegion] = useState('');
  const pathname = usePathname();
-  const { data: countries, isLoading } = useQuery({
+  
+ const { data: countries, isLoading } = useQuery({
     queryKey: ['country_list'],
     queryFn: () => country_api.list(),
     select(data) {
       return data.data.data;
     },
   });
+   
+const hideText = pathname.includes('/selectour') || pathname.includes('/selectour-test');
+
+  function getPassengerText(count: number) {
+    const lastTwo = count % 100;
+    const lastOne = count % 10;
+
+    if (lastTwo >= 11 && lastTwo <= 14) {
+      return t('пассажиров');
+    }
+
+    if (lastOne === 1) {
+      return t('пассажир');
+    }
+
+    if (lastOne >= 2 && lastOne <= 4) {
+      return t('пассажира');
+    }
+
+    return t('пассажиров');
+}
 
       const changeDeparture= (newDep: string) => {
         
@@ -208,20 +230,37 @@ useEffect(() => {
     setAdults(adultsParam ? parseInt(adultsParam) : 0);
     setChildren(childrenParam ? parseInt(childrenParam) : 0);
 
-    if (!selectedCountry && countries?.length) {
-      const defaultCountry = countries.find((c) => c.default_country === true);
-      if (defaultCountry) {
-        setSelectedCountry(defaultCountry.name);
+    // if (!selectedCountry && countries?.length) {
+    //   const defaultCountry = countries.find((c) => c.default_country === true);
+    //   if (defaultCountry) {
+    //     setSelectedCountry(defaultCountry.name);
   
-        const defaultRegion = defaultCountry.regions?.find(
-          (r) => r.default_region === true
-        );
-        if (defaultRegion) {
-          setSelectedRegion(String(defaultRegion.id));
-        }
+    //     const defaultRegion = defaultCountry.regions?.find(
+    //       (r) => r.default_region === true
+    //     );
+    //     if (defaultRegion) {
+    //       setSelectedRegion(String(defaultRegion.id));
+    //     }
+    //   }
+    // }
+  }, [searchParams, countries,  selectedCountry, setSelectedCountry, setSelectedRegion]);
+
+  useEffect(() => {
+  if (!selectedCountry && countries?.length) {
+    const defaultCountry = countries.find((c) => c.default_country === true);
+    if (defaultCountry) {
+      setSelectedCountry(defaultCountry.name);
+      const defaultRegion = defaultCountry.regions?.find(
+        (r) => r.default_region === true
+      );
+      if (defaultRegion) {
+        setSelectedRegion(String(defaultRegion.id));
       }
     }
-  }, [searchParams, countries,  selectedCountry, setSelectedCountry, setSelectedRegion]);
+  }
+// ❗️ faqat countries o‘zgarganda ishlasin
+}, [countries]);
+
 
   const saveFilter = () => {
     if (!selectedRegion || !selectedDestRegion) {
@@ -690,12 +729,16 @@ const defaultitems = selectedCountry
           onClick={() => setAgeOpen(!ageOpen)}
           className="cursor-pointer flex h-[60px] items-center justify-between px-6"
         >
-          <Input
-            className="h-auto border-0 p-0 text-[14px] font-medium text-[#1C1C1E] shadow-none placeholder:text-[#1C1C1E] focus-visible:ring-0"
-            placeholder={t('1 пассажир')}
-            value={selectAge === 0 ? '' : `${selectAge} ${t('пассажир')}`}
-            readOnly
-          />
+           <Input
+                className="h-auto border-0 p-0 text-[14px] font-medium text-[#1C1C1E] shadow-none placeholder:text-[#1C1C1E] focus-visible:ring-0"
+                placeholder={t('1 пассажир')}
+                value={
+                  selectAll === 0
+                    ? ''
+                    : `${selectAll} ${getPassengerText(selectAll)}`
+                }
+                readOnly
+              />
           <KeyboardArrowDownIcon sx={{ color: '#1A73E8', width: '16px', height: '16px' }} />
         </div>
 
@@ -810,9 +853,13 @@ const defaultitems = selectedCountry
         </Button>
       </div>
       </div>
-      <p className="absolute right-1 top-[84px] text-right text-[14px] font-normal leading-[17px] text-white">
-        {t('Переходи в раздел “Подобрать тур”, чтобы ознакомиться со всеми турами')}
-      </p>
+      
+      {!hideText && (
+        <p className="absolute right-1 top-[84px] text-right text-[14px] font-normal leading-[17px] text-white">
+          {t('Переходи в раздел “Подобрать тур”, чтобы ознакомиться со всеми турами')}
+        </p>
+      )}
+
     </div>
   );
 };
