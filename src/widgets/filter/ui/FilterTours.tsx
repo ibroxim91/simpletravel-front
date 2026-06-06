@@ -312,7 +312,7 @@ useEffect(() => {
     const departureParam = resolveDepartureParam();
 
     if (!departureParam || (!hasDestination && !hasCountryId)) {
-      toast.error("choice_country_and_region");
+      toast.error(t('choice_country_and_region'));
       return;
     }
 
