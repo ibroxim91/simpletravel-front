@@ -28,8 +28,15 @@ import { MoveLeft, MoveRight, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams, usePathname } from 'next/navigation';
 import { toast } from 'sonner';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { DateRange } from 'react-day-picker';
+
+const parseUrlDate = (value: string | null | undefined) => {
+  if (!value) return undefined;
+  const [year, month, day] = value.split('-').map(Number);
+  if (!year || !month || !day) return undefined;
+  return new Date(year, month - 1, day);
+};
 
 const FilterToursMobile = ({ selectedDestRegions, setSelectedDestRegions,setSelectedDefaulDestination, setHotelRating, setSelectedDurations, setMealPlan }) => {
   const { data: ticket } = useQuery({
@@ -41,36 +48,26 @@ const FilterToursMobile = ({ selectedDestRegions, setSelectedDestRegions,setSele
   });
 
   const pathname = usePathname();
+  const defaultDepartureInitialized = useRef(false);
 
 const hideText = pathname.includes('/selectour') || pathname.includes('/selectour-test');
 
-const changeDeparture= (newDep: string) => {
-      if (window.location.pathname === '/selectour') {
-        const params = new URLSearchParams(searchParams.toString());
-        params.set('departure', newDep);
-          const basePath = pathname.includes('/selectour-test')
-      ? '/selectour-test'
-      : '/selectour';
-        route.replace(`${basePath}?${params.toString()}`, { scroll: false });
-  } 
-   
-};
+  const getBasePath = () =>
+    pathname.includes('/selectour-test') ? '/selectour-test' : '/selectour';
 
   useEffect(() => {
-  if (ticket) {
-    // Default regionni topamiz
-    const defaultRegion = ticket
-      .flatMap((c) => c.regions)
-      .find((r) => r.default_region);
+  if (!ticket || defaultDepartureInitialized.current) return;
 
-    if (defaultRegion) {
-      setSelectedDefaulDestination(String(defaultRegion.id));
-      changeDeparture(String(defaultRegion.id));
-      // localStorage.setItem("dest_id", String(defaultRegion.id));
-    
-    }
+  const defaultRegion = ticket
+    .flatMap((c) => c.regions)
+    .find((r) => r.default_region);
+
+  if (defaultRegion) {
+    setSelectedDefaulDestination(String(defaultRegion.id));
   }
-}, [ticket]);
+
+  defaultDepartureInitialized.current = true;
+}, [ticket, setSelectedDefaulDestination]);
 
   const defaultCountry = ticket?.find((c) => c.default_country === true);
   const t = useTranslations();
@@ -85,6 +82,25 @@ const changeDeparture= (newDep: string) => {
   const [adults, setAdults] = useState<number>(0);
   const [children, setChildren] = useState<number>(0);
   const [range, setRange] = useState<DateRange | undefined>();
+  const applyDatesFromSearchParams = useCallback(() => {
+    const from = parseUrlDate(searchParams.get('dateFrom'));
+    const to = parseUrlDate(searchParams.get('dateTo'));
+
+    setFromDate(from);
+    setToDate(to);
+
+    if (from && to) {
+      setRange({ from, to });
+      setSelectData(
+        `${formatDate.format(from, 'DD.MM')} - ${formatDate.format(to, 'DD.MM')}`,
+      );
+    } else if (from) {
+      setRange({ from, to: undefined });
+    } else {
+      setRange(undefined);
+      setSelectData('');
+    }
+  }, [searchParams]);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [searchCountry, setSearchCountry] = useState('');
   const [searchRegion, setSearchRegion] = useState('');
@@ -104,6 +120,12 @@ const changeDeparture= (newDep: string) => {
     id: number;
     name: string;
   } | null>(null);
+  const [selectedDestCountryId, setSelectedDestCountryId] = useState<string | null>(null);
+  const destListScrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    destListScrollRef.current?.scrollTo(0, 0);
+  }, [selectedCountryDes?.id]);
 
   const filteredCountries =
     (ticket &&
@@ -162,6 +184,7 @@ useEffect(() => {
   const departure = searchParams.get('departure');
   // ❗️ Agar URL’da destination bo‘lmasa, localStorage’dan olamiz
   const destination = searchParams.get('destination');
+  const countryId = searchParams.get('country_id');
   const dateFrom = searchParams.get('dateFrom');
   const dateTo = searchParams.get('dateTo');
   const adultsParam = searchParams.get('adults');
@@ -193,21 +216,33 @@ useEffect(() => {
       if (region) {
         setSelectedCountryDes(country);
         setSelectedRegionDes(region);
-        // ❗️ localStorage’da ham saqlab qo‘yamiz
-        // localStorage.setItem("dest_id", String(region.id));
+        setSelectedDestCountryId(null);
+        setSelectedDestRegions(String(region.id));
         break;
       }
     }
+  } else if (countryId && ticket) {
+    const country = ticket.find((c) => String(c.id) === countryId);
+    if (country) {
+      setSelectedCountryDes(country);
+      setSelectedRegionDes(null);
+      setSelectedDestCountryId(countryId);
+      setSelectedDestRegions(null);
+    }
+  } else {
+    setSelectedCountryDes(null);
+    setSelectedRegionDes(null);
+    setSelectedDestCountryId(null);
+    setSelectedDestRegions(null);
   }
 
 
 
   // Dates & passengers
-  setFromDate(dateFrom ? new Date(dateFrom) : undefined);
-  setToDate(dateTo ? new Date(dateTo) : undefined);
+  applyDatesFromSearchParams();
   setAdults(adultsParam ? parseInt(adultsParam) : 0);
   setChildren(childrenParam ? parseInt(childrenParam) : 0);
-}, [searchParams, ticket, defaultCountry]);
+}, [searchParams, ticket, defaultCountry, applyDatesFromSearchParams]);
 
 
     function getPassengerText(count: number) {
@@ -230,22 +265,40 @@ useEffect(() => {
     }
 
     
+  const handleSelectAllDestRegions = () => {
+    if (!selectedCountryDes) return;
+
+    setSelectedRegionDes(null);
+    setSelectedDestCountryId(String(selectedCountryDes.id));
+    setSelectedDestRegions(null);
+    setOpenDrawerDes(false);
+  };
+
   const saveFilter = () => {
-    if (!selectedRegion || !selectedRegionDes) {
+    const hasDestination = Boolean(selectedRegionDes);
+    const hasCountryId = Boolean(selectedDestCountryId);
+    const departureParam = searchParams.get('departure');
+
+    if (!departureParam || (!hasDestination && !hasCountryId)) {
       toast.error("Avval davlat va shaharni tanlang!");
       return;
     }
+
     const params = new URLSearchParams();
-    
+
     localStorage.removeItem('town')
     localStorage.removeItem('mealPlan')
     setHotelRating(null)
     setSelectedDurations(null)
     setMealPlan(null)
-    
-    if (selectedRegion) params.set('departure', String(selectedRegion.id));
-    if (selectedRegionDes)
+
+    params.set('departure', departureParam);
+
+    if (selectedDestCountryId) {
+      params.set('country_id', selectedDestCountryId);
+    } else if (selectedRegionDes) {
       params.set('destination', String(selectedRegionDes.id));
+    }
     if (fromDate)
       params.set('dateFrom', formatDate.format(fromDate, 'YYYY-MM-DD'));
     if (toDate) params.set('dateTo', formatDate.format(toDate, 'YYYY-MM-DD'));
@@ -256,11 +309,7 @@ useEffect(() => {
     if (searchParams.get("rating")) params.set('rating',  "");
     if (searchParams.get("duration")) params.set('duration',  "");
     if (searchParams.get("meal")) params.set('meal',  "");
-const basePath = pathname.includes('/selectour-test')
-      ? '/selectour-test'
-      : '/selectour';
-  
-    route.push(`${basePath}?page=1&${params.toString()}`,  { scroll: false });
+    route.push(`${getBasePath()}?page=1&${params.toString()}`, { scroll: false });
   };
 
   const departureRegionName = selectedRegion?.name ?? '';
@@ -464,13 +513,16 @@ const basePath = pathname.includes('/selectour-test')
               borderTopRightRadius: 16,
               padding: 2,
               width: '100%',
-              overflow: 'auto',
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
               minHeight: '70%',
+              maxHeight: '90vh',
               transition: 'all 0.3s ease',
             },
           }}
         >
-          <div className="flex flex-col gap-4 w-full font-medium">
+          <div className="flex min-h-0 flex-1 flex-col gap-4 w-full font-medium">
             <div className="flex items-center justify-between">
               <p className="text-lg font-semibold">{t('Выберите город')}</p>
               <Button
@@ -500,12 +552,17 @@ const basePath = pathname.includes('/selectour-test')
                     }}
                   />
                 </div>
-                <div className="flex flex-col gap-2 max-h-[50vh] overflow-y-auto scroll-visible">
+                <div
+                  key={`dest-regions-${selectedCountryDes.id}`}
+                  ref={destListScrollRef}
+                  className="flex flex-col gap-2 min-h-0 flex-1 overflow-y-auto scroll-visible"
+                >
                   <Button
                     variant={'ghost'}
                     onClick={() => {
                       setSelectedCountryDes(null);
                       setSelectedRegionDes(null);
+                      setSelectedDestCountryId(null);
                       setSearchCountryDes('');
                       setSearchRegionDes('');
                     }}
@@ -514,6 +571,19 @@ const basePath = pathname.includes('/selectour-test')
                     <MoveLeft className="size-5" />
                     {t('Boshqa davlat tanlash')}
                   </Button>
+                  <div
+                    className="p-2 hover:bg-gray-200 rounded-lg cursor-pointer flex justify-between"
+                    onClick={handleSelectAllDestRegions}
+                  >
+                    <span className="font-bold">
+                      {t('select_all_regions')}
+                    </span>
+                    {selectedDestCountryId &&
+                      !selectedRegionDes &&
+                      selectedDestCountryId === String(selectedCountryDes.id) && (
+                        <DoneIcon sx={{ width: '14px', height: '14px' }} />
+                      )}
+                  </div>
                   {filteredRegionsDes.length ? (
                     filteredRegionsDes.map((region) => (
                       <div
@@ -521,6 +591,8 @@ const basePath = pathname.includes('/selectour-test')
                         className="p-2 hover:bg-gray-200 rounded-lg cursor-pointer flex justify-between "
                         onClick={() => {
                           setSelectedRegionDes(region);
+                          setSelectedDestCountryId(null);
+                          setSelectedDestRegions(String(region.id));
                           setSearchRegionDes(region.name);
                           setOpenDrawerDes(false);
                         }}
@@ -558,7 +630,11 @@ const basePath = pathname.includes('/selectour-test')
                   />
                 </div>
 
-                <div className="flex flex-col gap-2 max-h-[50vh] overflow-y-auto scroll-visible">
+                <div
+                  key="dest-countries"
+                  ref={destListScrollRef}
+                  className="flex flex-col gap-2 min-h-0 flex-1 overflow-y-auto scroll-visible"
+                >
                   {filteredCountriesDes.length ? (
                      filteredCountriesDes.filter((item) => !item.default_country).map((country) => (
                       <div
@@ -567,11 +643,12 @@ const basePath = pathname.includes('/selectour-test')
                         onClick={() => {
                           setSelectedCountryDes(country);
                           setSelectedRegionDes(null);
+                          setSelectedDestCountryId(null);
                           setSearchCountryDes(country.name);
                         }}
                       >
                         {country.name}
-                        {selectedCountryDes === country.id && (
+                        {selectedCountryDes?.id === country.id && (
                           <DoneIcon sx={{ width: '14px', height: '14px' }} />
                         )}
                       </div>
@@ -591,6 +668,7 @@ const basePath = pathname.includes('/selectour-test')
       <div className="relative h-full border-r border-[#E5E7EB]">
         <div
           onClick={() => {
+            if (!dataOpenMobile) applyDatesFromSearchParams();
             setDataOpenMobile(!dataOpenMobile);
           }}
           className="cursor-pointer w-full"
@@ -614,7 +692,13 @@ const basePath = pathname.includes('/selectour-test')
             />
           </div>
         </div>
-        <Sheet open={dataOpenMobile} onOpenChange={setDataOpenMobile}>
+        <Sheet
+          open={dataOpenMobile}
+          onOpenChange={(open) => {
+            if (open) applyDatesFromSearchParams();
+            setDataOpenMobile(open);
+          }}
+        >
           <SheetContent
             side="bottom"
             className="rounded-t-3xl !h-[90vh] p-0 flex flex-col"
@@ -708,7 +792,7 @@ const basePath = pathname.includes('/selectour-test')
                   setDataOpenMobile(false);
                   if (fromDate && toDate) {
                     setSelectData(
-                      `${formatDate.format(fromDate, 'DD/MM/YYYY')} - ${formatDate.format(toDate, 'DD/MM/YYYY')}`,
+                      `${formatDate.format(fromDate, 'DD.MM')} - ${formatDate.format(toDate, 'DD.MM')}`,
                     );
                   } else {
                     setSelectData('');

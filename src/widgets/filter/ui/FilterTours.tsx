@@ -30,8 +30,15 @@ import { Loader2, MoveLeft, SearchIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams, usePathname } from 'next/navigation';
 import { toast } from 'sonner';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { DateRange } from 'react-day-picker';
+
+const parseUrlDate = (value: string | null | undefined) => {
+  if (!value) return undefined;
+  const [year, month, day] = value.split('-').map(Number);
+  if (!year || !month || !day) return undefined;
+  return new Date(year, month - 1, day);
+};
 
 const FilterTours = ({ selectedDestRegions, setSelectedDestRegions,setSelectedDefaulDestination, setHotelRating, setSelectedDurations, setMealPlan,setIsSearchClicked }) => {
   const t = useTranslations();
@@ -46,6 +53,25 @@ const FilterTours = ({ selectedDestRegions, setSelectedDestRegions,setSelectedDe
   const [children, setChildren] = useState<number>(0);
   const selectAll = adults + children;
   const [range, setRange] = useState<DateRange | undefined>();
+  const applyDatesFromSearchParams = useCallback(() => {
+    const from = parseUrlDate(searchParams.get('dateFrom'));
+    const to = parseUrlDate(searchParams.get('dateTo'));
+
+    setFromDate(from);
+    setToDate(to);
+
+    if (from && to) {
+      setRange({ from, to });
+      setSelectData(
+        `${formatDate.format(from, 'DD/MM/YYYY')} - ${formatDate.format(to, 'DD/MM/YYYY')}`,
+      );
+    } else if (from) {
+      setRange({ from, to: undefined });
+    } else {
+      setRange(undefined);
+      setSelectData('');
+    }
+  }, [searchParams]);
   const [selectedCountry, setSelectedCountry] = useState<string>('');
 
   const [selectedRegion, setSelectedRegion] = useState<string>('');
@@ -55,9 +81,11 @@ const FilterTours = ({ selectedDestRegions, setSelectedDestRegions,setSelectedDe
   const [openDest, setOpenDest] = useState(false);
   const [selectedDestCountry, setSelectedDestCountry] = useState<string>('');
   const [selectedDestRegion, setSelectedDestRegion] = useState<string>('');
+  const [selectedDestCountryId, setSelectedDestCountryId] = useState<string | null>(null);
   const [searchDestCountry, setSearchDestCountry] = useState('');
   const [searchDestRegion, setSearchDestRegion] = useState('');
  const pathname = usePathname();
+ const defaultDepartureInitialized = useRef(false);
   
  const { data: countries, isLoading } = useQuery({
     queryKey: ['country_list'],
@@ -68,6 +96,20 @@ const FilterTours = ({ selectedDestRegions, setSelectedDestRegions,setSelectedDe
   });
    
 const hideText = pathname.includes('/selectour') || pathname.includes('/selectour-test');
+
+  const getBasePath = () =>
+    pathname.includes('/selectour-test') ? '/selectour-test' : '/selectour';
+
+  const getDefaultDepartureId = () => {
+    const defaultRegion = countries
+      ?.flatMap((c) => c.regions)
+      .find((r) => (r as { default_region?: boolean }).default_region);
+    return defaultRegion ? String(defaultRegion.id) : null;
+  };
+
+  const resolveDepartureParam = () =>
+    searchParams.get('departure');
+    selectedRegion || getDefaultDepartureId() || '';
 
   function getPassengerText(count: number) {
     const lastTwo = count % 100;
@@ -88,33 +130,19 @@ const hideText = pathname.includes('/selectour') || pathname.includes('/selectou
     return t('пассажиров');
 }
 
-      const changeDeparture= (newDep: string) => {
-        
-      if (window.location.pathname === '/selectour') {
-        const params = new URLSearchParams(searchParams.toString());
-        params.set('departure', newDep);
-         const basePath = pathname.includes('/selectour-test')
-      ? '/selectour-test'
-      : '/selectour';
-       route.replace(`${basePath}?${params.toString()}`, { scroll: false });
-  } 
-   
-};
 useEffect(() => {
-  if (countries) {
-    // Default regionni topamiz
-    const defaultRegion = countries
-      .flatMap((c) => c.regions)
-      .find((r) => r.default_region);
+  if (!countries || defaultDepartureInitialized.current) return;
 
-    if (defaultRegion) {
-      setSelectedDefaulDestination(String(defaultRegion.id));
-      changeDeparture(String(defaultRegion.id));
-      localStorage.setItem("dest_id", String(defaultRegion.id));
-    
-    }
+  const defaultRegion = countries
+    .flatMap((c) => c.regions)
+    .find((r) => r.default_region);
+
+  if (defaultRegion) {
+    setSelectedDefaulDestination(String(defaultRegion.id));
   }
-}, [countries]);
+
+  defaultDepartureInitialized.current = true;
+}, [countries, setSelectedDefaulDestination]);
  
 
   const filteredCountries = countries?.filter((c) =>
@@ -140,6 +168,7 @@ useEffect(() => {
   useEffect(() => {
     const departureId = searchParams.get('departure');
     const destination = searchParams.get('destination');
+    const countryId = searchParams.get('country_id');
     const dateTo = searchParams.get('dateTo');
     const adultsParam = searchParams.get('adults');
     const childrenParam = searchParams.get('children');
@@ -158,6 +187,7 @@ useEffect(() => {
       departure:departure,
       from_cache:from_cache,
       destination:destination,
+      country_id:countryId,
       dateFrom:dateFrom,
       dateTo:dateTo,
       duration:duration,
@@ -207,25 +237,27 @@ useEffect(() => {
       });
      
       if (foundCountry && foundRegion) {
-       
         setSelectedDestCountry(foundCountry.name);
         setSelectedDestRegion(String(foundRegion.id));
+        setSelectedDestCountryId(null);
         setSelectedDestRegions(String(foundRegion.id));
-        
       }
+    } else if (countryId && countries) {
+      const foundCountry = countries.find((c) => String(c.id) === countryId);
+      if (foundCountry) {
+        setSelectedDestCountry(foundCountry.name);
+        setSelectedDestRegion('');
+        setSelectedDestCountryId(countryId);
+        setSelectedDestRegions(null);
+      }
+    } else {
+      setSelectedDestCountry('');
+      setSelectedDestRegion('');
+      setSelectedDestCountryId(null);
+      setSelectedDestRegions(null);
     }
 
-    const from = dateFrom ? new Date(dateFrom) : undefined;
-    const to = dateTo ? new Date(dateTo) : undefined;
-    setFromDate(from);
-    setToDate(to);
-
-    if (from && to) {
-      setRange({ from, to });
-      setSelectData(
-        `${formatDate.format(from, 'DD/MM/YYYY')} - ${formatDate.format(to, 'DD/MM/YYYY')}`,
-      );
-    }
+    applyDatesFromSearchParams();
 
     setAdults(adultsParam ? parseInt(adultsParam) : 0);
     setChildren(childrenParam ? parseInt(childrenParam) : 0);
@@ -243,7 +275,7 @@ useEffect(() => {
     //     }
     //   }
     // }
-  }, [searchParams, countries,  selectedCountry, setSelectedCountry, setSelectedRegion]);
+  }, [searchParams, countries, selectedCountry, setSelectedCountry, setSelectedRegion, applyDatesFromSearchParams]);
 
   useEffect(() => {
   if (!selectedCountry && countries?.length) {
@@ -262,37 +294,33 @@ useEffect(() => {
 }, [countries]);
 
 
+  const handleSelectAllDestRegions = () => {
+    const country = countries?.find((c) => c.name === selectedDestCountry);
+    if (!country) return;
+
+    setSelectedDestRegion('');
+    setSelectedDestCountryId(String(country.id));
+    setSelectedDestRegions(null);
+    setOpenDest(false);
+  };
+
   const saveFilter = () => {
-    if (!selectedRegion || !selectedDestRegion) {
+    const hasDestination = Boolean(selectedDestRegion);
+    const hasCountryId = Boolean(selectedDestCountryId);
+    const departureParam = resolveDepartureParam();
+
+    if (!departureParam || (!hasDestination && !hasCountryId)) {
       toast.error("Avval davlat va shaharni tanlang!");
       return;
     }
-    localStorage.removeItem('town')
-    localStorage.removeItem('mealPlan')
-    setHotelRating(null)
-    setSelectedDurations(null)
-    setMealPlan(null)
+
     const params = new URLSearchParams();
+    params.set('departure', departureParam);
 
-    if (selectedCountry) {
-      if (selectedRegion) {
-        params.set('departure', selectedRegion);
-      } else {
-        params.set('departure', selectedCountry);
-      }
-    }
-
-    if (selectedDestCountry) {
-      if (selectedDestRegion) {
-        const cachedDestId = localStorage.getItem('dest_id');
-        if (cachedDestId) {
-          params.set('destination', cachedDestId);
-        } else {
-          params.set('destination', selectedDestRegion);
-        }
-      } else {
-        params.set('destination', selectedDestCountry);
-      }
+    if (selectedDestCountryId) {
+      params.set('country_id', selectedDestCountryId);
+    } else if (selectedDestRegion) {
+      params.set('destination', selectedDestRegion);
     }
 
 
@@ -306,11 +334,7 @@ useEffect(() => {
     if (searchParams.get('rating')) params.delete('rating');
     if (searchParams.get('duration')) params.delete('duration');
     if (searchParams.get('meal')) params.delete('meal');
-    const basePath = pathname.includes('/selectour-test')
-      ? '/selectour-test'
-      : '/selectour';
-  
-    route.push(`${basePath}?page=1&${params.toString()}`);
+    route.push(`${getBasePath()}?page=1&${params.toString()}`);
   };
 
   const items = selectedCountry ? filteredRegions : filteredCountries;
@@ -503,6 +527,10 @@ const defaultitems = selectedCountry
                     <div className="flex gap-1.5 items-center">
                       {selectedDestinationRegionName}
                     </div>
+                  ) : selectedDestCountryId && selectedDestCountry ? (
+                    <div className="flex gap-1.5 items-center">
+                      {selectedDestCountry}
+                    </div>
                   ) : (
                     <div className="flex gap-1.5">{t('Куда')}</div>
                   )}
@@ -560,6 +588,7 @@ const defaultitems = selectedCountry
                           onClick={() => {
                             setSelectedDestCountry('');
                             setSelectedDestRegion('');
+                            setSelectedDestCountryId(null);
                           }}
                           className="mt-1"
                         >
@@ -568,7 +597,23 @@ const defaultitems = selectedCountry
                         </Button>
                       </motion.div>
                     )}
-                    <CommandList className="px-1 gap-2">
+                    <CommandList
+                      key={
+                        selectedDestCountry
+                          ? `dest-regions-${selectedDestCountry}`
+                          : 'dest-countries'
+                      }
+                      className="px-1 gap-2"
+                    >
+                      {selectedDestCountry && (
+                        <CommandItem onClick={handleSelectAllDestRegions} 
+                        // bold text
+                        className="text-bold">
+                          <span className="font-bold">
+                            {t('select_all_regions')}
+                          </span>
+                        </CommandItem>
+                      )}
                       {itemsDes?.length ? (
                          itemsDes.filter((item) => !item.default_country).map((item) => (
                           <AnimatePresence key={selectedDestCountry + item.id}>
@@ -584,10 +629,9 @@ const defaultitems = selectedCountry
                                 onClick={() => {
                                   if (selectedDestCountry) {
                                     setSelectedDestRegion(String(item.id));
+                                    setSelectedDestCountryId(null);
                                     setOpenDest(false);
-                                     setSelectedDestRegions(String(item.id));
-                                     localStorage.setItem("dest_id", String(item.id))
-                                   
+                                    setSelectedDestRegions(String(item.id));
                                   } else {
                                     setSelectedDestCountry(item.name);
                                   }
@@ -617,7 +661,10 @@ const defaultitems = selectedCountry
       </div>
       <div className="relative h-full border-r border-[#E5E7EB]">
         <div
-          onClick={() => setDataOpen(!dataOpen)}
+          onClick={() => {
+            if (!dataOpen) applyDatesFromSearchParams();
+            setDataOpen(!dataOpen);
+          }}
           className="cursor-pointer flex h-[60px] items-center justify-between px-6"
         >
           <Input
@@ -839,7 +886,7 @@ const defaultitems = selectedCountry
               top: 700, // kerakli balandlikka moslab qo‘y
               behavior: 'smooth',
             });
-              if (selectedDestRegion && selectedRegion) {
+              if (resolveDepartureParam() && (selectedDestRegion || selectedDestCountryId)) {
                 setIsSearchClicked(true);
               } else {
                 toast.error("Avval shaharni tanlang!");

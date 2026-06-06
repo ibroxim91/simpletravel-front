@@ -80,6 +80,7 @@ export interface TickectAllFilter {
   departure_time?: string;
   town?: string;
   destination?: string;
+  country_id?: string;
   hotel_id?: string;
   operator?: string;
   dateTo?: string;

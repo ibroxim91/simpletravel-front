@@ -79,6 +79,7 @@ type FilterLocalState = {
   toDate: string;
   selectData: string;
   where: string;
+  country_id?: string;
   operator?: string;
   town?: string;
   hotel_id?: string;
@@ -87,6 +88,34 @@ type FilterLocalState = {
 
 const isEqualState = (a: unknown, b: unknown) =>
   JSON.stringify(a) === JSON.stringify(b);
+
+type HotelListItem = NonNullable<
+  TickectAll['data']['results']['hotels']
+>[number];
+
+const sortHotelsByRating = (hotels: HotelListItem[]) =>
+  [...hotels].sort((a, b) => {
+    const aIsNumber = typeof a.rating === 'number';
+    const bIsNumber = typeof b.rating === 'number';
+
+    if (aIsNumber && bIsNumber) {
+      const aRating = a.rating as number;
+      const bRating = b.rating as number;
+      if (aRating !== bRating) return aRating - bRating;
+      return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+    }
+
+    if (aIsNumber) return -1;
+    if (bIsNumber) return 1;
+
+    const ratingCompare = String(a.rating).localeCompare(
+      String(b.rating),
+      undefined,
+      { sensitivity: 'base' },
+    );
+    if (ratingCompare !== 0) return ratingCompare;
+    return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+  });
 
 export default function Selectour() {
   const params = useParams<{ locale: LanguageRoutes }>();
@@ -162,6 +191,7 @@ function generateSearchKey(params: TickectAllFilter) {
     dateFrom: params.dateFrom,
     operator: params.operator,
     destination: params.destination,
+    country_id: params.country_id,
     hotel_id: params.hotel_id,
     town: params.town,
     meal_plan: params.meal_plan,
@@ -213,6 +243,7 @@ const loadTickets = async () => {
     dateFrom: filterLocal?.date,
     departure: filterLocal?.from ?? '',
     destination: filterLocal?.where ?? '',
+    country_id: filterLocal?.country_id ?? '',
     hotel_amenity: hotelAmenities ?? '',
     hotel_id: filterLocal?.hotel_id ?? '',
     town: filterLocal?.town ?? '',
@@ -280,6 +311,7 @@ useEffect(() => {
 }, [
   filterLocal?.from,
   filterLocal?.where,
+  filterLocal?.country_id,
   filterLocal?.adults,
   filterLocal?.children,
   filterLocal?.date,
@@ -311,6 +343,7 @@ useEffect(() => {
   useEffect(() => {
     const departure = getSearchParam('departure') || selectedDefaulDestination || '';
     const destination = getSearchParam('destination') || '';
+    const country_id = getSearchParam('country_id') || '';
     const dateFrom = getSearchParam('dateFrom') || '';
     const dateTo = getSearchParam('dateTo') || '';
     const adultsParam = getSearchParam('adults') || '0';
@@ -334,6 +367,7 @@ useEffect(() => {
       departure:departure,
       from_cache:from_cache,
       destination:destination,
+      country_id:country_id,
       dateFrom:dateFrom,
       dateTo:dateTo,
       duration:duration,
@@ -352,6 +386,7 @@ useEffect(() => {
     const filterData = {
       from: departure,
       where: destination,
+      country_id: country_id,
       date: dateFrom,
       operator: operator,
       toDate: dateTo,
@@ -473,19 +508,23 @@ const hotels = useMemo(() => {
   const apiHotels = ticket?.data?.results?.hotels ?? [];
   // 🧠 lock mode
   if (isHotelLocked) {
-    return prevHotelsRef.current?.length
+    const list = prevHotelsRef.current?.length
       ? prevHotelsRef.current
       : apiHotels;
+    return sortHotelsByRating(list);
   }
 
   // 🧠 update mode
   if (apiHotels.length > 0) {
-    prevHotelsRef.current = apiHotels;
-    return apiHotels;
+    const sorted = sortHotelsByRating(apiHotels);
+    prevHotelsRef.current = sorted;
+    return sorted;
   }
 
-  return prevHotelsRef.current ?? [];
+  return sortHotelsByRating(prevHotelsRef.current ?? []);
 }, [ticket, isHotelLocked]);
+
+
 
 const prevCountry = useRef<string | null>(null);
 const prevRegion = useRef<string | null>(null);
@@ -558,13 +597,23 @@ const top_duration = [
   
   }, [searchParams]);
 
-  const regionId = Number(filterLocal?.where);
-  const regionData = country?.find((c) =>
-    c.regions.some((r) => r.id === regionId),
-  );
+  const destinationRegionId = filterLocal?.where
+    ? Number(filterLocal.where)
+    : null;
+  const destinationCountryId = filterLocal?.country_id || null;
 
-  const regionName = regionData?.regions.find((r) => r.id === regionId)?.name;
-  const countryName = regionData?.name;
+  let regionName: string | undefined;
+  let countryName: string | undefined;
+
+  if (destinationRegionId && !Number.isNaN(destinationRegionId)) {
+    const regionData = country?.find((c) =>
+      c.regions.some((r) => r.id === destinationRegionId),
+    );
+    regionName = regionData?.regions.find((r) => r.id === destinationRegionId)?.name;
+    countryName = regionData?.name;
+  } else if (destinationCountryId) {
+    countryName = country?.find((c) => String(c.id) === destinationCountryId)?.name;
+  }
 
   return (
     <div className="min-h-screen bg-[#FAFBFC] pb-20">
@@ -997,11 +1046,16 @@ const top_duration = [
             <div>
               <div className="flex w-full items-center justify-between max-lg:flex-col max-lg:items-start max-lg:gap-0">
               <h1 className="flex items-center gap-1 text-start text-2xl font-bold max-lg:hidden">
-                {regionName ? (
+               
+                {regionName || countryName ? (
                   <>
                     <span>{countryName}</span>
-                    <KeyboardArrowRightIcon />
-                    <span>{regionName}</span>
+                    {regionName && (
+                      <>
+                        <KeyboardArrowRightIcon />
+                        <span>{regionName}</span>
+                      </>
+                    )}
 
                     <span>
                       {isLoading ? (
@@ -1030,13 +1084,15 @@ const top_duration = [
 
                <div className="flex flex-col items-start gap-2 lg:hidden">
                   <p className="text-[20px] font-bold leading-6 text-[#1C1C1E]">
-                    {regionName ? (
+                    {regionName || countryName ? (
                       <>
                         <span>{countryName}</span>
-                        <KeyboardArrowRightIcon />
-                        <span>
-                          {regionName} 
-                        </span>
+                        {regionName && (
+                          <>
+                            <KeyboardArrowRightIcon />
+                            <span>{regionName}</span>
+                          </>
+                        )}
                       </>
                     ) : (
                       t('Filter uchun Kerakli davlat va shaharni tanlang')
@@ -1047,7 +1103,7 @@ const top_duration = [
                         <span className="animate-pulse">
                           {t('run_search')}
                         </span>
-                      ) : ticket && (regionName || ticket?.data?.total_items > 0) ? (
+                      ) : ticket && (regionName || countryName || ticket?.data?.total_items > 0) ? (
                         <>
                           {ticket.data.total_items} {t('ta tur topildi')}
                         </>
@@ -1055,7 +1111,7 @@ const top_duration = [
                         ''
                       )}
                     </p>
-                                    </div>
+              </div>
 
 
               </div>
