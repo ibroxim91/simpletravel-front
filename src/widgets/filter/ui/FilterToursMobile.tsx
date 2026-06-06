@@ -127,6 +127,19 @@ const hideText = pathname.includes('/selectour') || pathname.includes('/selectou
     destListScrollRef.current?.scrollTo(0, 0);
   }, [selectedCountryDes?.id]);
 
+  const getDefaultDepartureId = () => {
+    const defaultRegion =
+      defaultCountry?.regions.find((r) => r.default_region) ??
+      defaultCountry?.regions[0];
+    return defaultRegion ? String(defaultRegion.id) : null;
+  };
+
+  const resolveDepartureParam = () =>
+    searchParams.get('departure') ||
+    (selectedRegion ? String(selectedRegion.id) : '') ||
+    getDefaultDepartureId() ||
+    '';
+
   const filteredCountries =
     (ticket &&
       ticket.filter((c) =>
@@ -277,10 +290,10 @@ useEffect(() => {
   const saveFilter = () => {
     const hasDestination = Boolean(selectedRegionDes);
     const hasCountryId = Boolean(selectedDestCountryId);
-    const departureParam = searchParams.get('departure');
+    const departureParam = resolveDepartureParam();
 
     if (!departureParam || (!hasDestination && !hasCountryId)) {
-      toast.error("Avval davlat va shaharni tanlang!");
+      toast.error("choice_country_and_region");
       return;
     }
 

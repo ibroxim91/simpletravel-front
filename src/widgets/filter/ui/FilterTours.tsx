@@ -108,8 +108,10 @@ const hideText = pathname.includes('/selectour') || pathname.includes('/selectou
   };
 
   const resolveDepartureParam = () =>
-    searchParams.get('departure');
-    selectedRegion || getDefaultDepartureId() || '';
+    searchParams.get('departure') ||
+    selectedRegion ||
+    getDefaultDepartureId() ||
+    '';
 
   function getPassengerText(count: number) {
     const lastTwo = count % 100;
@@ -310,7 +312,7 @@ useEffect(() => {
     const departureParam = resolveDepartureParam();
 
     if (!departureParam || (!hasDestination && !hasCountryId)) {
-      toast.error("Avval davlat va shaharni tanlang!");
+      toast.error("choice_country_and_region");
       return;
     }
 
