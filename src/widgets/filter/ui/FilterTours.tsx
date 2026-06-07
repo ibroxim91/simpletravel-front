@@ -732,6 +732,7 @@ const defaultitems = selectedCountry
                     setFromDate(val?.from);
                     setToDate(val?.to);
                   }}
+                  disabled={{ before: new Date() }}
                   numberOfMonths={2}
                   className="text-[#212122]"
                 />

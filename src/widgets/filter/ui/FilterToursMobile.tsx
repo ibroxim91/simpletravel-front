@@ -778,6 +778,7 @@ useEffect(() => {
                     setFromDate(val?.from);
                     setToDate(val?.to);
                   }}
+                  disabled={{ before: new Date() }}
                   numberOfMonths={1}
                   className="rounded-md w-full"
                 />
