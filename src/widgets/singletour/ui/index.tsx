@@ -37,13 +37,13 @@ import Hotel2 from '../../../../public/images/hotel2.png';
 import Hotel3 from '../../../../public/images/hotel3.png';
 import Hotel4 from '../../../../public/images/hotel4.png';
 import Hotel_MEAL from '../../../../public/images/hotel_meal.png';
-import Hotel1 from '../../../../public/images/hotel_name.png';
-import Support from '../../../../public/images/support.png';
-import Food from '../../../../public/images/hotel_meal.png';
-import Insurance from '../../../../public/images/approved.png';
-import Bus from '../../../../public/images/bus.png';
+import Hotel1 from '../../../../public/icons/hotel.svg';
+import Support from '../../../../public/icons/support.svg';
+import Food from '../../../../public/icons/meal.svg';
+import Insurance from '../../../../public/icons/insurance.svg';
+import Bus from '../../../../public/icons/transfer.svg';
 import Hotel_Star from '../../../../public/images/hotel_star.png';
-import Flight from '../../../../public/images/flight.png';
+import Flight from '../../../../public/icons/flight.svg';
 import { TicketsDetailAPi } from '../lib/api';
 import HotelInfoItem from './HotelInfoItem';
 import TourDayItem from './TourDayItem';
@@ -502,9 +502,9 @@ const includedServicesToRender = [
 
                   <div className="flex w-full max-w-[301px] flex-col items-end gap-4 max-lg:hidden max-lg:items-start">
                     <h1 className="text-right text-[24px] leading-[29px] max-lg:text-left font-bold text-[#1C1C1E]">
-                      {formatPrice(data.price, locale as LanguageRoutes, true)} /{' '}
+                      {Number(data.price_full).toLocaleString('uz-UZ')}  uzs 
                       <span className="text-[24px] font-normal">
-                        {data?.passenger_count} {t('человек')}
+                       /{' '} {data?.passenger_count} {t('человек')}
                       </span>
                     </h1>
                     <div className="flex items-center gap-6">
@@ -799,7 +799,7 @@ const includedServicesToRender = [
 
               <div className="mt-12 mb-12 flex w-full flex-col gap-4 lg:hidden">
                 <p className="w-full text-left text-[20px] font-bold leading-6 text-[#1C1C1E]">
-                  {formatPrice(data.price, locale as LanguageRoutes, true)} /{' '}
+                {Number(data.price_full).toLocaleString('uz-UZ')} uzs  /{' '}
                   <span className="font-normal">{data.passenger_count || 1} {t('человек')}</span>
                 </p>
                 {user ? (
