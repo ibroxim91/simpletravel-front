@@ -8,24 +8,36 @@ export const formatPrice = (
 ) => {
   const numericAmount = Number(amount) || 0;
 
-  // label tilga qarab
-  const label = withLabel
-    ? locale === LanguageRoutes.RU
-      ? ' млн сум'
-      : locale === LanguageRoutes.UZ
-        ? " mln so'm"
+  let formatted = "";
+  let label = "";
+
+  // Agar milliondan katta bo‘lsa → qisqartiramiz
+  if (numericAmount >= 1_000_000) {
+    const mlnValue = numericAmount / 1_000_000;
+
+    formatted = mlnValue % 1 === 0
+      ? mlnValue.toString()
+      : mlnValue.toFixed(1);
+
+    label = withLabel
+      ? locale === LanguageRoutes.RU
+        ? " млн сум"
         : " mln so'm"
-    : '';
+      : "";
+  } else {
+    // Oddiy formatlash (minglarda)
+    formatted = numericAmount.toString();
+    label = withLabel
+      ? locale === LanguageRoutes.RU
+        ? " сум"
+        : " so'm"
+      : "";
+  }
 
-  // butun yoki kasr qismini chiqarish
-  const formatted =
-    numericAmount % 1 === 0
-      ? numericAmount.toString()
-      : numericAmount.toFixed(1);
-
-  // vergul bilan ko‘rsatish (7.2 → 7,2)
-  return formatted.replace('.', ',') + label;
+  // Vergul bilan ko‘rsatish (7.2 → 7,2)
+  return formatted.replace(".", ",") + label;
 };
+
 
 // export const formatPrice = (
 //   amount: number | string,

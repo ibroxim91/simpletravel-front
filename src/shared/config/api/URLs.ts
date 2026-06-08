@@ -13,6 +13,7 @@ const GET_TAGS = '/api/v1/category/';
 const COUNTRIES = '/api/v1/countries/';
 
 const HOTEL_MEAL_PLAN = '/api/v1/hotel-meal-plan/';
+const POPULAR_DESTINATIONS = '/api/v1/popular-destinations/';
 
 //Auth
 const PHONE_SENDOTP = '/api/v1/auth/register/';
@@ -107,4 +108,5 @@ export {
   UPDATE_USER,
   GET_TICKET_COMMENTS,
   GET_TICKETS_FROM_GO,
+  POPULAR_DESTINATIONS,
 };

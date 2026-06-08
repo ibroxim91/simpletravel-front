@@ -12,19 +12,20 @@ import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import DestinationCard from './cards/DestinationCard';
 
+
 const Populardestinations = () => {
   const params = useParams<{ locale: LanguageRoutes }>();
   const locale = params?.locale as LanguageRoutes;
   const t = useTranslations();
-  const { data: ticket, isLoading } = useQuery({
+  const { data: popularDestionations, isLoading } = useQuery({
     queryKey: ['ticket_home_popular'],
     queryFn: () =>
-      Ticket_Api.GetHomeTickets(),
+      Ticket_Api.GetPopularDestination(),
     select(data) {
-      return data.data.results.tickets;
+      return data.results;
     },
   });
-  const popular = ticket?.slice(0, 8) ?? [];
+ 
 
   return (
     <section className="custom-container">
@@ -43,7 +44,7 @@ const Populardestinations = () => {
             ? Array.from({ length: 8 }).map((_, idx) => (
                 <Skeleton key={idx} className="h-[340px] rounded-[14px]" />
               ))
-            : popular.map((item: any, index: number) => (
+            : popularDestionations.map((item: any, index: number) => (
                 <DestinationCard
                   key={item.id}
                   item={item}
@@ -55,12 +56,14 @@ const Populardestinations = () => {
               ))}
         </div>
 
+      
+
         <div className="mt-6 hidden grid-cols-3 gap-3 md:grid xl:hidden">
           {isLoading
             ? Array.from({ length: 6 }).map((_, idx) => (
                 <Skeleton key={idx} className="h-[220px] rounded-[14px]" />
               ))
-            : popular.map((item: any) => (
+            : popularDestionations.map((item: any) => (
                 <Link
                   key={item.id}
                   href={`/selectour/?page=1&departure=${item?.departure_id ?? ''}&destination=${item?.destination_id ?? ''}`}
@@ -97,7 +100,7 @@ const Populardestinations = () => {
             ? Array.from({ length: 8 }).map((_, idx) => (
                 <Skeleton key={idx} className="h-[200px] w-[157px] rounded-[14px]" />
               ))
-            : popular.map((item: any) => (
+            : popularDestionations.map((item: any) => (
                 <Link
                   key={item.id}
                  href={`/selectour/?page=1&departure=${item?.departure_id ?? ''}&destination=${item?.destination_id ?? ''}`}

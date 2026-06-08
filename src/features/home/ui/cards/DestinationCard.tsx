@@ -15,6 +15,7 @@ interface DestinationCardProps {
   onClick?: () => void;
 }
 
+
 const DestinationCard = ({
   item,
   index: _index = 0,
@@ -28,16 +29,8 @@ const DestinationCard = ({
         href={`/selectour/?page=1&departure=${item?.departure_id ?? ''}&destination=${item?.destination_id ?? ''}`}
         className="group relative block h-[340px] overflow-hidden rounded-[14px]"
         prefetch
-        // onClick={onClick},
-        onClick={() => {
-                    localStorage.setItem('tourOperator', item?.operator ?? '');
-                    localStorage.setItem('tour', JSON.stringify(item));
-                    localStorage.setItem(
-                      'tourOperatorId',
-                      String(item?.tour_operator_id ?? ''),
-                    );
-                    localStorage.setItem('from_cache', String(item?.from_cache ?? ''));
-                  }}
+        onClick={onClick}
+        
       >
         <Image
           src={item.ticket_images}

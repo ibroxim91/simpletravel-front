@@ -2,6 +2,7 @@ import httpClient from '@/shared/config/api/httpClient';
 import httpClientTickets from '@/shared/config/api/httpClientTickets';
 import {
   GET_TICKETS,
+  POPULAR_DESTINATIONS,
   GET_TICKETS_FROM_GO,
   HOTEL_MEAL_PLAN,
   SAVE_TICKETS,
@@ -16,6 +17,11 @@ const Ticket_Api = {
   async GetHomeTickets() {
     
     const res = await httpClient.get(HOMETICKETS);
+    return res.data;
+  },
+
+  async GetPopularDestination(){
+    const res = await httpClient.get(POPULAR_DESTINATIONS);
     return res.data;
   },
   
