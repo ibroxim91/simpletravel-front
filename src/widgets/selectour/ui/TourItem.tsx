@@ -279,10 +279,10 @@ const isLiked = likedIds.includes(data.tour_operator_id)
 
             <div className="flex w-[153px] shrink-0 flex-col items-end max-lg:w-auto max-lg:min-w-[108px]">
               <p className="whitespace-nowrap text-right text-sm font-medium leading-[17px] text-[#6B7280]/75 line-through max-lg:text-xs">
-                {formatPrice(data.price * 1.1, locale as LanguageRoutes, true)}
+                {formatPrice(data.price_full * 1.1, locale as LanguageRoutes, true)}
               </p>
               <p className="whitespace-nowrap text-right text-2xl font-bold leading-[29px] text-[#FF6B00] max-lg:text-xl max-lg:leading-6">
-                {formatPrice(data.price, locale as LanguageRoutes, true)}
+                {formatPrice(data.price_full, locale as LanguageRoutes, true)}
               </p>
               <p className="text-right text-sm font-medium leading-[17px] text-[#FF6B00]">
                 {data.passenger_count} {" "} {data.passenger_count === 1 ? t('человек') : t('человекa')}
@@ -398,11 +398,11 @@ const isLiked = likedIds.includes(data.tour_operator_id)
             <div className="mt-auto flex min-h-[49px] w-full shrink-0 items-end justify-between gap-2 pt-4">
               <div className="flex w-[163px] shrink-0 flex-col items-start justify-center gap-0 p-0">
                 <p className="w-full min-w-0 shrink-0 text-left text-[12px] font-medium leading-[15px] text-[#112211]/75 line-through">
-                  {formatPrice(data.price * 1.55, locale as LanguageRoutes, true)}
+                  {formatPrice(data?.price_full * 1.55, locale as LanguageRoutes, true)}
                 </p>
                 <div className="flex min-h-[34px] w-[163px] flex-col justify-center gap-0 text-[#FF6B00]">
                   <p className="text-[16px] font-bold leading-5">
-                    {formatPrice(data.price, locale as LanguageRoutes, true)}
+                    {formatPrice(data?.price_full, locale as LanguageRoutes, true)}
                   </p>
 
                   <p className="text-[12px] font-medium leading-[15px]">

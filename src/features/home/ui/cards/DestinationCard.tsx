@@ -23,6 +23,13 @@ const DestinationCard = ({
   fromLabel,
   onClick,
 }: DestinationCardProps) => {
+  
+  const Label =
+    locale === LanguageRoutes.RU
+      ? "от" // rus tilida narx oldida
+      : locale === LanguageRoutes.UZ
+        ? ""   // uz tilida narxdan keyin "dan" qo‘shamiz
+        : "";
   return (
     <div>
       <Link
@@ -45,7 +52,9 @@ const DestinationCard = ({
               {item.destination?.name || item.title}
             </p>
             <p className="mt-2 text-base font-medium leading-5 text-white">
-              {fromLabel} {formatPrice(item.price, locale, true)}
+             {locale === LanguageRoutes.RU
+                ? `${Label} ${formatPrice(item.price, locale, true)}`
+                : `${formatPrice(item.price, locale, true)} dan`}
             </p>
           </div>
           <span className="grid h-9 w-9 place-items-center rounded-full bg-[#E5E7EB]/75 text-white">
