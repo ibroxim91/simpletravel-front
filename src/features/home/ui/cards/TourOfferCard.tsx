@@ -101,10 +101,10 @@ TourOfferCard = ({
                   <div className="mt-auto flex items-end justify-between">
                     <div>
                       <p className="text-[12px] leading-[15px] text-[#F59E0B] line-through">
-                        {formatPrice(oldPrice, locale, true)}
+                       {oldPrice} {t('mln')} {t('сум')}
                       </p>
                       <p className="text-[14px] font-bold leading-[17px] text-[#1C1C1E]">
-                        {formatPrice(item.price, locale, true)}
+                        {item.price} {t('mln')} {t('сум')}
                       </p>
                     </div>
                     <span className="hidden h-9 w-9 place-items-center rounded-full bg-[#E5E7EB]/80 text-white md:grid">
