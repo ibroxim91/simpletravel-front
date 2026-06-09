@@ -16,6 +16,7 @@ import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import TourOfferCard from './cards/TourOfferCard';
+import router from 'next/router';
 
 type TourOffersSectionProps = {
   queryKey: string;
@@ -147,7 +148,12 @@ const TourOffersSection = ({
           </div>
 
           <div className="mt-8 w-full md:mt-10 md:flex md:justify-center">
-            <Button className="h-12 w-full rounded-[14px] bg-[#E8F1FF] text-[14px] font-medium text-[#1C1C1E] hover:bg-[#DCE8FF] md:h-[60px] md:w-[292px] md:text-base md:font-normal">
+            <Button className="h-12 w-full rounded-[14px] bg-[#E8F1FF] text-[14px] font-medium text-[#1C1C1E]
+             hover:bg-[#DCE8FF] md:h-[60px] md:w-[292px] md:text-base md:font-normal"
+             onClick={() => {
+              router.push('/selectour?page=1');
+             }}
+             >
               {t('Смотреть все туры')}
             </Button>
           </div>
