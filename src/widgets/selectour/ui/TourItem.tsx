@@ -131,6 +131,7 @@ const isLiked = likedIds.includes(data.tour_operator_id)
       full_board: 'FB',
       all_inclusive: 'AI',
       ultra_all_inclusive: 'UAI',
+      "ALL_INCLUSIVE...": 'AI',
     };
     return mealMap[normalized] || meal.toUpperCase();
   };
@@ -370,7 +371,7 @@ const isLiked = likedIds.includes(data.tour_operator_id)
                   </div>
   
                     
-                   <div className="flex items-center gap-6">
+                   <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
                     {/* Meal plan */}
                     <div className="flex items-center gap-2">
                       <img src="/icons/meal.png" alt="meal" className="w-4 h-4 shrink-0" />
@@ -379,8 +380,16 @@ const isLiked = likedIds.includes(data.tour_operator_id)
                       </p>
                     </div>
 
+                    {/* Duration days */}
+                    <div className="flex items-center gap-2">
+                      <img src="/icons/time.png" alt="time" className="w-4 h-4 shrink-0" />
+                      <p className="text-[12px] font-medium leading-[15px] text-[#1C1C1E]">
+                        {data.duration_days || '7'} {t('дней')}
+                      </p>
+                    </div>
+
                     {/* Departure date */}
-                    <div className="flex items-center gap-2 ml-3">
+                    <div className="flex items-center gap-2">
                       <img src="/icons/airplan.png" alt="airplane" className="w-4 h-4 shrink-0" />
                       <p className="text-[12px] font-medium leading-[15px] text-[#1C1C1E]">
                         {formatDepartureDate(data.departure_time)}

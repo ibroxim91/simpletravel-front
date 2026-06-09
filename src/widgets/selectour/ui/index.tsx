@@ -341,6 +341,14 @@ useEffect(() => {
 
 
   useEffect(() => {
+
+    const scrollTo = searchParams.get('scrollTo');
+    if (scrollTo === 'true') {
+      window.scrollTo({
+        top: 700, 
+        behavior: 'smooth',
+      });
+    }
     const departure = getSearchParam('departure') || selectedDefaulDestination || '';
     const destination = getSearchParam('destination') || '';
     const country_id = getSearchParam('country_id') || '';
@@ -1552,7 +1560,7 @@ const top_duration = [
           {ticket && ticket.data.total_pages > 1 && (
             <div className="mt-10 flex w-full items-end justify-end">
              
-              {selectedDestinations ? (
+              {selectedDestinations || countryName ? (
   <Pagination className="flex justify-end">
     <PaginationContent>
       <Button
