@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 import PaymePayment from '../../../../public/images/payme-payment.png';
 import { Get_Info, Ticketorder_Api } from '../lib/api';
 import formStore from '../lib/hook';
+import { downloadOrderVoucherPdf } from './orderPdf';
 import PaidModal from './PaidModal';
 
 type Props = {
@@ -43,6 +44,7 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
   );
   const tariff = JSON.parse(localStorage.getItem('info') || '{}');
   const price = JSON.parse(localStorage.getItem('totalPrice') || '0');
+  const tourData = JSON.parse(localStorage.getItem('tour') || '{}');
   const [isPaid, setIsPaid] = useState<boolean>(false);
   const [isPaidMobile, setIsPaidMobile] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -76,22 +78,27 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
     },
   });
 
-  const { mutate: downloadPdf } = useMutation({
-    mutationFn: (body: { order_id: number; lang: string }) =>
-      Ticketorder_Api.downloadPdf(body),
-    onSuccess: (res) => {
-      const blob = new Blob([res.data], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `ticket-order-${orderId}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    },
-    onError: () => {
-      toast.error('Произошла ошибка при отправке. Попробуйте ещё раз.');
+  const { mutate: downloadPdf, isPending: isPdfDownloading } = useMutation({
+    mutationFn: async (body: { order_id: number; lang: LanguageRoutes }) =>
+      downloadOrderVoucherPdf({
+        orderId: body.order_id,
+        locale: body.lang,
+        labels: {
+          bookingTime: t('Bron qilingan vaqt'),
+          hotelAndTransfer: t('Hotel va transfer'),
+          tourists: t('Turistlar'),
+          stayDates: t('Yashash sanalari'),
+          hotelName: t('Отель'),
+          mealType: t('Ovqatlanish turi'),
+          transferType: t('Transfer turi'),
+          roomType: t('Xona turi'),
+          receivingCompany: t('Qabul qiluvchi kompaniya'),
+          voucher: t('Voucher'),
+        },
+      }),
+    onError: (error: unknown) => {
+      console.error('Voucher PDF error:', error);
+      toast.error(t('Произошла ошибка при отправке. Попробуйте ещё раз.'));
     },
   });
 
@@ -100,7 +107,7 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
   async function onSubmit() {
     setIsPaid(true);
     mutate({
-      order_id: orderId!,
+      order_id: order_id!,
       paymentType: 'click',
       return_url:
         process.env.NEXT_PUBLIC_ORDER_RETURN_LINK || 'http://localhost:3000/uz',
@@ -112,7 +119,7 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
     setSuccess(false);
 
     mutate({
-      order_id: orderId!,
+      order_id: order_id!,
       paymentType: 'click',
       return_url:
         process.env.NEXT_PUBLIC_ORDER_RETURN_LINK || 'http://localhost:3000/uz',
@@ -126,7 +133,7 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
         <hr className="h-[2px] my-[24px] bg-[#DFDFDF] " />
         <div className="flex my-5 justify-between flex-col items-start gap-2 bg-[#EDEEF180] p-[20px] rounded-[20px] border-2 border-[#EDEEF180]">
           <h1 className="text-2xl font-bold text-[#212122]">
-            {price && formatPrice(price, locale as LanguageRoutes, true)}
+           {tourData?.price_full} {t('mln')} {t('сум')}
           </h1>
           <p className="text-[#050B08] font-medium">{t('Общая сумма')}</p>
         </div>
@@ -250,18 +257,20 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
           <h1 className="text-2xl font-bold text-[#212122]">
             {t('Подробности заказа')}
           </h1>
+          
           <button
+            disabled={!order_id || isPdfDownloading}
             onClick={() =>
               downloadPdf({
                 lang: locale as LanguageRoutes,
-                order_id: orderId!,
+                order_id: order_id!,
               })
             }
-            className="flex items-center gap-[10px] cursor-pointer px-[15px] py-[10px] border-2 rounded-full border-[#DFDFDF] max-lg:w-full justify-center hover:bg-gray-50 transition-colors"
+            className="flex items-center gap-[10px] cursor-pointer px-[15px] py-[10px] border-2 rounded-full border-[#DFDFDF] max-lg:w-full justify-center hover:bg-gray-50 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
           >
             <InsertDriveFileIcon sx={{ color: '#031753' }} />
             <p className="text-[#031753] font-semibold text-lg">
-              {t('Скачать PDF')}
+              {isPdfDownloading ? t('Загрузка') : t('Скачать PDF')}
             </p>
           </button>
         </div>

@@ -70,6 +70,39 @@ export interface Get_Info {
   };
 }
 
+export interface SamoOrderParticipant {
+  id: number;
+  first_name: string;
+  last_name: string;
+  gender?: 'male' | 'female';
+}
+
+export interface SamoOrder {
+  id: number;
+  tour_operator_id: string;
+  tour_operator: string;
+  title: string;
+  price: string;
+  total_price: number | string;
+  check_in_date: string;
+  check_out_date: string;
+  order_status: string;
+  payment_type?: string | null;
+  destination_id: number;
+  destination_name: string;
+  destination_country_name?: string;
+  departure_id: number;
+  departure_name: string;
+  departure_country_name?: string;
+  passenger_count: number;
+  duration_days: number;
+  hotel_id?: number;
+  hotel_name?: string;
+  meal_plan?: string;
+  rating?: string;
+  participant: SamoOrderParticipant[] | number[];
+}
+
 export interface Create_Ticketorder {
   departure: string;
   destination: string;
@@ -122,6 +155,13 @@ export const Ticketorder_Api = {
     const res = await httpClient.post(DONWLOAD_PDF, body, {
       responseType: 'blob',
     });
+    return res;
+  },
+
+  async getOrderById({ id }: { id: number }) {
+    const res = await httpClient.get<SamoOrder | { data: SamoOrder }>(
+      `${TICKETORDER}${id}/`,
+    );
     return res;
   },
 };
