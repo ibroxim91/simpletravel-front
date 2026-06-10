@@ -1,3 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Питание">
-  <path fill="#0B66F6" d="M26 10a4 4 0 0 1 4 4v9a16 16 0 0 1-8 13.9V56a4 4 0 1 1-8 0V36.9A16 16 0 0 1 6 23v-9a4 4 0 0 1 8 0v10h4V14a4 4 0 1 1 8 0v10h4V14a4 4 0 0 1 4-4zM45 10c7.2 0 13 6.8 13 15.2V56a4 4 0 1 1-8 0V42h-8c-3.3 0-6-2.7-6-6V25.2C36 16.8 40.1 10 45 10z"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path fill="#0B66F6" d="M16 8h2v16h2V8h4v16h2V8h4v18a6 6 0 0 1-6 6v24h-4V32a6 6 0 0 1-6-6z"/><path fill="#0B66F6" d="M46 8c4 0 6 4 6 9v39h-6V8z"/></svg>

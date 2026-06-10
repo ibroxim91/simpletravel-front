@@ -1,6 +1,7 @@
 'use client';
 
 import { LanguageRoutes } from '@/shared/config/i18n/types';
+import { formatPrice } from '@/shared/lib/formatPrice';
 import dayjs from 'dayjs';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
@@ -619,6 +620,7 @@ type OrderVoucherDocumentProps = {
 
 export function VoucherDocument({
   order,
+  locale,
   tourExtras,
   printDateTime,
   assets,
@@ -631,7 +633,7 @@ export function VoucherDocument({
   const mealCode = getMealShort(order.meal_plan);
   const transferType =
     tourExtras.freight_external || tourExtras.place || 'GROUP';
-  const hotelBlock = `${order.hotel_name || order.title || '—'} (${roomType}, ${mealCode})`;
+  const hotelBlock = `${order.hotel_name || order.title || '—'} (${roomType})`;
   const departureLocation = formatLocationWithCountry(
     order.departure_name,
     order.departure_country_name,
@@ -640,6 +642,8 @@ export function VoucherDocument({
     order.destination_name,
     order.destination_country_name,
   );
+  const tourPrice = order.total_price ?? order.price;
+  const formattedTourPrice = `${Number(tourPrice).toLocaleString('uz-UZ')} uzs`
 
   return (
     <div
@@ -771,11 +775,12 @@ export function VoucherDocument({
       >
         <thead>
           <tr>
-            <Th width="24%">Название / Title</Th>
-            <Th width="18%">Откуда / Departure</Th>
-            <Th width="18%">Куда / Destination</Th>
-            <Th width="14%">Пассажиры / Passengers</Th>
-            <Th width="14%">Длительность / Duration</Th>
+            <Th width="20%">Название / Title</Th>
+            <Th width="15%">Откуда / Departure</Th>
+            <Th width="15%">Куда / Destination</Th>
+            <Th width="10%">Пассажиры / Passengers</Th>
+            <Th width="12%">Длительность / Duration</Th>
+            <Th width="14%">Цена / Price</Th>
           </tr>
         </thead>
         <tbody>
@@ -786,9 +791,10 @@ export function VoucherDocument({
             <Td>{order.passenger_count ?? '—'}</Td>
             <Td>
               {order.duration_days
-                ? `${order.duration_days} ${order.duration_days === 1 ? 'день' : 'дней'}`
+                ? `${order.duration_days} ${order.duration_days === 1 ? 'ночь/night' : 'ночей/nights'}`
                 : '—'}
             </Td>
+            <Td bold>{formattedTourPrice}</Td>
           </tr>
         </tbody>
       </table>
@@ -812,7 +818,7 @@ export function VoucherDocument({
           <tr>
             <Th width="18%">Туристы / Tourists</Th>
             <Th width="16%">Проживание / Accommodation</Th>
-            <Th width="28%">Отель / Тип номера / Питание</Th>
+            <Th width="28%">Отель- Тип номера/ Hotel- Room Type</Th>
             <Th width="16%"> Тип питания / Meal Type</Th>
             <Th width="22%">Принимающая компания / DMC</Th>
           </tr>

@@ -133,7 +133,7 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
         <hr className="h-[2px] my-[24px] bg-[#DFDFDF] " />
         <div className="flex my-5 justify-between flex-col items-start gap-2 bg-[#EDEEF180] p-[20px] rounded-[20px] border-2 border-[#EDEEF180]">
           <h1 className="text-2xl font-bold text-[#212122]">
-           {tourData?.price_full} {t('mln')} {t('сум')}
+           {Number(tourData?.price_full).toLocaleString('uz-UZ')} uzs
           </h1>
           <p className="text-[#050B08] font-medium">{t('Общая сумма')}</p>
         </div>
