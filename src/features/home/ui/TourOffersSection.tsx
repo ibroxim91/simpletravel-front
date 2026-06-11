@@ -16,7 +16,8 @@ import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import TourOfferCard from './cards/TourOfferCard';
-import router from 'next/router';
+import {  useRouter } from '@/shared/config/i18n/navigation';
+
 
 type TourOffersSectionProps = {
   queryKey: string;
@@ -46,7 +47,7 @@ const TourOffersSection = ({
     queryFn: () => Ticket_Api.GetHomeTickets(),
     select: (res) => res.data.results.tickets ?? [],
   });
-
+  const router = useRouter();
   const tours = data?.slice(cardsStart, cardsEnd) ?? [];
   const carouselItems = isLoading ? Array.from({ length: 4 }) : tours;
 

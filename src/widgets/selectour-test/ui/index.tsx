@@ -57,6 +57,7 @@ import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import { useEffect, useRef, useState } from 'react';
 import Ticket_Api, { hotel_meal_plan } from '../lib/api';
+import { ensureDestinationInParams } from '../lib/ensureDestinationParams';
 import { useFilterTickectsStore } from '../lib/store';
 import { TickectAll, TickectAllFilter } from '../lib/types';
 import CheckboxFilter from './CheckBox';
@@ -79,6 +80,7 @@ type FilterLocalState = {
   toDate: string;
   selectData: string;
   where: string;
+  country_id?: string;
   operator?: string;
   town?: string;
   hotel_id?: string;
@@ -88,6 +90,78 @@ type FilterLocalState = {
 const isEqualState = (a: unknown, b: unknown) =>
   JSON.stringify(a) === JSON.stringify(b);
 
+type HotelListItem = NonNullable<
+  TickectAll['data']['results']['hotels']
+>[number];
+
+const sortHotelsByRating = (hotels: HotelListItem[]) =>
+  [...hotels].sort((a, b) => {
+    const aIsNumber = typeof a.rating === 'number';
+    const bIsNumber = typeof b.rating === 'number';
+
+    if (aIsNumber && bIsNumber) {
+      const aRating = a.rating as number;
+      const bRating = b.rating as number;
+      if (aRating !== bRating) return aRating - bRating;
+      return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+    }
+
+    if (aIsNumber) return -1;
+    if (bIsNumber) return 1;
+
+    const ratingCompare = String(a.rating).localeCompare(
+      String(b.rating),
+      undefined,
+      { sensitivity: 'base' },
+    );
+    if (ratingCompare !== 0) return ratingCompare;
+    return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+  });
+
+type StreamTicketCache = {
+  key: string;
+  tickets: any[];
+  hotels: HotelListItem[];
+  totalItems: number;
+  totalPages: number;
+  minPrice: number;
+  maxPrice: number;
+  createdAt: number;
+};
+
+function buildStreamSearchKey(values: Record<string, unknown>) {
+  return JSON.stringify(values);
+}
+
+function getStreamTicketCache(): StreamTicketCache | null {
+  try {
+    const raw = localStorage.getItem('stream_ticket_cache');
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+function saveStreamTicketCache(key: string, data: Omit<StreamTicketCache, 'key' | 'createdAt'>) {
+  const payload: StreamTicketCache = {
+    key,
+    ...data,
+    createdAt: Date.now(),
+  };
+  localStorage.setItem('stream_ticket_cache', JSON.stringify(payload));
+}
+
+function calcPriceBounds(tickets: { price_full?: number }[]) {
+  const prices = tickets
+    .map((t) => t.price_full)
+    .filter((p): p is number => typeof p === 'number' && p > 0);
+  if (prices.length === 0) {
+    return { min: 2_500_000, max: 100_000_000 };
+  }
+  return { min: Math.min(...prices), max: Math.max(...prices) };
+}
+
 export default function SelectourTest() {
   const params = useParams<{ locale: LanguageRoutes }>();
   const locale = params?.locale as LanguageRoutes;
@@ -95,7 +169,13 @@ export default function SelectourTest() {
   const [isSearchClicked, setIsSearchClicked] = useState(false);
    const prevRegionRef = useRef<string | null>(null);
 const prevHotelsRef = useRef<any[] | null>(null);
-  const [priceRange, setPriceRange] = useState<number[] | []>([]);
+  const [priceRange, setPriceRange] = useState<number[]>([]);
+  const [appliedPriceRange, setAppliedPriceRange] = useState<number[]>([]);
+  const [streamPriceBounds, setStreamPriceBounds] = useState({
+    min: 2_500_000,
+    max: 100_000_000,
+  });
+  const prevFilterBaseKeyRef = useRef('');
   const {
     durationDays,
     setDestinations,
@@ -107,6 +187,8 @@ const prevHotelsRef = useRef<any[] | null>(null);
     hotel_features_by_type,
     hotel_type,
   } = useFilterTickectsStore();
+
+  const streamUrl = process.env.NEXT_PUBLIC_TICKETS_API_URL + '/stream-samo/tickets';
   const [hotelName, setHotelName] = useState<string>('');
   const [hotelID, setHotelID] = useState<string | null>(null);
   const [expensive, setExpensive] = useState<boolean>(false);
@@ -140,13 +222,99 @@ const prevHotelsRef = useRef<any[] | null>(null);
   const [streamTotalItems, setStreamTotalItems] = useState(0);
   const [streamFromCache, setStreamFromCache] = useState(false);
 
+  const priceLimits = useMemo(() => {
+    if (streamPriceBounds.min < streamPriceBounds.max) {
+      return streamPriceBounds;
+    }
+    return { min: 2_500_000, max: 100_000_000 };
+  }, [streamPriceBounds]);
+
+  const sliderValue =
+    priceRange.length === 2
+      ? priceRange
+      : [priceLimits.min, priceLimits.max];
+
+  const applyPriceFilter = (range: number[]) => {
+    const clampedMin = Math.max(
+      priceLimits.min,
+      Math.min(range[0], priceLimits.max),
+    );
+    const clampedMax = Math.max(
+      clampedMin,
+      Math.min(range[1], priceLimits.max),
+    );
+    const nextRange = [clampedMin, clampedMax];
+    setPriceRange(nextRange);
+    setAppliedPriceRange(nextRange);
+    setCurrentPage(1);
+  };
+
+  const applyDestinationFallback = (params: URLSearchParams) => {
+    ensureDestinationInParams(params, {
+      destination: filterLocal?.where || selectedDestinations,
+      country_id: filterLocal?.country_id,
+    });
+  };
 
   const handleInputChange = (value: string, index: number) => {
     const numericValue = Number(value.replace(/\s/g, '')) || 0;
-    const newRange = [...priceRange];
-    newRange[index] = numericValue;
-    setPriceRange(newRange);
+    const baseRange =
+      priceRange.length === 2 ? [...priceRange] : [...sliderValue];
+    baseRange[index] = numericValue;
+    setPriceRange(baseRange);
   };
+
+  const handlePriceInputBlur = () => {
+    if (priceRange.length === 2) {
+      applyPriceFilter(priceRange);
+    }
+  };
+
+  const filterBaseKey = useMemo(
+    () =>
+      JSON.stringify({
+        from: filterLocal?.from,
+        where: filterLocal?.where,
+        country_id: filterLocal?.country_id,
+        date: filterLocal?.date,
+        toDate: filterLocal?.toDate,
+        town: filterLocal?.town,
+        hotel_id: filterLocal?.hotel_id,
+        mealPlan: filterLocal?.mealPlan,
+        selectedDurations,
+        hotelRating,
+        cheaper,
+        expensive,
+      }),
+    [
+      filterLocal?.from,
+      filterLocal?.where,
+      filterLocal?.country_id,
+      filterLocal?.date,
+      filterLocal?.toDate,
+      filterLocal?.town,
+      filterLocal?.hotel_id,
+      filterLocal?.mealPlan,
+      selectedDurations,
+      hotelRating,
+      cheaper,
+      expensive,
+    ],
+  );
+
+  useEffect(() => {
+    if (prevFilterBaseKeyRef.current !== filterBaseKey) {
+      prevFilterBaseKeyRef.current = filterBaseKey;
+      setPriceRange([]);
+      setAppliedPriceRange([]);
+    }
+  }, [filterBaseKey]);
+
+  useEffect(() => {
+    if (priceRange.length === 0 && priceLimits.min < priceLimits.max) {
+      setPriceRange([priceLimits.min, priceLimits.max]);
+    }
+  }, [priceLimits.min, priceLimits.max, priceRange.length]);
 
 useEffect(() => {
   const params = new URLSearchParams(window.location.search);
@@ -158,8 +326,17 @@ useEffect(() => {
 
 
   useEffect(() => {
+    const scrollTo = searchParams.get('scrollTo');
+    if (scrollTo === 'true') {
+      window.scrollTo({
+        top: 700,
+        behavior: 'smooth',
+      });
+    }
+
     const departure = getSearchParam('departure') || selectedDefaulDestination || '';
     const destination = getSearchParam('destination') || '';
+    const country_id = getSearchParam('country_id') || '';
     const dateFrom = getSearchParam('dateFrom') || '';
     const dateTo = getSearchParam('dateTo') || '';
     const adultsParam = getSearchParam('adults') || '0';
@@ -183,6 +360,7 @@ useEffect(() => {
       departure:departure,
       from_cache:from_cache,
       destination:destination,
+      country_id:country_id,
       dateFrom:dateFrom,
       dateTo:dateTo,
       duration:duration,
@@ -201,6 +379,7 @@ useEffect(() => {
     const filterData = {
       from: departure,
       where: destination,
+      country_id: country_id,
       date: dateFrom,
       operator: operator,
       toDate: dateTo,
@@ -249,15 +428,62 @@ useEffect(() => {
   useEffect(() => {
     if (!filterLocal) return;
 
+    const streamSearchValues: Record<string, unknown> = {
+      page: currentPage,
+      adults: filterLocal?.adults,
+      children: filterLocal?.children,
+      operator: filterLocal?.operator || '',
+      departure: filterLocal?.from || '',
+      destination: filterLocal?.where || '',
+      country_id: filterLocal?.country_id || '',
+      hotel_amenity: hotelAmenities || '',
+      hotel_id: filterLocal?.hotel_id || '',
+      town: filterLocal?.town || '',
+      hotel_type: hotelType || '',
+      cheapest: cheaper,
+      most_expensive: expensive,
+      dateFrom: filterLocal?.date || '',
+      dateTo: filterLocal?.toDate || '',
+      min_price:
+        appliedPriceRange.length === 2 ? appliedPriceRange[0] : undefined,
+      max_price:
+        appliedPriceRange.length === 2 ? appliedPriceRange[1] : undefined,
+      hotel_rating: hotelRating || '',
+      duration_days: selectedDurations || '',
+      meal_plan: filterLocal?.mealPlan || '',
+      hotel_feature: hotelFeature,
+    };
+
+    const streamCacheKey = buildStreamSearchKey(streamSearchValues);
+    const cachedStream = getStreamTicketCache();
+
+    if (cachedStream && cachedStream.key === streamCacheKey) {
+      setStreamTickets(cachedStream.tickets);
+      setStreamHotels(cachedStream.hotels);
+      setStreamTotalItems(cachedStream.totalItems);
+      setStreamTotalPages(cachedStream.totalPages);
+      setStreamTotal(cachedStream.totalItems);
+      setStreamPriceBounds({
+        min: cachedStream.minPrice,
+        max: cachedStream.maxPrice,
+      });
+      setStreamFromCache(true);
+      setIsStreaming(false);
+      setStreamError(null);
+      return;
+    }
+
     setIsStreaming(true);
     setStreamError(null);
     setStreamTickets([]);
     setStreamHotels([]);
+    setStreamTotalItems(0);
+    setStreamTotal(0);
+    setStreamFromCache(false);
 
     let es: EventSource | null = null;
     let allTickets: any[] = [];
 
-    // Helper function to merge and sort by price
     const mergeAndSort = (existing: any[], newItems: any[]) => {
       const merged = [...existing, ...newItems];
       merged.sort((a: any, b: any) => a.price_full - b.price_full);
@@ -273,30 +499,37 @@ useEffect(() => {
         operator: filterLocal?.operator || '',
         departure: filterLocal?.from || '',
         destination: filterLocal?.where || '',
+        country_id: filterLocal?.country_id || '',
         hotel_amenity: hotelAmenities || '',
         hotel_id: filterLocal?.hotel_id || '',
         town: filterLocal?.town || '',
         hotel_type: hotelType || '',
         cheapest: cheaper ? 'true' : 'false',
         most_expensive: expensive ? 'true' : 'false',
-        min_departure_date: filterLocal?.date
+        dateFrom: filterLocal?.date
           ? formatDate.format(filterLocal?.date, 'YYYY-MM-DD')
           : '',
-        max_departure_date: filterLocal?.toDate
+        dateTo: filterLocal?.toDate
           ? formatDate.format(filterLocal?.toDate, 'YYYY-MM-DD')
           : '',
-        min_price: priceRange[0]?.toString() || '',
-        max_price: priceRange[1]?.toString() || '',
         visa_required: visa === 'visa' ? 'true' : visa === 'no_visa' ? 'false' : '',
         hotel_rating: hotelRating || '',
         duration_days: selectedDurations || '',
         meal_plan: filterLocal?.mealPlan || '',
-        ...(hotelFeature.length > 0 && { hotel_feature: hotelFeature }),
       });
 
-      const streamUrl = `https://search.simpletravel.uz/stream-samo/tickets?${params}`;
-      
-      es = new EventSource(streamUrl);
+      if (appliedPriceRange.length === 2) {
+        params.set('min_price', String(appliedPriceRange[0]));
+        params.set('max_price', String(appliedPriceRange[1]));
+      }
+
+      hotelFeature.forEach((feature) => {
+        params.append('hotel_feature', feature);
+      });
+
+      // const streamUrl = `https://search.simpletravel.uz/stream-samo/tickets?${params}`;
+
+      es = new EventSource(streamUrl + '?' + params.toString());
 
       es.onopen = () => {
         console.log('EventSource connected');
@@ -334,10 +567,37 @@ useEffect(() => {
           }
 
           // Stream tugasi - hotels set qilib connection close qil
-          if (payload.end && payload.hotels) {
+          if (payload.end) {
             console.log('Stream finished');
-            setStreamHotels(payload.hotels);
+            const finalTotal =
+              payload.total_items ?? payload.total ?? allTickets.length;
+
+            setStreamTotalItems(finalTotal);
+            setStreamTotal(finalTotal);
+            if (payload.total_pages !== undefined) {
+              setStreamTotalPages(payload.total_pages);
+            }
+
+            const bounds = calcPriceBounds(allTickets);
+            if (payload.hotels) {
+              setStreamHotels(payload.hotels);
+            }
+            setStreamPriceBounds(bounds);
             setIsStreaming(false);
+
+            if (allTickets.length > 0) {
+              saveStreamTicketCache(streamCacheKey, {
+                tickets: allTickets,
+                hotels: payload.hotels ?? [],
+                totalItems: finalTotal,
+                totalPages:
+                  payload.total_pages ??
+                  Math.max(1, Math.ceil(finalTotal / 100)),
+                minPrice: bounds.min,
+                maxPrice: bounds.max,
+              });
+            }
+
             es?.close();
           }
         } catch (parseError) {
@@ -374,11 +634,12 @@ useEffect(() => {
     hotelType,
     cheaper,
     expensive,
-    priceRange,
+    appliedPriceRange,
     visa,
     hotelRating,
     selectedDurations,
     hotelFeature,
+    filterLocal?.country_id,
   ]);
 
   // Legacy useQuery for compatibility with other components
@@ -450,31 +711,39 @@ useEffect(() => {
   });
 
  
-const animatedCount = UseAnimatedNumber(streamTickets.length, 400);
+const animatedCountTarget = isStreaming
+  ? streamTickets.length
+  : streamTotalItems > 0
+    ? streamTotalItems
+    : streamTickets.length;
 
-const displayedHotels = useMemo(() => {
-  const currentRegion = filterLocal?.where ?? null;
-  const newHotels = streamHotels.length > 0 ? streamHotels : ticket?.data?.results?.hotels ?? [];
+const animatedCount = UseAnimatedNumber(animatedCountTarget, 400);
 
- 
-  if (
-    currentRegion !== null &&
-    prevRegionRef.current === currentRegion &&
-    Array.isArray(prevHotelsRef.current)
-  ) {
-    return prevHotelsRef.current;
+const isHotelLocked = Boolean(
+  searchParams.get('hotel_id') && searchParams.get('operator'),
+);
+
+const hotels = useMemo(() => {
+  const apiHotels =
+    streamHotels.length > 0
+      ? streamHotels
+      : (ticket?.data?.results?.hotels ?? []);
+
+  if (isHotelLocked) {
+    const list = prevHotelsRef.current?.length
+      ? prevHotelsRef.current
+      : apiHotels;
+    return sortHotelsByRating(list);
   }
 
-
-  if (Array.isArray(newHotels) && newHotels.length > 0) {
-    prevRegionRef.current = currentRegion;
-    prevHotelsRef.current = newHotels;
-    return newHotels;
+  if (apiHotels.length > 0) {
+    const sorted = sortHotelsByRating(apiHotels);
+    prevHotelsRef.current = sorted;
+    return sorted;
   }
 
-
-  return Array.isArray(prevHotelsRef.current) ? prevHotelsRef.current : [];
-}, [ticket, filterLocal?.where]);
+  return sortHotelsByRating(prevHotelsRef.current ?? []);
+}, [streamHotels, ticket, isHotelLocked]);
 
 
 const prevCountry = useRef<string | null>(null);
@@ -548,13 +817,27 @@ const top_duration = [
   
   }, [searchParams]);
 
-  const regionId = Number(filterLocal?.where);
-  const regionData = country?.find((c) =>
-    c.regions.some((r) => r.id === regionId),
-  );
+  const destinationRegionId = filterLocal?.where
+    ? Number(filterLocal.where)
+    : null;
+  const destinationCountryId = filterLocal?.country_id || null;
 
-  const regionName = regionData?.regions.find((r) => r.id === regionId)?.name;
-  const countryName = regionData?.name;
+  let regionName: string | undefined;
+  let countryName: string | undefined;
+
+  if (destinationRegionId && !Number.isNaN(destinationRegionId)) {
+    const regionData = country?.find((c) =>
+      c.regions.some((r) => r.id === destinationRegionId),
+    );
+    regionName = regionData?.regions.find(
+      (r) => r.id === destinationRegionId,
+    )?.name;
+    countryName = regionData?.name;
+  } else if (destinationCountryId) {
+    countryName = country?.find(
+      (c) => String(c.id) === destinationCountryId,
+    )?.name;
+  }
 
   return (
     <div className="min-h-screen bg-[#FAFBFC] pb-20">
@@ -657,39 +940,34 @@ const top_duration = [
           <FilterSection title={t('Стоимость')} icon='/icons/money.png'>
             <Slider
               range
-              min={2500000}
-              max={100000000}
-              value={priceRange}
+              min={priceLimits.min}
+              max={priceLimits.max}
+              value={sliderValue}
               className="placeholder:!text-[#909091] !text-[#909091]"
-              onChange={(v) => {
-                setPriceRange(v as number[]);
-                setCurrentPage(1);
-              }}
+              onChange={(v) => setPriceRange(v as number[])}
+              onChangeComplete={(v) => applyPriceFilter(v as number[])}
             />
             <div className="flex justify-between mt-3 border border-[#DFDFDF] rounded-xl p-3">
               <input
                 type="text"
-                value={formatPrice(priceRange[0])}
-                placeholder="2 500 000"
-                onChange={(e) => {
-                  handleInputChange(e.target.value, 0);
-                  setCurrentPage(1);
-                }}
+                value={formatPrice(sliderValue[0])}
+                placeholder={formatPrice(priceLimits.min)}
+                onChange={(e) => handleInputChange(e.target.value, 0)}
+                onBlur={handlePriceInputBlur}
                 className={clsx(
                   'w-1/2 border-none outline-none',
-                  priceRange[0] ? 'text-[#212122]' : 'text-[#909091]',
+                  sliderValue[0] ? 'text-[#212122]' : 'text-[#909091]',
                 )}
               />
               <input
                 type="text"
-                value={formatPrice(priceRange[1])}
-                onChange={(e) => {
-                  handleInputChange(e.target.value, 1);
-                  setCurrentPage(1);
-                }}
+                value={formatPrice(sliderValue[1])}
+                placeholder={formatPrice(priceLimits.max)}
+                onChange={(e) => handleInputChange(e.target.value, 1)}
+                onBlur={handlePriceInputBlur}
                 className={clsx(
                   'w-1/2 border-none outline-none text-right',
-                  priceRange[1] ? 'text-[#212122]' : 'text-[#909091]',
+                  sliderValue[1] ? 'text-[#212122]' : 'text-[#909091]',
                 )}
               />
             </div>
@@ -748,14 +1026,14 @@ const top_duration = [
                               setSelectedDurations(value);
                               setCurrentPage(1);
 
-                              // URL paramName="duration" ni yangilash
                               const params = new URLSearchParams(window.location.search);
                               if (value) {
                                 params.set("duration", value);
                               } else {
                                 params.delete("duration");
                               }
-                              window.history.replaceState({}, "", `${window.location.pathname}?${params.toString()}`);
+                              applyDestinationFallback(params);
+                              router.replace(`/selectour-test?${params.toString()}`, { scroll: false });
                             }}
                             className="w-full h-[40px] px-2 rounded bg-transparent border-none outline-none focus:ring-0"
                           >
@@ -815,8 +1093,9 @@ const top_duration = [
                               if (val) {
                                 params.set("town", typeof val === 'string' ? val : '');
                               } else {
-                                params.delete("town"); // ❌ check olib tashlansa URL’dan o‘chadi
+                                params.delete("town");
                               }
+                              applyDestinationFallback(params);
                               router.replace(`/selectour-test?${params.toString()}`, { scroll: false });
                             }}
                         selectedValue={selectedTown}
@@ -844,11 +1123,15 @@ const top_duration = [
                   setHotelRating(val ? rating : null);
                   setCurrentPage(1);
 
-                  // URL parametrlardan hotel_id va operatorni olib tashlash
                   const params = new URLSearchParams(window.location.search);
                   params.delete("hotel_id");
                   params.delete("operator");
-
+                  if (val) {
+                    params.set("rating", rating);
+                  } else {
+                    params.delete("rating");
+                  }
+                  applyDestinationFallback(params);
                   router.push(`/selectour-test?${params.toString()}`);
                 }}
                 selectedValue={hotelRating}
@@ -877,42 +1160,42 @@ const top_duration = [
 
           <div className="w-full rounded-[14px] bg-[#FAFBFC] p-4">
        <FilterSection title={t('Отель')} defaultHidden icon="/icons/hotel.png">
-        {displayedHotels.map((hotel, hotelIndex) => (
-          <CheckboxFilter
-            key={`${hotel.id}-${hotelIndex}`}
-            value={String(hotel.id)}
-            label={
-              <span className="flex flex-wrap items-center gap-2">
-                <span>{hotel.name}</span>
-                <span className="text-sm text-[#909091]">
-                  {typeof hotel.rating === 'number' ? `${hotel.rating}★` : hotel.rating}
+        {hotels.length > 0 ? (
+          hotels.map((hotel, hotelIndex) => (
+            <CheckboxFilter
+              key={`${hotel.id}-${hotelIndex}`}
+              value={String(hotel.id)}
+              label={
+                <span className="flex flex-wrap items-center gap-2">
+                  <span>{hotel.name}</span>
+                  <span className="text-sm text-[#909091]">
+                    {typeof hotel.rating === 'number'
+                      ? `${hotel.rating}★`
+                      : hotel.rating}
+                  </span>
                 </span>
-              </span>
-            }
-            setChecked={(val) => {
-              console.log("VAL ", val)
-              
-              // URL parametrlarga qo‘shish
-              const params = new URLSearchParams(window.location.search);
-              if (val) {
-                setHotelID(String(hotel.id));
-                
-                params.set('hotel_id', String(hotel.id));
-                params.set('operator', String((hotel as any).operator ?? ''));
-              }else{
-                setHotelID(null);
-                params.delete('hotel_id');
-                params.delete('operator');
-
               }
-
-              router.push(`/selectour-test?${params.toString()}`);
-            }}
-            selectedValue={hotelID}
-            exclusive
-            // paramName="hotel_name"
-          />
-        ))}
+              setChecked={(val) => {
+                const params = new URLSearchParams(window.location.search);
+                if (val) {
+                  setHotelID(String(hotel.id));
+                  params.set('hotel_id', String(hotel.id));
+                  params.set('operator', String((hotel as any).operator ?? ''));
+                } else {
+                  setHotelID(null);
+                  params.delete('hotel_id');
+                  params.delete('operator');
+                }
+                applyDestinationFallback(params);
+                router.push(`/selectour-test?${params.toString()}`);
+              }}
+              selectedValue={hotelID}
+              exclusive
+            />
+          ))
+        ) : (
+          <p className="text-sm text-gray-500">{t('Отели не найдены')}</p>
+        )}
       </FilterSection>
       </div>
 
@@ -938,39 +1221,34 @@ const top_duration = [
           <FilterSection title={t('Цена')}  icon="/icons/money.png">
             <Slider
               range
-              min={2500000}
-              max={100000000}
-              value={priceRange}
+              min={priceLimits.min}
+              max={priceLimits.max}
+              value={sliderValue}
               className="placeholder:!text-[#909091] !text-[#909091]"
-              onChange={(v) => {
-                setPriceRange(v as number[]);
-                setCurrentPage(1);
-              }}
+              onChange={(v) => setPriceRange(v as number[])}
+              onChangeComplete={(v) => applyPriceFilter(v as number[])}
             />
             <div className="mt-3 flex justify-between rounded-xl border border-[#DFDFDF] p-3">
               <input
                 type="text"
-                value={formatPrice(priceRange[0])}
-                placeholder="2 500 000"
-                onChange={(e) => {
-                  handleInputChange(e.target.value, 0);
-                  setCurrentPage(1);
-                }}
+                value={formatPrice(sliderValue[0])}
+                placeholder={formatPrice(priceLimits.min)}
+                onChange={(e) => handleInputChange(e.target.value, 0)}
+                onBlur={handlePriceInputBlur}
                 className={clsx(
                   'w-1/2 border-none text-xs leading-3 outline-none',
-                  priceRange[0] ? 'text-[#848484]' : 'text-[#909091]',
+                  sliderValue[0] ? 'text-[#848484]' : 'text-[#909091]',
                 )}
               />
               <input
                 type="text"
-                value={formatPrice(priceRange[1])}
-                onChange={(e) => {
-                  handleInputChange(e.target.value, 1);
-                  setCurrentPage(1);
-                }}
+                value={formatPrice(sliderValue[1])}
+                placeholder={formatPrice(priceLimits.max)}
+                onChange={(e) => handleInputChange(e.target.value, 1)}
+                onBlur={handlePriceInputBlur}
                 className={clsx(
                   'w-1/2 border-none text-right text-xs leading-3 outline-none',
-                  priceRange[1] ? 'text-[#848484]' : 'text-[#909091]',
+                  sliderValue[1] ? 'text-[#848484]' : 'text-[#909091]',
                 )}
               />
             </div>
@@ -984,20 +1262,31 @@ const top_duration = [
             <div>
               <div className="flex w-full items-center justify-between max-lg:flex-col max-lg:items-start max-lg:gap-0">
                 <h1 className="flex items-center gap-1 text-start text-2xl font-bold max-lg:hidden">
-                  {regionName ? (
+                  {regionName || countryName ? (
                     <>
                       <span>{countryName}</span>
-                      <KeyboardArrowRightIcon />
-                      <span>
-                        {regionName} {ticket && ticket ? t('ga tegishli') : ''}
-                      </span>
+                      {regionName ? (
+                        <>
+                          <KeyboardArrowRightIcon />
+                          <span>{regionName}</span>
+                        </>
+                      ) : null}
+                      {/* <span>
+                        {!isStreaming ? t('ga tegishli') : ''}
+                      </span> */}
                     </>
                   ) : (
                     t('Filter uchun Kerakli davlat va shaharni tanlang')
                   )}{' '}
-                  {(regionName || streamTotalItems > 0) ? (
+                  {(regionName || countryName || streamTotalItems > 0 || isStreaming) ? (
                     <>
+                    
                       {animatedCount} {t('ta tur topildi')}
+                      {isStreaming && (
+                        <span className="text-sm font-normal text-[#8E8E93]  animate-pulse ml-2">
+                          {t('run_search')}
+                        </span>
+                      )}
                     </>
                   ) : (
                     ''
@@ -1006,10 +1295,34 @@ const top_duration = [
 
                 <div className="flex flex-col items-start gap-2 lg:hidden">
                   <p className="text-[20px] font-bold leading-6 text-[#1C1C1E]">
-                    {t('Горящие туры: успейте забронировать!')}
+                    {regionName || countryName ? (
+                      <>
+                        <span>{countryName}</span>
+                        {regionName && (
+                          <>
+                            <KeyboardArrowRightIcon />
+                            <span>{regionName}</span>
+                          </>
+                        )}
+                      </>
+                    ) : (
+                      t('Filter uchun Kerakli davlat va shaharni tanlang')
+                    )}
                   </p>
                   <p className="text-[14px] font-normal leading-[17px] text-[#1C1C1E]">
-                    {t('Лучшие направления по минимальным ценам')}
+                    {(regionName || countryName || streamTotalItems > 0 || isStreaming) ? (
+                      <>
+                        
+                        {animatedCount} {t('ta tur topildi')}
+                        {isStreaming && (
+                          <span className="text-[12px] font-normal text-[#8E8E93]  animate-pulse ml-2">
+                            {t('run_search')}
+                          </span>
+                        )}
+                      </>
+                    ) : (
+                      ''
+                    )}
                   </p>
                 </div>
 
@@ -1143,22 +1456,27 @@ const top_duration = [
                 <FilterSection title={t('Стоимость')} icon="/icons/money.png">
                   <Slider
                     range
-                    min={2500000}
-                    max={100000000}
-                    value={priceRange}
+                    min={priceLimits.min}
+                    max={priceLimits.max}
+                    value={sliderValue}
                     onChange={(v) => setPriceRange(v as number[])}
+                    onChangeComplete={(v) => applyPriceFilter(v as number[])}
                   />
                   <div className="mt-3 flex justify-between rounded-xl border border-[#DFDFDF] p-3">
                     <input
                       type="text"
-                      value={formatPrice(priceRange[0])}
+                      value={formatPrice(sliderValue[0])}
+                      placeholder={formatPrice(priceLimits.min)}
                       onChange={(e) => handleInputChange(e.target.value, 0)}
+                      onBlur={handlePriceInputBlur}
                       className="w-1/2 border-none text-gray-600 outline-none"
                     />
                     <input
                       type="text"
-                      value={formatPrice(priceRange[1])}
+                      value={formatPrice(sliderValue[1])}
+                      placeholder={formatPrice(priceLimits.max)}
                       onChange={(e) => handleInputChange(e.target.value, 1)}
+                      onBlur={handlePriceInputBlur}
                       className="w-1/2 border-none text-right text-gray-600 outline-none"
                     />
                   </div>
@@ -1253,8 +1571,9 @@ const top_duration = [
                               if (val) {
                                 params.set("town", typeof val === 'string' ? val : '');
                               } else {
-                                params.delete("town"); // ❌ check olib tashlansa URL’dan o‘chadi
+                                params.delete("town");
                               }
+                              applyDestinationFallback(params);
                               router.replace(`/selectour-test?${params.toString()}`, { scroll: false });
                             }}
                         selectedValue={selectedTown}
@@ -1276,11 +1595,15 @@ const top_duration = [
         setHotelRating(val ? rating : null);
         setCurrentPage(1);
 
-        // URL parametrlardan hotel_id va operatorni olib tashlash
         const params = new URLSearchParams(window.location.search);
         params.delete("hotel_id");
         params.delete("operator");
-
+        if (val) {
+          params.set("rating", rating);
+        } else {
+          params.delete("rating");
+        }
+        applyDestinationFallback(params);
         router.push(`/selectour-test?${params.toString()}`);
       }}
       selectedValue={hotelRating}
@@ -1322,41 +1645,43 @@ const top_duration = [
             </FilterSection>
 
             <FilterSection title={t('Отели')} icon="/icons/hotel.png">
-              {displayedHotels.map((hotel, hotelIndex) => (
-                <CheckboxFilter
-                  key={`${hotel.id}-${hotelIndex}`}
-                  value={String(hotel.id)}
-                  label={
-                    <span className="flex flex-wrap items-center gap-2">
-                      <span>{hotel.name}</span>
-                      <span className="text-sm text-[#909091]">
-                        {typeof hotel.rating === 'number' ? `${hotel.rating}★` : hotel.rating}
+              {hotels.length > 0 ? (
+                hotels.map((hotel, hotelIndex) => (
+                  <CheckboxFilter
+                    key={`${hotel.id}-${hotelIndex}`}
+                    value={String(hotel.id)}
+                    label={
+                      <span className="flex flex-wrap items-center gap-2">
+                        <span>{hotel.name}</span>
+                        <span className="text-sm text-[#909091]">
+                          {typeof hotel.rating === 'number'
+                            ? `${hotel.rating}★`
+                            : hotel.rating}
+                        </span>
                       </span>
-                    </span>
-                  }
-                  onclick={setCurrentPage}
-                  // setChecked={setHotelName}
-                  selectedValue={hotelID}
-                  exclusive
-                   setChecked={(val) => {
-                     console.log("VAL ", val)
-                     const params = new URLSearchParams(window.location.search);
-                     if(val){
-                      setHotelID(String(hotel.id));
-                       params.set('hotel_id', String(hotel.id));
-                      params.set('operator', String((hotel as any).operator ?? ''));
-                      }else{
-                          setHotelID(null);
-                          params.delete('hotel_id');
-                          params.delete('operator');
-
-                        }
-
-                        router.push(`/selectour-test?${params.toString()}`);
-                      }}
-                  // paramName="hotel_name"
-                />
-              ))}
+                    }
+                    onclick={setCurrentPage}
+                    selectedValue={hotelID}
+                    exclusive
+                    setChecked={(val) => {
+                      const params = new URLSearchParams(window.location.search);
+                      if (val) {
+                        setHotelID(String(hotel.id));
+                        params.set('hotel_id', String(hotel.id));
+                        params.set('operator', String((hotel as any).operator ?? ''));
+                      } else {
+                        setHotelID(null);
+                        params.delete('hotel_id');
+                        params.delete('operator');
+                      }
+                      applyDestinationFallback(params);
+                      router.push(`/selectour-test?${params.toString()}`);
+                    }}
+                  />
+                ))
+              ) : (
+                <p className="text-sm text-gray-500">{t('Отели не найдены')}</p>
+              )}
             </FilterSection>
 
             {hotel_features_by_type.map((row) => (

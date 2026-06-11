@@ -124,7 +124,9 @@ export default function Selectour() {
   const [isSearchClicked, setIsSearchClicked] = useState(false);
    const prevRegionRef = useRef<string | null>(null);
 const prevHotelsRef = useRef<any[] | null>(null);
-  const [priceRange, setPriceRange] = useState<number[] | []>([]);
+  const [priceRange, setPriceRange] = useState<number[]>([]);
+  const [appliedPriceRange, setAppliedPriceRange] = useState<number[]>([]);
+  const prevFilterBaseKeyRef = useRef('');
   const {
     durationDays,
     setDestinations,
@@ -167,11 +169,41 @@ const [isError, setIsError] = useState(false);
 const [error, setError] = useState<Error | null>(null);
 
 
+  const priceLimits = useMemo(() => {
+    const min = ticket?.data?.results?.min_price;
+    const max = ticket?.data?.results?.max_price;
+    if (min != null && max != null && max > min) {
+      return { min, max };
+    }
+    return { min: 2_500_000, max: 100_000_000 };
+  }, [ticket?.data?.results?.min_price, ticket?.data?.results?.max_price]);
+
+  const sliderValue =
+    priceRange.length === 2
+      ? priceRange
+      : [priceLimits.min, priceLimits.max];
+
+  const applyPriceFilter = (range: number[]) => {
+    const clampedMin = Math.max(priceLimits.min, Math.min(range[0], priceLimits.max));
+    const clampedMax = Math.max(clampedMin, Math.min(range[1], priceLimits.max));
+    const nextRange = [clampedMin, clampedMax];
+    setPriceRange(nextRange);
+    setAppliedPriceRange(nextRange);
+    setCurrentPage(1);
+  };
+
   const handleInputChange = (value: string, index: number) => {
     const numericValue = Number(value.replace(/\s/g, '')) || 0;
-    const newRange = [...priceRange];
-    newRange[index] = numericValue;
-    setPriceRange(newRange);
+    const baseRange =
+      priceRange.length === 2 ? [...priceRange] : [...sliderValue];
+    baseRange[index] = numericValue;
+    setPriceRange(baseRange);
+  };
+
+  const handlePriceInputBlur = () => {
+    if (priceRange.length === 2) {
+      applyPriceFilter(priceRange);
+    }
   };
 
 
@@ -199,6 +231,8 @@ function generateSearchKey(params: TickectAllFilter) {
     duration_days: params.duration_days,
     cheapest: params.cheapest,
     most_expensive: params.most_expensive,
+    min_price: params.min_price,
+    max_price: params.max_price,
   });
 }
 function getTicketCache(): TicketCache | null {
@@ -253,6 +287,12 @@ const loadTickets = async () => {
     hotel_rating: hotelRating ?? '',
     duration_days: selectedDurations ?? '',
     meal_plan: filterLocal?.mealPlan ?? '',
+    ...(appliedPriceRange.length === 2
+      ? {
+          min_price: appliedPriceRange[0],
+          max_price: appliedPriceRange[1],
+        }
+      : {}),
   };
 
   const currentKey = generateSearchKey(params);
@@ -324,6 +364,60 @@ useEffect(() => {
   hotelRating,
   cheaper,
   expensive,
+  appliedPriceRange,
+]);
+
+const filterBaseKey = useMemo(
+  () =>
+    JSON.stringify({
+      from: filterLocal?.from,
+      where: filterLocal?.where,
+      country_id: filterLocal?.country_id,
+      date: filterLocal?.date,
+      toDate: filterLocal?.toDate,
+      town: filterLocal?.town,
+      hotel_id: filterLocal?.hotel_id,
+      mealPlan: filterLocal?.mealPlan,
+      selectedDurations,
+      hotelRating,
+      cheaper,
+      expensive,
+    }),
+  [
+    filterLocal?.from,
+    filterLocal?.where,
+    filterLocal?.country_id,
+    filterLocal?.date,
+    filterLocal?.toDate,
+    filterLocal?.town,
+    filterLocal?.hotel_id,
+    filterLocal?.mealPlan,
+    selectedDurations,
+    hotelRating,
+    cheaper,
+    expensive,
+  ],
+);
+
+useEffect(() => {
+  if (prevFilterBaseKeyRef.current !== filterBaseKey) {
+    prevFilterBaseKeyRef.current = filterBaseKey;
+    setPriceRange([]);
+    setAppliedPriceRange([]);
+  }
+}, [filterBaseKey]);
+
+useEffect(() => {
+  const min = ticket?.data?.results?.min_price;
+  const max = ticket?.data?.results?.max_price;
+  if (min == null || max == null || max <= min) return;
+  if (priceRange.length === 0) {
+    setPriceRange([min, max]);
+  }
+}, [
+  ticket?.data?.results?.min_price,
+  ticket?.data?.results?.max_price,
+  priceRange.length,
 ]);
 
 useEffect(() => {
@@ -724,39 +818,34 @@ const top_duration = [
           <FilterSection title={t('Стоимость')} icon='/icons/money.png'>
             <Slider
               range
-              min={2500000}
-              max={100000000}
-              value={priceRange}
+              min={priceLimits.min}
+              max={priceLimits.max}
+              value={sliderValue}
               className="placeholder:!text-[#909091] !text-[#909091]"
-              onChange={(v) => {
-                setPriceRange(v as number[]);
-                setCurrentPage(1);
-              }}
+              onChange={(v) => setPriceRange(v as number[])}
+              onChangeComplete={(v) => applyPriceFilter(v as number[])}
             />
             <div className="flex justify-between mt-3 border border-[#DFDFDF] rounded-xl p-3">
               <input
                 type="text"
-                value={formatPrice(priceRange[0])}
-                placeholder="2 500 000"
-                onChange={(e) => {
-                  handleInputChange(e.target.value, 0);
-                  setCurrentPage(1);
-                }}
+                value={formatPrice(sliderValue[0])}
+                placeholder={formatPrice(priceLimits.min)}
+                onChange={(e) => handleInputChange(e.target.value, 0)}
+                onBlur={handlePriceInputBlur}
                 className={clsx(
                   'w-1/2 border-none outline-none',
-                  priceRange[0] ? 'text-[#212122]' : 'text-[#909091]',
+                  sliderValue[0] ? 'text-[#212122]' : 'text-[#909091]',
                 )}
               />
               <input
                 type="text"
-                value={formatPrice(priceRange[1])}
-                onChange={(e) => {
-                  handleInputChange(e.target.value, 1);
-                  setCurrentPage(1);
-                }}
+                value={formatPrice(sliderValue[1])}
+                placeholder={formatPrice(priceLimits.max)}
+                onChange={(e) => handleInputChange(e.target.value, 1)}
+                onBlur={handlePriceInputBlur}
                 className={clsx(
                   'w-1/2 border-none outline-none text-right',
-                  priceRange[1] ? 'text-[#212122]' : 'text-[#909091]',
+                  sliderValue[1] ? 'text-[#212122]' : 'text-[#909091]',
                 )}
               />
             </div>
@@ -1008,39 +1097,34 @@ const top_duration = [
           <FilterSection title={t('Цена')}  icon="/icons/money.png">
             <Slider
               range
-              min={2500000}
-              max={100000000}
-              value={priceRange}
+              min={priceLimits.min}
+              max={priceLimits.max}
+              value={sliderValue}
               className="placeholder:!text-[#909091] !text-[#909091]"
-              onChange={(v) => {
-                setPriceRange(v as number[]);
-                setCurrentPage(1);
-              }}
+              onChange={(v) => setPriceRange(v as number[])}
+              onChangeComplete={(v) => applyPriceFilter(v as number[])}
             />
             <div className="mt-3 flex justify-between rounded-xl border border-[#DFDFDF] p-3">
               <input
                 type="text"
-                value={formatPrice(priceRange[0])}
-                placeholder="2 500 000"
-                onChange={(e) => {
-                  handleInputChange(e.target.value, 0);
-                  setCurrentPage(1);
-                }}
+                value={formatPrice(sliderValue[0])}
+                placeholder={formatPrice(priceLimits.min)}
+                onChange={(e) => handleInputChange(e.target.value, 0)}
+                onBlur={handlePriceInputBlur}
                 className={clsx(
                   'w-1/2 border-none text-xs leading-3 outline-none',
-                  priceRange[0] ? 'text-[#848484]' : 'text-[#909091]',
+                  sliderValue[0] ? 'text-[#848484]' : 'text-[#909091]',
                 )}
               />
               <input
                 type="text"
-                value={formatPrice(priceRange[1])}
-                onChange={(e) => {
-                  handleInputChange(e.target.value, 1);
-                  setCurrentPage(1);
-                }}
+                value={formatPrice(sliderValue[1])}
+                placeholder={formatPrice(priceLimits.max)}
+                onChange={(e) => handleInputChange(e.target.value, 1)}
+                onBlur={handlePriceInputBlur}
                 className={clsx(
                   'w-1/2 border-none text-right text-xs leading-3 outline-none',
-                  priceRange[1] ? 'text-[#848484]' : 'text-[#909091]',
+                  sliderValue[1] ? 'text-[#848484]' : 'text-[#909091]',
                 )}
               />
             </div>
@@ -1225,22 +1309,27 @@ const top_duration = [
                 <FilterSection title={t('Стоимость')} icon="/icons/money.png">
                   <Slider
                     range
-                    min={2500000}
-                    max={100000000}
-                    value={priceRange}
+                    min={priceLimits.min}
+                    max={priceLimits.max}
+                    value={sliderValue}
                     onChange={(v) => setPriceRange(v as number[])}
+                    onChangeComplete={(v) => applyPriceFilter(v as number[])}
                   />
                   <div className="mt-3 flex justify-between rounded-xl border border-[#DFDFDF] p-3">
                     <input
                       type="text"
-                      value={formatPrice(priceRange[0])}
+                      value={formatPrice(sliderValue[0])}
+                      placeholder={formatPrice(priceLimits.min)}
                       onChange={(e) => handleInputChange(e.target.value, 0)}
+                      onBlur={handlePriceInputBlur}
                       className="w-1/2 border-none text-gray-600 outline-none"
                     />
                     <input
                       type="text"
-                      value={formatPrice(priceRange[1])}
+                      value={formatPrice(sliderValue[1])}
+                      placeholder={formatPrice(priceLimits.max)}
                       onChange={(e) => handleInputChange(e.target.value, 1)}
+                      onBlur={handlePriceInputBlur}
                       className="w-1/2 border-none text-right text-gray-600 outline-none"
                     />
                   </div>

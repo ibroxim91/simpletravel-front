@@ -1,3 +1,7 @@
+import {
+  DESTINATION_DEPENDENT_PARAMS,
+  ensureDestinationInParams,
+} from '@/widgets/selectour-test/lib/ensureDestinationParams';
 import { Checkbox } from '@/shared/ui/checkbox';
 import { Label } from '@/shared/ui/label';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
@@ -85,6 +89,10 @@ function CheckboxFilter<T extends string | string[] | null>({
         } else {
           params.delete(paramName);
         }
+      }
+
+      if (DESTINATION_DEPENDENT_PARAMS.has(paramName)) {
+        ensureDestinationInParams(params);
       }
 
       router.push(`${pathname}?${params.toString()}`);
