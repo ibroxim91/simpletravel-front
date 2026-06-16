@@ -128,6 +128,7 @@ const prevHotelsRef = useRef<any[] | null>(null);
   const [priceRange, setPriceRange] = useState<number[]>([]);
   const [appliedPriceRange, setAppliedPriceRange] = useState<number[]>([]);
   const prevFilterBaseKeyRef = useRef('');
+  const ticketsFetchSignatureRef = useRef('');
   const {
     durationDays,
     setDestinations,
@@ -266,7 +267,7 @@ function saveTicketCache(
   );
 }
 
-const loadTickets = async () => {
+const loadTickets = async (priceForFetch: number[]) => {
   if (!filterLocal) return;
 
   const params: TickectAllFilter = {
@@ -289,10 +290,10 @@ const loadTickets = async () => {
     hotel_rating: hotelRating ?? '',
     duration_days: selectedDurations ?? '',
     meal_plan: filterLocal?.mealPlan ?? '',
-    ...(appliedPriceRange.length === 2
+    ...(priceForFetch.length === 2
       ? {
-          min_price: appliedPriceRange[0],
-          max_price: appliedPriceRange[1],
+          min_price: priceForFetch[0],
+          max_price: priceForFetch[1],
         }
       : {}),
   };
@@ -348,27 +349,6 @@ setError(null);
 }
 };
 
-useEffect(() => {
-  loadTickets();
-}, [
-  filterLocal?.from,
-  filterLocal?.where,
-  filterLocal?.country_id,
-  filterLocal?.adults,
-  filterLocal?.children,
-  filterLocal?.date,
-  filterLocal?.toDate,
-  filterLocal?.town,
-  filterLocal?.hotel_id,
-  filterLocal?.mealPlan,
-  currentPage,
-  selectedDurations,
-  hotelRating,
-  cheaper,
-  expensive,
-  appliedPriceRange,
-]);
-
 const filterBaseKey = useMemo(
   () =>
     JSON.stringify({
@@ -402,12 +382,46 @@ const filterBaseKey = useMemo(
 );
 
 useEffect(() => {
-  if (prevFilterBaseKeyRef.current !== filterBaseKey) {
+  if (!filterLocal) return;
+
+  const isNewSearch = prevFilterBaseKeyRef.current !== filterBaseKey;
+  const priceForFetch = isNewSearch ? [] : appliedPriceRange;
+
+  const signature = JSON.stringify({
+    filterBaseKey,
+    currentPage,
+    priceForFetch,
+    adults: filterLocal.adults,
+    children: filterLocal.children,
+    operator: filterLocal.operator,
+    hotelAmenities,
+    hotelType,
+  });
+
+  if (ticketsFetchSignatureRef.current === signature) {
+    return;
+  }
+  ticketsFetchSignatureRef.current = signature;
+
+  if (isNewSearch) {
     prevFilterBaseKeyRef.current = filterBaseKey;
     setPriceRange([]);
     setAppliedPriceRange([]);
   }
-}, [filterBaseKey]);
+
+  loadTickets(priceForFetch);
+}, [
+  filterBaseKey,
+  filterLocal,
+  currentPage,
+  appliedPriceRange,
+  hotelAmenities,
+  hotelType,
+  cheaper,
+  expensive,
+  hotelRating,
+  selectedDurations,
+]);
 
 useEffect(() => {
   const min = ticket?.data?.results?.min_price;
@@ -512,6 +526,14 @@ useEffect(() => {
   
     return filterData; // ✅ faqat o‘zgarsa
   });
+
+    const pageParam = getSearchParam('page');
+    const nextPage = pageParam ? Number(pageParam) : 1;
+    setCurrentPage((prev) => (prev === nextPage ? prev : nextPage));
+
+    setHotelRating(rating || null);
+    setSelectedDurations(duration || null);
+    setMealPlan(mealPlan || null);
    
     setSelectedDestinations(destination);
   }, [searchParams]);
@@ -688,18 +710,12 @@ const top_duration = [
 
   useEffect(() => {
     const params = new URLSearchParams(searchParamsString);
+    const urlPage = Number(params.get('page') || '1');
+    if (urlPage === currentPage) return;
+
     params.set('page', currentPage.toString());
-
     router.replace(`/selectour?${params.toString()}`, { scroll: false });
-  }, [currentPage, router, searchParams]);
-
-  useEffect(() => {
-    const pageParam = getSearchParam('page');
-    if (pageParam) {
-      setCurrentPage(Number(pageParam));
-    }
-  
-  }, [searchParams]);
+  }, [currentPage, router, searchParamsString]);
 
   useEffect(() => {
     const onScroll = () => {

@@ -298,13 +298,9 @@ useEffect(() => {
     }
 
     const params = new URLSearchParams();
-    
 
-    localStorage.removeItem('town')
-    localStorage.removeItem('mealPlan')
-    setHotelRating(null)
-    setSelectedDurations(null)
-    setMealPlan(null)
+    localStorage.removeItem('town');
+    localStorage.removeItem('mealPlan');
 
     params.set('departure', departureParam);
 
