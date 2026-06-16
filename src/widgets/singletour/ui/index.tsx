@@ -180,7 +180,13 @@ const data = typeof window !== 'undefined'
 
 
 const { data: hotelData, isLoading, error } = useQuery({
-  queryKey: ["hotel_detail", data.ticket_hotel[0].id],
+ 
+  queryKey: [
+    "hotel_detail",
+    data.hotel_db_id && data.hotel_db_id > 0
+      ? data.hotel_db_id
+      : data.ticket_hotel[0].id,
+  ],
   queryFn: async () => {
     const hotel = data.ticket_hotel[0];
     const url = new URL(`${BASE_URL}/api/v1/hotels/`);
@@ -190,6 +196,7 @@ const { data: hotelData, isLoading, error } = useQuery({
     url.searchParams.append("operator", data.operator);
     url.searchParams.append("country_id", data.destination.country.id.toString());
     url.searchParams.append("meal_plan", hotel.meal_plan);
+    url.searchParams.append("hotel_db_id", data.hotel_db_id?.toString() || "");
 
     const res = await fetch(url.toString(), {
       method: "GET",
