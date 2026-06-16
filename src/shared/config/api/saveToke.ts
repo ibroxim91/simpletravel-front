@@ -24,4 +24,5 @@ export const getRefToken = (): string | undefined => {
 
 export const removeRefToken = () => {
   Cookies.remove('simple-reftoken');
+  Cookies.remove('ref_auth_token');
 };

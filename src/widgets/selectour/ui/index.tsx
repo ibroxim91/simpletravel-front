@@ -34,6 +34,7 @@ import EastIcon from '@mui/icons-material/East';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import StarIcon from '@mui/icons-material/Star';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Drawer from '@mui/material/Drawer';
@@ -152,6 +153,7 @@ const prevHotelsRef = useRef<any[] | null>(null);
 
   const [selectedDestinations, setSelectedDestinations] = useState<string | null>(null);
   const [selectedDefaulDestination, setSelectedDefaulDestination] = useState<string | null>(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
   const [hotelRating, setHotelRating] = useState<string | null>(null);
   const [mealPlan, setMealPlan] = useState<string | null>(null);
   const [hotelType, setHotelTypes] = useState<string | null>(null);
@@ -699,6 +701,16 @@ const top_duration = [
   
   }, [searchParams]);
 
+  useEffect(() => {
+    const onScroll = () => {
+      setShowScrollTop(window.scrollY > 400);
+    };
+
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   const destinationRegionId = filterLocal?.where
     ? Number(filterLocal.where)
     : null;
@@ -1104,7 +1116,7 @@ const top_duration = [
               onChange={(v) => setPriceRange(v as number[])}
               onChangeComplete={(v) => applyPriceFilter(v as number[])}
             />
-            <div className="mt-3 flex justify-between rounded-xl border border-[#DFDFDF] p-3">
+            <div className="mt-3 flex items-center gap-2 rounded-xl border border-[#DFDFDF] p-3">
               <input
                 type="text"
                 value={formatPrice(sliderValue[0])}
@@ -1112,10 +1124,13 @@ const top_duration = [
                 onChange={(e) => handleInputChange(e.target.value, 0)}
                 onBlur={handlePriceInputBlur}
                 className={clsx(
-                  'w-1/2 border-none text-xs leading-3 outline-none',
+                  'min-w-0 flex-1 border-none text-xs leading-3 outline-none',
                   sliderValue[0] ? 'text-[#848484]' : 'text-[#909091]',
                 )}
               />
+              <span className="shrink-0 whitespace-nowrap px-1 text-[10px] leading-3 text-[#909091] sm:text-xs">
+                {t('mln')} uzs
+              </span>
               <input
                 type="text"
                 value={formatPrice(sliderValue[1])}
@@ -1123,7 +1138,7 @@ const top_duration = [
                 onChange={(e) => handleInputChange(e.target.value, 1)}
                 onBlur={handlePriceInputBlur}
                 className={clsx(
-                  'w-1/2 border-none text-right text-xs leading-3 outline-none',
+                  'min-w-0 flex-1 border-none text-right text-xs leading-3 outline-none',
                   sliderValue[1] ? 'text-[#848484]' : 'text-[#909091]',
                 )}
               />
@@ -1315,22 +1330,25 @@ const top_duration = [
                     onChange={(v) => setPriceRange(v as number[])}
                     onChangeComplete={(v) => applyPriceFilter(v as number[])}
                   />
-                  <div className="mt-3 flex justify-between rounded-xl border border-[#DFDFDF] p-3">
+                  <div className="mt-3 flex items-center gap-2 rounded-xl border border-[#DFDFDF] p-3">
                     <input
                       type="text"
                       value={formatPrice(sliderValue[0])}
                       placeholder={formatPrice(priceLimits.min)}
                       onChange={(e) => handleInputChange(e.target.value, 0)}
                       onBlur={handlePriceInputBlur}
-                      className="w-1/2 border-none text-gray-600 outline-none"
+                      className="min-w-0 flex-1 border-none text-gray-600 outline-none"
                     />
+                    <span className="shrink-0 whitespace-nowrap px-1 text-[10px] leading-3 text-[#909091] sm:text-xs">
+                      {t('mln')} uzs
+                    </span>
                     <input
                       type="text"
                       value={formatPrice(sliderValue[1])}
                       placeholder={formatPrice(priceLimits.max)}
                       onChange={(e) => handleInputChange(e.target.value, 1)}
                       onBlur={handlePriceInputBlur}
-                      className="w-1/2 border-none text-right text-gray-600 outline-none"
+                      className="min-w-0 flex-1 border-none text-right text-gray-600 outline-none"
                     />
                   </div>
                 </FilterSection>
@@ -1723,6 +1741,17 @@ const top_duration = [
           )}
         </div>
       </div>
+
+      {showScrollTop && (
+        <button
+          type="button"
+          aria-label={t('Yuqoriga qaytish')}
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="fixed z-50 flex items-center justify-center rounded-full bg-[#084FE3] text-white shadow-[0_4px_20px_rgba(8,79,227,0.35)] transition-transform hover:bg-[#0640c4] active:scale-95 bottom-[calc(1.5rem+env(safe-area-inset-bottom,0px))] right-4 h-11 w-11 sm:bottom-6 sm:right-6 sm:h-12 sm:w-12"
+        >
+          <KeyboardArrowUpIcon sx={{ fontSize: { xs: 24, sm: 28 } }} />
+        </button>
+      )}
     </div>
   );
 }
