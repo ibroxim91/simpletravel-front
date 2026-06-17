@@ -13,6 +13,7 @@ import { useParams } from 'next/navigation';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 import PaymePayment from '../../../../public/images/payme-payment.png';
+import MulticardPayment from '../../../../public/multicard.png';
 import { Get_Info, Ticketorder_Api } from '../lib/api';
 import formStore from '../lib/hook';
 import { downloadOrderVoucherPdf } from './orderPdf';
@@ -192,6 +193,31 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
           </label>
 
           <label
+            onClick={() => setPaymentType('multicard')}
+            htmlFor="payment-multicard"
+            className="cursor-pointer flex items-center gap-[10px] justify-between bg-[#EDEEF180] p-[20px] rounded-[20px] border-2 border-[#EDEEF180]"
+          >
+            <div className="flex items-center gap-[20px]">
+              <div className="w-[60px] h-[60px] relative rounded-[10px] overflow-hidden">
+                <Image
+                  src={MulticardPayment.src}
+                  alt="multicard-payment"
+                  className="object-cover"
+                  fill
+                  quality={100}
+                />
+              </div>
+              <p className="text-xl font-bold text-[#212122]">Multicard</p>
+            </div>
+            <input
+              type="radio"
+              id="payment-multicard"
+              name="payment"
+              className="w-[20px] h-[20px] border-2 border-[#EDEEF180] cursor-pointer"
+            />
+          </label>
+
+          <label
             onClick={() => setPaymentType('click')}
             htmlFor="payment-click"
             className="cursor-pointer flex items-center gap-[10px] justify-between bg-[#EDEEF180] p-[20px] rounded-[20px] border-2 border-[#EDEEF180]"
@@ -200,21 +226,23 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
               <div className="w-[60px] h-[60px] relative rounded-[10px] overflow-hidden">
                 <Image
                   src={Click.src}
-                  alt="payme-click"
+                  alt="multicard-payment"
                   className="object-cover"
                   fill
                   quality={100}
                 />
               </div>
-              <p className="text-xl font-bold text-[#212122]">Click</p>
+              <p className="text-xl font-bold text-[#212122]">Multicard</p>
             </div>
             <input
               type="radio"
-              id="payment-click"
+              id="payment-multicard"
               name="payment"
               className="w-[20px] h-[20px] border-2 border-[#EDEEF180] cursor-pointer"
             />
           </label>
+
+
         </div>
       </div>
 
