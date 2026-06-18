@@ -232,7 +232,7 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
                   quality={100}
                 />
               </div>
-              <p className="text-xl font-bold text-[#212122]">Multicard</p>
+              <p className="text-xl font-bold text-[#212122]">Click</p>
             </div>
             <input
               type="radio"

@@ -7,7 +7,9 @@ import { formatPrice } from '@/shared/lib/formatPrice';
 import { Badge } from '@/shared/ui/badge';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import BusinessIcon from '@mui/icons-material/Business';
+import PersonIcon from '@mui/icons-material/Person';
 import FmdGoodOutlinedIcon from '@mui/icons-material/FmdGoodOutlined';
+import TimelapseOutlinedIcon from '@mui/icons-material/TimelapseOutlined';
 import StarIcon from '@mui/icons-material/Star';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
@@ -20,6 +22,7 @@ interface TourOfferCardProps {
   fallbackHotelText: string;
   fallbackDurationText: string;
   starsText: string;
+  isPopularDestination: boolean;
 }
 
 const 
@@ -31,10 +34,18 @@ TourOfferCard = ({
   fallbackHotelText,
   fallbackDurationText,
   starsText,
+  isPopularDestination = false,
 }: TourOfferCardProps) => {
   const t = useTranslations();
-  const oldPrice = Math.round(Number(item.price || 0) * 1.23);
+  // const oldPrice = Math.round(Number(item.price || 0) * 1.23);
+  const formatHalfPrice = (price) => {
+    const num = parseFloat(price) / 2;   // string → number va 2 ga bo‘lish
+    return Math.round(num * 10) / 10;    // 1 kasr o‘rinda yaxlitlash
+  };
+  const currentPrice = isPopularDestination ? formatHalfPrice(item.price) : Number(item.price || 0);
+const oldPrice = Math.round(currentPrice / 0.7);
 
+  
   return (
     <div>
       <Link
@@ -52,12 +63,17 @@ TourOfferCard = ({
                         }}
       >
                 <div className="relative h-[153px] w-full overflow-hidden rounded-[14px] sm:h-[210px] xl:h-[233px]">
-                  <Image
-                    src={item.ticket_images}
-                    alt={item.title}
-                    fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
+                <Image
+                  src={
+                    isPopularDestination && item.hotel_photo && item.hotel_photo.trim() !== ""
+                      ? item.hotel_photo
+                      : item.ticket_images
+                  }
+                  alt={item.title}
+                  fill
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+
                   <div className="absolute left-3 top-3 z-10">
                     <span className="inline-flex h-[23px] items-center rounded-[14px] bg-[#FF6B00] px-2 text-[12px] font-medium text-white">
                       -30%
@@ -70,18 +86,28 @@ TourOfferCard = ({
                     <p className="min-h-[60px] overflow-hidden text-[16px] font-bold leading-5 text-black [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3] sm:min-h-10 sm:[-webkit-line-clamp:2]">
                       {item.title}
                     </p>
-                    <p className="text-[12px] font-normal leading-[15px] text-[#6B7280]">
+                    {/* <p className="text-[12px] font-normal leading-[15px] text-[#6B7280]">
                       {item.duration_days} {t('дней')}
-                    </p>
+                    </p> */}
                   </div>
 
                   <div className="space-y-1 text-[12px] font-medium text-[#6B7280]">
-                    <div className="flex items-center gap-2">
+                  {/* durations days */}
+                  <div className="flex items-center gap-2">
                       <FmdGoodOutlinedIcon sx={{ fontSize: 16, color: '#1A73E8' }} />
                       <span className="block min-w-0 truncate">
                         {item.destination?.name}
                       </span>
                     </div>
+                 
+                  <div className="flex items-center gap-2">
+                      <TimelapseOutlinedIcon sx={{ fontSize: 16, color: '#1A73E8' }} />
+                      <span className="block min-w-0 truncate">
+                        {item.duration_days} {t('ночей')}
+                      </span>
+                    </div>
+                   
+                   
                     <div className="flex items-center gap-2">
                       <BusinessIcon sx={{ fontSize: 16, color: '#1A73E8' }} />
                       <span className="block min-w-0 truncate">
@@ -96,6 +122,19 @@ TourOfferCard = ({
                         : item.ticket_hotel[0].rating}
                       </span>
                     </div>
+                    {/* passenger count */}
+                        {!isPopularDestination && (
+                    <div className="flex items-center gap-2">
+                      <PersonIcon sx={{ fontSize: 16, color: '#1A73E8' }} />
+                      <span className="block min-w-0 truncate">
+                      {isPopularDestination
+                              ? `1 ${t("человек")}`
+                              : `${item.passenger_count} ${
+                                  item.passenger_count === 1 ? t("человек") : t("человекa")
+                                }`}
+                      </span>
+                    </div>
+                    )}
                   </div>
 
                   <div className="mt-auto flex items-end justify-between">
@@ -104,8 +143,11 @@ TourOfferCard = ({
                        {oldPrice} {t('mln')} {t('сум')}
                       </p>
                       <p className="text-[14px] font-bold leading-[17px] text-[#1C1C1E]">
-                        {item.price} {t('mln')} {t('сум')}
-                      </p>
+                            {isPopularDestination ? formatHalfPrice(item.price) : item.price}{" "}
+                            {t("mln")} {t("сум")} {isPopularDestination &&  (" / " + t('за человека'))}  
+                           
+                          </p>
+
                     </div>
                     <span className="hidden h-9 w-9 place-items-center rounded-full bg-[#E5E7EB]/80 text-white md:grid">
                       <ArrowRightAltIcon sx={{ fontSize: 20 }} />

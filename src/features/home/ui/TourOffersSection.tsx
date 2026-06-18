@@ -26,6 +26,7 @@ type TourOffersSectionProps = {
   sectionClassName?: string;
   cardsStart: number;
   cardsEnd: number;
+  isPopularDestination: boolean;
 };
 
 const TourOffersSection = ({
@@ -35,6 +36,7 @@ const TourOffersSection = ({
   sectionClassName = 'bg-transparent pb-10 pt-0',
   cardsStart,
   cardsEnd,
+  isPopularDestination = false,
 }: TourOffersSectionProps) => {
   const t = useTranslations();
   const { locale }: any = useParams();
@@ -131,6 +133,7 @@ const TourOffersSection = ({
                         fallbackDurationText={t('дней')}
                         fallbackHotelText={t('Отель')}
                         starsText={t('звёзды')}
+                        isPopularDestination={isPopularDestination}
                         onClick={() => {
                           localStorage.setItem('tourOperator', item?.operator ?? '');
                           localStorage.setItem('from_cache', item?.from_cache ?? '');

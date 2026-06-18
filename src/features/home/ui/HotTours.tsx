@@ -11,6 +11,7 @@ const HotTours = () => {
       sectionClassName="bg-transparent pb-10 pt-0"
       cardsStart={0}
       cardsEnd={4}
+      isPopularDestination={true}
     />
   );
 };
