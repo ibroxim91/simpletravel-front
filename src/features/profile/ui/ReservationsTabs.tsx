@@ -17,6 +17,7 @@ import * as React from 'react';
 
 import Badge from '@/assets/Badge.png';
 import Click from '@/assets/Click.png';
+// import MulticardPayment from '../../../../public/images/multicard.png';
 import { useRouter } from '@/shared/config/i18n/navigation';
 import { LanguageRoutes } from '@/shared/config/i18n/types';
 import { formatPrice } from '@/shared/lib/formatPrice';
@@ -125,14 +126,11 @@ const ReservationsTabs = ({
     {
       accessorKey: 'service',
       header: t('Название услуги'),
-      cell: ({ row }) => {
-        const ticket = row.original.ticket;
-        return (
-          <div className="capitalize">
-            {ticket?.service_name || ticket?.title || t('Не указано')}
-          </div>
-        );
-      },
+      cell: ({ row }) => (
+        <div className="capitalize">
+          {row.original.title || t('Не указано')}
+        </div>
+      ),
     },
     {
       accessorKey: 'total_price',
@@ -150,14 +148,11 @@ const ReservationsTabs = ({
     {
       accessorKey: 'destination',
       header: t('Место положение'),
-      cell: ({ row }) => {
-        const ticket = row.original.ticket;
-        return (
-          <div className="capitalize">
-            {ticket?.location_name || ticket?.location_name || t('Не указано')}
-          </div>
-        );
-      },
+      cell: ({ row }) => (
+        <div className="capitalize">
+          {row.original.destination_name || t('Не указано')}
+        </div>
+      ),
     },
     {
       accessorKey: 'order_status',
@@ -274,9 +269,16 @@ const ReservationsTabs = ({
     }
   };
 
-  const tableData = order?.data?.data?.results || [];
-  const totalItems = order?.data?.data?.total_items || 0;
-  const totalPages = order?.data?.data?.total_pages || 0;
+  const responseData = order?.data;
+  const pagination =
+    responseData && 'results' in responseData
+      ? responseData
+      : responseData && 'data' in responseData
+        ? responseData.data
+        : undefined;
+  const tableData = pagination?.results ?? [];
+  const totalItems = pagination?.total_items ?? 0;
+  const totalPages = pagination?.total_pages ?? 0;
 
   const table = useReactTable<PaymentRow>({
     data: tableData,
@@ -506,6 +508,36 @@ const ReservationsTabs = ({
                 name="payment-modal"
                 checked={paymentTypes === 'click'}
                 onChange={() => setPaymentType('click')}
+                className="w-[20px] h-[20px] cursor-pointer"
+              />
+            </label>
+
+            <label
+              onClick={() => setPaymentType('multicard')}
+              htmlFor="payment-multicard-modal"
+              className="cursor-pointer flex items-center gap-[10px] justify-between bg-[#EDEEF180] p-[20px] rounded-[20px] border-2 hover:border-[#084FE3] transition-colors"
+              style={{
+                borderColor: paymentTypes === 'multicard' ? '#084FE3' : '#EDEEF180',
+              }}
+            >
+              <div className="flex items-center gap-[20px]">
+                <div className="w-[60px] h-[60px] relative rounded-[10px] overflow-hidden">
+                  <Image
+                    src="/images/multicard.png"
+                    alt="multicard-payment"
+                    className="object-cover"
+                    fill
+                    quality={100}
+                  />
+                </div>
+                <p className="text-xl font-bold">Multicard</p>
+              </div>
+              <input
+                type="radio"
+                id="payment-multicard-modal"
+                name="payment-modal"
+                checked={paymentTypes === 'multicard'}
+                onChange={() => setPaymentType('multicard')}
                 className="w-[20px] h-[20px] cursor-pointer"
               />
             </label>

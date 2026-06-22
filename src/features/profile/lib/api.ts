@@ -65,87 +65,55 @@ interface GetOneParticipantData {
   };
 }
 
-interface GetAllOrder {
-  status: boolean;
-  data: {
-    links: {
-      previous: string;
-      next: string;
-    };
-    total_items: number;
-    total_pages: number;
-    page_size: number;
-    current_page: number;
-    results: {
-      id: number;
-      departure: string;
-      destination: string;
-      departure_date: string;
-      arrival_time: string;
-      participant: {
-        id: number;
-        first_name: string;
-        last_name: string;
-        gender: 'male' | 'female';
-      }[];
-      ticket: {
-        id: 1;
-        title: string;
-        service_name: string;
-        location_name: string;
-      };
-      tariff: string;
-      transport: string;
-      extra_service: {
-        id: number;
-        name: string;
-      }[];
-      extra_paid_service: {
-        id: number;
-        name: string;
-        price: number;
-      }[];
-      total_price: number;
-      order_status: string;
-    }[];
-  };
+export interface SamoTicketOrder {
+  id: number;
+  participant: {
+    id: number;
+    first_name: string;
+    last_name: string;
+    gender: 'male' | 'female';
+  }[];
+  tour_operator: string;
+  tour_operator_id: string;
+  title: string;
+  price: string;
+  total_price: string | number;
+  check_in_date: string;
+  check_out_date: string;
+  order_status: string;
+  payment_type: string | null;
+  destination_id: number;
+  destination_name: string;
+  destination_country_id: number | null;
+  destination_country_name: string;
+  departure_id: number;
+  departure_name: string;
+  departure_country_id: number | null;
+  departure_country_name: string;
+  passenger_count: number;
+  duration_days: number;
+  hotel_id: number;
+  hotel_name: string;
+  meal_plan: string;
+  rating: string;
+  user: number;
 }
 
-interface GetOrderId {
-  status: boolean;
-  data: {
-    id: number;
-    departure: string;
-    destination: string;
-    departure_date: string;
-    arrival_time: string;
-    participant: {
-      id: number;
-      first_name: string;
-      last_name: string;
-      gender: 'male' | 'female';
-    }[];
-    ticket: {
-      id: number;
-      title: string;
-      service_name: string;
-      location_name: string;
-    };
-    tariff: string;
-    transport: string;
-    extra_service: {
-      id: number;
-      name: string;
-    }[];
-    extra_paid_service: {
-      id: number;
-      name: string;
-      price: number;
-    }[];
-    total_price: number;
-    order_status: string;
+interface PaginatedOrders {
+  links: {
+    previous: string | null;
+    next: string | null;
   };
+  total_items: number;
+  total_pages: number;
+  page_size: number;
+  current_page: number;
+  results: SamoTicketOrder[];
 }
+
+type GetAllOrder = PaginatedOrders | { status: boolean; data: PaginatedOrders };
+
+type GetOrderId = SamoTicketOrder | { status: boolean; data: SamoTicketOrder };
 
 export const User_Api = {
   async getMe() {

@@ -474,6 +474,16 @@ declare const messages: {
   "Включено": "Kiritilgan",
   "Не включено": "Kiritilmagan",
   "Singletour_visa_notice_title": "Ha, ushbu davlatga kirish uchun viza talab qilinadi.",
-  "Singletour_visa_notice_body": "Lekin xavotir olmang — buni yolg‘iz hal qilishingiz shart emas! Agentligimiz barcha mijozlarimizga hujjatlarni rasmiylashtirishda to‘liq yordam ko‘rsatadi."
+  "Singletour_visa_notice_body": "Lekin xavotir olmang — buni yolg‘iz hal qilishingiz shart emas! Agentligimiz barcha mijozlarimizga hujjatlarni rasmiylashtirishda to‘liq yordam ko‘rsatadi.",
+  "Qayerdan": "Qayerdan",
+  "Qayerga": "Qayerga",
+  "Ketish sanasi": "Ketish sanasi",
+  "Kelish sanasi": "Kelish sanasi",
+  "Tunlar soni": "Tunlar soni",
+  "Sayohatchilar soni": "Sayohatchilar soni",
+  "Tur ma'lumotlari": "Tur ma'lumotlari",
+  "Qo'shimcha izoh": "Qo'shimcha izoh",
+  "ixtiyoriy": "ixtiyoriy",
+  "Izoh qoldiring...": "Izoh qoldiring..."
 };
 export default messages;

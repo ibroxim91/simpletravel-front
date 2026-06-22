@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 import { toast } from 'sonner';
-import { User_Api } from '../lib/api';
+import { SamoTicketOrder, User_Api } from '../lib/api';
 
 const ReservationsDeatilTabs = ({
   id,
@@ -26,16 +26,10 @@ const ReservationsDeatilTabs = ({
     enabled: !!id,
   });
 
-  const { data } = useQuery({
-    queryKey: ['tickets_info', id],
-    queryFn: () =>
-      Ticketorder_Api.ticketorder_info({
-        id: Number(store?.data.data.ticket.id),
-      }),
-    select(data) {
-      return data.data;
-    },
-  });
+  const order: SamoTicketOrder | undefined =
+    store?.data && 'id' in store.data
+      ? store.data
+      : store?.data?.data;
 
   const { mutate: downloadPdf } = useMutation({
     mutationFn: (body: { order_id: number | null; lang: string }) =>
@@ -45,7 +39,7 @@ const ReservationsDeatilTabs = ({
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `ticket-order-${store?.data.data.id}.pdf`;
+      link.download = `ticket-order-${order?.id}.pdf`;
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -71,28 +65,27 @@ const ReservationsDeatilTabs = ({
         <div
           className={clsx(
             'capitalize px-2 py-1 rounded-md text-sm font-medium inline-block',
-            store?.data.data.order_status === 'pending_payment'
+            order?.order_status === 'pending_payment'
               ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
-              : store?.data.data.order_status === 'pending_confirmation'
+              : order?.order_status === 'pending_confirmation'
                 ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'
-                : store?.data.data.order_status === 'cancelled'
+                : order?.order_status === 'cancelled'
                   ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
-                  : store?.data.data.order_status === 'confirmed'
+                  : order?.order_status === 'confirmed'
                     ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
-                    : store?.data.data.order_status === 'completed' &&
+                    : order?.order_status === 'completed' &&
                       'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
           )}
         >
-          {store?.data.data.order_status === 'pending_payment'
+          {order?.order_status === 'pending_payment'
             ? t('Kutimoqda')
-            : store?.data.data.order_status === 'pending_confirmation'
+            : order?.order_status === 'pending_confirmation'
               ? t('Tasdiqlanmoqda')
-              : store?.data.data.order_status === 'cancelled'
+              : order?.order_status === 'cancelled'
                 ? t('Bekor qilingan')
-                : store?.data.data.order_status === 'confirmed'
+                : order?.order_status === 'confirmed'
                   ? t('Tasdiqlangan')
-                  : store?.data.data.order_status === 'completed' &&
-                    t('Tugallangan')}
+                  : order?.order_status === 'completed' && t('Tugallangan')}
         </div>
       </div>
       <hr className="h-[2px] my-[24px] bg-[#EDEEF1] " />
@@ -101,9 +94,9 @@ const ReservationsDeatilTabs = ({
         <hr className="h-[2px] my-[24px] bg-[#DFDFDF] " />
         <div className="flex my-5 justify-between flex-col items-start gap-2 bg-[#EDEEF180] p-[20px] rounded-[20px] border-2 border-[#EDEEF180]">
           <h1 className="text-2xl font-bold text-[#212122]">
-            {store?.data.data.total_price &&
+            {order?.total_price &&
               formatPrice(
-                store.data.data.total_price,
+                order.total_price,
                 locale as LanguageRoutes,
                 true,
               )}
@@ -134,40 +127,39 @@ const ReservationsDeatilTabs = ({
         <div className="grid grid-cols-2 w-full my-2 bg-[#EDEEF1] px-[8px] py-[5px] rounded-[8px] text-[#646465]">
           <p className="text-md">{t('Откуда')}</p>
           <p className="break-words text-end !text-[#212122]">
-            {store?.data.data.departure}
+            {order?.departure_name}
           </p>
         </div>
 
         <div className="grid grid-cols-2 w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465]">
           <p className="text-md">{t('Куда')}</p>
           <p className="text-[#212122] break-words text-end">
-            {store?.data.data.ticket.location_name}
+            {order?.destination_name}
           </p>
         </div>
 
         <div className="grid grid-cols-2 items-center justify-between w-full my-2 bg-[#EDEEF1] px-[8px] py-[5px] rounded-[8px] text-[#646465]">
           <p className="text-md">{t('Время вылета')}</p>
           <p className="text-[#212122] break-words text-end max-md:px-5">
-            {store?.data.data.departure_date &&
-              formatDate.format(store?.data.data.departure_date, 'DD-MM-YYYY')}
+            {order?.check_in_date &&
+              formatDate.format(order.check_in_date, 'DD-MM-YYYY')}
           </p>
         </div>
 
         <div className="grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465]">
           <p className="text-md">{t('Время возвращения')}</p>
           <p className="text-[#212122] text-end break-words max-md:px-5">
-            {store?.data.data.arrival_time &&
-              formatDate.format(store?.data.data.arrival_time, 'DD-MM-YYYY')}
+            {order?.check_out_date &&
+              formatDate.format(order.check_out_date, 'DD-MM-YYYY')}
           </p>
         </div>
 
         <h1 className="mt-5 text-lg font-bold text-[#212122]">
           {t('Мои попутчики')}
         </h1>
-        {store?.data.data.participant.map((e, index) => (
-          <>
+        {order?.participant.map((e, index) => (
+          <div key={e.id ?? index}>
             <div
-              key={index}
               className={`grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465] 
               ${index % 2 === 0 ? 'bg-[#EDEEF1]' : 'bg-white'}`}
             >
@@ -178,13 +170,7 @@ const ReservationsDeatilTabs = ({
                 {e.first_name} {e.last_name}
               </p>
             </div>
-            <div className="grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465]">
-              <p className="text-md">{t('Дата рождения')}</p>
-              <p className="!text-black text-end break-words max-md:px-5">
-                {/* {e.birthDate && formatDate.format(e.birthDate, 'DD-MM-YYYY')} */}
-              </p>
-            </div>
-          </>
+          </div>
         ))}
 
         <h1 className="mt-5 text-lg font-bold text-[#212122]">
@@ -193,87 +179,37 @@ const ReservationsDeatilTabs = ({
         <div className="grid grid-cols-2 items-center justify-between w-full my-2 bg-[#EDEEF1] px-[8px] py-[5px] rounded-[8px] text-[#646465]">
           <p className="text-md">{t('Отель')}</p>
           <p className="text-[#212122] text-end break-words">
-            {data?.data.title}
+            {order?.hotel_name}
           </p>
         </div>
 
         <div className="grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465]">
           <p className="text-md">{t('Локация')}</p>
           <p className="text-[#212122] text-end break-words">
-            {data?.data.destination}
+            {order?.destination_name}
           </p>
         </div>
 
         <div className="grid grid-cols-2 items-center justify-between w-full my-2 bg-[#EDEEF1] px-[8px] py-[5px] rounded-[8px] text-[#646465]">
           <p className="text-md">{t('Рейтинг')}</p>
           <p className="text-[#212122] text-end break-words">
-            {data?.data.rating} {t('звёзды')}
+            {order?.rating} {t('звёзды')}
           </p>
         </div>
 
         <div className="grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465]">
-          <p className="text-md break-words">{t('Характеристики')}</p>
-          {data?.data.ticket_amenities.slice(0, 1).map((e) => (
-            <p className="text-[#212122] text-end break-words" key={e.name}>
-              {e.name}...
-            </p>
-          ))}
+          <p className="text-md">{t('Тип пакета')}</p>
+          <p className="text-[#212122] text-end break-words">
+            {order?.meal_plan}
+          </p>
         </div>
 
         <div className="grid grid-cols-2 items-center justify-between w-full my-2 bg-[#EDEEF1] px-[8px] py-[5px] rounded-[8px] text-[#646465]">
-          <p className="text-md">{t('Тип пакета')}</p>
+          <p className="text-md">{t('Тур оператор')}</p>
           <p className="text-[#212122] text-end break-words">
-            {store?.data.data.tariff}
+            {order?.tour_operator}
           </p>
         </div>
-
-        <div className="grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465]">
-          <p className="text-md">{t('Транспорт')}</p>
-          <p className="text-[#212122] text-end break-words">
-            {store?.data.data.transport}
-          </p>
-        </div>
-
-        {store && store?.data.data.extra_paid_service.length > 0 && (
-          <>
-            <h1 className="mt-5 text-lg font-bold text-[#212122]">
-              {t('Услуги')}
-            </h1>
-            {store?.data.data.extra_paid_service.map((e, i) => (
-              <div
-                key={e.id || i}
-                className={`grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465] ${
-                  i % 2 === 0 ? 'bg-[#EDEEF1]' : 'bg-white'
-                }`}
-              >
-                <p className="text-md">{e.name}</p>
-                <p className="text-[#212122] text-end break-words">
-                  {formatPrice(e.price, locale as LanguageRoutes, true)}
-                </p>
-              </div>
-            ))}
-          </>
-        )}
-        {store?.data.data.extra_service.length && (
-          <>
-            <h1 className="mt-5 text-lg font-bold text-[#212122]">
-              {t('Дополнительные услуги')}
-            </h1>
-            {store?.data.data.extra_service.map((e, i) => (
-              <div
-                key={e.id || i}
-                className={`grid grid-cols-2 items-center justify-between w-full my-2 px-[8px] py-[5px] rounded-[8px] text-[#646465] ${
-                  i % 2 === 0 ? 'bg-[#EDEEF1]' : 'bg-white'
-                }`}
-              >
-                <p className="text-md text-[#212122]">{e.name}</p>
-                {/* <p className="!text-black text-end break-words">
-              {formatPrice('1450000', locale as LanguageRoutes, true)}
-              </p> */}
-              </div>
-            ))}
-          </>
-        )}
       </div>
     </div>
   );

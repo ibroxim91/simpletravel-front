@@ -8,55 +8,61 @@ import {
 
 export interface Get_Info {
   status: boolean;
+  hotel_photo?: string;
   data: {
+    id?: number;
+    title: string;
+    slug?: string;
+    nights?: number;
+    price: number | string;
+    price_full?: number;
+    operator?: string;
+    rating: number;
+    passenger_count?: number;
+    duration_days?: number;
+    ticket_images?: string;
+    hotel_photo?: string;
+    allow_comment?: boolean;
+    room_type?: string;
+    hotel_meals?: string;
     departure: {
       id: number;
       name: string;
-      country: {
-        id: number;
-        name: string;
-      };
+      country?: string | { id: number; name: string };
     };
     min_person: number;
     max_person: number;
     destination: {
       id: number;
       name: string;
-      country: {
-        id: number;
-        name: string;
-      };
+      country?: string | { id: number; name: string };
     };
-    price: number;
-    departure_date: string;
-    departure_time: string;
-    travel_time: string;
-    title: string;
-    rating: number;
+    departure_date?: string;
+    departure_time?: string;
+    travel_time?: string;
     image_banner: string;
-    ticket_amenities: [
-      {
-        name: string;
-        icon_name: string;
-      },
-    ];
-    tariff: [
-      {
-        tariff: {
-          name: string;
-        };
-        price: number;
-      },
-    ];
-    transports: [
-      {
-        transport: {
-          name: string;
-          icon_name: string;
-        };
-        price: number;
-      },
-    ];
+    ticket_amenities: {
+      name: string;
+      icon_name?: string;
+    }[];
+    ticket_hotel?: {
+      id: number;
+      name: string;
+      meal_plan?: string;
+      rating?: number | string;
+    }[];
+    tariff: {
+      name?: string;
+      tariff?: { name: string };
+      price?: number;
+    }[];
+    transports: {
+      id?: number;
+      name?: string;
+      icon_name?: string;
+      transport?: { name: string; icon_name: string };
+      price?: number;
+    }[];
     extra_service: {
       id: number;
       name: string;
