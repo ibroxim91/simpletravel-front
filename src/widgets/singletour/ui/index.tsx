@@ -32,6 +32,7 @@ import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { AxiosError } from 'axios';
 import 'swiper/css';
 import Hotel2 from '../../../../public/images/hotel2.png';
 import Hotel3 from '../../../../public/images/hotel3.png';
@@ -45,6 +46,15 @@ import Bus from '../../../../public/icons/transfer.svg';
 import Hotel_Star from '../../../../public/images/hotel_star.png';
 import Flight from '../../../../public/icons/flight.svg';
 import { TicketsDetailAPi } from '../lib/api';
+import {
+  extractShareTokenFromSlug,
+  getSlugFromTourParam,
+  isStoredTourMatchingShareToken,
+  readStoredTour,
+  resolveTourFromStorage,
+} from '../lib/shareTour';
+import ShareTourNotFound from './ShareTourNotFound';
+import ShareTourSearching from './ShareTourSearching';
 import HotelInfoItem from './HotelInfoItem';
 import TourDayItem from './TourDayItem';
 import TourDetailLoading from './TourDetailLoading';
@@ -73,19 +83,75 @@ const slideIn = {
 export default function SingleTour() {
   const t = useTranslations();
   const [tourOperatorId, setTourOperatorId] = useState<string | null>(null);
-  
+  const route = useRouter();
+  const { tourid, locale } = useParams();
+
+  const slug = getSlugFromTourParam(tourid as string | string[] | undefined);
+  const urlShareToken = extractShareTokenFromSlug(slug);
+
+  const [data, setData] = useState<Record<string, any> | null>(() =>
+    resolveTourFromStorage(readStoredTour(), urlShareToken),
+  );
+
+  const shareTokenForFetch =
+    urlShareToken && !isStoredTourMatchingShareToken(data, urlShareToken)
+      ? urlShareToken
+      : null;
+
+  useEffect(() => {
+    const stored = readStoredTour();
+    if (
+      urlShareToken &&
+      !isStoredTourMatchingShareToken(stored, urlShareToken)
+    ) {
+      setData(null);
+      return;
+    }
+    const resolved = resolveTourFromStorage(stored, urlShareToken);
+    if (resolved) {
+      setData(resolved);
+    }
+  }, [slug, urlShareToken]);
+
   useEffect(() => {
     setTourOperatorId(localStorage.getItem('tourOperatorId'));
   }, []);
-  const route = useRouter();
-  const { tourid, locale } = useParams();
-  // const tourOperatorId =
-  //   typeof window !== 'undefined' ? localStorage.getItem('tourOperatorId') : null;
- const idFromSlug = Array.isArray(tourid)
-    ? Number(tourid[tourid.length - 1].split('-').pop())
-    : tourid
-      ? Number(tourid.split('-').pop())
-      : undefined;
+
+  const {
+    data: sharedResult,
+    isLoading: isShareLoading,
+    isError: isShareError,
+    error: shareError,
+    isFetched: isShareFetched,
+  } = useQuery({
+    queryKey: ['shared_tour', shareTokenForFetch],
+    queryFn: () =>
+      Ticket_Api.GetAllTickets({
+        params: {
+          shared_token: shareTokenForFetch!,
+          page: 1,
+          page_size: 1,
+        },
+      }),
+    enabled: Boolean(shareTokenForFetch),
+    retry: false,
+  });
+
+  useEffect(() => {
+    const ticket = sharedResult?.data?.results?.tickets?.[0] as
+      | Record<string, any>
+      | undefined;
+    if (!ticket) return;
+
+    localStorage.setItem('tour', JSON.stringify(ticket));
+    localStorage.setItem('tourOperator', ticket.operator ?? '');
+    localStorage.setItem(
+      'tourOperatorId',
+      String(ticket.tour_operator_id ?? ''),
+    );
+    setData(ticket);
+    setTourOperatorId(String(ticket.tour_operator_id ?? ''));
+  }, [sharedResult]);
 
   const formatShortDate = (value?: string) => {
   if (!value) return '--.--.--';
@@ -136,13 +202,7 @@ export default function SingleTour() {
   //   cacheTime: 0,
   // });
 
-const data = typeof window !== 'undefined'
-  ? JSON.parse(localStorage.getItem("tour") || "null")
-  : null;
-
-    const [likedIds, setLikedIds] = useState<string[]>([])
-   
-  
+  const [likedIds, setLikedIds] = useState<string[]>([]);
   useEffect(() => {
     const saved = localStorage.getItem("likedTours")
     if (saved) {
@@ -174,29 +234,32 @@ const data = typeof window !== 'undefined'
     setLikedIds(liked.map((t) => t.tour_operator_id)) 
   }
   
-  const isLiked = likedIds.includes(data.tour_operator_id)
-  
-
+  const isLiked = data ? likedIds.includes(String(data.tour_operator_id)) : false;
 
 
 const { data: hotelData, isLoading, error } = useQuery({
- 
   queryKey: [
-    "hotel_detail",
-    data.hotel_db_id && data.hotel_db_id > 0
+    'hotel_detail',
+    data?.hotel_db_id && Number(data.hotel_db_id) > 0
       ? data.hotel_db_id
-      : data.ticket_hotel[0].id,
+      : data?.ticket_hotel?.[0]?.id,
   ],
   queryFn: async () => {
-    const hotel = data.ticket_hotel[0];
+    const hotel = data!.ticket_hotel[0];
     const url = new URL(`${BASE_URL}/api/v1/hotels/`);
 
-    url.searchParams.append("hotel_name", hotel.name);
-    url.searchParams.append("hotel_id", hotel.id.toString());
-    url.searchParams.append("operator", data.operator);
-    url.searchParams.append("country_id", data.destination.country.id.toString());
-    url.searchParams.append("meal_plan", hotel.meal_plan);
-    url.searchParams.append("hotel_db_id", data.hotel_db_id?.toString() || "");
+    url.searchParams.append('hotel_name', hotel.name);
+    url.searchParams.append('hotel_id', hotel.id.toString());
+    url.searchParams.append('operator', String(data!.operator));
+    url.searchParams.append(
+      'country_id',
+      String(data!.destination.country.id),
+    );
+    url.searchParams.append('meal_plan', hotel.meal_plan);
+    url.searchParams.append(
+      'hotel_db_id',
+      data!.hotel_db_id?.toString() || '',
+    );
 
     const res = await fetch(url.toString(), {
       method: "GET",
@@ -211,7 +274,7 @@ const { data: hotelData, isLoading, error } = useQuery({
 
     return res.json();
   },
-  enabled: !!data?.ticket_hotel?.length, // faqat hotel mavjud bo‘lsa so‘rov yuboriladi
+  enabled: Boolean(data?.ticket_hotel?.length),
 });
 
 console.log("hotelData ", hotelData)
@@ -293,8 +356,25 @@ console.log("hotelData ", hotelData)
     }
   }, [isAnimating]);
 
+ if (shareTokenForFetch && isShareLoading) {
+  return <ShareTourSearching />;
+ }
+
+ const shareStatus = (shareError as AxiosError | undefined)?.response?.status;
+ const sharedTicketMissing =
+  shareTokenForFetch &&
+  isShareFetched &&
+  !isShareLoading &&
+  (isShareError ||
+    shareStatus === 404 ||
+    !sharedResult?.data?.results?.tickets?.length);
+
+ if (sharedTicketMissing) {
+  return <ShareTourNotFound />;
+ }
+
  if (!data) {
-  return <TourDetailLoading />
+  return <TourDetailLoading />;
  }
       const hotelRating = (() => {
         const rating = data.ticket_hotel?.[0]?.rating;

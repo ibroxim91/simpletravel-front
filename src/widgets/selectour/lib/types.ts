@@ -106,6 +106,7 @@ export interface TickectAllFilter {
   title?: string;
   visa_required?: boolean | string;
   cheapest?: boolean;
+  shared_token?: string;
 }
 
 export interface HotelMealPlan {

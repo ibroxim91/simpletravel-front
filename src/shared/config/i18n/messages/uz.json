@@ -530,5 +530,10 @@
   "Tur ma'lumotlari": "Tur ma'lumotlari",
   "Qo'shimcha izoh": "Qo'shimcha izoh",
   "ixtiyoriy": "ixtiyoriy",
-  "Izoh qoldiring...": "Izoh qoldiring..."
+  "Izoh qoldiring...": "Izoh qoldiring...",
+  "Sizga kerakli turni qidiryapmiz": "Sizga kerakli turni qidiryapmiz",
+  "waiting_for_data": "Iltimos, biroz kuting...",
+  "search_tour_detail": "Tur ma'lumotlari qidirilmoqda",
+  "Tur topilmadi yoki aktual emas": "Tur topilmadi yoki aktual emas",
+  "Ushbu havola muddati tugagan yoki tur endi mavjud emas bo‘lishi mumkin": "Ushbu havola muddati tugagan yoki tur endi mavjud emas bo‘lishi mumkin"
 }

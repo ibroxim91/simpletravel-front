@@ -164,18 +164,12 @@ const isLiked = likedIds.includes(data.tour_operator_id)
 
   return (
     <Link
-      href={`/selectour/${data?.slug}?from_cache=${data?.from_cache}`}
+      href={`/selectour/${data?.slug}`}
       onClick={() => {
         localStorage.setItem('tourOperator', data?.operator ?? '');
         localStorage.setItem('tourOperatorId', String(data?.tour_operator_id ?? ''));
-        localStorage.setItem('from_cache', String(data?.from_cache));
         localStorage.setItem('tour', JSON.stringify(data));
         saveQueryParamsToLocalStorage();
-        // TourItem.tsx
-
-        // queryClient.setQueryData(['tickets_detail', data.tour_operator_id], data);
-
-
       }}
       prefetch
     >
