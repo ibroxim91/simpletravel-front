@@ -311,7 +311,6 @@ const loadTickets = async (priceForFetch: number[]) => {
     return;
   }
 
-  console.log("API REQUEST");
 
   setLoading(true);
 setFetching(true);
