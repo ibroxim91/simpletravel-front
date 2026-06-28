@@ -1,8 +1,35 @@
 "use client";
 import httpClient from '@/shared/config/api/httpClient';
-import { GET_TICKETS, GET_TICKET_COMMENTS, SEND_COMMENT } from '@/shared/config/api/URLs';
+import {
+  GET_AVIA_DATA,
+  GET_TICKETS,
+  GET_TICKET_COMMENTS,
+  SEND_COMMENT,
+} from '@/shared/config/api/URLs';
 import { ToursDetail } from './data';
 // import { useSearchParams } from 'next/navigation';
+
+export interface AviaFlightInfo {
+  departure: {
+    local_time?: string;
+    iata?: string;
+    name?: string;
+  };
+  arrival: {
+    local_time?: string;
+    iata?: string;
+    name?: string;
+  };
+  airline?: string;
+  number?: string;
+  aircraft?: string;
+  flight_time?: string | null;
+}
+
+export interface AviaDataResponse {
+  count: number;
+  results: AviaFlightInfo[];
+}
 
 export const TicketsDetailAPi = {
   async getTicketsDetail({ id }: { id: number | string }) {
@@ -62,5 +89,14 @@ export const TicketsDetailAPi = {
   async sendCommet(body: { text: string; rating: number; ticket: number }) {
     const res = await httpClient.post(SEND_COMMENT, body);
     return res;
+  },
+
+  async getAviaData(body: {
+    flight_date: string;
+    region_id: string | number;
+    destination_name?: string;
+  }) {
+    const res = await httpClient.post<AviaDataResponse>(GET_AVIA_DATA, body);
+    return res.data;
   },
 };

@@ -65,6 +65,7 @@ import WatchTour from './WatchTour';
 import CommentTour from './commentTour';
 import HotelRooms from './HotelRooms';
 import InterestPoints from './InterestPoints';
+import FlightInfoCard from './FlightInfoCard';
 import { BASE_URL } from '@/shared/config/api/URLs';
 
 const fadeInUp = {
@@ -80,6 +81,20 @@ const slideIn = {
     transition: { delay: i * 0.05, duration: 0.5 },
   }),
 };
+
+const formatFlightDateForApi = (value?: string) => {
+  if (!value) return '';
+  if (/^\d{8}$/.test(value)) return value;
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+
+  const year = String(date.getFullYear());
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}${month}${day}`;
+};
+
 export default function SingleTour() {
   const t = useTranslations();
   const [tourOperatorId, setTourOperatorId] = useState<string | null>(null);
@@ -276,6 +291,22 @@ const { data: hotelData, isLoading, error } = useQuery({
   },
   enabled: Boolean(data?.ticket_hotel?.length),
 });
+
+  const aviaFlightDate = formatFlightDateForApi(data?.departure_date);
+  const aviaRegionId = data?.destination_id ?? data?.destination?.id;
+  const aviaDestinationName = data?.destination?.name;
+
+  const { data: aviaData } = useQuery({
+    queryKey: ['avia_data', aviaFlightDate, aviaRegionId, aviaDestinationName],
+    queryFn: () =>
+      TicketsDetailAPi.getAviaData({
+        flight_date: aviaFlightDate,
+        region_id: aviaRegionId,
+        destination_name: aviaDestinationName,
+      }),
+    enabled: Boolean(aviaFlightDate && aviaRegionId || aviaDestinationName),
+    retry: false,
+  });
 
 console.log("hotelData ", hotelData)
 
@@ -699,6 +730,18 @@ const includedServicesToRender = [
                 )}
               </motion.div>
 
+
+              {aviaData?.results?.length ? (
+                <motion.div
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: false, amount: 0.2 }}
+                  variants={fadeInUp}
+                  className="mt-8"
+                >
+                  <FlightInfoCard flights={aviaData.results} />
+                </motion.div>
+              ) : null}
 
                {data.visa_required && (     
               <div className="hidden w-full max-lg:block max-lg:my-8">

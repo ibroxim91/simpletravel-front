@@ -533,5 +533,13 @@
   "search_tour_detail": "Ищем данные о туре",
   "waiting_for_data": "Пожалуйста, подождите...",
   "Tur topilmadi yoki aktual emas": "Тур не найден или недоступен",
-  "Ushbu havola muddati tugagan yoki tur endi mavjud emas bo‘lishi mumkin": "Ссылка могла устареть или тур больше недоступен"
+  "Ushbu havola muddati tugagan yoki tur endi mavjud emas bo‘lishi mumkin": "Ссылка могла устареть или тур больше недоступен",
+  "Avia reyslar": "Авиарейсы",
+  "Uchish va qo'nish ma'lumotlari": "Информация о вылете и прилёте",
+  "Reyslar soni": "{count} рейс(ов)",
+  "Reys raqami": "Номер рейса",
+  "Parvoz vaqti": "Время полёта",
+  "Transfer": "Трансфер",
+  "Avia kompaniya": "Авиакомпания",
+  "Tashkent International Airaport": "Международный аэропорт Ташкента"
 }

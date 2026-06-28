@@ -484,6 +484,14 @@ declare const messages: {
   "Tur ma'lumotlari": "Tur ma'lumotlari",
   "Qo'shimcha izoh": "Qo'shimcha izoh",
   "ixtiyoriy": "ixtiyoriy",
-  "Izoh qoldiring...": "Izoh qoldiring..."
+  "Izoh qoldiring...": "Izoh qoldiring...",
+  "Avia reyslar": "Avia reyslar",
+  "Uchish va qo'nish ma'lumotlari": "Uchish va qo'nish ma'lumotlari",
+  "Reyslar soni": "{count} ta reys",
+  "Reys raqami": "Reys raqami",
+  "Parvoz vaqti": "Parvoz vaqti",
+  "Transfer": "Transfer",
+  "Avia kompaniya": "Avia kompaniya",
+  "Tashkent International Airaport": "Toshkent xalqaro aeroporti"
 };
 export default messages;

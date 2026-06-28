@@ -46,6 +46,7 @@ const PARTICIPANT_IMAGE = '/api/v1/participant-image/';
 const FAQ = '/api/v1/faq/';
 const TICKETORDER_INFO = '/api/v1/get-ticket-info/';
 const TICKETORDER = '/api/v1/ticketorder/';
+const GET_AVIA_DATA = '/api/v1/get-avia-data/';
 const PAYMENTS = '/api/v1/payments_link/';
 const DONWLOAD_PDF = '/api/v1/get-order-pdf/';
 
@@ -77,6 +78,7 @@ export {
   ENDP_POSTS,
   FAQ,
   GET_BANNER,
+  GET_AVIA_DATA,
   GET_BLOGS,
   GET_CONTACT,
   GET_HELP_PAGE,
