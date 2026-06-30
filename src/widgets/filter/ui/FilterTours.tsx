@@ -32,6 +32,7 @@ import { useSearchParams, usePathname } from 'next/navigation';
 import { toast } from 'sonner';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { DateRange } from 'react-day-picker';
+import { adultsForSearch, DEFAULT_ADULTS, getPassengerDisplayCount, resolveAdultsCount } from '../lib/passengers';
 
 const parseUrlDate = (value: string | null | undefined) => {
   if (!value) return undefined;
@@ -49,9 +50,9 @@ const FilterTours = ({ selectedDestRegions, setSelectedDestRegions,setSelectedDe
   const [fromDate, setFromDate] = useState<Date | undefined>();
   const [toDate, setToDate] = useState<Date | undefined>();
   const [selectData, setSelectData] = useState<string>('');
-  const [adults, setAdults] = useState<number>(0);
+  const [adults, setAdults] = useState<number>(DEFAULT_ADULTS);
   const [children, setChildren] = useState<number>(0);
-  const selectAll = adults + children;
+  const passengerCount = getPassengerDisplayCount(adults, children);
   const [range, setRange] = useState<DateRange | undefined>();
   const applyDatesFromSearchParams = useCallback(() => {
     const from = parseUrlDate(searchParams.get('dateFrom'));
@@ -197,7 +198,7 @@ useEffect(() => {
       rating:rating,
       hotel_id:hotel_id,
       mealPlan:mealPlan,
-      adults:adultsParam,
+      adults: adultsParam ?? String(resolveAdultsCount(null)),
       children:childrenParam,
       operator:operator,
       
@@ -261,7 +262,7 @@ useEffect(() => {
 
     applyDatesFromSearchParams();
 
-    setAdults(adultsParam ? parseInt(adultsParam) : 0);
+    setAdults(resolveAdultsCount(adultsParam));
     setChildren(childrenParam ? parseInt(childrenParam) : 0);
 
     // if (!selectedCountry && countries?.length) {
@@ -329,7 +330,7 @@ useEffect(() => {
 
     if (fromDate) params.set('dateFrom', formatDate.format(fromDate, 'YYYY-MM-DD'));
     if (toDate) params.set('dateTo', formatDate.format(toDate, 'YYYY-MM-DD'));
-    if (adults > 0) params.set('adults', adults.toString());
+    params.set('adults', adultsForSearch(adults).toString());
     if (children > 0) params.set('children', children.toString());
     if (searchParams.get('hotel_id')) params.delete('hotel_id');
     if (searchParams.get('town')) params.delete('town');
@@ -781,12 +782,7 @@ const defaultitems = selectedCountry
         >
            <Input
                 className="h-auto border-0 p-0 text-[14px] font-medium text-[#1C1C1E] shadow-none placeholder:text-[#1C1C1E] focus-visible:ring-0"
-                placeholder={t('1 пассажир')}
-                value={
-                  selectAll === 0
-                    ? ''
-                    : `${selectAll} ${getPassengerText(selectAll)}`
-                }
+                value={`${passengerCount} ${getPassengerText(passengerCount)}`}
                 readOnly
               />
           <KeyboardArrowDownIcon sx={{ color: '#1A73E8', width: '16px', height: '16px' }} />
@@ -822,7 +818,7 @@ const defaultitems = selectedCountry
                   <Button
                     variant={'ghost'}
                     onClick={() =>
-                      setAdults((prev) => (prev > 0 ? prev - 1 : prev))
+                      setAdults((prev) => (prev > 1 ? prev - 1 : prev))
                     }
                   >
                     <RemoveIcon className="text-[#084FE3]" />

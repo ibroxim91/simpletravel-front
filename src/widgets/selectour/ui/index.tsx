@@ -63,6 +63,7 @@ import { TickectAll, TickectAllFilter } from '../lib/types';
 import CheckboxFilter from './CheckBox';
 import FilterSection from './FilterSection';
 import TourItem from '@/widgets/selectour/ui/TourItem';
+import { resolveAdultsCount } from '@/widgets/filter/lib/passengers';
 import { useMemo } from "react";
 import CircleLoader from './TourLoader';
 
@@ -273,7 +274,7 @@ const loadTickets = async (priceForFetch: number[]) => {
   const params: TickectAllFilter = {
     page: currentPage,
     page_size: 10,
-    adults: filterLocal?.adults,
+    adults: resolveAdultsCount(filterLocal?.adults),
     children: filterLocal?.children,
     operator: filterLocal?.operator,
     dateTo: filterLocal?.toDate,
@@ -463,8 +464,9 @@ useEffect(() => {
     const country_id = getSearchParam('country_id') || '';
     const dateFrom = getSearchParam('dateFrom') || '';
     const dateTo = getSearchParam('dateTo') || '';
-    const adultsParam = getSearchParam('adults') || '0';
+    const adultsParam = getSearchParam('adults');
     const childrenParam = getSearchParam('children') || '0';
+    const resolvedAdults = resolveAdultsCount(adultsParam);
     const town = getSearchParam('town') || '';
     const hotel_id = getSearchParam('hotel_id') || '';
     const operator = getSearchParam('operator') || '';
@@ -492,7 +494,7 @@ useEffect(() => {
       rating:rating,
       hotel_id:hotel_id,
       mealPlan:mealPlan,
-      adults:adultsParam,
+      adults: String(resolvedAdults),
       children:childrenParam,
       operator:operator,
    }
@@ -514,7 +516,7 @@ useEffect(() => {
         dateFrom && dateTo
           ? `${formatDate.format(new Date(dateFrom), 'DD/MM/YYYY')} - ${formatDate.format(new Date(dateTo), 'DD/MM/YYYY')}`
           : '',
-      adults: parseInt(adultsParam),
+      adults: resolvedAdults,
       children: parseInt(childrenParam),
     };
     // setFilterLocal(filterData);

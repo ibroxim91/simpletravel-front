@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { DEFAULT_ADULTS } from './passengers';
 
 interface FilterToursStore {
   where: string;
@@ -28,7 +29,7 @@ interface FilterToursStore {
 
 export const useFilterToursStore = create<FilterToursStore>((set) => ({
   date: undefined,
-  adults: 0,
+  adults: DEFAULT_ADULTS,
   children: 0,
   toDate: undefined,
   from: '',

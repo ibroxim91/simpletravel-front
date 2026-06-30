@@ -26,6 +26,7 @@ import { MoveLeft, MoveRight, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { DateRange } from 'react-day-picker';
+import { adultsForSearch, DEFAULT_ADULTS, getPassengerDisplayCount, resolveAdultsCount } from '../lib/passengers';
 
 const FilterHotelMobile = () => {
   const { data: ticket } = useQuery({
@@ -39,13 +40,13 @@ const FilterHotelMobile = () => {
   const route = useRouter();
   const [ageOpen, setAgeOpen] = useState(false);
   const [dataOpenMobile, setDataOpenMobile] = useState(false);
-  const [selectAge, setSelectAge] = useState<number>(0);
   const [fromDate, setFromDate] = useState<Date | undefined>();
   const [toDate, setToDate] = useState<Date | undefined>();
   const [selectData, setSelectData] = useState<string>('');
-  const [adults, setAdults] = useState<number>(0);
+  const [adults, setAdults] = useState<number>(DEFAULT_ADULTS);
   const [range, setRange] = useState<DateRange | undefined>();
   const [children, setChildren] = useState<number>(0);
+  const passengerCount = getPassengerDisplayCount(adults, children);
 
   const [openDrawer, setOpenDrawer] = useState(false);
   const [searchCountry, setSearchCountry] = useState('');
@@ -94,7 +95,7 @@ const FilterHotelMobile = () => {
     }
     if (dateFrom) setFromDate(new Date(dateFrom));
     if (dateTo) setToDate(new Date(dateTo));
-    if (adultsParam) setAdults(parseInt(adultsParam));
+    if (adultsParam) setAdults(resolveAdultsCount(adultsParam));
     if (childrenParam) setChildren(parseInt(childrenParam));
 
     if (dateFrom && dateTo) {
@@ -112,7 +113,7 @@ const FilterHotelMobile = () => {
     if (fromDate)
       params.set('dateFrom', formatDate.format(fromDate, 'YYYY-MM-DD'));
     if (toDate) params.set('dateTo', formatDate.format(toDate, 'YYYY-MM-DD'));
-    if (adults > 0) params.set('adults', adults.toString());
+    params.set('adults', adultsForSearch(adults).toString());
     if (children > 0) params.set('children', children.toString());
 
     route.push(`/selectour?page=1&${params.toString()}`);
@@ -463,8 +464,7 @@ const FilterHotelMobile = () => {
           <div className="relative">
             <Input
               className="h-[60px] text-md placeholder:text-md placeholder:text-[#A3A3A3]"
-              placeholder={t('Вызрослых')}
-              value={selectAge === 0 ? '' : selectAge}
+              value={passengerCount}
               readOnly
             />
           </div>
@@ -509,7 +509,7 @@ const FilterHotelMobile = () => {
                   variant={'ghost'}
                   className="h-full rounded-tl-lg rounded-bl-lg rounded-br-none rounded-tr-none"
                   onClick={() =>
-                    setAdults((prev) => (prev > 0 ? prev - 1 : prev))
+                    setAdults((prev) => (prev > 1 ? prev - 1 : prev))
                   }
                 >
                   <RemoveIcon className="text-[#084FE3]" />
@@ -565,10 +565,7 @@ const FilterHotelMobile = () => {
           <div className="mt-auto grid grid-cols-1 gap-2">
             <button
               className="bg-[#1764FC] rounded-3xl p-3 text-white cursor-pointer font-semibold"
-              onClick={() => {
-                setSelectAge(adults + children);
-                setAgeOpen(false);
-              }}
+              onClick={() => setAgeOpen(false)}
             >
               {t('Применять')}
             </button>

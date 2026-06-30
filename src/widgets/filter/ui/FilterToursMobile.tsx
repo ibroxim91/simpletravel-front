@@ -28,6 +28,7 @@ import { MoveLeft, MoveRight, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams, usePathname } from 'next/navigation';
 import { toast } from 'sonner';
+import { adultsForSearch, DEFAULT_ADULTS, getPassengerDisplayCount, resolveAdultsCount } from '../lib/passengers';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { DateRange } from 'react-day-picker';
 
@@ -75,12 +76,12 @@ const hideText = pathname.includes('/selectour') || pathname.includes('/selectou
   const searchParams = useSearchParams();
   const [ageOpen, setAgeOpen] = useState(false);
   const [dataOpenMobile, setDataOpenMobile] = useState(false);
-  const [selectAge, setSelectAge] = useState<number>(0);
   const [fromDate, setFromDate] = useState<Date | undefined>();
   const [toDate, setToDate] = useState<Date | undefined>();
   const [selectData, setSelectData] = useState<string>('');
-  const [adults, setAdults] = useState<number>(0);
+  const [adults, setAdults] = useState<number>(DEFAULT_ADULTS);
   const [children, setChildren] = useState<number>(0);
+  const passengerCount = getPassengerDisplayCount(adults, children);
   const [range, setRange] = useState<DateRange | undefined>();
   const applyDatesFromSearchParams = useCallback(() => {
     const from = parseUrlDate(searchParams.get('dateFrom'));
@@ -253,8 +254,10 @@ useEffect(() => {
 
   // Dates & passengers
   applyDatesFromSearchParams();
-  setAdults(adultsParam ? parseInt(adultsParam) : 0);
-  setChildren(childrenParam ? parseInt(childrenParam) : 0);
+  const resolvedAdults = resolveAdultsCount(adultsParam);
+  const resolvedChildren = childrenParam ? parseInt(childrenParam) : 0;
+  setAdults(resolvedAdults);
+  setChildren(resolvedChildren);
 }, [searchParams, ticket, defaultCountry, applyDatesFromSearchParams]);
 
 
@@ -312,7 +315,7 @@ useEffect(() => {
     if (fromDate)
       params.set('dateFrom', formatDate.format(fromDate, 'YYYY-MM-DD'));
     if (toDate) params.set('dateTo', formatDate.format(toDate, 'YYYY-MM-DD'));
-    if (adults > 0) params.set('adults', adults.toString());
+    params.set('adults', adultsForSearch(adults).toString());
     if (children > 0) params.set('children', children.toString());
     if (searchParams.get("hotel_id")) params.set('hotel_id', "");
     if (searchParams.get("town")) params.set('town', "");
@@ -825,12 +828,7 @@ useEffect(() => {
           <div className="relative">
             <Input
               className="h-12 rounded-none border-0 px-5 text-[14px] font-medium text-[#1C1C1E] placeholder:text-[14px] placeholder:text-[#1C1C1E]"
-              placeholder={t('Вызрослых')}
-              value={
-                selectAge === 0
-                  ? ''
-                  : `${selectAge} ${getPassengerText(selectAge)}`
-              }
+              value={`${passengerCount} ${getPassengerText(passengerCount)}`}
               readOnly
             />
             <KeyboardArrowDownIcon
@@ -883,7 +881,7 @@ useEffect(() => {
                   variant={'ghost'}
                   className="h-full rounded-tl-lg rounded-bl-lg rounded-br-none rounded-tr-none"
                   onClick={() =>
-                    setAdults((prev) => (prev > 0 ? prev - 1 : prev))
+                    setAdults((prev) => (prev > 1 ? prev - 1 : prev))
                   }
                 >
                   <RemoveIcon className="text-blue-600" />
@@ -937,10 +935,7 @@ useEffect(() => {
           <div className="mt-auto grid grid-cols-1 gap-2">
             <button
               className="bg-blue-600 rounded-3xl p-3 text-white cursor-pointer font-semibold"
-              onClick={() => {
-                setSelectAge(adults + children);
-                setAgeOpen(false);
-              }}
+              onClick={() => setAgeOpen(false)}
             >
               {t('Применять')}
             </button>

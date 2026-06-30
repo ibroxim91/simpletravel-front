@@ -27,6 +27,7 @@ import { Loader2, MoveLeft, MoveRight } from 'lucide-react';
 
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
+import { adultsForSearch, DEFAULT_ADULTS, getPassengerDisplayCount, resolveAdultsCount } from '../lib/passengers';
 import { DateRange } from 'react-day-picker';
 
 const FilterHotel = () => {
@@ -37,9 +38,9 @@ const FilterHotel = () => {
   const [fromDate, setFromDate] = useState<Date | undefined>();
   const [toDate, setToDate] = useState<Date | undefined>();
   const [selectData, setSelectData] = useState<string>('');
-  const [adults, setAdults] = useState<number>(0);
+  const [adults, setAdults] = useState<number>(DEFAULT_ADULTS);
   const [children, setChildren] = useState<number>(0);
-  const selectAge = adults + children;
+  const passengerCount = getPassengerDisplayCount(adults, children);
   const [range, setRange] = useState<DateRange | undefined>();
   const [selectedRegion, setSelectedRegion] = useState<string>('');
   const [searchCountry, setSearchCountry] = useState('');
@@ -85,7 +86,7 @@ const FilterHotel = () => {
     }
     if (dateFrom) setFromDate(new Date(dateFrom));
     if (dateTo) setToDate(new Date(dateTo));
-    if (adultsParam) setAdults(parseInt(adultsParam));
+    if (adultsParam) setAdults(resolveAdultsCount(adultsParam));
     if (childrenParam) setChildren(parseInt(childrenParam));
 
     if (dateFrom && dateTo) {
@@ -109,7 +110,7 @@ const FilterHotel = () => {
     if (fromDate)
       params.set('dateFrom', formatDate.format(fromDate, 'YYYY-MM-DD'));
     if (toDate) params.set('dateTo', formatDate.format(toDate, 'YYYY-MM-DD'));
-    if (adults > 0) params.set('adults', adults.toString());
+    params.set('adults', adultsForSearch(adults).toString());
     if (children > 0) params.set('children', children.toString());
 
     route.push(`/selectour?page=1&${params.toString()}`);
@@ -402,8 +403,7 @@ const FilterHotel = () => {
           <div className="relative">
             <Input
               className="h-14 text-md placeholder:text-md placeholder:text-[#A3A3A3]"
-              placeholder={t('Вызрослых')}
-              value={selectAge === 0 ? '' : selectAge}
+              value={passengerCount}
               readOnly
             />
           </div>
@@ -446,7 +446,7 @@ const FilterHotel = () => {
                   variant={'ghost'}
                   className="h-full rounded-bl-lg rounded-br-none rounded-tr-none"
                   onClick={() => {
-                    setAdults((prev) => (prev > 0 ? prev - 1 : prev));
+                    setAdults((prev) => (prev > 1 ? prev - 1 : prev));
                   }}
                 >
                   <RemoveIcon className="text-[#084FE3]" />
