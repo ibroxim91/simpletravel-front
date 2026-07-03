@@ -777,9 +777,15 @@ function InfoIcon() {
   );
 }
 
-function CheckCircleIcon({ color = CARD_COLORS.green }: { color?: string }) {
+function CheckCircleIcon({
+  color = CARD_COLORS.green,
+  size = 48,
+}: {
+  color?: string;
+  size?: number;
+}) {
   return (
-    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden>
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" aria-hidden>
       <circle cx="24" cy="24" r="22" fill={`${color}18`} stroke={color} strokeWidth="2" />
       <path
         d="M15 24L21 30L33 18"
@@ -789,6 +795,36 @@ function CheckCircleIcon({ color = CARD_COLORS.green }: { color?: string }) {
         strokeLinejoin="round"
       />
     </svg>
+  );
+}
+
+function IncludedServiceBlock({
+  titleRu,
+  titleEn,
+}: {
+  titleRu: string;
+  titleEn?: string;
+}) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        textAlign: 'center',
+        gap: 8,
+      }}
+    >
+      <CheckCircleIcon size={40} />
+      <p style={{ margin: 0, fontSize: 10, fontWeight: 600, lineHeight: 1.45, color: COLORS.text }}>
+        {titleRu}
+      </p>
+      {titleEn ? (
+        <p style={{ margin: 0, fontSize: 9, color: COLORS.textMuted, lineHeight: 1.4 }}>
+          {titleEn}
+        </p>
+      ) : null}
+    </div>
   );
 }
 
@@ -1113,18 +1149,25 @@ export function VoucherDocument({
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              textAlign: 'center',
+              gap: 14,
               minHeight: 140,
-              gap: 10,
             }}
           >
-            <CheckCircleIcon />
-            <p style={{ margin: 0, fontSize: 10, fontWeight: 600, lineHeight: 1.5, color: COLORS.text }}>
-              Услуги авиабилетов включены в турпакет.
-            </p>
-            <p style={{ margin: 0, fontSize: 9, color: COLORS.textMuted, lineHeight: 1.5 }}>
-              Детали билета будут отправлены за 1–2 дня до вылета по SMS/Email.
-            </p>
+            <IncludedServiceBlock
+              titleRu="Услуги авиабилетов включены в турпакет."
+              titleEn="Детали билета будут отправлены за 1–2 дня до вылета по SMS/Email."
+            />
+            <div
+              style={{
+                width: '80%',
+                height: 1,
+                backgroundColor: `${CARD_COLORS.green}30`,
+              }}
+            />
+            <IncludedServiceBlock
+              titleRu="Страховое обслуживание включено в турпакет."
+              titleEn="Travel insurance is included in the package."
+            />
           </div>
         </InfoCard>
 
@@ -1236,7 +1279,7 @@ export function VoucherDocument({
           ) : null}
           <div>
             <p style={{ margin: 0, fontSize: 10, fontWeight: 700, color: COLORS.blue }}>
-              Поддержка туристов 24/7 — {BRAND_NAME.toUpperCase()}
+              Поддержка туристов — {BRAND_NAME.toUpperCase()}
             </p>
             <p style={{ margin: '3px 0 0', fontSize: 9, color: COLORS.textMuted }}>
               simpletravel.uz
