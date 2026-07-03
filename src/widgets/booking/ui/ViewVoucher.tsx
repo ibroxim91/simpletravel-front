@@ -3,12 +3,15 @@
 import { LanguageRoutes } from '@/shared/config/i18n/types';
 import { useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
+import DownloadIcon from '@mui/icons-material/Download';
 import PrintIcon from '@mui/icons-material/Print';
 import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
+import { useState } from 'react';
 import { Ticketorder_Api } from '../lib/api';
 import {
   buildWebVoucherAssets,
+  downloadOrderVoucherPdf,
   getTourExtrasFromLocalStorage,
   getVoucherUrl,
   unwrapOrder,
@@ -19,6 +22,7 @@ export default function ViewVoucher({ orderId }: { orderId: number }) {
   const t = useTranslations();
   const { locale } = useParams();
   const currentLocale = (locale as LanguageRoutes) || LanguageRoutes.UZ;
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['view-voucher', orderId],
@@ -60,6 +64,31 @@ export default function ViewVoucher({ orderId }: { orderId: number }) {
   const assets = buildWebVoucherAssets(voucherUrl);
   const tourExtras = getTourExtrasFromLocalStorage();
   const printDateTime = dayjs().format('DD.MM.YYYY HH:mm');
+  const voucherLabels = {
+    voucher: t('Voucher'),
+    hotelAndTransfer: t('Hotel va transfer'),
+    tourists: t('Turistlar'),
+    stayDates: t('Yashash sanalari'),
+    hotelName: t('Отель'),
+    mealType: t('Ovqatlanish turi'),
+    transferType: t('Transfer turi'),
+    roomType: t('Xona turi'),
+    receivingCompany: t('Qabul qiluvchi kompaniya'),
+    bookingTime: t('Bron qilingan vaqt'),
+  };
+
+  const handleDownloadPdf = async () => {
+    try {
+      setIsDownloading(true);
+      await downloadOrderVoucherPdf({
+        orderId: order.id,
+        locale: currentLocale,
+        labels: voucherLabels,
+      });
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   return (
     <>
@@ -81,7 +110,16 @@ export default function ViewVoucher({ orderId }: { orderId: number }) {
         }
       `}</style>
       <div className="voucher-page-wrapper min-h-screen bg-[#F3F4F6] py-6 print:bg-white print:py-0">
-        <div className="voucher-print-toolbar mx-auto mb-4 flex w-full max-w-[860px] justify-end px-4 print:hidden">
+        <div className="voucher-print-toolbar mx-auto mb-4 flex w-full max-w-[860px] justify-end gap-3 px-4 print:hidden">
+          <button
+            type="button"
+            onClick={handleDownloadPdf}
+            disabled={isDownloading}
+            className="flex items-center gap-2 rounded-full border-2 border-[#DFDFDF] bg-white px-5 py-2.5 text-[#031753] font-semibold shadow-sm transition-colors hover:bg-gray-50 disabled:opacity-60"
+          >
+            <DownloadIcon sx={{ fontSize: 20 }} />
+            {isDownloading ? t('Загрузка') : t('Скачать PDF')}
+          </button>
           <button
             type="button"
             onClick={() => window.print()}
@@ -101,18 +139,7 @@ export default function ViewVoucher({ orderId }: { orderId: number }) {
               <VoucherDocument
                 order={order}
                 locale={currentLocale}
-                labels={{
-                  voucher: t('Voucher'),
-                  hotelAndTransfer: t('Hotel va transfer'),
-                  tourists: t('Turistlar'),
-                  stayDates: t('Yashash sanalari'),
-                  hotelName: t('Отель'),
-                  mealType: t('Ovqatlanish turi'),
-                  transferType: t('Transfer turi'),
-                  roomType: t('Xona turi'),
-                  receivingCompany: t('Qabul qiluvchi kompaniya'),
-                  bookingTime: t('Bron qilingan vaqt'),
-                }}
+                labels={voucherLabels}
                 tourExtras={tourExtras}
                 printDateTime={printDateTime}
                 assets={assets}

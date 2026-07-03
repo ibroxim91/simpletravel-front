@@ -81,6 +81,9 @@ export interface SamoOrderParticipant {
   first_name: string;
   last_name: string;
   gender?: 'male' | 'female';
+  birth_date?: string;
+  phone_number?: string;
+  age?: number;
 }
 
 export interface SamoOrder {

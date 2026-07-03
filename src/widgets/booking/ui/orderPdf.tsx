@@ -52,6 +52,8 @@ type VoucherParticipant = {
   fullName: string;
   gender: string;
   birthDate: string;
+  age: string;
+  phone: string;
   citizenship: string;
   document: string;
   travelClass: string;
@@ -178,8 +180,10 @@ function resolveParticipantDetails(order: SamoOrder): VoucherParticipant[] {
       return {
         fullName: `${p.first_name ?? ''} ${p.last_name ?? ''}`.trim().toUpperCase(),
         gender: formatGender(p.gender || local?.gender),
-        birthDate: formatBirthDate(local?.date),
-        citizenship: 'UZB',
+        birthDate: formatBirthDate(p.birth_date || local?.date),
+        age: p.age != null ? String(p.age) : '—',
+        phone: p.phone_number || '—',
+        citizenship: 'Uzbekistan',
         document: '—',
         travelClass: 'Y',
       };
@@ -191,7 +195,9 @@ function resolveParticipantDetails(order: SamoOrder): VoucherParticipant[] {
       fullName: `${p.firstName ?? ''} ${p.lastName ?? ''}`.trim().toUpperCase(),
       gender: formatGender(p.gender),
       birthDate: formatBirthDate(p.date),
-      citizenship: 'UZB',
+      age: '—',
+      phone: '—',
+      citizenship: 'Uzbekistan',
       document: '—',
       travelClass: 'Y',
     }));
@@ -202,11 +208,35 @@ function resolveParticipantDetails(order: SamoOrder): VoucherParticipant[] {
       fullName: '—',
       gender: '—',
       birthDate: '—',
+      age: '—',
+      phone: '—',
       citizenship: '—',
       document: '—',
       travelClass: 'Y',
     },
   ];
+}
+
+function buildVoucherNumber(order: SamoOrder) {
+  const checkIn = order.check_in_date
+    ? dayjs(order.check_in_date)
+    : dayjs();
+  const datePart = checkIn.isValid() ? checkIn.format('DDMM') : dayjs().format('DDMM');
+  const yearPart = checkIn.isValid() ? checkIn.format('YYYY') : dayjs().format('YYYY');
+  return `№ ST-${order.id}-${datePart}-${yearPart}`;
+}
+
+function formatTourOperatorName(value?: string) {
+  const mapping: Record<string, string> = {
+    samo_tour: 'KOMPAS TOUR',
+    easy_booking: 'EASY BOOKING',
+    right_flight: 'RIGHT FLIGHT',
+    flykhiva: 'FLYKHIVA',
+    malva_tour: 'MALVA TOUR',
+    aqua_travelplus: 'AQUA TRAVELPLUS',
+  };
+  if (!value) return '—';
+  return mapping[value] ?? value.toUpperCase();
 }
 
 function resolveTouristNames(participants: VoucherParticipant[]) {
@@ -483,16 +513,19 @@ function HotelIcon() {
   );
 }
 
-function PlaneIcon({ size = 16 }: { size?: number }) {
-    return (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden>
-        <path
-          d="M10.5 13.5L6 18.5L7.5 20L12 15.5L16.5 20L18 18.5L13.5 13.5L21 6H16L12 10L8 6H3L10.5 13.5Z"
-          fill={COLORS.blue}
-        />
-      </svg>
-    );
-  }
+function PlaneIcon({
+  size = 16,
+  color = COLORS.blue,
+}: {
+  size?: number;
+  color?: string;
+}) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={color} aria-hidden>
+      <path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
+    </svg>
+  );
+}
 function PeopleIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -608,6 +641,229 @@ function Td({
   );
 }
 
+const CARD_COLORS = {
+  blue: '#1A73E8',
+  green: '#22C55E',
+  purple: '#8B5CF6',
+  cyan: '#0EA5E9',
+  orange: '#F59E0B',
+};
+
+function FieldRow({
+  labelRu,
+  labelEn,
+  value,
+}: {
+  labelRu: string;
+  labelEn: string;
+  value: ReactNode;
+}) {
+  return (
+    <div style={{ marginBottom: 10 }}>
+      <div style={{ fontSize: 9, color: COLORS.textMuted, lineHeight: 1.3 }}>
+        {labelRu} / {labelEn}
+      </div>
+      <div style={{ fontSize: 11, fontWeight: 600, color: COLORS.text, marginTop: 2 }}>
+        {value}
+      </div>
+    </div>
+  );
+}
+
+function InfoCard({
+  color,
+  icon,
+  titleRu,
+  titleEn,
+  children,
+  badge,
+}: {
+  color: string;
+  icon: ReactNode;
+  titleRu: string;
+  titleEn: string;
+  children: ReactNode;
+  badge?: ReactNode;
+}) {
+  return (
+    <div
+      style={{
+        border: `1px solid ${color}22`,
+        borderRadius: 14,
+        overflow: 'hidden',
+        backgroundColor: COLORS.white,
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <div
+        style={{
+          backgroundColor: `${color}12`,
+          padding: '10px 12px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 8,
+          borderBottom: `1px solid ${color}18`,
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div
+            style={{
+              width: 28,
+              height: 28,
+              borderRadius: 8,
+              backgroundColor: `${color}20`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            {icon}
+          </div>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 800, color: COLORS.text, lineHeight: 1.2 }}>
+              {titleRu}
+            </div>
+            <div style={{ fontSize: 9, color: COLORS.textMuted, lineHeight: 1.2 }}>
+              {titleEn}
+            </div>
+          </div>
+        </div>
+        {badge}
+      </div>
+      <div style={{ padding: '12px 14px', flex: 1 }}>{children}</div>
+    </div>
+  );
+}
+
+function TransferIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <rect
+        x="3"
+        y="6"
+        width="18"
+        height="11"
+        rx="2"
+        stroke={CARD_COLORS.cyan}
+        strokeWidth="1.8"
+      />
+      <path
+        d="M3 11h18"
+        stroke={CARD_COLORS.cyan}
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <circle cx="7.5" cy="14.5" r="1.2" fill={CARD_COLORS.cyan} />
+      <circle cx="16.5" cy="14.5" r="1.2" fill={CARD_COLORS.cyan} />
+      <path
+        d="M7 17v2M17 17v2"
+        stroke={CARD_COLORS.cyan}
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function InfoIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <circle cx="12" cy="12" r="9" stroke={CARD_COLORS.orange} strokeWidth="1.8" />
+      <path d="M12 10V16M12 7V7.01" stroke={CARD_COLORS.orange} strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function CheckCircleIcon({ color = CARD_COLORS.green }: { color?: string }) {
+  return (
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden>
+      <circle cx="24" cy="24" r="22" fill={`${color}18`} stroke={color} strokeWidth="2" />
+      <path
+        d="M15 24L21 30L33 18"
+        stroke={color}
+        strokeWidth="3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function ShieldIcon() {
+  return (
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path
+        d="M12 2L4 5V11C4 16.55 7.84 21.74 12 23C16.16 21.74 20 16.55 20 11V5L12 2Z"
+        fill={`${COLORS.blue}18`}
+        stroke={COLORS.blue}
+        strokeWidth="1.5"
+      />
+      <path
+        d="M9 12L11 14L15 10"
+        stroke={COLORS.blue}
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+const INFO_BULLETS = [
+  'В турпакет входят авиабилет, отель и трансфер.',
+  'Проверьте срок действия паспорта.',
+  'Заранее уточните время заезда/выезда в отель.',
+];
+
+const INFO_BULLETS_EN = [
+  'Package includes flight, hotel and transfer.',
+  'Check your passport validity.',
+  'Confirm hotel check-in/check-out times in advance.',
+];
+
+function VoucherNumberBadge({ number }: { number: string }) {
+  return (
+    <div
+      style={{
+        display: 'inline-block',
+        borderRadius: 12,
+        backgroundColor: COLORS.blue,
+        overflow: 'hidden',
+      }}
+    >
+      <table
+        cellPadding={0}
+        cellSpacing={0}
+        style={{ borderCollapse: 'collapse', height: 24 }}
+      >
+        <tbody>
+          <tr>
+            <td
+              style={{
+                paddingLeft: 14,
+                paddingRight: 14,
+                color: COLORS.white,
+                fontSize: 10,
+                fontWeight: 700,
+                textAlign: 'center',
+                verticalAlign: 'middle',
+                lineHeight: 1,
+                whiteSpace: 'nowrap',
+                height: 24,
+              }}
+            >
+              {number}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 type OrderVoucherDocumentProps = {
   order: SamoOrder;
   locale: LanguageRoutes;
@@ -620,20 +876,16 @@ type OrderVoucherDocumentProps = {
 
 export function VoucherDocument({
   order,
-  locale,
   tourExtras,
   printDateTime,
   assets,
 }: OrderVoucherDocumentProps) {
   const participants = resolveParticipantDetails(order);
-  const touristNames = resolveTouristNames(participants);
   const stayRange = formatStayDates(order);
   const accommodationDates = formatAccommodationDates(order);
   const roomType = tourExtras.room_type || 'STD';
   const mealCode = getMealShort(order.meal_plan);
-  const transferType =
-    tourExtras.freight_external || tourExtras.place || 'GROUP';
-  const hotelBlock = `${order.hotel_name || order.title || '—'} (${roomType})`;
+  const hotelName = order.hotel_name || order.title || '—';
   const departureLocation = formatLocationWithCountry(
     order.departure_name,
     order.departure_country_name,
@@ -643,7 +895,14 @@ export function VoucherDocument({
     order.destination_country_name,
   );
   const tourPrice = order.total_price ?? order.price;
-  const formattedTourPrice = `${Number(tourPrice).toLocaleString('uz-UZ')} uzs`
+  const formattedTourPrice = `${Number(tourPrice).toLocaleString('uz-UZ')} uzs`;
+  const durationText = order.duration_days
+    ? `${order.duration_days} ${order.duration_days === 1 ? 'ночь' : 'ночей'} / nights`
+    : '—';
+  const passengerCount = order.passenger_count || participants.length;
+  const voucherNumber = buildVoucherNumber(order);
+  const dmcName = formatTourOperatorName(order.tour_operator || tourExtras.operator);
+  const transferRoute = 'Аэропорт - Отель - Аэропорт';
 
   return (
     <div
@@ -651,7 +910,7 @@ export function VoucherDocument({
       style={{
         width: '794px',
         backgroundColor: COLORS.white,
-        padding: '28px 32px 24px',
+        padding: '24px 28px 20px',
         fontFamily: 'Arial, Helvetica, sans-serif',
         color: COLORS.text,
         boxSizing: 'border-box',
@@ -660,37 +919,41 @@ export function VoucherDocument({
       {/* HEADER */}
       <div
         style={{
+          position: 'relative',
           display: 'flex',
           alignItems: 'flex-start',
           justifyContent: 'space-between',
-          gap: '16px',
+          gap: 16,
+          marginBottom: 18,
+          paddingBottom: 16,
+          borderBottom: `1px solid ${COLORS.border}`,
         }}
       >
-        <div style={{ width: '220px' }}>
+        <div style={{ width: 200 }}>
           {assets.logoSrc ? (
             <img
               src={assets.logoSrc}
               alt={BRAND_NAME}
               style={{
-                width: '150px',
-                height: '48px',
+                width: 150,
+                height: 44,
                 objectFit: 'contain',
                 objectPosition: 'left center',
                 display: 'block',
               }}
             />
           ) : (
-            <p style={{ margin: 0, fontSize: '20px', fontWeight: 700, color: COLORS.blue }}>
+            <p style={{ margin: 0, fontSize: 20, fontWeight: 700, color: COLORS.blue }}>
               {BRAND_NAME}
             </p>
           )}
-          <p style={{ margin: '8px 0 0', fontSize: '11px', color: COLORS.textMuted }}>
+          <p style={{ margin: '8px 0 0', fontSize: 10, color: COLORS.textMuted }}>
             {BRAND_NAME} Uzbekistan
           </p>
-          <p style={{ margin: '4px 0 0', fontSize: '11px', color: COLORS.text }}>
-            Турпакет: <strong>#{order.id}</strong>
+          <p style={{ margin: '4px 0 0', fontSize: 10, color: COLORS.text }}>
+            Туроператор: <strong>#{order.id}</strong>
           </p>
-          <p style={{ margin: '4px 0 0', fontSize: '10px', color: COLORS.textMuted }}>
+          <p style={{ margin: '4px 0 0', fontSize: 9, color: COLORS.textMuted }}>
             MCHJ: {COMPANY_NAME}
           </p>
         </div>
@@ -701,21 +964,21 @@ export function VoucherDocument({
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: '6px',
+            gap: 6,
           }}
         >
           {assets.qrSrc ? (
-            <img src={assets.qrSrc} alt="QR" width={118} height={118} />
+            <img src={assets.qrSrc} alt="QR" width={96} height={96} />
           ) : (
             <div
               style={{
-                width: 118,
-                height: 118,
+                width: 96,
+                height: 96,
                 border: `1px dashed ${COLORS.border}`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '11px',
+                fontSize: 11,
                 color: COLORS.textMuted,
               }}
             >
@@ -725,300 +988,303 @@ export function VoucherDocument({
           <p
             style={{
               margin: 0,
-              fontSize: '28px',
+              fontSize: 26,
               fontWeight: 800,
-              letterSpacing: '0.12em',
-              color: COLORS.text,
+              letterSpacing: '0.1em',
+              color: '#0F2B6E',
+              textAlign: 'center',
+              width: '100%',
             }}
           >
             VOUCHER
           </p>
-        </div>
-
-        <div style={{ width: '170px', textAlign: 'right' }}>
-          <p
-            style={{
-              margin: 0,
-              fontSize: '16px',
-              fontWeight: 700,
-              color: COLORS.text,
-            }}
-          >
-            {stayRange}
-          </p>
           <div
             style={{
-              marginTop: '10px',
               display: 'flex',
-              justifyContent: 'flex-end',
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: '100%',
             }}
           >
-            <PassengerCounters count={order.passenger_count || participants.length} />
+            <VoucherNumberBadge number={voucherNumber} />
           </div>
+        </div>
+
+        <div style={{ width: 170, textAlign: 'right' }}>
+          <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: COLORS.text }}>
+            {stayRange}
+          </p>
+          <p style={{ margin: '4px 0 0', fontSize: 9, color: COLORS.textMuted }}>
+            Даты / Dates
+          </p>
+          <div style={{ marginTop: 10, display: 'flex', justifyContent: 'flex-end' }}>
+            <PassengerCounters count={passengerCount} />
+          </div>
+          <p style={{ margin: '4px 0 0', fontSize: 9, color: COLORS.textMuted, textAlign: 'right' }}>
+            {passengerCount} На ваучер / For
+          </p>
         </div>
       </div>
 
-      {/* TOUR INFO */}
-      <SectionTitle
-        icon={<TourPackageIcon />}
-        title="Турпакет / Tour Package"
-      />
-
-      <table
+      {/* 6-CARD GRID */}
+      <div
         style={{
-          width: '100%',
-          borderCollapse: 'collapse',
-          border: `1px solid ${COLORS.border}`,
-          borderRadius: '10px',
-          overflow: 'hidden',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: 12,
+          marginBottom: 16,
         }}
       >
-        <thead>
-          <tr>
-            <Th width="20%">Название / Title</Th>
-            <Th width="15%">Откуда / Departure</Th>
-            <Th width="15%">Куда / Destination</Th>
-            <Th width="10%">Пассажиры / Passengers</Th>
-            <Th width="12%">Длительность / Duration</Th>
-            <Th width="14%">Цена / Price</Th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <Td bold>{order.title || '—'}</Td>
-            <Td>{departureLocation}</Td>
-            <Td>{destinationLocation}</Td>
-            <Td>{order.passenger_count ?? '—'}</Td>
-            <Td>
-              {order.duration_days
-                ? `${order.duration_days} ${order.duration_days === 1 ? 'ночь/night' : 'ночей/nights'}`
-                : '—'}
-            </Td>
-            <Td bold>{formattedTourPrice}</Td>
-          </tr>
-        </tbody>
-      </table>
-
-      {/* HOTEL & TRANSFER */}
-      <SectionTitle
-        icon={<HotelIcon />}
-        title="Отель и Трансфер / Hotel and Transfer"
-      />
-
-      <table
-        style={{
-          width: '100%',
-          borderCollapse: 'collapse',
-          border: `1px solid ${COLORS.border}`,
-          borderRadius: '10px',
-          overflow: 'hidden',
-        }}
-      >
-        <thead>
-          <tr>
-            <Th width="18%">Туристы / Tourists</Th>
-            <Th width="16%">Проживание / Accommodation</Th>
-            <Th width="28%">Отель- Тип номера/ Hotel- Room Type</Th>
-            <Th width="16%"> Тип питания / Meal Type</Th>
-            <Th width="22%">Принимающая компания / DMC</Th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <Td preLine>{touristNames}</Td>
-            <Td>{accommodationDates}</Td>
-            <Td bold>{hotelBlock}</Td>
-            <Td>{mealCode}</Td>
-            <Td>
-              <div
-                style={{
-                  display: 'inline-block',
-                  padding: '8px 12px',
-                  border: `1px solid ${COLORS.border}`,
-                  borderRadius: '8px',
-                  backgroundColor: COLORS.headerBg,
-                  fontWeight: 700,
-                  fontSize: '11px',
-                  color: COLORS.blue,
-                  textTransform: 'uppercase',
-                }}
-              >
-                {order.tour_operator || tourExtras.operator || '—'}
-              </div>
-            </Td>
-          </tr>
-        </tbody>
-      </table>
-
-      {/* FLIGHT + TOURISTS */}
-      {/* <div style={{ display: 'flex', gap: '14px', marginTop: '4px' }}>
-        <div style={{ flex: 1 }}>
-          <SectionTitle
-            icon={<PlaneIcon />}
-            title="Полётные данные / Flight data"
+        {/* Tour Package */}
+        <InfoCard
+          color={CARD_COLORS.blue}
+          icon={<TourPackageIcon />}
+          titleRu="ТУРПАКЕТ"
+          titleEn="TOUR PACKAGE"
+        >
+          <p style={{ margin: '0 0 10px', fontSize: 11, fontWeight: 700, lineHeight: 1.4 }}>
+            {order.title || '—'}
+          </p>
+          <FieldRow labelRu="Отправление" labelEn="Departure" value={departureLocation} />
+          <FieldRow labelRu="Направление" labelEn="Destination" value={destinationLocation} />
+          <FieldRow
+            labelRu="Пассажиры"
+            labelEn="Passengers"
+            value={String(passengerCount)}
           />
-          <div
-            style={{
-              border: `1px solid ${COLORS.border}`,
-              borderRadius: '10px',
-              padding: '14px',
-              minHeight: '180px',
-            }}
-          >
+          <FieldRow labelRu="Длительность" labelEn="Duration" value={durationText} />
+          <FieldRow labelRu="Цена" labelEn="Price" value={formattedTourPrice} />
+        </InfoCard>
+
+        {/* Tourists */}
+        <InfoCard
+          color={CARD_COLORS.blue}
+          icon={<PeopleIcon />}
+          titleRu="ТУРИСТЫ"
+          titleEn="TOURISTS"
+        >
+          {participants.map((p, index) => (
             <div
+              key={`${p.fullName}-${index}`}
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                marginBottom: '12px',
+                marginBottom: index < participants.length - 1 ? 12 : 0,
+                paddingBottom: index < participants.length - 1 ? 12 : 0,
+                borderBottom:
+                  index < participants.length - 1 ? `1px solid ${COLORS.border}` : 'none',
               }}
             >
-              <PlaneIcon size={18} />
-              <span style={{ fontSize: '11px', fontWeight: 700 }}>
-                Прямой чартерный рейс / Direct charter
-              </span>
+              <p style={{ margin: '0 0 8px', fontSize: 11, fontWeight: 800 }}>
+                {index + 1} {p.fullName}
+              </p>
+              <FieldRow labelRu="Паспорт" labelEn="Passport" value={p.document} />
+              <FieldRow labelRu="Дата рождения" labelEn="DOB" value={p.birthDate} />
+              <FieldRow labelRu="Возраст" labelEn="Age" value={p.age} />
+              <FieldRow labelRu="Телефон" labelEn="Phone" value={p.phone} />
+              <FieldRow labelRu="Гражданство" labelEn="Nationality" value={p.citizenship} />
             </div>
+          ))}
+        </InfoCard>
 
-            <div style={{ marginBottom: '12px' }}>
-              <p style={{ margin: '0 0 6px', fontSize: '10px', color: COLORS.textMuted }}>
-                ТУДА / OUTBOUND · {outboundDate}
-              </p>
-              <p style={{ margin: 0, fontSize: '12px', fontWeight: 700 }}>
-                {airportCode(departureName)} → {airportCode(destinationName)}
-              </p>
-              <p style={{ margin: '4px 0 0', fontSize: '11px', color: COLORS.textMuted }}>
-                {outboundTime}
-              </p>
-            </div>
-
-            <div>
-              <p style={{ margin: '0 0 6px', fontSize: '10px', color: COLORS.textMuted }}>
-                ОБРАТНО / INBOUND · {inboundDate}
-              </p>
-              <p style={{ margin: 0, fontSize: '12px', fontWeight: 700 }}>
-                {airportCode(destinationName)} → {airportCode(departureName)}
-              </p>
-              <p style={{ margin: '4px 0 0', fontSize: '11px', color: COLORS.textMuted }}>
-                {outboundTime}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div style={{ flex: 1.2 }}>
-          <SectionTitle icon={<PeopleIcon />} title="Туристы / Tourists" />
-          <table
+        {/* Flight */}
+        <InfoCard
+          color={CARD_COLORS.green}
+          icon={<PlaneIcon size={16} color={CARD_COLORS.green} />}
+          titleRu="АВИАРЕЙС"
+          titleEn="FLIGHT INFORMATION"
+          badge={
+            <span
+              style={{
+                padding: '3px 8px',
+                borderRadius: 999,
+                backgroundColor: `${CARD_COLORS.green}20`,
+                color: '#15803D',
+                fontSize: 8,
+                fontWeight: 700,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              ВКЛЮЧЕНО В ТУР
+            </span>
+          }
+        >
+          <div
             style={{
-              width: '100%',
-              borderCollapse: 'collapse',
-              border: `1px solid ${COLORS.border}`,
-              borderRadius: '10px',
-              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              textAlign: 'center',
+              minHeight: 140,
+              gap: 10,
             }}
           >
-            <thead>
-              <tr>
-                <Th width="10%">Класс</Th>
-                <Th width="28%">Турист</Th>
-                <Th width="8%">Пол</Th>
-                <Th width="18%">Дата рожд.</Th>
-                <Th width="14%">Гражд.</Th>
-                <Th width="22%">Документ</Th>
-              </tr>
-            </thead>
-            <tbody>
-              {participants.map((p, index) => (
-                <tr key={`${p.fullName}-${index}`}>
-                  <Td>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <PlaneIcon size={12} />
-                      <span>{p.travelClass}</span>
-                    </div>
-                  </Td>
-                  <Td bold>{p.fullName}</Td>
-                  <Td>{p.gender}</Td>
-                  <Td>{p.birthDate}</Td>
-                  <Td>{p.citizenship}</Td>
-                  <Td>{p.document}</Td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div> */}
+            <CheckCircleIcon />
+            <p style={{ margin: 0, fontSize: 10, fontWeight: 600, lineHeight: 1.5, color: COLORS.text }}>
+              Услуги авиабилетов включены в турпакет.
+            </p>
+            <p style={{ margin: 0, fontSize: 9, color: COLORS.textMuted, lineHeight: 1.5 }}>
+              Детали билета будут отправлены за 1–2 дня до вылета по SMS/Email.
+            </p>
+          </div>
+        </InfoCard>
+
+        {/* Hotel */}
+        <InfoCard
+          color={CARD_COLORS.purple}
+          icon={<HotelIcon />}
+          titleRu="ОТЕЛЬ"
+          titleEn="HOTEL"
+        >
+          <FieldRow
+            labelRu="Отель"
+            labelEn="Hotel"
+            value={`${hotelName} (${roomType})`}
+          />
+          <FieldRow
+            labelRu="Даты заезда"
+            labelEn="Check-in - Check-out"
+            value={accommodationDates}
+          />
+          <FieldRow labelRu="Тип номера" labelEn="Room Type" value={roomType} />
+          <FieldRow labelRu="Тип питания" labelEn="Meal Type" value={mealCode} />
+          <FieldRow labelRu="Примечание" labelEn="Note" value="—" />
+        </InfoCard>
+
+        {/* Transfer */}
+        <InfoCard
+          color={CARD_COLORS.cyan}
+          icon={<TransferIcon />}
+          titleRu="ТРАНСФЕР"
+          titleEn="TRANSFER"
+        >
+          <FieldRow labelRu="Тип трансфера" labelEn="Type" value={transferRoute} />
+          <FieldRow labelRu="Маршрут" labelEn="Route" value="Airport - Hotel - Airport" />
+          <FieldRow labelRu="Принимающая компания" labelEn="DMC" value={dmcName} />
+          <FieldRow
+            labelRu="Включено"
+            labelEn="Included"
+            value={
+              <span style={{ color: CARD_COLORS.green, fontWeight: 700 }}>
+                Да ✓
+              </span>
+            }
+          />
+          <FieldRow labelRu="Примечание" labelEn="Note" value="—" />
+        </InfoCard>
+
+        {/* Additional Info */}
+        <InfoCard
+          color={CARD_COLORS.orange}
+          icon={<InfoIcon />}
+          titleRu="ДОП. ИНФОРМАЦИЯ"
+          titleEn="INFORMATION"
+        >
+          <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+            {INFO_BULLETS.map((item, index) => (
+              <li
+                key={item}
+                style={{
+                  display: 'flex',
+                  gap: 8,
+                  marginBottom: 8,
+                  fontSize: 9,
+                  lineHeight: 1.45,
+                }}
+              >
+                <span
+                  style={{
+                    width: 14,
+                    height: 14,
+                    borderRadius: '50%',
+                    backgroundColor: `${CARD_COLORS.orange}25`,
+                    color: CARD_COLORS.orange,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 8,
+                    flexShrink: 0,
+                    marginTop: 1,
+                  }}
+                >
+                  ✓
+                </span>
+                <span>
+                  {item}
+                  <br />
+                  <span style={{ color: COLORS.textMuted }}>{INFO_BULLETS_EN[index]}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </InfoCard>
+      </div>
 
       {/* FOOTER */}
-      <p
-        style={{
-          margin: '20px 0 10px',
-          fontSize: '10px',
-          color: COLORS.textMuted,
-          textAlign: 'right',
-        }}
-      >
-        Время и дата печати счёта: {printDateTime}
-      </p>
-
       <div
         style={{
           borderTop: `1px solid ${COLORS.border}`,
-          paddingTop: '14px',
+          paddingTop: 14,
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'flex-start',
-          gap: '20px',
+          gap: 16,
         }}
       >
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', flex: 1 }}>
           {assets.footerQrSrc ? (
-            <img
-              src={assets.footerQrSrc}
-              alt="Support QR"
-              width={58}
-              height={58}
-            />
+            <img src={assets.footerQrSrc} alt="Support QR" width={52} height={52} />
           ) : null}
           <div>
-            <p style={{ margin: 0, fontSize: '11px', fontWeight: 700, color: COLORS.blue }}>
-              🎧 Поддержка туристов 24/7
+            <p style={{ margin: 0, fontSize: 10, fontWeight: 700, color: COLORS.blue }}>
+              Поддержка туристов 24/7 — {BRAND_NAME.toUpperCase()}
             </p>
-            <p style={{ margin: '4px 0 0', fontSize: '10px', color: COLORS.text }}>
-              {BRAND_NAME.toUpperCase()} 
-            </p>
-            <p style={{ margin: '4px 0 0', fontSize: '10px', color: COLORS.textMuted }}>
-              {BRAND_NAME.toLowerCase().replace(' ', '')}.uz
+            <p style={{ margin: '3px 0 0', fontSize: 9, color: COLORS.textMuted }}>
+              simpletravel.uz
             </p>
           </div>
         </div>
 
-        <div style={{ textAlign: 'right' }}>
-          <p style={{ margin: 0, fontSize: '10px', color: COLORS.textMuted }}>
-           Контактные номера / Contact numbers
-          </p>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
+          <ShieldIcon />
           <p
             style={{
-              margin: '4px 0 10px',
-              fontSize: '13px',
-              fontWeight: 700,
+              margin: '6px 0 0',
+              fontSize: 9,
+              fontWeight: 600,
               color: COLORS.blue,
+              textAlign: 'center',
+              maxWidth: 140,
             }}
           >
+            Надёжный сервис — всегда с вами!
+          </p>
+        </div>
+
+        <div style={{ textAlign: 'right', flex: 1 }}>
+          <p style={{ margin: 0, fontSize: 9, color: COLORS.textMuted }}>
+            Связаться с нами / Contact us
+          </p>
+          <p style={{ margin: '4px 0', fontSize: 11, fontWeight: 700, color: COLORS.blue }}>
             📞 {SUPPORT_PHONE}
           </p>
-          {/* <p style={{ margin: 0, fontSize: '10px', color: COLORS.textMuted }}>
-            Короткий номер
-          </p> */}
-          <p
-            style={{
-              margin: '4px 0 0',
-              fontSize: '13px',
-              fontWeight: 700,
-              color: COLORS.blue,
-            }}
-          >
+          <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: COLORS.blue }}>
             📞 {SUPPORT_PHONE_2}
           </p>
         </div>
+      </div>
+
+      <div
+        style={{
+          marginTop: 12,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          fontSize: 9,
+          color: COLORS.textMuted,
+        }}
+      >
+        <span>Время печати счёта: {printDateTime}</span>
+        <span>Для дополнительной информации свяжитесь с нами.</span>
       </div>
     </div>
   );
