@@ -38,6 +38,7 @@ const GET_SAVED = '/api/v1/likes/';
 
 const SEND_PARTNER = '/api/v1/travel-agency/';
 const SEND_SUPPORT = '/api/v1/support/';
+const CHAT_MESSAGES = '/api/v1/chat/messages/';
 const UPDATE_USER = '/api/v1/auth/user-update/';
 const NEW_PASSWORD = '/api/v1/auth/change-password/';
 const GET_ME = '/api/v1/auth/me/';
@@ -105,6 +106,7 @@ export {
   SEND_COMMENT,
   SEND_PARTNER,
   SEND_SUPPORT,
+  CHAT_MESSAGES,
   TICKETORDER,
   TICKETORDER_INFO,
   UPDATE_USER,

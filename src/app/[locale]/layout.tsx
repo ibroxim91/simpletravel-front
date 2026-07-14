@@ -7,6 +7,7 @@ import { getPageSeo } from '@/shared/lib/getPageSeo';
 import { Toaster } from '@/shared/ui/sonner';
 import ConditionalFooter from '@/widgets/footer/ui/ConditionalFooter';
 import Navbar from '@/widgets/navbar/ui';
+import ConditionalSupportChat from '@/widgets/support-chat/ui/ConditionalSupportChat';
 import type { Metadata } from 'next';
 import { hasLocale, Locale, NextIntlClientProvider } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
@@ -171,6 +172,7 @@ export default async function RootLayout({ children, params }: Props) {
             <QueryProvider>
               <Navbar />
               <Welcome />
+              <ConditionalSupportChat />
               <main className="flex-1">{children}</main>
               <ConditionalFooter />
               <Toaster richColors />

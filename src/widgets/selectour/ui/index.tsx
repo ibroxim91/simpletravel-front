@@ -28,6 +28,7 @@ import {
   SelectValue,
 } from '@/shared/ui/select';
 import FilterTours from '@/widgets/filter/ui/FilterTours';
+import SupportChatWidget from '@/widgets/support-chat/ui/SupportChatWidget';
 import FilterToursMobile from '@/widgets/filter/ui/FilterToursMobile';
 import CloseIcon from '@mui/icons-material/Close';
 import EastIcon from '@mui/icons-material/East';
@@ -1764,11 +1765,13 @@ const top_duration = [
           type="button"
           aria-label={t('Yuqoriga qaytish')}
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="fixed z-50 flex items-center justify-center rounded-full bg-[#084FE3] text-white shadow-[0_4px_20px_rgba(8,79,227,0.35)] transition-transform hover:bg-[#0640c4] active:scale-95 bottom-[calc(1.5rem+env(safe-area-inset-bottom,0px))] right-4 h-11 w-11 sm:bottom-6 sm:right-6 sm:h-12 sm:w-12"
+          className="fixed z-[70] flex items-center justify-center rounded-full bg-[#084FE3] text-white shadow-[0_4px_20px_rgba(8,79,227,0.35)] transition-transform hover:bg-[#0640c4] active:scale-95 bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))] right-4 h-11 w-11 sm:bottom-[calc(5.75rem+env(safe-area-inset-bottom,0px))] sm:right-6 sm:h-12 sm:w-12"
         >
           <KeyboardArrowUpIcon sx={{ fontSize: { xs: 24, sm: 28 } }} />
         </button>
       )}
+
+      <SupportChatWidget variant="bar" />
     </div>
   );
 }

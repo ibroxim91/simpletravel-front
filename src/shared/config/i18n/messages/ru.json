@@ -540,5 +540,17 @@
   "Parvoz vaqti": "Время полёта",
   "Transfer": "Трансфер",
   "Avia kompaniya": "Авиакомпания",
-  "Tashkent International Airaport": "Международный аэропорт Ташкента"
+  "Tashkent International Airaport": "Международный аэропорт Ташкента",
+  "support_chat_title": "Поддержка",
+  "support_chat_brand": "Simple Travel",
+  "support_chat_welcome": "Здравствуйте! Укажите имя, телефон и ваш вопрос — мы ответим в ближайшее время.",
+  "support_chat_name": "Имя",
+  "support_chat_phone": "Телефон",
+  "support_chat_message": "Сообщение...",
+  "support_chat_send_error": "Не удалось отправить сообщение. Попробуйте снова.",
+  "support_chat_required": "Имя, телефон и сообщение обязательны",
+  "support_chat_close": "Закрыть чат",
+  "support_chat_open": "Открыть чат поддержки",
+  "support_chat_send": "Отправить",
+  "support_chat_bar_label": "Поддержка — есть вопрос?"
 }
