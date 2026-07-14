@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Loader2, MessageCircle, Send, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
   countUnreadAdminMessages,
   getChatMessages,
@@ -54,6 +55,7 @@ export default function SupportChatWidget({
 }: SupportChatWidgetProps) {
   const t = useTranslations();
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [message, setMessage] = useState('');
@@ -62,6 +64,10 @@ export default function SupportChatWidget({
   const [error, setError] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const profile = getStoredProfile();
@@ -259,20 +265,40 @@ export default function SupportChatWidget({
   ) : null;
 
   if (variant === 'bar') {
-    return (
-      <>
-        {panel}
+    if (!mounted) return null;
+
+    // Portal: selectour wrapperdagi overflow/transform fixed ni ishlamas qilib qo‘yadi (prod CSS da
+    // `fixed` + `relative` conflict ham bo‘lgan — relative yutib, tugma footerdan oldin qolardi).
+    return createPortal(
+      <div
+        className="pointer-events-none"
+        style={{
+          position: 'fixed',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 80,
+        }}
+      >
+        <div className="pointer-events-auto">{panel}</div>
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="fixed bottom-0 left-0 right-0 z-[80] relative flex h-[calc(3.25rem+env(safe-area-inset-bottom,0px))] min-h-[52px] items-center justify-center border-t border-[#084FE3]/20 px-4 text-sm font-semibold text-white shadow-[0_-4px_20px_rgba(23,100,252,0.2)] transition-colors hover:bg-[#084FE3]"
-          style={{ backgroundColor: COLORS.primary, paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+          className="pointer-events-auto relative flex w-full min-h-[52px] items-center justify-center border-t border-[#084FE3]/20 px-4 text-sm font-semibold text-white shadow-[0_-4px_20px_rgba(23,100,252,0.2)] transition-colors hover:bg-[#084FE3]"
+          style={{
+            backgroundColor: COLORS.primary,
+            height: 'calc(3.25rem + env(safe-area-inset-bottom, 0px))',
+            paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+          }}
           aria-label={t('support_chat_open')}
         >
-          {!open ? <UnreadBadge count={unreadCount} className="right-4 top-2" /> : null}
+          {!open ? (
+            <UnreadBadge count={unreadCount} className="right-4 top-2" />
+          ) : null}
           {open ? t('support_chat_close') : t('support_chat_bar_label')}
         </button>
-      </>
+      </div>,
+      document.body,
     );
   }
 

@@ -2,7 +2,7 @@ import Selectour from '@/widgets/selectour/ui';
 
 const SelectourClient = () => {
   return (
-    <div className="overflow-hidden">
+    <div className="overflow-x-hidden">
       <Selectour />
     </div>
   );
