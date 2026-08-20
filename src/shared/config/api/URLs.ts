@@ -42,6 +42,7 @@ const CHAT_MESSAGES = '/api/v1/chat/messages/';
 const UPDATE_USER = '/api/v1/auth/user-update/';
 const NEW_PASSWORD = '/api/v1/auth/change-password/';
 const GET_ME = '/api/v1/auth/me/';
+const DELETE_ACCOUNT = '/api/v1/auth/delete/';
 const PARTICIPANT = '/api/v1/participant/';
 const PARTICIPANT_IMAGE = '/api/v1/participant-image/';
 const FAQ = '/api/v1/faq/';
@@ -84,6 +85,7 @@ export {
   GET_CONTACT,
   GET_HELP_PAGE,
   GET_ME,
+  DELETE_ACCOUNT,
   GET_OFFERTA,
   GET_SAVED,
   GET_TAGS,

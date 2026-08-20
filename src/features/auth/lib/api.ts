@@ -8,6 +8,7 @@ import {
   EMAIL_RESET_PASS,
   EMAIL_SENDOTP,
   EMAIL_SET_PASSWORD,
+  DELETE_ACCOUNT,
   NEW_PASSWORD,
   PHONE_CONFIRM_RESET_PASS,
   PHONE_CONFIRMOTP,
@@ -192,6 +193,11 @@ export const Auth_Api = {
       new_password,
       old_password,
     });
+    return res;
+  },
+
+  async deleteAccount() {
+    const res = await httpClient.delete(DELETE_ACCOUNT);
     return res;
   },
 };
