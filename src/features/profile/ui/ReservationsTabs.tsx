@@ -258,12 +258,16 @@ const ReservationsTabs = ({
     }
 
     if (selectedOrderId) {
+      const lang =
+        locale === LanguageRoutes.UZ ? LanguageRoutes.UZ : LanguageRoutes.RU;
+      const siteUrl = (
+        process.env.NEXT_PUBLIC_SITE_URL || 'https://simpletravel.uz'
+      ).replace(/\/$/, '');
+
       mutate({
         order_id: selectedOrderId,
         paymentType: paymentTypes,
-        return_url:
-          process.env.NEXT_PUBLIC_ORDER_RETURN_LINK ||
-          'http://localhost:3000/uz',
+        return_url: `${siteUrl}/${lang}/view-voucher/${selectedOrderId}`,
       });
       setIsPaymentModalOpen(false);
     }

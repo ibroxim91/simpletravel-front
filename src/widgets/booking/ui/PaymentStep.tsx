@@ -8,19 +8,18 @@ import { formatPrice } from '@/shared/lib/formatPrice';
 import { cn } from '@/shared/lib/utils';
 import CreditCardOutlinedIcon from '@mui/icons-material/CreditCardOutlined';
 import EventRepeatOutlinedIcon from '@mui/icons-material/EventRepeatOutlined';
-import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import PaymePayment from '../../../../public/images/payme-payment.png';
 import MulticardPayment from '../../../../public/multicard.png';
 import { Get_Info, Ticketorder_Api } from '../lib/api';
 import formStore from '../lib/hook';
-import { downloadOrderVoucherPdf } from './orderPdf';
+import { unwrapOrder } from './orderPdf';
 import PaidModal from './PaidModal';
 
 type Props = {
@@ -34,6 +33,16 @@ type PaymentMode = 'full' | 'installment';
 const INSTALLMENT_URL =
   process.env.NEXT_PUBLIC_INSTALLMENT_PAYMENT_URL ||
   'https://www.apelsin.uz/open-service?serviceId=498649927';
+
+const PAID_ORDER_STATUSES = new Set([
+  'pending_confirmation',
+  'confirmed',
+  'completed',
+]);
+
+const SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://simpletravel.uz'
+).replace(/\/$/, '');
 
 interface User {
   date: string;
@@ -52,7 +61,19 @@ const PAYMENT_PROVIDERS = [
   { id: 'click', label: 'Click', logo: Click.src, size: 60 },
 ] as const;
 
-export default function PaymentStep({ onPrev, data }: Props) {
+function resolveOrderId(propOrderId?: number) {
+  if (propOrderId && propOrderId > 0) return propOrderId;
+  if (typeof window === 'undefined') return null;
+  const fromStorage = Number(localStorage.getItem('orderId'));
+  return Number.isFinite(fromStorage) && fromStorage > 0 ? fromStorage : null;
+}
+
+function buildPaymentReturnUrl(orderId: number, locale: string) {
+  const lang = locale === LanguageRoutes.UZ ? LanguageRoutes.UZ : LanguageRoutes.RU;
+  return `${SITE_URL}/${lang}/view-voucher/${orderId}`;
+}
+
+export default function PaymentStep({ onPrev, data, orderId }: Props) {
   const t = useTranslations();
   const { locale } = useParams();
   const timeData = JSON.parse(localStorage.getItem('timesStepForm') || '{}');
@@ -70,13 +91,32 @@ export default function PaymentStep({ onPrev, data }: Props) {
   const [paymentTypes, setPaymentType] = useState<string | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
-  const order_id = localStorage.getItem('orderId');
+  const resolvedOrderId = resolveOrderId(orderId);
+  const currentLocale =
+    locale === LanguageRoutes.UZ ? LanguageRoutes.UZ : LanguageRoutes.RU;
+
+  const { data: orderResponse } = useQuery({
+    queryKey: ['payment-order-status', resolvedOrderId],
+    queryFn: () => Ticketorder_Api.getOrderById({ id: resolvedOrderId! }),
+    enabled: Boolean(resolvedOrderId),
+    retry: false,
+    refetchOnWindowFocus: true,
+  });
+
+  useEffect(() => {
+    if (!resolvedOrderId || !orderResponse) return;
+
+    const order = unwrapOrder(orderResponse.data);
+    if (order?.order_status && PAID_ORDER_STATUSES.has(order.order_status)) {
+      route.replace(`/view-voucher/${resolvedOrderId}`);
+    }
+  }, [orderResponse, resolvedOrderId, route]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: ({ return_url }: { return_url: string }) => {
       return Ticketorder_Api.payments({
         return_url,
-        order_id: Number(order_id),
+        order_id: Number(resolvedOrderId),
         paymentType: paymentTypes!,
       });
     },
@@ -89,48 +129,25 @@ export default function PaymentStep({ onPrev, data }: Props) {
     },
   });
 
-  const { mutate: downloadPdf, isPending: isPdfDownloading } = useMutation({
-    mutationFn: async (body: { order_id: number; lang: LanguageRoutes }) =>
-      downloadOrderVoucherPdf({
-        orderId: body.order_id,
-        locale: body.lang,
-        labels: {
-          bookingTime: t('Bron qilingan vaqt'),
-          hotelAndTransfer: t('Hotel va transfer'),
-          tourists: t('Turistlar'),
-          stayDates: t('Yashash sanalari'),
-          hotelName: t('Отель'),
-          mealType: t('Ovqatlanish turi'),
-          transferType: t('Transfer turi'),
-          roomType: t('Xona turi'),
-          receivingCompany: t('Qabul qiluvchi kompaniya'),
-          voucher: t('Voucher'),
-        },
-      }),
-    onError: (error: unknown) => {
-      console.error('Voucher PDF error:', error);
-      toast.error(t('Произошла ошибка при отправке. Попробуйте ещё раз.'));
-    },
-  });
-
   const store = formStore();
 
-  const returnUrl =
-    process.env.NEXT_PUBLIC_ORDER_RETURN_LINK || 'http://localhost:3000/uz';
-
   function onSubmitFull() {
-    if (!paymentTypes) return;
+    if (!paymentTypes || !resolvedOrderId) return;
 
     setIsPaid(true);
-    mutate({ return_url: returnUrl });
+    mutate({
+      return_url: buildPaymentReturnUrl(resolvedOrderId, currentLocale),
+    });
   }
 
   function onSubmitFullMobile() {
-    if (!paymentTypes) return;
+    if (!paymentTypes || !resolvedOrderId) return;
 
     setIsPaidMobile(true);
     setSuccess(false);
-    mutate({ return_url: returnUrl });
+    mutate({
+      return_url: buildPaymentReturnUrl(resolvedOrderId, currentLocale),
+    });
   }
 
   function onSubmitInstallment() {
@@ -357,22 +374,6 @@ export default function PaymentStep({ onPrev, data }: Props) {
           <h1 className="text-2xl font-bold text-[#212122]">
             {t('Подробности заказа')}
           </h1>
-
-          <button
-            disabled={!order_id || isPdfDownloading}
-            onClick={() =>
-              downloadPdf({
-                lang: locale as LanguageRoutes,
-                order_id: Number(order_id),
-              })
-            }
-            className="flex items-center gap-[10px] cursor-pointer px-[15px] py-[10px] border-2 rounded-full border-[#DFDFDF] max-lg:w-full justify-center hover:bg-gray-50 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            <InsertDriveFileIcon sx={{ color: '#031753' }} />
-            <p className="text-[#031753] font-semibold text-lg">
-              {isPdfDownloading ? t('Загрузка') : t('Скачать PDF')}
-            </p>
-          </button>
         </div>
 
         <h1 className="mt-5 text-lg font-bold text-[#212122]">{t('Дата')}</h1>

@@ -226,26 +226,13 @@ function buildVoucherNumber(order: SamoOrder) {
   return `№ ST-${order.id}-${datePart}-${yearPart}`;
 }
 
-function formatTourOperatorName(value?: string) {
-  const mapping: Record<string, string> = {
-    samo_tour: 'KOMPAS TOUR',
-    easy_booking: 'EASY BOOKING',
-    right_flight: 'RIGHT FLIGHT',
-    flykhiva: 'FLYKHIVA',
-    malva_tour: 'MALVA TOUR',
-    aqua_travelplus: 'AQUA TRAVELPLUS',
-  };
-  if (!value) return '—';
-  return mapping[value] ?? value.toUpperCase();
-}
-
 function resolveTouristNames(participants: VoucherParticipant[]) {
   return participants.map((p) => p.fullName).join('\n');
 }
 
 export function getVoucherUrl(orderId: number, locale: LanguageRoutes) {
   const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+    process.env.NEXT_PUBLIC_SITE_URL || 'https://simpletravel.uz';
   return `${siteUrl.replace(/\/$/, '')}/${locale}/view-voucher/${orderId}`;
 }
 
@@ -937,7 +924,6 @@ export function VoucherDocument({
     : '—';
   const passengerCount = order.passenger_count || participants.length;
   const voucherNumber = buildVoucherNumber(order);
-  const dmcName = formatTourOperatorName(order.tour_operator || tourExtras.operator);
   const transferRoute = 'Аэропорт - Отель - Аэропорт';
 
   return (
@@ -1202,7 +1188,6 @@ export function VoucherDocument({
         >
           <FieldRow labelRu="Тип трансфера" labelEn="Type" value={transferRoute} />
           <FieldRow labelRu="Маршрут" labelEn="Route" value="Airport - Hotel - Airport" />
-          <FieldRow labelRu="Принимающая компания" labelEn="DMC" value={dmcName} />
           <FieldRow
             labelRu="Включено"
             labelEn="Included"
