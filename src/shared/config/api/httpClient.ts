@@ -1,4 +1,5 @@
 import getLocaleCS from '@/shared/lib/getLocaleCS';
+import { getAnalyticsSessionId } from '@/shared/lib/analytics';
 import axios, {
   AxiosError,
   AxiosResponse,
@@ -53,6 +54,11 @@ httpClient.interceptors.request.use(
     const accessToken = getToken();
     if (accessToken) {
       config.headers.set('Authorization', `Bearer ${accessToken}`);
+    }
+
+    if (typeof window !== 'undefined') {
+      config.headers.set('X-Analytics-Session', getAnalyticsSessionId());
+      config.headers.set('X-Platform', 'web');
     }
 
     return config;

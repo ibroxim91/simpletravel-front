@@ -4,6 +4,7 @@ import { routing } from '@/shared/config/i18n/routing';
 import QueryProvider from '@/shared/config/react-query/QueryProvider';
 import { ThemeProvider } from '@/shared/config/theme-provider';
 import { getPageSeo } from '@/shared/lib/getPageSeo';
+import AnalyticsPageTracker from '@/shared/lib/analytics/AnalyticsPageTracker';
 import { Toaster } from '@/shared/ui/sonner';
 import ConditionalFooter from '@/widgets/footer/ui/ConditionalFooter';
 import Navbar from '@/widgets/navbar/ui';
@@ -170,6 +171,7 @@ export default async function RootLayout({ children, params }: Props) {
             disableTransitionOnChange
           >
             <QueryProvider>
+              <AnalyticsPageTracker />
               <Navbar />
               <Welcome />
               <ConditionalSupportChat />
