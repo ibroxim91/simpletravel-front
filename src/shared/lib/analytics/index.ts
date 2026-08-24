@@ -35,7 +35,7 @@ export async function trackPageView(page: string, locale?: string) {
   }
 
   try {
-    await fetch(`${baseUrl.replace(/\/$/, '')}/analytics/events/`, {
+    await fetch(`${baseUrl.replace(/\/$/, '')}/api/v1/analytics/events/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
