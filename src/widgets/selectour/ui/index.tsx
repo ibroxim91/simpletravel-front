@@ -1,7 +1,7 @@
 'use client';
 
 import loaderAnimation from '@/assets/lottie/Loading spinner simplui.json';
-import { country_api } from '@/shared/config/api/country';
+import { country_api, CountryListData } from '@/shared/config/api/country';
 import { Link, useRouter } from '@/shared/config/i18n/navigation';
 import { LanguageRoutes } from '@/shared/config/i18n/types';
 import formatDate from '@/shared/lib/formatDate';
@@ -270,9 +270,36 @@ function saveTicketCache(
   );
 }
 
+function findPlaceNameById(
+  countries: CountryListData[] | undefined,
+  id: string | number | null | undefined,
+): string | null {
+  if (id === null || id === undefined || id === '') return null;
+
+  const raw = String(id).trim();
+  if (!raw) return null;
+
+  const numericId = Number(raw);
+  if (Number.isNaN(numericId)) {
+    // Already a human-readable label
+    return raw;
+  }
+
+  if (!countries?.length) return null;
+
+  for (const countryItem of countries) {
+    const region = countryItem.regions?.find((r) => r.id === numericId);
+    if (region?.name) return region.name;
+  }
+
+  const countryMatch = countries.find((c) => c.id === numericId);
+  return countryMatch?.name ?? null;
+}
+
 function emitTourSearchEvent(
   params: TickectAllFilter,
   response?: TickectAll | null,
+  countries?: CountryListData[],
 ) {
   const tickets = response?.data?.results?.tickets;
   const first = Array.isArray(tickets) && tickets.length > 0 ? tickets[0] : null;
@@ -282,13 +309,27 @@ function emitTourSearchEvent(
     params.passenger_count ??
     (adults || children ? adults + children : null);
 
+  const departureName =
+    first?.departure?.name ||
+    findPlaceNameById(countries, params.departure) ||
+    null;
+  const destinationName =
+    first?.destination?.name ||
+    findPlaceNameById(countries, params.destination) ||
+    findPlaceNameById(countries, params.country_id) ||
+    first?.destination?.country?.name ||
+    null;
+
   void trackTourSearch({
     departure_id: params.departure || first?.departure?.id || null,
-    departure_name: first?.departure?.name || null,
+    departure_name: departureName,
     destination_id: params.destination || first?.destination?.id || null,
-    destination_name: first?.destination?.name || null,
+    destination_name: destinationName,
     country_id: params.country_id || first?.destination?.country?.id || null,
-    country_name: first?.destination?.country?.name || null,
+    country_name:
+      first?.destination?.country?.name ||
+      findPlaceNameById(countries, params.country_id) ||
+      null,
     passenger_count: passengerCount,
     adults: params.adults ?? null,
     children: params.children ?? null,
@@ -297,6 +338,14 @@ function emitTourSearchEvent(
     result_count: response?.data?.total_items ?? tickets?.length ?? 0,
   });
 }
+
+  const { data: country } = useQuery({
+    queryKey: ['country_list'],
+    queryFn: () => country_api.list(),
+    select(data) {
+      return data.data.data;
+    },
+  });
 
 const loadTickets = async (priceForFetch: number[]) => {
   if (!filterLocal) return;
@@ -339,7 +388,7 @@ const loadTickets = async (priceForFetch: number[]) => {
   ) {
     console.log("LOCALSTORAGE CACHE");
     setTicket(cache.data);
-    emitTourSearchEvent(params, cache.data);
+    emitTourSearchEvent(params, cache.data, country);
     return;
   }
 
@@ -362,7 +411,7 @@ setError(null);
       });
 
     setTicket(response);
-    emitTourSearchEvent(params, response);
+    emitTourSearchEvent(params, response, country);
 
     const tickets = response?.data?.results?.tickets;
     const totalItems = response?.data?.total_items;
@@ -573,14 +622,6 @@ useEffect(() => {
 
 
 
-
-  const { data: country } = useQuery({
-    queryKey: ['country_list'],
-    queryFn: () => country_api.list(),
-    select(data) {
-      return data.data.data;
-    },
-  });
 
   const { data: meal } = useQuery({
     queryKey: ['meal_list'],
