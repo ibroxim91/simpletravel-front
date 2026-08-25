@@ -6,6 +6,7 @@ import { Link, useRouter } from '@/shared/config/i18n/navigation';
 import { LanguageRoutes } from '@/shared/config/i18n/types';
 import formatDate from '@/shared/lib/formatDate';
 import { formatPrice } from '@/shared/lib/formatPrice';
+import { trackTourSearch } from '@/shared/lib/analytics';
 import { Button } from '@/shared/ui/button';
 import {
   Pagination,
@@ -269,6 +270,34 @@ function saveTicketCache(
   );
 }
 
+function emitTourSearchEvent(
+  params: TickectAllFilter,
+  response?: TickectAll | null,
+) {
+  const tickets = response?.data?.results?.tickets;
+  const first = Array.isArray(tickets) && tickets.length > 0 ? tickets[0] : null;
+  const adults = Number(params.adults ?? 0);
+  const children = Number(params.children ?? 0);
+  const passengerCount =
+    params.passenger_count ??
+    (adults || children ? adults + children : null);
+
+  void trackTourSearch({
+    departure_id: params.departure || first?.departure?.id || null,
+    departure_name: first?.departure?.name || null,
+    destination_id: params.destination || first?.destination?.id || null,
+    destination_name: first?.destination?.name || null,
+    country_id: params.country_id || first?.destination?.country?.id || null,
+    country_name: first?.destination?.country?.name || null,
+    passenger_count: passengerCount,
+    adults: params.adults ?? null,
+    children: params.children ?? null,
+    date_from: params.dateFrom || null,
+    date_to: params.dateTo || null,
+    result_count: response?.data?.total_items ?? tickets?.length ?? 0,
+  });
+}
+
 const loadTickets = async (priceForFetch: number[]) => {
   if (!filterLocal) return;
 
@@ -310,6 +339,7 @@ const loadTickets = async (priceForFetch: number[]) => {
   ) {
     console.log("LOCALSTORAGE CACHE");
     setTicket(cache.data);
+    emitTourSearchEvent(params, cache.data);
     return;
   }
 
@@ -332,6 +362,7 @@ setError(null);
       });
 
     setTicket(response);
+    emitTourSearchEvent(params, response);
 
     const tickets = response?.data?.results?.tickets;
     const totalItems = response?.data?.total_items;

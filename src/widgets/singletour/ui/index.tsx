@@ -33,6 +33,7 @@ import { useParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { AxiosError } from 'axios';
+import { trackTourDetail } from '@/shared/lib/analytics';
 import 'swiper/css';
 import Hotel2 from '../../../../public/images/hotel2.png';
 import Hotel3 from '../../../../public/images/hotel3.png';
@@ -131,6 +132,41 @@ export default function SingleTour() {
   useEffect(() => {
     setTourOperatorId(localStorage.getItem('tourOperatorId'));
   }, []);
+
+  useEffect(() => {
+    if (!data) return;
+
+    const tourId =
+      data.tour_operator_id || data.id || data.slug || null;
+    if (!tourId) return;
+
+    void trackTourDetail({
+      tour_id: tourId,
+      title: data.title ?? null,
+      destination_name:
+        data.destination?.name || data.destination_name || null,
+      departure_name: data.departure?.name || data.departure_name || null,
+      duration_days: data.duration_days ?? null,
+      passenger_count: data.passenger_count ?? null,
+      price: data.price ?? null,
+      price_full: data.price_full ?? null,
+      operator: data.operator ?? null,
+    });
+  }, [
+    data?.tour_operator_id,
+    data?.id,
+    data?.slug,
+    data?.title,
+    data?.destination?.name,
+    data?.destination_name,
+    data?.departure?.name,
+    data?.departure_name,
+    data?.duration_days,
+    data?.passenger_count,
+    data?.price,
+    data?.price_full,
+    data?.operator,
+  ]);
 
   const {
     data: sharedResult,
