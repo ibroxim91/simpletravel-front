@@ -1,10 +1,7 @@
 'use client';
 
 import Logo from '@/assets/LogoWhite.png';
-import { getOfferta } from '@/features/legal-offerta/lib/api';
-import { getHelpPage } from '@/features/privacy-policy/lib/api';
 import { Link, usePathname } from '@/shared/config/i18n/navigation';
-import formatPhone from '@/shared/lib/formatPhone';
 import FacebookOutlinedIcon from '@mui/icons-material/FacebookOutlined';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
@@ -37,38 +34,6 @@ const Footer = () => {
     },
   });
 
-  const { data: offerta } = useQuery({
-    queryKey: ['offerta'],
-    queryFn: () => getOfferta({ person_type: 'individual' }),
-    select(data) {
-      return data.data.data.results;
-    },
-  });
-
-  const { data: PrivacyPolicy } = useQuery({
-    queryKey: ['privacy_policy'],
-    queryFn: () => getHelpPage({ page_type: 'privacy_policy' }),
-    select(data) {
-      return data.data.data.results;
-    },
-  });
-
-  const { data: UserAgreement } = useQuery({
-    queryKey: ['user_agreement'],
-    queryFn: () => getHelpPage({ page_type: 'user_agreement' }),
-    select(data) {
-      return data.data.data.results;
-    },
-  });
-
-  const { data: legalOffer } = useQuery({
-    queryKey: ['legal_entity'],
-    queryFn: () => getOfferta({ person_type: 'legal_entity' }),
-    select(data) {
-      return data.data.data.results;
-    },
-  });
-
   if (authRoutes.includes(pathname)) {
     return null;
   }
@@ -90,6 +55,23 @@ const Footer = () => {
     { src: '/visa.png', alt: 'Visa', width: 52 },
     { src: '/mastercard.png', alt: 'Mastercard', width: 52 },
   ];
+
+  const documentsLinks = (
+    <>
+      <Link href="/privacy-policy" className="w-fit">
+        {t('Политика конфиденциальности')}
+      </Link>
+      <Link href="/public-offer" prefetch className="w-fit">
+        {t('offerta')}
+      </Link>
+      <Link href="/refund-policy" className="w-fit">
+        {t('Правила возврата')}
+      </Link>
+      <Link href="/risk-control-measures" className="w-fit">
+        {t('Risk Control Measures')}
+      </Link>
+    </>
+  );
 
   return (
     <section className="bg-[#1A73E8] pb-10 pt-[56px] max-lg:pt-10">
@@ -148,15 +130,9 @@ const Footer = () => {
               </div>
 
               <div className="w-[187px] space-y-8">
-                <p className="text-xl font-bold leading-[27px] text-white">{t('Сервисы:')}</p>
+                <p className="text-xl font-bold leading-[27px] text-white">{t('Документы:')}</p>
                 <div className="flex flex-col gap-4 text-base font-medium leading-[22px] text-white">
-                  <Link href="/contacts" className="w-fit">{t('Услуги')}</Link>
-                  {(offerta && offerta.length !== 0) && (
-                    <Link href="/public-offer" prefetch className="w-fit">{t('Публичная оферта')}</Link>
-                  )}
-                  {(legalOffer && legalOffer.length !== 0) && (
-                    <Link href="/legal-offerta" prefetch className="w-fit">{t('Оферта для юрлиц')}</Link>
-                  )}
+                  {documentsLinks}
                 </div>
               </div>
             </div>
@@ -280,15 +256,9 @@ const Footer = () => {
               </div>
 
               <div className="space-y-3">
-                <p className="text-[20px] font-bold leading-10 text-[#E5E7EB]">{t('Сервисы:')}</p>
+                <p className="text-[20px] font-bold leading-10 text-[#E5E7EB]">{t('Документы:')}</p>
                 <div className="flex flex-col gap-2 text-[16px] font-medium leading-10 text-[#E5E7EB]">
-                  <Link href="/contacts" className="w-fit">{t('Услуги')}</Link>
-                  {(offerta && offerta.length !== 0) && (
-                    <Link href="/public-offer" prefetch className="w-fit">{t('Публичная оферта')}</Link>
-                  )}
-                  {(legalOffer && legalOffer.length !== 0) && (
-                    <Link href="/legal-offerta" prefetch className="w-fit">{t('Оферта для юрлиц')}</Link>
-                  )}
+                  {documentsLinks}
                 </div>
               </div>
             </div>

@@ -492,6 +492,9 @@ declare const messages: {
   "Parvoz vaqti": "Parvoz vaqti",
   "Transfer": "Transfer",
   "Avia kompaniya": "Avia kompaniya",
-  "Tashkent International Airaport": "Toshkent xalqaro aeroporti"
+  "Tashkent International Airaport": "Toshkent xalqaro aeroporti",
+  "Документы:": "Xujjatlar:",
+  "Правила возврата": "Qaytarish qoidalari",
+  "Risk Control Measures": "Risk Control Measures"
 };
 export default messages;
