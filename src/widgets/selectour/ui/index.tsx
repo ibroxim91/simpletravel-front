@@ -58,7 +58,8 @@ import { useParams, useSearchParams } from 'next/navigation';
 import qs from 'qs';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { toast } from 'sonner';
 import Ticket_Api, { hotel_meal_plan } from '../lib/api';
 import { useFilterTickectsStore } from '../lib/store';
 import { TickectAll, TickectAllFilter } from '../lib/types';
@@ -66,8 +67,87 @@ import CheckboxFilter from './CheckBox';
 import FilterSection from './FilterSection';
 import TourItem from '@/widgets/selectour/ui/TourItem';
 import { resolveAdultsCount } from '@/widgets/filter/lib/passengers';
-import { useMemo } from "react";
 import CircleLoader from './TourLoader';
+
+const STATIC_PRICE_LIMITS = {
+  min: 3_000_000,
+  max: 300_000_000,
+} as const;
+
+type AppliedSideFilters = {
+  durations: string | null;
+  mealPlan: string | null;
+  hotelRating: string | null;
+  town: string | null;
+  hotel_id: string | null;
+  operator: string | null;
+};
+
+const EMPTY_SIDE_FILTERS: AppliedSideFilters = {
+  durations: null,
+  mealPlan: null,
+  hotelRating: null,
+  town: null,
+  hotel_id: null,
+  operator: null,
+};
+
+const sideFiltersFromParams = (params: {
+  duration?: string;
+  meal?: string;
+  rating?: string;
+  town?: string;
+  hotel_id?: string;
+  operator?: string;
+}): AppliedSideFilters => ({
+  durations: params.duration || null,
+  mealPlan: params.meal || null,
+  hotelRating: params.rating || null,
+  town: params.town || null,
+  hotel_id: params.hotel_id || null,
+  operator: params.operator || null,
+});
+
+const sideUrlKey = (side: AppliedSideFilters) =>
+  [
+    side.durations ?? '',
+    side.mealPlan ?? '',
+    side.hotelRating ?? '',
+    side.town ?? '',
+    side.hotel_id ?? '',
+    side.operator ?? '',
+  ].join('|');
+
+const clampPriceRange = (range: number[]) => {
+  const clampedMin = Math.max(
+    STATIC_PRICE_LIMITS.min,
+    Math.min(range[0], STATIC_PRICE_LIMITS.max),
+  );
+  const clampedMax = Math.max(
+    clampedMin,
+    Math.min(range[1], STATIC_PRICE_LIMITS.max),
+  );
+  return [clampedMin, clampedMax];
+};
+
+/** UI da narx mln ko‘rinadi (3 → 3 mln UZS). */
+const parsePriceInputToUzs = (value: string): number => {
+  const normalized = value.replace(/\s/g, '').replace(',', '.');
+  if (!normalized) return 0;
+  const mln = Number(normalized);
+  if (!Number.isFinite(mln) || mln < 0) return 0;
+  return Math.round(mln * 1_000_000);
+};
+
+const writeSideParams = (
+  params: URLSearchParams,
+  side: Record<string, string | null | undefined>,
+) => {
+  Object.entries(side).forEach(([key, value]) => {
+    if (value) params.set(key, value);
+    else params.delete(key);
+  });
+};
 
 
 const Player = dynamic(
@@ -130,7 +210,11 @@ export default function Selectour() {
 const prevHotelsRef = useRef<any[] | null>(null);
   const [priceRange, setPriceRange] = useState<number[]>([]);
   const [appliedPriceRange, setAppliedPriceRange] = useState<number[]>([]);
+  const [appliedSideFilters, setAppliedSideFilters] =
+    useState<AppliedSideFilters>(EMPTY_SIDE_FILTERS);
+  const prevSideUrlKeyRef = useRef('');
   const prevFilterBaseKeyRef = useRef('');
+  const prevCoreSearchKeyRef = useRef('');
   const ticketsFetchSignatureRef = useRef('');
   const {
     durationDays,
@@ -145,6 +229,7 @@ const prevHotelsRef = useRef<any[] | null>(null);
   } = useFilterTickectsStore();
   const [hotelName, setHotelName] = useState<string>('');
   const [hotelID, setHotelID] = useState<string | null>(null);
+  const [draftOperator, setDraftOperator] = useState<string | null>(null);
   const [expensive, setExpensive] = useState<boolean>(false);
   const [cheaper, setCheaper] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -175,41 +260,165 @@ const [isError, setIsError] = useState(false);
 const [error, setError] = useState<Error | null>(null);
 
 
-  const priceLimits = useMemo(() => {
-    const min = ticket?.data?.results?.min_price;
-    const max = ticket?.data?.results?.max_price;
-    if (min != null && max != null && max > min) {
-      return { min, max };
-    }
-    return { min: 2_500_000, max: 100_000_000 };
-  }, [ticket?.data?.results?.min_price, ticket?.data?.results?.max_price]);
+  const priceLimits = STATIC_PRICE_LIMITS;
 
   const sliderValue =
     priceRange.length === 2
       ? priceRange
       : [priceLimits.min, priceLimits.max];
 
-  const applyPriceFilter = (range: number[]) => {
-    const clampedMin = Math.max(priceLimits.min, Math.min(range[0], priceLimits.max));
-    const clampedMax = Math.max(clampedMin, Math.min(range[1], priceLimits.max));
-    const nextRange = [clampedMin, clampedMax];
+  const collectSideFilterParams = useCallback(
+    () => ({
+      duration: selectedDurations || undefined,
+      meal: mealPlan || undefined,
+      rating: hotelRating || undefined,
+      town: selectedTown || undefined,
+      hotel_id: hotelID || undefined,
+      operator: draftOperator || undefined,
+    }),
+    [
+      selectedDurations,
+      mealPlan,
+      hotelRating,
+      selectedTown,
+      hotelID,
+      draftOperator,
+    ],
+  );
+
+  const applyDraftPriceToApplied = useCallback(() => {
+    if (priceRange.length !== 2) {
+      setAppliedPriceRange([]);
+      return;
+    }
+    const nextRange = clampPriceRange(priceRange);
     setPriceRange(nextRange);
-    setAppliedPriceRange(nextRange);
+    if (
+      nextRange[0] === STATIC_PRICE_LIMITS.min &&
+      nextRange[1] === STATIC_PRICE_LIMITS.max
+    ) {
+      setAppliedPriceRange([]);
+    } else {
+      setAppliedPriceRange(nextRange);
+    }
+  }, [priceRange]);
+
+  const commitSideFiltersFromDraft = useCallback(() => {
+    const nextSide = sideFiltersFromParams({
+      duration: selectedDurations || undefined,
+      meal: mealPlan || undefined,
+      rating: hotelRating || undefined,
+      town: selectedTown || undefined,
+      hotel_id: hotelID || undefined,
+      operator: draftOperator || undefined,
+    });
+    setAppliedSideFilters(nextSide);
+    applyDraftPriceToApplied();
     setCurrentPage(1);
+    return nextSide;
+  }, [
+    selectedDurations,
+    mealPlan,
+    hotelRating,
+    selectedTown,
+    hotelID,
+    draftOperator,
+    applyDraftPriceToApplied,
+  ]);
+
+  const handlePriceInputBlur = () => {
+    if (priceRange.length === 2) {
+      setPriceRange(clampPriceRange(priceRange));
+    }
   };
 
   const handleInputChange = (value: string, index: number) => {
-    const numericValue = Number(value.replace(/\s/g, '')) || 0;
+    const numericValue = parsePriceInputToUzs(value);
     const baseRange =
       priceRange.length === 2 ? [...priceRange] : [...sliderValue];
     baseRange[index] = numericValue;
     setPriceRange(baseRange);
   };
 
-  const handlePriceInputBlur = () => {
-    if (priceRange.length === 2) {
-      applyPriceFilter(priceRange);
+  const hasSearchDestination = (state?: FilterLocalState) =>
+    Boolean(state?.from) && Boolean(state?.where || state?.country_id);
+
+  const scrollToSearchForm = () => {
+    document
+      .getElementById('selectour-search-form')
+      ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+
+  const scrollToResults = () => {
+    requestAnimationFrame(() => {
+      document
+        .getElementById('selectour-results')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  };
+
+  const applySideFilters = (options?: { closeMobileDrawer?: boolean }) => {
+    if (!hasSearchDestination(filterLocal)) {
+      toast.error(t('choice_country_and_region'));
+      scrollToSearchForm();
+      return;
     }
+
+    const nextSide = commitSideFiltersFromDraft();
+    const params = new URLSearchParams(searchParamsString);
+    writeSideParams(params, {
+      duration: nextSide.durations,
+      meal: nextSide.mealPlan,
+      rating: nextSide.hotelRating,
+      town: nextSide.town,
+      hotel_id: nextSide.hotel_id,
+      operator: nextSide.operator,
+    });
+    params.set('page', '1');
+    router.replace(`/selectour?${params.toString()}`, { scroll: false });
+    if (options?.closeMobileDrawer) {
+      setFilter(false);
+    } else {
+      scrollToResults();
+    }
+  };
+
+  const handleClearSideFilters = () => {
+    setSelectedDurations(null);
+    setMealPlan(null);
+    setHotelRating(null);
+    setSelectedTown(null);
+    setHotelID(null);
+    setDraftOperator(null);
+    setPriceRange([]);
+    setAppliedPriceRange([]);
+    setAppliedSideFilters(EMPTY_SIDE_FILTERS);
+    setCheaper(false);
+    setExpensive(false);
+    setHotelTypes(null);
+    setHotelAmenitie(null);
+    setHotelFeature([]);
+
+    const params = new URLSearchParams(searchParamsString);
+    writeSideParams(params, {
+      duration: null,
+      meal: null,
+      rating: null,
+      town: null,
+      hotel_id: null,
+      operator: null,
+    });
+    params.delete('type-hotel');
+    params.delete('amenitie');
+    params.delete('feature');
+    params.delete('visa');
+    params.set('page', '1');
+    prevSideUrlKeyRef.current = sideUrlKey(EMPTY_SIDE_FILTERS);
+    router.replace(`/selectour?${params.toString()}`, { scroll: false });
+  };
+
+  const handleApplyMobileFilters = () => {
+    applySideFilters({ closeMobileDrawer: true });
   };
 
 
@@ -350,26 +559,30 @@ function emitTourSearchEvent(
 const loadTickets = async (priceForFetch: number[]) => {
   if (!filterLocal) return;
 
+  if (!hasSearchDestination(filterLocal)) {
+    return;
+  }
+
   const params: TickectAllFilter = {
     page: currentPage,
     page_size: 10,
     adults: resolveAdultsCount(filterLocal?.adults),
     children: filterLocal?.children,
-    operator: filterLocal?.operator,
+    operator: appliedSideFilters.operator || filterLocal?.operator,
     dateTo: filterLocal?.toDate,
     dateFrom: filterLocal?.date,
     departure: filterLocal?.from ?? '',
     destination: filterLocal?.where ?? '',
     country_id: filterLocal?.country_id ?? '',
     hotel_amenity: hotelAmenities ?? '',
-    hotel_id: filterLocal?.hotel_id ?? '',
-    town: filterLocal?.town ?? '',
+    hotel_id: appliedSideFilters.hotel_id ?? '',
+    town: appliedSideFilters.town ?? '',
     hotel_type: hotelType ?? '',
     cheapest: cheaper,
     most_expensive: expensive,
-    hotel_rating: hotelRating ?? '',
-    duration_days: selectedDurations ?? '',
-    meal_plan: filterLocal?.mealPlan ?? '',
+    hotel_rating: appliedSideFilters.hotelRating ?? '',
+    duration_days: appliedSideFilters.durations ?? '',
+    meal_plan: appliedSideFilters.mealPlan ?? '',
     ...(priceForFetch.length === 2
       ? {
           min_price: priceForFetch[0],
@@ -438,11 +651,12 @@ const filterBaseKey = useMemo(
       country_id: filterLocal?.country_id,
       date: filterLocal?.date,
       toDate: filterLocal?.toDate,
-      town: filterLocal?.town,
-      hotel_id: filterLocal?.hotel_id,
-      mealPlan: filterLocal?.mealPlan,
-      selectedDurations,
-      hotelRating,
+      town: appliedSideFilters.town,
+      hotel_id: appliedSideFilters.hotel_id,
+      mealPlan: appliedSideFilters.mealPlan,
+      selectedDurations: appliedSideFilters.durations,
+      hotelRating: appliedSideFilters.hotelRating,
+      operator: appliedSideFilters.operator,
       cheaper,
       expensive,
     }),
@@ -452,21 +666,44 @@ const filterBaseKey = useMemo(
     filterLocal?.country_id,
     filterLocal?.date,
     filterLocal?.toDate,
-    filterLocal?.town,
-    filterLocal?.hotel_id,
-    filterLocal?.mealPlan,
-    selectedDurations,
-    hotelRating,
+    appliedSideFilters,
     cheaper,
     expensive,
   ],
 );
 
+const coreSearchKey = useMemo(
+  () =>
+    JSON.stringify({
+      from: filterLocal?.from,
+      where: filterLocal?.where,
+      country_id: filterLocal?.country_id,
+      date: filterLocal?.date,
+      toDate: filterLocal?.toDate,
+      adults: filterLocal?.adults,
+      children: filterLocal?.children,
+    }),
+  [
+    filterLocal?.from,
+    filterLocal?.where,
+    filterLocal?.country_id,
+    filterLocal?.date,
+    filterLocal?.toDate,
+    filterLocal?.adults,
+    filterLocal?.children,
+  ],
+);
+
 useEffect(() => {
   if (!filterLocal) return;
+  if (!hasSearchDestination(filterLocal)) return;
 
-  const isNewSearch = prevFilterBaseKeyRef.current !== filterBaseKey;
-  const priceForFetch = isNewSearch ? [] : appliedPriceRange;
+  const isNewCoreSearch = prevFilterBaseKeyRef.current !== '' &&
+    prevCoreSearchKeyRef.current !== coreSearchKey;
+  const isFirstLoad = prevFilterBaseKeyRef.current === '';
+  const isNewFilterSearch = prevFilterBaseKeyRef.current !== filterBaseKey;
+  const priceForFetch =
+    isNewCoreSearch || isFirstLoad ? [] : appliedPriceRange;
 
   const signature = JSON.stringify({
     filterBaseKey,
@@ -474,7 +711,6 @@ useEffect(() => {
     priceForFetch,
     adults: filterLocal.adults,
     children: filterLocal.children,
-    operator: filterLocal.operator,
     hotelAmenities,
     hotelType,
   });
@@ -484,8 +720,11 @@ useEffect(() => {
   }
   ticketsFetchSignatureRef.current = signature;
 
-  if (isNewSearch) {
+  if (isNewFilterSearch) {
     prevFilterBaseKeyRef.current = filterBaseKey;
+  }
+  if (isNewCoreSearch || isFirstLoad) {
+    prevCoreSearchKeyRef.current = coreSearchKey;
     setPriceRange([]);
     setAppliedPriceRange([]);
   }
@@ -493,40 +732,13 @@ useEffect(() => {
   loadTickets(priceForFetch);
 }, [
   filterBaseKey,
+  coreSearchKey,
   filterLocal,
   currentPage,
   appliedPriceRange,
   hotelAmenities,
   hotelType,
-  cheaper,
-  expensive,
-  hotelRating,
-  selectedDurations,
 ]);
-
-useEffect(() => {
-  const min = ticket?.data?.results?.min_price;
-  const max = ticket?.data?.results?.max_price;
-  if (min == null || max == null || max <= min) return;
-  if (priceRange.length === 0) {
-    setPriceRange([min, max]);
-  }
-}, [
-  ticket?.data?.results?.min_price,
-  ticket?.data?.results?.max_price,
-  priceRange.length,
-]);
-
-useEffect(() => {
-  const params = new URLSearchParams(window.location.search);
-  const ratingParam = params.get("rating");
-  if (ratingParam) {
-    setHotelRating(ratingParam);
-  }
-
-
-
-}, []);
 
 
 
@@ -551,17 +763,10 @@ useEffect(() => {
     const town = getSearchParam('town') || '';
     const hotel_id = getSearchParam('hotel_id') || '';
     const operator = getSearchParam('operator') || '';
-    const mealPlan = getSearchParam('meal') || '';
+    const mealPlanParam = getSearchParam('meal') || '';
     const rating = getSearchParam('rating') || '';
     const duration = getSearchParam('duration') || '';
     const from_cache = getSearchParam('from_cache') || '';
-    const hotelIdParam = getSearchParam('hotel_id');
-  if (hotelIdParam) {
-    setHotelID(hotelIdParam); // statega yozib qo‘yish
-  } else {
-    setHotelID(null);
-  }
-
 
     let newData = {
       departure:departure,
@@ -574,7 +779,7 @@ useEffect(() => {
       town:town,
       rating:rating,
       hotel_id:hotel_id,
-      mealPlan:mealPlan,
+      mealPlan:mealPlanParam,
       adults: String(resolvedAdults),
       children:childrenParam,
       operator:operator,
@@ -582,7 +787,7 @@ useEffect(() => {
    localStorage.setItem('filterTours', JSON.stringify(newData));
 
     localStorage.setItem('town', town);
-    localStorage.setItem('mealPlan', mealPlan);
+    localStorage.setItem('mealPlan', mealPlanParam);
     const filterData = {
       from: departure,
       where: destination,
@@ -591,7 +796,7 @@ useEffect(() => {
       operator: operator,
       toDate: dateTo,
       town: town,
-      mealPlan: mealPlan,
+      mealPlan: mealPlanParam,
       hotel_id: hotel_id,
       selectData:
         dateFrom && dateTo
@@ -600,24 +805,39 @@ useEffect(() => {
       adults: resolvedAdults,
       children: parseInt(childrenParam),
     };
-    // setFilterLocal(filterData);
     setFilterLocal(prev => {
     if (isEqualState(prev, filterData)) {
-      return prev; // ❌ set qilmaydi → re-render yo‘q
+      return prev;
     }
   
-    return filterData; // ✅ faqat o‘zgarsa
+    return filterData;
   });
 
     const pageParam = getSearchParam('page');
     const nextPage = pageParam ? Number(pageParam) : 1;
     setCurrentPage((prev) => (prev === nextPage ? prev : nextPage));
 
-    setHotelRating(rating || null);
-    setSelectedDurations(duration || null);
-    setMealPlan(mealPlan || null);
+    const nextSide = sideFiltersFromParams({
+      duration,
+      meal: mealPlanParam,
+      rating,
+      town,
+      hotel_id,
+      operator,
+    });
+    const nextSideKey = sideUrlKey(nextSide);
+    if (prevSideUrlKeyRef.current !== nextSideKey) {
+      prevSideUrlKeyRef.current = nextSideKey;
+      setHotelRating(nextSide.hotelRating);
+      setSelectedDurations(nextSide.durations);
+      setMealPlan(nextSide.mealPlan);
+      setSelectedTown(nextSide.town);
+      setHotelID(nextSide.hotel_id);
+      setDraftOperator(nextSide.operator);
+      setAppliedSideFilters(nextSide);
+    }
    
-    setSelectedDestinations(destination);
+    setSelectedDestinations(destination || null);
   }, [searchParams]);
 
 
@@ -847,7 +1067,7 @@ const top_duration = [
             </p>
           </div>
 
-          <div className="mt-16 xl:mt-[68px]">
+          <div className="mt-16 xl:mt-[68px]" id="selectour-search-form">
             <FilterTours
               selectedDestRegions={selectedDestinations}
               setSelectedDestRegions={setSelectedDestinations}
@@ -856,6 +1076,8 @@ const top_duration = [
               setSelectedDurations={setSelectedDurations}
               setMealPlan={setMealPlan}
               setIsSearchClicked={setIsSearchClicked}
+              getSideFilterParams={collectSideFilterParams}
+              onBeforeSearch={commitSideFiltersFromDraft}
             />
           </div>
           <div className="mt-6">
@@ -866,6 +1088,8 @@ const top_duration = [
               setHotelRating={setHotelRating}
               setSelectedDurations={setSelectedDurations}
               setMealPlan={setMealPlan}
+              getSideFilterParams={collectSideFilterParams}
+              onBeforeSearch={commitSideFiltersFromDraft}
             />
           </div>
         </div>
@@ -925,7 +1149,9 @@ const top_duration = [
               value={sliderValue}
               className="placeholder:!text-[#909091] !text-[#909091]"
               onChange={(v) => setPriceRange(v as number[])}
-              onChangeComplete={(v) => applyPriceFilter(v as number[])}
+              onChangeComplete={(v) =>
+                setPriceRange(clampPriceRange(v as number[]))
+              }
             />
             <div className="flex justify-between mt-3 border border-[#DFDFDF] rounded-xl p-3">
               <input
@@ -962,18 +1188,14 @@ const top_duration = [
               label={t('Без визы')}
               selectedValue={visa}
               setChecked={setVisa}
-              onclick={setCurrentPage}
               exclusive
-              paramName="visa"
             />
             <CheckboxFilter
               value="visa"
               label={t('С визой')}
               selectedValue={visa}
               setChecked={setVisa}
-              onclick={setCurrentPage}
               exclusive
-              paramName="visa"
             />
           </FilterSection> */}
 
@@ -989,9 +1211,7 @@ const top_duration = [
                     label={`${e.duration} ${t('дня')}`}
                     setChecked={setSelectedDurations}
                     selectedValue={selectedDurations}
-                    onclick={setCurrentPage}
                     exclusive
-                    paramName="duration"
                     />
                 ))}
           </FilterSection>
@@ -1000,20 +1220,10 @@ const top_duration = [
                     <FilterSection title={t('Длительность')} icon='/icons/time.png'>
                         {top_duration && (
                           <select
-                            value={selectedDurations}
+                            value={selectedDurations ?? ''}
                             onChange={(e) => {
                               const value = e.target.value;
-                              setSelectedDurations(value);
-                              setCurrentPage(1);
-
-                              // URL paramName="duration" ni yangilash
-                              const params = new URLSearchParams(window.location.search);
-                              if (value) {
-                                params.set("duration", value);
-                              } else {
-                                params.delete("duration");
-                              }
-                              window.history.replaceState({}, "", `${window.location.pathname}?${params.toString()}`);
+                              setSelectedDurations(value || null);
                             }}
                             className="w-full h-[40px] px-2 rounded bg-transparent border-none outline-none focus:ring-0"
                           >
@@ -1047,44 +1257,20 @@ const top_duration = [
               // console.log('Selected Region Object:', selectedRegionObj); // Tanlangan regionni konsolga chiqaramiz
               return (
                 <div key={selectedRegionObj.id}>
-                  {/* <CheckboxFilter
-                    value={String(selectedRegionObj.id)}
-                    label={selectedRegionObj.name}
-                    setChecked={setSelectedDestinations}
-                    selectedValue={selectedDestinations}
-                    exclusive
-                    paramName="destination"
-                  /> */}
-
                   {Array.isArray(selectedRegionObj.towns) &&
                     selectedRegionObj.towns.length > 0 &&
                     selectedRegionObj.towns.map((town, townIndex) => (
                       <CheckboxFilter
-                       onclick={setCurrentPage}
                         key={`${town.id}-${townIndex}`}
                         value={String(town.id)}
                         label={<span className="pl-6">{town.name}</span>}
-
-                        // setChecked={setSelectedTown}   // endi town uchun alohida state
-                          setChecked={(val) => {
-                              setSelectedTown(val);
-
-                              const params = new URLSearchParams(searchParamsString);
-                              if (val) {
-                                params.set("town", typeof val === 'string' ? val : '');
-                              } else {
-                                params.delete("town"); // ❌ check olib tashlansa URL’dan o‘chadi
-                              }
-                              router.replace(`/selectour?${params.toString()}`, { scroll: false });
-                            }}
+                        setChecked={(val) => {
+                          setSelectedTown(typeof val === 'string' ? val : null);
+                        }}
                         selectedValue={selectedTown}
                         exclusive
-                        paramName="town"
                       />
                     ))}
-                  {/* <p className="mt-3 w-full text-right text-xs font-medium text-[#6B7280] underline">
-                    {t('Еще')}
-                  </p> */}
                 </div>
               );
             })()}
@@ -1100,18 +1286,11 @@ const top_duration = [
                 label={t(`${rating} звезды`)}
                 setChecked={(val) => {
                   setHotelRating(val ? rating : null);
-                  setCurrentPage(1);
-
-                  // URL parametrlardan hotel_id va operatorni olib tashlash
-                  const params = new URLSearchParams(window.location.search);
-                  params.delete("hotel_id");
-                  params.delete("operator");
-
-                  router.push(`/selectour?${params.toString()}`);
+                  setHotelID(null);
+                  setDraftOperator(null);
                 }}
                 selectedValue={hotelRating}
                 exclusive
-                paramName="rating"
               />
             ))}
           </FilterSection>
@@ -1124,11 +1303,9 @@ const top_duration = [
                   key={e}
                   value={e}
                   label={e}
-                  onclick={setCurrentPage}
                   setChecked={setHotelTypes}
                   selectedValue={hotelType}
                   exclusive
-                  paramName="type-hotel"
                 />
               ))}
           </FilterSection> */}
@@ -1151,19 +1328,13 @@ const top_duration = [
                 </span>
               }
               setChecked={(val) => {
-                const params = new URLSearchParams(window.location.search);
-
                 if (val) {
                   setHotelID(String(hotel.id));
-                  params.set('hotel_id', String(hotel.id));
-                  params.set('operator', String((hotel as any).operator ?? ''));
+                  setDraftOperator(String((hotel as any).operator ?? ''));
                 } else {
                   setHotelID(null);
-                  params.delete('hotel_id');
-                  params.delete('operator');
+                  setDraftOperator(null);
                 }
-
-                router.push(`/selectour?${params.toString()}`);
               }}
               selectedValue={hotelID}
               exclusive
@@ -1185,11 +1356,9 @@ const top_duration = [
                 value={String(e.id)}
                 label={e.name}
                 key={`${e.id}-${mealIndex}`}
-                onclick={setCurrentPage}
                 setChecked={setMealPlan}
                 selectedValue={mealPlan}
                 exclusive
-                paramName="meal"
               />
             ))}
           </FilterSection>
@@ -1204,7 +1373,9 @@ const top_duration = [
               value={sliderValue}
               className="placeholder:!text-[#909091] !text-[#909091]"
               onChange={(v) => setPriceRange(v as number[])}
-              onChangeComplete={(v) => applyPriceFilter(v as number[])}
+              onChangeComplete={(v) =>
+                setPriceRange(clampPriceRange(v as number[]))
+              }
             />
             <div className="mt-3 flex items-center gap-2 rounded-xl border border-[#DFDFDF] p-3">
               <input
@@ -1234,6 +1405,23 @@ const top_duration = [
               />
             </div>
           </FilterSection>
+          </div>
+
+          <div className="grid w-full grid-cols-2 gap-3">
+            <button
+              type="button"
+              className="h-12 w-full cursor-pointer rounded-[14px] border border-[#1A73E8] bg-[#FAFBFC] text-[14px] font-medium text-[#1A73E8] transition-colors hover:bg-[#EEF4FF]"
+              onClick={handleClearSideFilters}
+            >
+              {t('Очистить')}
+            </button>
+            <button
+              type="button"
+              className="h-12 w-full cursor-pointer rounded-[14px] bg-[#1A73E8] text-[14px] font-medium text-white transition-colors hover:bg-[#1557B0]"
+              onClick={() => applySideFilters()}
+            >
+              {t('Применять')}
+            </button>
           </div>
         </div>
 
@@ -1418,7 +1606,9 @@ const top_duration = [
                     max={priceLimits.max}
                     value={sliderValue}
                     onChange={(v) => setPriceRange(v as number[])}
-                    onChangeComplete={(v) => applyPriceFilter(v as number[])}
+                    onChangeComplete={(v) =>
+                      setPriceRange(clampPriceRange(v as number[]))
+                    }
                   />
                   <div className="mt-3 flex items-center gap-2 rounded-xl border border-[#DFDFDF] p-3">
                     <input
@@ -1459,18 +1649,14 @@ const top_duration = [
                 label={t('Без визы')}
                 selectedValue={visa}
                 setChecked={setVisa}
-                onclick={setCurrentPage}
                 exclusive
-                paramName="visa"
               />
               <CheckboxFilter
                 value="visa"
                 label={t('С визой')}
                 selectedValue={visa}
                 setChecked={setVisa}
-                onclick={setCurrentPage}
                 exclusive
-                paramName="visa"
               />
             </FilterSection> */}
 
@@ -1485,9 +1671,7 @@ const top_duration = [
                       label={`${e.duration} ${t('дня')}`}
                       setChecked={setSelectedDurations}
                       selectedValue={selectedDurations}
-                      onclick={setCurrentPage}
                       exclusive
-                      paramName="duration"
                       />
                   ))}
             </FilterSection>
@@ -1495,26 +1679,15 @@ const top_duration = [
             <FilterSection title={t('Регионы и курорты')} icon="/icons/country.png">
                {country &&
             (() => {
-              // Tanlangan regionni topamiz
               const selectedRegionObj = country
                 .flatMap((c) => c.regions)
                 .find((r) => String(r.id) === selectedDestinations);
 
               if (!selectedRegionObj) {
-                return null; // Agar tanlanmagan bo‘lsa hech narsa chiqmaydi
+                return null;
               }
-              // console.log('Selected Region Object:', selectedRegionObj); // Tanlangan regionni konsolga chiqaramiz
               return (
                 <div key={selectedRegionObj.id}>
-                  {/* <CheckboxFilter
-                    value={String(selectedRegionObj.id)}
-                    label={selectedRegionObj.name}
-                    setChecked={setSelectedDestinations}
-                    selectedValue={selectedDestinations}
-                    exclusive
-                    paramName="destination"
-                  /> */}
-
                   {Array.isArray(selectedRegionObj.towns) &&
                     selectedRegionObj.towns.length > 0 &&
                     selectedRegionObj.towns.map((town, townIndex) => (
@@ -1522,23 +1695,11 @@ const top_duration = [
                         key={`${town.id}-${townIndex}`}
                         value={String(town.id)}
                         label={<span className="pl-6">{town.name}</span>}
-                        
-                        onclick={setCurrentPage}
-                        // setChecked={setSelectedTown}   // endi town uchun alohida state
-                          setChecked={(val) => {
-                              setSelectedTown(val);
-
-                              const params = new URLSearchParams(searchParamsString);
-                              if (val) {
-                                params.set("town", typeof val === 'string' ? val : '');
-                              } else {
-                                params.delete("town"); // ❌ check olib tashlansa URL’dan o‘chadi
-                              }
-                              router.replace(`/selectour?${params.toString()}`, { scroll: false });
-                            }}
+                        setChecked={(val) => {
+                          setSelectedTown(typeof val === 'string' ? val : null);
+                        }}
                         selectedValue={selectedTown}
                         exclusive
-                        paramName="town"
                       />
                     ))}
                 </div>
@@ -1553,18 +1714,11 @@ const top_duration = [
       label={t(`${rating} звезды`)}
       setChecked={(val) => {
         setHotelRating(val ? rating : null);
-        setCurrentPage(1);
-
-        // URL parametrlardan hotel_id va operatorni olib tashlash
-        const params = new URLSearchParams(window.location.search);
-        params.delete("hotel_id");
-        params.delete("operator");
-
-        router.push(`/selectour?${params.toString()}`);
+        setHotelID(null);
+        setDraftOperator(null);
       }}
       selectedValue={hotelRating}
       exclusive
-      paramName="rating"
     />
   ))}
 </FilterSection>
@@ -1575,11 +1729,9 @@ const top_duration = [
                   value={String(e.id)}
                   label={e.name}
                   key={`${e.id}-${mealIndex}`}
-                  onclick={setCurrentPage}
                   setChecked={setMealPlan}
                   selectedValue={mealPlan}
                   exclusive
-                  paramName="meal"
                 />
               ))}
             </FilterSection>
@@ -1591,11 +1743,9 @@ const top_duration = [
                     key={e}
                     value={e}
                     label={e}
-                    onclick={setCurrentPage}
                     setChecked={setHotelTypes}
                     selectedValue={hotelType}
                     exclusive
-                    paramName="type-hotel"
                   />
                 ))}
             </FilterSection>
@@ -1613,24 +1763,16 @@ const top_duration = [
           </span>
         </span>
       }
-      onclick={setCurrentPage}
       selectedValue={hotelID}
       exclusive
       setChecked={(val) => {
-        console.log("VAL ", val);
-        const params = new URLSearchParams(window.location.search);
-
         if (val) {
           setHotelID(String(hotel.id));
-          params.set('hotel_id', String(hotel.id));
-          params.set('operator', String((hotel as any).operator ?? ''));
+          setDraftOperator(String((hotel as any).operator ?? ''));
         } else {
           setHotelID(null);
-          params.delete('hotel_id');
-          params.delete('operator');
+          setDraftOperator(null);
         }
-
-        router.push(`/selectour?${params.toString()}`);
       }}
     />
   ))}
@@ -1645,12 +1787,10 @@ const top_duration = [
                     <CheckboxFilter
                       key={i}
                       value={feature}
-                      onclick={setCurrentPage}
                       label={feature}
                       setChecked={setHotelFeature}
                       selectedValue={hotelFeature}
                       exclusive
-                      paramName="feature"
                     />
                   ))}
               </FilterSection>
@@ -1663,11 +1803,9 @@ const top_duration = [
                     key={e}
                     value={e}
                     label={e}
-                    onclick={setCurrentPage}
                     setChecked={setHotelAmenitie}
                     selectedValue={hotelAmenities}
                     exclusive
-                    paramName="amenitie"
                   />
                 ))}
             </FilterSection> */}
@@ -1682,9 +1820,7 @@ const top_duration = [
                 </button>
                 <button
                   className="h-12 w-full rounded-[14px] bg-[#1A73E8] text-[14px] font-medium text-white"
-                  onClick={() => {
-                    setFilter(false);
-                  }}
+                  onClick={handleApplyMobileFilters}
                 >
                   {t('Применять')}
                 </button>
@@ -1693,7 +1829,7 @@ const top_duration = [
               </Drawer>
             </div>
 
-            <div className="max-lg:mt-[31px] lg:mt-6">
+            <div id="selectour-results" className="max-lg:mt-[31px] lg:mt-6 scroll-mt-6">
               {!filterLocal ? (
                 <div className="flex min-h-[420px] flex-col items-center justify-center rounded-[14px] bg-[#FAFBFC]">
                   <Player

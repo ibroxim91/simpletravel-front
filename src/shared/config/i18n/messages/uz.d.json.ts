@@ -35,6 +35,7 @@ declare const messages: {
   "Выезд": "Jo‘nash",
   "Отмена": "Bekor qilish",
   "Применять": "Qo‘llash",
+  "Очистить": "Tozalash",
   "Вызрослых": "Kattalar",
   "старше 13 лет": "13 yoshdan katta",
   "Укажите регион": "Hududni kiriting",

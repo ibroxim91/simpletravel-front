@@ -41,7 +41,27 @@ const parseUrlDate = (value: string | null | undefined) => {
   return new Date(year, month - 1, day);
 };
 
-const FilterTours = ({ selectedDestRegions, setSelectedDestRegions,setSelectedDefaulDestination, setHotelRating, setSelectedDurations, setMealPlan,setIsSearchClicked }) => {
+const FilterTours = ({
+  selectedDestRegions,
+  setSelectedDestRegions,
+  setSelectedDefaulDestination,
+  setHotelRating,
+  setSelectedDurations,
+  setMealPlan,
+  setIsSearchClicked,
+  getSideFilterParams,
+  onBeforeSearch,
+}: {
+  selectedDestRegions?: any;
+  setSelectedDestRegions?: any;
+  setSelectedDefaulDestination?: any;
+  setHotelRating?: any;
+  setSelectedDurations?: any;
+  setMealPlan?: any;
+  setIsSearchClicked?: (value: boolean) => void;
+  getSideFilterParams?: () => Record<string, string | undefined>;
+  onBeforeSearch?: () => void;
+}) => {
   const t = useTranslations();
   const route = useRouter();
   const searchParams = useSearchParams();
@@ -314,8 +334,10 @@ useEffect(() => {
 
     if (!departureParam || (!hasDestination && !hasCountryId)) {
       toast.error(t('choice_country_and_region'));
-      return;
+      return false;
     }
+
+    onBeforeSearch?.();
 
     const params = new URLSearchParams();
     params.set('departure', departureParam);
@@ -326,18 +348,19 @@ useEffect(() => {
       params.set('destination', selectedDestRegion);
     }
 
-
-
     if (fromDate) params.set('dateFrom', formatDate.format(fromDate, 'YYYY-MM-DD'));
     if (toDate) params.set('dateTo', formatDate.format(toDate, 'YYYY-MM-DD'));
     params.set('adults', adultsForSearch(adults).toString());
     if (children > 0) params.set('children', children.toString());
-    if (searchParams.get('hotel_id')) params.delete('hotel_id');
-    if (searchParams.get('town')) params.delete('town');
-    if (searchParams.get('rating')) params.delete('rating');
-    if (searchParams.get('duration')) params.delete('duration');
-    if (searchParams.get('meal')) params.delete('meal');
+
+    const side = getSideFilterParams?.() ?? {};
+    Object.entries(side).forEach(([key, value]) => {
+      if (value) params.set(key, String(value));
+      else params.delete(key);
+    });
+
     route.push(`${getBasePath()}?page=1&${params.toString()}`);
+    return true;
   };
 
   const items = selectedCountry ? filteredRegions : filteredCountries;
@@ -879,17 +902,12 @@ const defaultitems = selectedCountry
           className="h-[60px] w-full cursor-pointer rounded-[14px] bg-[#FF6B00] px-[10px] text-base font-normal leading-[19px] text-white hover:bg-[#ff7a1f]"
           // onClick={saveFilter}
             onClick={() => {
-              saveFilter()
-               // sahifani pastga siljitish
-            window.scrollTo({
-              top: 700, // kerakli balandlikka moslab qo‘y
+              if (!saveFilter()) return;
+              window.scrollTo({
+              top: 700,
               behavior: 'smooth',
             });
-              if (resolveDepartureParam() && (selectedDestRegion || selectedDestCountryId)) {
-                setIsSearchClicked(true);
-              } else {
-                toast.error("Avval shaharni tanlang!");
-              }
+              setIsSearchClicked?.(true);
             }}
         >
           <span className="flex items-center gap-4">

@@ -39,7 +39,25 @@ const parseUrlDate = (value: string | null | undefined) => {
   return new Date(year, month - 1, day);
 };
 
-const FilterToursMobile = ({ selectedDestRegions, setSelectedDestRegions,setSelectedDefaulDestination, setHotelRating, setSelectedDurations, setMealPlan }) => {
+const FilterToursMobile = ({
+  selectedDestRegions,
+  setSelectedDestRegions,
+  setSelectedDefaulDestination,
+  setHotelRating,
+  setSelectedDurations,
+  setMealPlan,
+  getSideFilterParams,
+  onBeforeSearch,
+}: {
+  selectedDestRegions?: any;
+  setSelectedDestRegions?: any;
+  setSelectedDefaulDestination?: any;
+  setHotelRating?: any;
+  setSelectedDurations?: any;
+  setMealPlan?: any;
+  getSideFilterParams?: () => Record<string, string | undefined>;
+  onBeforeSearch?: () => void;
+}) => {
   const { data: ticket } = useQuery({
     queryKey: ['country_list'],
     queryFn: () => country_api.list(),
@@ -297,8 +315,10 @@ useEffect(() => {
 
     if (!departureParam || (!hasDestination && !hasCountryId)) {
       toast.error(t('choice_country_and_region'));
-      return;
+      return false;
     }
+
+    onBeforeSearch?.();
 
     const params = new URLSearchParams();
 
@@ -317,12 +337,15 @@ useEffect(() => {
     if (toDate) params.set('dateTo', formatDate.format(toDate, 'YYYY-MM-DD'));
     params.set('adults', adultsForSearch(adults).toString());
     if (children > 0) params.set('children', children.toString());
-    if (searchParams.get("hotel_id")) params.set('hotel_id', "");
-    if (searchParams.get("town")) params.set('town', "");
-    if (searchParams.get("rating")) params.set('rating',  "");
-    if (searchParams.get("duration")) params.set('duration',  "");
-    if (searchParams.get("meal")) params.set('meal',  "");
+
+    const side = getSideFilterParams?.() ?? {};
+    Object.entries(side).forEach(([key, value]) => {
+      if (value) params.set(key, String(value));
+      else params.delete(key);
+    });
+
     route.push(`${getBasePath()}?page=1&${params.toString()}`, { scroll: false });
+    return true;
   };
 
   const departureRegionName = selectedRegion?.name ?? '';
@@ -948,10 +971,9 @@ useEffect(() => {
         <Button
           className="flex h-12 items-center justify-center rounded-[14px] bg-[#FF6B00] text-center text-[14px] font-medium text-white hover:bg-[#ff7a1f]"
          onClick={() => {
-            saveFilter();
-            // sahifani pastga siljitish
+            if (!saveFilter()) return;
             window.scrollTo({
-              top: 700, // kerakli balandlikka moslab qo‘y
+              top: 700,
               behavior: 'smooth',
             });
           }}
