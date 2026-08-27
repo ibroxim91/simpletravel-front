@@ -303,28 +303,38 @@ const [error, setError] = useState<Error | null>(null);
     }
   }, [priceRange]);
 
-  const commitSideFiltersFromDraft = useCallback(() => {
-    const nextSide = sideFiltersFromParams({
-      duration: selectedDurations || undefined,
-      meal: mealPlan || undefined,
-      rating: hotelRating || undefined,
-      town: selectedTown || undefined,
-      hotel_id: hotelID || undefined,
-      operator: draftOperator || undefined,
-    });
-    setAppliedSideFilters(nextSide);
-    applyDraftPriceToApplied();
-    setCurrentPage(1);
-    return nextSide;
-  }, [
-    selectedDurations,
-    mealPlan,
-    hotelRating,
-    selectedTown,
-    hotelID,
-    draftOperator,
-    applyDraftPriceToApplied,
-  ]);
+  const commitSideFiltersFromDraft = useCallback(
+    (options?: { resetDestinationFilters?: boolean }) => {
+      const resetDestination = Boolean(options?.resetDestinationFilters);
+      if (resetDestination) {
+        setSelectedTown(null);
+        setHotelID(null);
+        setDraftOperator(null);
+      }
+
+      const nextSide = sideFiltersFromParams({
+        duration: selectedDurations || undefined,
+        meal: mealPlan || undefined,
+        rating: hotelRating || undefined,
+        town: resetDestination ? undefined : selectedTown || undefined,
+        hotel_id: resetDestination ? undefined : hotelID || undefined,
+        operator: resetDestination ? undefined : draftOperator || undefined,
+      });
+      setAppliedSideFilters(nextSide);
+      applyDraftPriceToApplied();
+      setCurrentPage(1);
+      return nextSide;
+    },
+    [
+      selectedDurations,
+      mealPlan,
+      hotelRating,
+      selectedTown,
+      hotelID,
+      draftOperator,
+      applyDraftPriceToApplied,
+    ],
+  );
 
   const handlePriceInputBlur = () => {
     if (priceRange.length === 2) {

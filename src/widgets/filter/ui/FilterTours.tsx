@@ -60,7 +60,7 @@ const FilterTours = ({
   setMealPlan?: any;
   setIsSearchClicked?: (value: boolean) => void;
   getSideFilterParams?: () => Record<string, string | undefined>;
-  onBeforeSearch?: () => void;
+  onBeforeSearch?: (options?: { resetDestinationFilters?: boolean }) => void;
 }) => {
   const t = useTranslations();
   const route = useRouter();
@@ -337,7 +337,14 @@ useEffect(() => {
       return false;
     }
 
-    onBeforeSearch?.();
+    const nextDestination = selectedDestRegion ? String(selectedDestRegion) : '';
+    const nextCountryId = selectedDestCountryId ? String(selectedDestCountryId) : '';
+    const prevDestination = searchParams.get('destination') || '';
+    const prevCountryId = searchParams.get('country_id') || '';
+    const destinationChanged =
+      nextDestination !== prevDestination || nextCountryId !== prevCountryId;
+
+    onBeforeSearch?.({ resetDestinationFilters: destinationChanged });
 
     const params = new URLSearchParams();
     params.set('departure', departureParam);
@@ -353,7 +360,12 @@ useEffect(() => {
     params.set('adults', adultsForSearch(adults).toString());
     if (children > 0) params.set('children', children.toString());
 
-    const side = getSideFilterParams?.() ?? {};
+    const side = { ...(getSideFilterParams?.() ?? {}) };
+    if (destinationChanged) {
+      delete side.town;
+      delete side.hotel_id;
+      delete side.operator;
+    }
     Object.entries(side).forEach(([key, value]) => {
       if (value) params.set(key, String(value));
       else params.delete(key);
