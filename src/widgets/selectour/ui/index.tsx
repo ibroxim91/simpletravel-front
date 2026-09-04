@@ -251,6 +251,10 @@ const prevHotelsRef = useRef<any[] | null>(null);
   const [openFilter, setFilter] = useState(false);
   const searchParamsString = searchParams?.toString() ?? '';
   const getSearchParam = (key: string) => searchParams?.get(key) ?? '';
+  const isHotOffers = getSearchParam('hot') === 'true';
+  const visaRequiredParam = getSearchParam('visa_required');
+  const isVisaFreeOffers = visaRequiredParam === 'false';
+  const isHomeOffersMode = isHotOffers || isVisaFreeOffers;
 const [ticket, setTicket] = useState<TickectAll | null>(null);
 
 const [isLoading, setLoading] = useState(false);
@@ -573,6 +577,11 @@ const loadTickets = async (priceForFetch: number[]) => {
     return;
   }
 
+  // Home-offers mode uses a dedicated loader; keep normal search path intact.
+  if (isHomeOffersMode) {
+    return;
+  }
+
   const params: TickectAllFilter = {
     page: currentPage,
     page_size: 10,
@@ -706,6 +715,7 @@ const coreSearchKey = useMemo(
 
 useEffect(() => {
   if (!filterLocal) return;
+  if (isHomeOffersMode) return;
   if (!hasSearchDestination(filterLocal)) return;
 
   const isNewCoreSearch = prevFilterBaseKeyRef.current !== '' &&
@@ -748,6 +758,61 @@ useEffect(() => {
   appliedPriceRange,
   hotelAmenities,
   hotelType,
+  isHomeOffersMode,
+]);
+
+useEffect(() => {
+  if (!isHomeOffersMode) return;
+
+  const signature = JSON.stringify({
+    mode: isHotOffers ? 'hot' : 'visa_free',
+    visa_required: visaRequiredParam,
+    page: currentPage,
+  });
+  if (ticketsFetchSignatureRef.current === `home-offers:${signature}`) {
+    return;
+  }
+  ticketsFetchSignatureRef.current = `home-offers:${signature}`;
+
+  let cancelled = false;
+  const run = async () => {
+    setLoading(true);
+    setFetching(true);
+    setIsError(false);
+    setError(null);
+    try {
+      const response = await Ticket_Api.GetHomeOffers({
+        ...(isHotOffers ? { hot: true } : {}),
+        ...(visaRequiredParam !== ''
+          ? { visa_required: visaRequiredParam === 'true' }
+          : isVisaFreeOffers
+            ? { visa_required: false }
+            : {}),
+        page: currentPage,
+      });
+      if (cancelled) return;
+      setTicket(response);
+    } catch (err) {
+      if (cancelled) return;
+      setIsError(true);
+      setError(err as Error);
+    } finally {
+      if (!cancelled) {
+        setLoading(false);
+        setFetching(false);
+      }
+    }
+  };
+  void run();
+  return () => {
+    cancelled = true;
+  };
+}, [
+  isHomeOffersMode,
+  isHotOffers,
+  isVisaFreeOffers,
+  visaRequiredParam,
+  currentPage,
 ]);
 
 
@@ -1983,13 +2048,20 @@ const top_duration = [
           type="button"
           aria-label={t('Yuqoriga qaytish')}
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="fixed z-[70] flex items-center justify-center rounded-full bg-[#084FE3] text-white shadow-[0_4px_20px_rgba(8,79,227,0.35)] transition-transform hover:bg-[#0640c4] active:scale-95 bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))] right-4 h-11 w-11 sm:bottom-[calc(5.75rem+env(safe-area-inset-bottom,0px))] sm:right-6 sm:h-12 sm:w-12"
+          className="fixed z-[70] flex h-11 w-11 items-center justify-center rounded-full bg-[#084FE3] text-white shadow-[0_4px_20px_rgba(8,79,227,0.35)] transition-transform hover:bg-[#0640c4] active:scale-95 bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] right-5 sm:bottom-[calc(1.25rem+env(safe-area-inset-bottom,0px))] sm:h-12 sm:w-12"
         >
           <KeyboardArrowUpIcon sx={{ fontSize: { xs: 24, sm: 28 } }} />
         </button>
       )}
 
-      <SupportChatWidget variant="bar" />
+      <SupportChatWidget
+        variant="fab"
+        fabClassName={
+          showScrollTop
+            ? 'bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] sm:bottom-[calc(5rem+env(safe-area-inset-bottom,0px))]'
+            : undefined
+        }
+      />
     </div>
   );
 }

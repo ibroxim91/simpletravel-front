@@ -16,8 +16,9 @@ import { useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import TourOfferCard from './cards/TourOfferCard';
-import {  useRouter } from '@/shared/config/i18n/navigation';
+import { useRouter } from '@/shared/config/i18n/navigation';
 
+export type OfferMode = 'hot' | 'visa_free';
 
 type TourOffersSectionProps = {
   queryKey: string;
@@ -26,7 +27,8 @@ type TourOffersSectionProps = {
   sectionClassName?: string;
   cardsStart: number;
   cardsEnd: number;
-  isPopularDestination: boolean;
+  isPopularDestination?: boolean;
+  offerMode: OfferMode;
 };
 
 const TourOffersSection = ({
@@ -37,6 +39,7 @@ const TourOffersSection = ({
   cardsStart,
   cardsEnd,
   isPopularDestination = false,
+  offerMode,
 }: TourOffersSectionProps) => {
   const t = useTranslations();
   const { locale }: any = useParams();
@@ -45,13 +48,26 @@ const TourOffersSection = ({
   const [canScrollNext, setCanScrollNext] = useState(false);
 
   const { data, isLoading } = useQuery({
-    queryKey: [queryKey],
-    queryFn: () => Ticket_Api.GetHomeTickets(),
-    select: (res) => res.data.results.tickets ?? [],
+    queryKey: [queryKey, offerMode],
+    queryFn: async () => {
+      try {
+        if (offerMode === 'hot') {
+          return await Ticket_Api.GetHomeOffers({ hot: true, page: 1 });
+        }
+        return await Ticket_Api.GetHomeOffers({ visa_required: false, page: 1 });
+      } catch {
+        // Fallback keeps homepage working if Go home-offers is unavailable.
+        return await Ticket_Api.GetHomeTickets();
+      }
+    },
+    select: (res) => res?.data?.results?.tickets ?? [],
   });
   const router = useRouter();
   const tours = data?.slice(cardsStart, cardsEnd) ?? [];
   const carouselItems = isLoading ? Array.from({ length: 4 }) : tours;
+
+  const seeAllHref =
+    offerMode === 'hot' ? '/selectour?hot=true' : '/selectour?visa_required=false';
 
   useEffect(() => {
     if (!carouselApi) return;
@@ -152,12 +168,13 @@ const TourOffersSection = ({
           </div>
 
           <div className="mt-8 w-full md:mt-10 md:flex md:justify-center">
-            <Button className="h-12 w-full rounded-[14px] bg-[#E8F1FF] text-[14px] font-medium text-[#1C1C1E]
+            <Button
+              className="h-12 w-full rounded-[14px] bg-[#E8F1FF] text-[14px] font-medium text-[#1C1C1E]
              hover:bg-[#DCE8FF] md:h-[60px] md:w-[292px] md:text-base md:font-normal"
-             onClick={() => {
-              router.push('/selectour?page=1');
-             }}
-             >
+              onClick={() => {
+                router.push(seeAllHref);
+              }}
+            >
               {t('Смотреть все туры')}
             </Button>
           </div>

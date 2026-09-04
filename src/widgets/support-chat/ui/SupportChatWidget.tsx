@@ -30,6 +30,8 @@ const COLORS = {
 
 type SupportChatWidgetProps = {
   variant?: 'fab' | 'bar';
+  /** Extra classes for the FAB wrapper (e.g. stack above another fixed button). */
+  fabClassName?: string;
 };
 
 function UnreadBadge({
@@ -52,6 +54,7 @@ function UnreadBadge({
 
 export default function SupportChatWidget({
   variant = 'fab',
+  fabClassName,
 }: SupportChatWidgetProps) {
   const t = useTranslations();
   const [open, setOpen] = useState(false);
@@ -303,7 +306,11 @@ export default function SupportChatWidget({
   }
 
   return (
-    <div className="fixed bottom-5 right-5 z-[80] max-md:bottom-4 max-md:right-4">
+    <div
+      className={`fixed right-5 z-[80] max-md:right-4 ${
+        fabClassName ?? 'bottom-5 max-md:bottom-4'
+      }`}
+    >
       {panel}
       <button
         type="button"
