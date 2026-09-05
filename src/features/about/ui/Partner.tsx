@@ -6,7 +6,7 @@ import { easeOut, motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { CardData } from '../lib/data';
-import SendPartner from './SendPartner';
+// import SendPartner from './SendPartner';
 import { Link } from '@/shared/config/i18n/navigation';
 
 const Partner = () => {
@@ -143,7 +143,7 @@ const Partner = () => {
 </MotionDiv>
 
 
-      <SendPartner />
+      {/* <SendPartner /> */}
     </div>
   );
 };
