@@ -13,7 +13,6 @@ import {
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/shared/ui/input-otp';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
 import clsx from 'clsx';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { LoaderCircle } from 'lucide-react';
@@ -24,6 +23,7 @@ import { toast } from 'sonner';
 import z from 'zod';
 import { Auth_Api } from '../lib/api';
 import { useLoginPhoneStore } from '../lib/store';
+import { resolveAuthErrorMessage } from '@/shared/lib/extractApiErrorMessage';
 
 interface Props {
   setStep: Dispatch<SetStateAction<number>>;
@@ -73,10 +73,10 @@ const TwoStep = ({ setStep }: Props) => {
     onSuccess() {
       setStep(3);
     },
-    onError(error: AxiosError<{ data: { detail: string } }>) {
+    onError(error) {
       toast.error(t('Xatolik yuz berdi'), {
         icon: null,
-        description: error.response?.data.data.detail,
+        description: resolveAuthErrorMessage(error),
         position: 'bottom-right',
       });
     },
@@ -94,10 +94,10 @@ const TwoStep = ({ setStep }: Props) => {
         position: 'bottom-right',
       });
     },
-    onError(error: AxiosError<{ non_field_errors: [string] }>) {
+    onError(error) {
       toast.error(t('Xatolik yuz berdi'), {
         icon: null,
-        description: error.response?.data.non_field_errors[0],
+        description: resolveAuthErrorMessage(error),
         position: 'bottom-right',
       });
     },
@@ -115,10 +115,10 @@ const TwoStep = ({ setStep }: Props) => {
         position: 'bottom-right',
       });
     },
-    onError(error: AxiosError<{ non_field_errors: [string] }>) {
+    onError(error) {
       toast.error(t('Xatolik yuz berdi'), {
         icon: null,
-        description: error.response?.data.non_field_errors[0],
+        description: resolveAuthErrorMessage(error),
         position: 'bottom-right',
       });
     },
@@ -131,10 +131,10 @@ const TwoStep = ({ setStep }: Props) => {
     onSuccess() {
       setStep(3);
     },
-    onError(error: AxiosError<{ data: { detail: string } }>) {
+    onError(error) {
       toast.error(t('Xatolik yuz berdi'), {
         icon: null,
-        description: error.response?.data.data.detail,
+        description: resolveAuthErrorMessage(error),
         position: 'bottom-right',
       });
     },

@@ -25,7 +25,6 @@ import {
 import LegalOffertaUi from '@/features/legal-offerta/ui/LegalOffertaUi';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
 import { LoaderCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
@@ -35,6 +34,7 @@ import { toast } from 'sonner';
 import z from 'zod';
 import { Auth_Api } from '../lib/api';
 import { useLoginPhoneStore } from '../lib/store';
+import { resolveAuthErrorMessage } from '@/shared/lib/extractApiErrorMessage';
 
 interface Props {
   setStep: Dispatch<SetStateAction<number>>;
@@ -75,12 +75,10 @@ const OneStep = ({ setStep }: Props) => {
     onSuccess() {
       setStep(2);
     },
-    onError(error: AxiosError<{ data: { detail: string; phone: [string] } }>) {
+    onError(error) {
       toast.error(t('Xatolik yuz berdi'), {
         icon: null,
-        description:
-          error.response?.data.data.detail ||
-          error.response?.data.data.phone[0],
+        description: resolveAuthErrorMessage(error),
         position: 'bottom-right',
       });
     },
@@ -93,11 +91,10 @@ const OneStep = ({ setStep }: Props) => {
     onSuccess() {
       setStep(2);
     },
-    onError(error: AxiosError<{ data: { email: string; detail: string } }>) {
+    onError(error) {
       toast.error(t('Xatolik yuz berdi'), {
         icon: null,
-        description:
-          error.response?.data.data.email || error.response?.data.data.detail,
+        description: resolveAuthErrorMessage(error),
         position: 'bottom-right',
       });
     },

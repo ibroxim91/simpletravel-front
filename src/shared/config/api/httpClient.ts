@@ -1,5 +1,6 @@
 import getLocaleCS from '@/shared/lib/getLocaleCS';
 import { getAnalyticsSessionId } from '@/shared/lib/analytics';
+import { extractApiErrorMessage } from '@/shared/lib/extractApiErrorMessage';
 import axios, {
   AxiosError,
   AxiosResponse,
@@ -127,15 +128,17 @@ httpClient.interceptors.response.use(
     }
 
     const status = error.response?.status;
-    const data = error.response?.data as
-      | { detail?: string; message?: string }
-      | undefined;
+    const data = error.response?.data;
 
-    const message =
-      data?.detail ||
-      data?.message ||
-      error.message ||
-      'Server bilan bog‘liq xatolik.';
+    let message: string;
+    if (!error.response || (typeof status === 'number' && status >= 500)) {
+      message = 'Что то пошло не так попробуйте позже...';
+    } else {
+      message =
+        extractApiErrorMessage(data) ||
+        error.message ||
+        'Что то пошло не так попробуйте позже...';
+    }
 
     return Promise.reject({
       ...error,

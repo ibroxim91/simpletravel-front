@@ -5,11 +5,11 @@ import { Link, useRouter } from '@/shared/config/i18n/navigation';
 import { removeRefToken, removeToken, getToken } from '@/shared/config/api/saveToke';
 import { Button } from '@/shared/ui/button';
 import { useMutation } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
 import { LoaderCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { resolveAuthErrorMessage } from '@/shared/lib/extractApiErrorMessage';
 
 export default function DeleteAccountClient() {
   const t = useTranslations();
@@ -29,12 +29,8 @@ export default function DeleteAccountClient() {
       toast.success(t('delete_account_success'));
       router.replace('/');
     },
-    onError: (error: AxiosError<{ detail?: string; data?: { detail?: string } }>) => {
-      const detail =
-        error.response?.data?.detail ||
-        error.response?.data?.data?.detail ||
-        t('Xatolik yuz berdi');
-      toast.error(detail);
+    onError: (error) => {
+      toast.error(resolveAuthErrorMessage(error, t('Xatolik yuz berdi')));
     },
   });
 

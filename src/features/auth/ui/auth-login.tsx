@@ -18,7 +18,6 @@ import { Label } from '@/shared/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
 import { LoaderCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
@@ -27,6 +26,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import z from 'zod';
 import { Auth_Api } from '../lib/api';
+import { resolveAuthErrorMessage } from '@/shared/lib/extractApiErrorMessage';
 
 const AuthLogin = () => {
   const t = useTranslations();
@@ -79,10 +79,10 @@ const AuthLogin = () => {
         route.push('/profile');
       }
     },
-    onError(error: AxiosError<{ non_field_errors: [string] }>) {
+    onError(error) {
       toast.error(t('Xatolik yuz berdi'), {
         icon: null,
-        description: error.response?.data.non_field_errors[0],
+        description: resolveAuthErrorMessage(error),
         position: 'bottom-right',
       });
     },
@@ -98,19 +98,10 @@ const AuthLogin = () => {
       route.back();
       ref.clear();
     },
-    onError(
-      error: AxiosError<{
-        non_field_errors: string[];
-        data: { detail: string };
-      }>,
-    ) {
+    onError(error) {
       toast.error(t('Xatolik yuz berdi'), {
         icon: null,
-        description:
-          error.response && error.response.data
-            ? error.response?.data?.data?.detail ||
-              error.response?.data?.non_field_errors?.[0]
-            : t('Xatolik yuz berdi'),
+        description: resolveAuthErrorMessage(error),
         position: 'bottom-right',
       });
     },

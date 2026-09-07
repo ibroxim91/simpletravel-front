@@ -14,7 +14,6 @@ import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
 import { LoaderCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
@@ -22,6 +21,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import z from 'zod';
 import { Auth_Api } from '../lib/api';
+import { resolveAuthErrorMessage } from '@/shared/lib/extractApiErrorMessage';
 
 const formSchema = z
   .object({
@@ -69,10 +69,10 @@ const AuthEditPassword = () => {
       route.back();
       toast.success(t("Paro muvaffaqiyatli o'zgardi"));
     },
-    onError(error: AxiosError<{ data: { detail: string } }>) {
+    onError(error) {
       toast.error(t('Xatolik yuz berdi'), {
         icon: null,
-        description: error.response?.data.data.detail,
+        description: resolveAuthErrorMessage(error),
         position: 'bottom-right',
       });
     },

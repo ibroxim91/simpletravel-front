@@ -13,7 +13,6 @@ import { Label } from '@/shared/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
 import { LoaderCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Dispatch, SetStateAction } from 'react';
@@ -22,6 +21,7 @@ import { toast } from 'sonner';
 import z from 'zod';
 import { Auth_Api } from '../lib/api';
 import { useLoginPhoneStore } from '../lib/store';
+import { resolveAuthErrorMessage } from '@/shared/lib/extractApiErrorMessage';
 
 interface Props {
   setStep: Dispatch<SetStateAction<number>>;
@@ -59,10 +59,10 @@ const ForgetOneStep = ({ setStep }: Props) => {
     onSuccess() {
       setStep(2);
     },
-    onError(error: AxiosError<{ data: { detail: string } }>) {
+    onError(error) {
       toast.error(t('Xatolik yuz berdi'), {
         icon: null,
-        description: error.response?.data.data.detail,
+        description: resolveAuthErrorMessage(error),
         position: 'bottom-right',
       });
     },
@@ -75,10 +75,10 @@ const ForgetOneStep = ({ setStep }: Props) => {
     onSuccess() {
       setStep(2);
     },
-    onError(error: AxiosError<{ data: { email: string } }>) {
+    onError(error) {
       toast.error(t('Xatolik yuz berdi'), {
         icon: null,
-        description: error.response?.data.data.email,
+        description: resolveAuthErrorMessage(error),
         position: 'bottom-right',
       });
     },
