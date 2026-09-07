@@ -16,7 +16,7 @@ const ProfileClient = () => {
 
     // Agar token yo'q bo'lsa, redirect
     if (!t) {
-      router.replace('/auth/register');
+      router.replace('/auth/login');
     }
   }, [router]);
 

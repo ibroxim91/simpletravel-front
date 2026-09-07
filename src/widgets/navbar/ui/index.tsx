@@ -60,15 +60,15 @@ const Navbar = () => {
       active: '/saved',
     },
     {
-      href: user ? '/profile?tabs=profile' : '/auth/register',
+      href: user ? '/profile?tabs=profile' : '/auth/login',
       label: 'Профиль',
       icon: PersonIcon,
       active: '/profile',
     },
   ];
 
-  const profileHref = user ? '/profile?tabs=profile' : '/auth/register';
-  const profileLabel = user ? t('Профиль') : t('Регистрация');
+  const profileHref = user ? '/profile?tabs=profile' : '/auth/login';
+  const profileLabel = user ? t('Профиль') : t('Войти');
   const profileName = user
     ? `${user.data.data.first_name || ''} ${user.data.data.last_name || ''}`.trim()
     : '';

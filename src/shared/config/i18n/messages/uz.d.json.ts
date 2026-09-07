@@ -347,7 +347,7 @@ declare const messages: {
   "Смотреть тур": "Turni ko‘rish",
   "фото": "foto",
   "с учетом налогов": "soliqlarni hisobga olgan holda",
-  "за человека": "bir kishi uchun",
+  "за человека": "1 kishi uchun",
   "Блог": "Blog",
   "Сервисы:": "Xizmatlar:",
   "Способы оплаты:": "To‘lov usullari:",
