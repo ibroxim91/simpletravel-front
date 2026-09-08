@@ -137,8 +137,19 @@ export default function SingleTour() {
     if (!data) return;
 
     const tourId =
-      data.tour_operator_id || data.id || data.slug || null;
+      data.id || data.slug || data.tour_operator_id || null;
     if (!tourId) return;
+
+    const dateFrom = data.departure_date || null;
+    const travelTime =
+      (data as { travel_time?: string }).travel_time || null;
+    const dateTo = travelTime || null;
+    const priceFull =
+      (data as { price_full?: number | string }).price_full ?? null;
+    const operatorPrice =
+      (data as { operator_price?: number | string }).operator_price ??
+      data.price ??
+      null;
 
     void trackTourDetail({
       tour_id: tourId,
@@ -149,8 +160,12 @@ export default function SingleTour() {
       duration_days: data.duration_days ?? null,
       passenger_count: data.passenger_count ?? null,
       price: data.price ?? null,
-      price_full: data.price_full ?? null,
+      price_full: priceFull,
+      operator_price: operatorPrice,
       operator: data.operator ?? null,
+      date_from: dateFrom,
+      date_to: dateTo,
+      travel_time: travelTime,
     });
   }, [
     data?.tour_operator_id,
@@ -166,6 +181,8 @@ export default function SingleTour() {
     data?.price,
     data?.price_full,
     data?.operator,
+    data?.departure_date,
+    data?.travel_time,
   ]);
 
   const {

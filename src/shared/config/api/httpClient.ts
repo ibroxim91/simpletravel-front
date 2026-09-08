@@ -1,5 +1,5 @@
 import getLocaleCS from '@/shared/lib/getLocaleCS';
-import { getAnalyticsSessionId } from '@/shared/lib/analytics';
+import { getAnalyticsDeviceId, getAnalyticsSessionId } from '@/shared/lib/analytics';
 import { extractApiErrorMessage } from '@/shared/lib/extractApiErrorMessage';
 import axios, {
   AxiosError,
@@ -59,6 +59,7 @@ httpClient.interceptors.request.use(
 
     if (typeof window !== 'undefined') {
       config.headers.set('X-Analytics-Session', getAnalyticsSessionId());
+      config.headers.set('X-Analytics-Device', getAnalyticsDeviceId());
       config.headers.set('X-Platform', 'web');
     }
 
