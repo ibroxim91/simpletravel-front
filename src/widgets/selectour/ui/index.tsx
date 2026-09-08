@@ -58,7 +58,7 @@ import { useParams, useSearchParams } from 'next/navigation';
 import qs from 'qs';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type SetStateAction } from 'react';
 import { toast } from 'sonner';
 import Ticket_Api, { hotel_meal_plan } from '../lib/api';
 import { useFilterTickectsStore } from '../lib/store';
@@ -68,6 +68,11 @@ import FilterSection from './FilterSection';
 import TourItem from '@/widgets/selectour/ui/TourItem';
 import { resolveAdultsCount } from '@/widgets/filter/lib/passengers';
 import CircleLoader from './TourLoader';
+import {
+  parseDurationList,
+  resolveNightsList,
+} from '@/widgets/selectour/lib/nights';
+import Switch from '@mui/material/Switch';
 
 const STATIC_PRICE_LIMITS = {
   min: 3_000_000,
@@ -237,7 +242,8 @@ const prevHotelsRef = useRef<any[] | null>(null);
   const searchParams = useSearchParams();
   const router = useRouter();
   const [filterLocal, setFilterLocal] = useState<FilterLocalState>();
-  const [selectedDurations, setSelectedDurations] = useState<string | null>(null,);
+  const [selectedDurations, setSelectedDurations] = useState<string[]>([]);
+  const [onlyFrom7, setOnlyFrom7] = useState(true);
   const [selectedTown, setSelectedTown] = useState<string | null>(null);
 
   const [selectedDestinations, setSelectedDestinations] = useState<string | null>(null);
@@ -273,7 +279,9 @@ const [error, setError] = useState<Error | null>(null);
 
   const collectSideFilterParams = useCallback(
     () => ({
-      duration: selectedDurations || undefined,
+      duration: selectedDurations.length
+        ? selectedDurations.join(',')
+        : undefined,
       meal: mealPlan || undefined,
       rating: hotelRating || undefined,
       town: selectedTown || undefined,
@@ -288,6 +296,17 @@ const [error, setError] = useState<Error | null>(null);
       hotelID,
       draftOperator,
     ],
+  );
+
+  const handleDurationsChange = useCallback(
+    (value: SetStateAction<string[]>) => {
+      setSelectedDurations((prev) => {
+        const next = typeof value === 'function' ? value(prev) : value;
+        setOnlyFrom7(next.length === 0);
+        return next;
+      });
+    },
+    [],
   );
 
   const applyDraftPriceToApplied = useCallback(() => {
@@ -317,7 +336,9 @@ const [error, setError] = useState<Error | null>(null);
       }
 
       const nextSide = sideFiltersFromParams({
-        duration: selectedDurations || undefined,
+        duration: selectedDurations.length
+          ? selectedDurations.join(',')
+          : undefined,
         meal: mealPlan || undefined,
         rating: hotelRating || undefined,
         town: resetDestination ? undefined : selectedTown || undefined,
@@ -388,6 +409,8 @@ const [error, setError] = useState<Error | null>(null);
       hotel_id: nextSide.hotel_id,
       operator: nextSide.operator,
     });
+    if (onlyFrom7) params.delete('from7');
+    else params.set('from7', '0');
     params.set('page', '1');
     router.replace(`/selectour?${params.toString()}`, { scroll: false });
     if (options?.closeMobileDrawer) {
@@ -397,8 +420,27 @@ const [error, setError] = useState<Error | null>(null);
     }
   };
 
+  const handleOnlyFrom7Change = (checked: boolean) => {
+    setOnlyFrom7(checked);
+    if (checked) {
+      setSelectedDurations([]);
+      setAppliedSideFilters((prev) => ({ ...prev, durations: null }));
+    }
+    const params = new URLSearchParams(searchParamsString);
+    if (checked) {
+      params.delete('from7');
+      params.delete('duration');
+    } else {
+      params.set('from7', '0');
+    }
+    params.set('page', '1');
+    setCurrentPage(1);
+    router.replace(`/selectour?${params.toString()}`, { scroll: false });
+  };
+
   const handleClearSideFilters = () => {
-    setSelectedDurations(null);
+    setSelectedDurations([]);
+    setOnlyFrom7(true);
     setMealPlan(null);
     setHotelRating(null);
     setSelectedTown(null);
@@ -422,6 +464,7 @@ const [error, setError] = useState<Error | null>(null);
       hotel_id: null,
       operator: null,
     });
+    params.delete('from7');
     params.delete('type-hotel');
     params.delete('amenitie');
     params.delete('feature');
@@ -610,6 +653,11 @@ const loadTickets = async (priceForFetch: number[]) => {
       : {}),
   };
 
+  params.duration_days = resolveNightsList(
+    appliedSideFilters.durations,
+    onlyFrom7,
+  );
+
   const currentKey = generateSearchKey(params);
 
   const cache = getTicketCache();
@@ -676,6 +724,7 @@ const filterBaseKey = useMemo(
       selectedDurations: appliedSideFilters.durations,
       hotelRating: appliedSideFilters.hotelRating,
       operator: appliedSideFilters.operator,
+      onlyFrom7,
       cheaper,
       expensive,
     }),
@@ -686,6 +735,7 @@ const filterBaseKey = useMemo(
     filterLocal?.date,
     filterLocal?.toDate,
     appliedSideFilters,
+    onlyFrom7,
     cheaper,
     expensive,
   ],
@@ -842,6 +892,10 @@ useEffect(() => {
     const rating = getSearchParam('rating') || '';
     const duration = getSearchParam('duration') || '';
     const from_cache = getSearchParam('from_cache') || '';
+    const from7Param = getSearchParam('from7');
+    const nextOnlyFrom7 =
+      duration.length > 0 ? false : from7Param !== '0';
+    setOnlyFrom7((prev) => (prev === nextOnlyFrom7 ? prev : nextOnlyFrom7));
 
     let newData = {
       departure:departure,
@@ -904,7 +958,7 @@ useEffect(() => {
     if (prevSideUrlKeyRef.current !== nextSideKey) {
       prevSideUrlKeyRef.current = nextSideKey;
       setHotelRating(nextSide.hotelRating);
-      setSelectedDurations(nextSide.durations);
+      setSelectedDurations(parseDurationList(nextSide.durations));
       setMealPlan(nextSide.mealPlan);
       setSelectedTown(nextSide.town);
       setHotelID(nextSide.hotel_id);
@@ -1024,6 +1078,7 @@ const hotels = useMemo(() => {
 const prevCountry = useRef<string | null>(null);
 const prevRegion = useRef<string | null>(null);
 const top_duration = [
+                {"duration": 2},
                 {"duration": 3},
                 {"duration": 4},
                 {"duration": 5},
@@ -1036,13 +1091,6 @@ const top_duration = [
                 {"duration": 12},
                 {"duration": 13},
                 {"duration": 14},
-                {"duration": 15},
-                {"duration": 16},
-                {"duration": 17},
-                {"duration": 18},
-                {"duration": 19},
-                {"duration": 20},
-                {"duration": 21}
             ]
   // const initialized = useRef(false);
   useEffect(() => {
@@ -1148,7 +1196,7 @@ const top_duration = [
               setSelectedDestRegions={setSelectedDestinations}
               setSelectedDefaulDestination={setSelectedDefaulDestination}
               setHotelRating={setHotelRating}
-              setSelectedDurations={setSelectedDurations}
+              setSelectedDurations={handleDurationsChange}
               setMealPlan={setMealPlan}
               setIsSearchClicked={setIsSearchClicked}
               getSideFilterParams={collectSideFilterParams}
@@ -1161,7 +1209,7 @@ const top_duration = [
               setSelectedDestRegions={setSelectedDestinations}
               setSelectedDefaulDestination={setSelectedDefaulDestination}
               setHotelRating={setHotelRating}
-              setSelectedDurations={setSelectedDurations}
+              setSelectedDurations={handleDurationsChange}
               setMealPlan={setMealPlan}
               getSideFilterParams={collectSideFilterParams}
               onBeforeSearch={commitSideFiltersFromDraft}
@@ -1293,25 +1341,18 @@ const top_duration = [
           </div> */}
                     <div className=" w-full overflow-hidden rounded-[14px] bg-[#FAFBFC] p-4">
                     <FilterSection title={t('Длительность')} icon='/icons/time.png'>
-                        {top_duration && (
-                          <select
-                            value={selectedDurations ?? ''}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              setSelectedDurations(value || null);
-                            }}
-                            className="w-full h-[40px] px-2 rounded bg-transparent border-none outline-none focus:ring-0"
-                          >
-                            <option value="">---</option>
-                            {[...top_duration]
-                              .sort((a, b) => a.duration - b.duration)
-                              .map((e) => (
-                                <option key={e.duration} value={String(e.duration)}>
-                                  {e.duration} {t('ночей')}
-                                </option>
-                              ))}
-                          </select>
-                        )}
+                        {top_duration &&
+                          [...top_duration]
+                            .sort((a, b) => a.duration - b.duration)
+                            .map((e) => (
+                              <CheckboxFilter
+                                key={e.duration}
+                                value={String(e.duration)}
+                                label={`${e.duration} ${t('ночей')}`}
+                                setChecked={handleDurationsChange}
+                                selectedValue={selectedDurations}
+                              />
+                            ))}
                       </FilterSection>
 
 
@@ -1575,6 +1616,18 @@ const top_duration = [
 
 
               </div>
+
+              <div className="mt-3 flex w-full items-center justify-between gap-3 rounded-[12px] border border-[#E5E7EB] bg-[#FAFBFC] px-3 py-2">
+                <p className="text-sm font-medium leading-5 text-[#1C1C1E]">
+                  {t('only_from_7_days_tours')}
+                </p>
+                <Switch
+                  checked={onlyFrom7}
+                  onChange={(_, checked) => handleOnlyFrom7Change(checked)}
+                  color="primary"
+                  inputProps={{ 'aria-label': t('only_from_7_days_tours') }}
+                />
+              </div>
             </div>
 
             <div className="lg:hidden">
@@ -1743,10 +1796,9 @@ const top_duration = [
                     <CheckboxFilter
                       key={e.duration}
                       value={String(e.duration)}
-                      label={`${e.duration} ${t('дня')}`}
-                      setChecked={setSelectedDurations}
+                      label={`${e.duration} ${t('ночей')}`}
+                      setChecked={handleDurationsChange}
                       selectedValue={selectedDurations}
-                      exclusive
                       />
                   ))}
             </FilterSection>

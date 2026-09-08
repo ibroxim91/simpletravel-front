@@ -258,11 +258,14 @@ const isLiked = likedIds.includes(data.tour_operator_id)
                         </p>
                       </div>
 
-                      {/* Duration days */}
+                      {/* Duration: nights + days (days = nights + 1) */}
                       <div className="flex items-center gap-2">
                         <img src="/icons/time.png" alt="time" className="w-6 h-6" />
                         <p className="text-sm font-semibold leading-[17px] text-[#1C1C1E]">
-                          {data.duration_days || '7'} {t('дней')}
+                          {(() => {
+                            const nights = Number(data.duration_days) || 7;
+                            return `${nights} ${t('ночей')}, ${nights + 1} ${t('дней')}`;
+                          })()}
                         </p>
                       </div>
                     </div>
@@ -374,11 +377,14 @@ const isLiked = likedIds.includes(data.tour_operator_id)
                       </p>
                     </div>
 
-                    {/* Duration days */}
+                    {/* Duration: nights + days (days = nights + 1) */}
                     <div className="flex items-center gap-2">
                       <img src="/icons/time.png" alt="time" className="w-4 h-4 shrink-0" />
                       <p className="text-[12px] font-medium leading-[15px] text-[#1C1C1E]">
-                        {data.duration_days || '7'} {t('дней')}
+                        {(() => {
+                          const nights = Number(data.duration_days) || 7;
+                          return `${nights} ${t('ночей')}, ${nights + 1} ${t('дней')}`;
+                        })()}
                       </p>
                     </div>
 

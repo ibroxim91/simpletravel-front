@@ -285,6 +285,7 @@ declare const messages: {
   "Hozircha yangiliklar mavjud emas": "Hozircha yangiliklar mavjud emas. Keyinroq qayta urinib ko‘ring",
   "Xatolik yuz berdi": "Xatolik yuz berdi",
   "ta tur topildi": "ta tur topildi",
+  "only_from_7_days_tours": "Faqat 7 kundan boshlanadigan turlar",
   "So'rov muvaffaqiyatli jo'natildi": "So'rov muvaffaqiyatli jo'natildi. Tez orada siz bilan bog'lanamiz",
   "ga tegishli": "ga tegishli",
   "Hisobingiz yo'qmi": "Hisobingiz yo'qmi?",
