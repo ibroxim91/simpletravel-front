@@ -6,7 +6,7 @@ import { Button } from '@/shared/ui/button';
 import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
-import { ArrowRight, Heart } from 'lucide-react';
+import { ArrowRight, Heart, Star } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
@@ -16,7 +16,7 @@ import { TickectAllResults, Tour } from '../lib/types';
 import { useEffect,  useState } from 'react';
 
 
-export default function TourItem({ data }: { data: TickectAllResults; isLiked: boolean }) {
+export default function TourItem({ data }: { data: TickectAllResults; isLiked?: boolean }) {
   const { locale } = useParams();
   const t = useTranslations();
   const route = useRouter();
@@ -173,7 +173,12 @@ const isLiked = likedIds.includes(data.tour_operator_id)
       }}
       prefetch
     >
-      <div className="relative flex h-[296.5px] w-full items-stretch overflow-hidden rounded-[12px] bg-[#FAFBFC] max-lg:min-h-[189px] max-lg:h-auto max-lg:rounded-[14px] lg:bg-white lg:shadow-[0_4px_16px_rgba(17,34,17,0.05)]">
+      <div
+        className={clsx(
+          'relative flex h-[296.5px] w-full items-stretch overflow-hidden rounded-[12px] bg-[#FAFBFC] max-lg:min-h-[189px] max-lg:h-auto max-lg:rounded-[14px] lg:bg-white lg:shadow-[0_4px_16px_rgba(17,34,17,0.05)]',
+          data?.is_recommended && 'border-2 border-[#F5B400]',
+        )}
+      >
         <div className="relative h-full max-lg:h-auto w-[297px] shrink-0 overflow-hidden max-lg:min-h-[189px] max-lg:w-[126px] max-lg:self-stretch">
           
           <Image
@@ -187,6 +192,15 @@ const isLiked = likedIds.includes(data.tour_operator_id)
           <div className="absolute right-2 top-2 rounded-lg bg-white/50 px-4 py-2 text-xs font-medium leading-4 text-[#112211] backdrop-blur-[2px] max-lg:hidden">
             {`${data?.hotel_photo_count ? data.hotel_photo_count : 1} ${t('фото')}`}
           </div>
+
+          {data?.is_recommended ? (
+            <div
+              className="absolute bottom-2 left-2 z-20 flex size-7 items-center justify-center rounded-full bg-[#FFF8E1] shadow-sm"
+              aria-label={t('recommended_badge')}
+            >
+              <Star className="size-4 fill-[#F5B400] text-[#F5B400]" aria-hidden />
+            </div>
+          ) : null}
 
           <Button
             onClick={(e) => {

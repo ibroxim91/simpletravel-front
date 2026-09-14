@@ -15,6 +15,7 @@ type CheckboxFilterProps<T extends string | string[] | null> = {
   setChecked?: Dispatch<SetStateAction<T>>;
   onclick?: Dispatch<SetStateAction<number>>;
   paramName?: string; // URL param nomi (optional)
+  onSelect?: () => void;
 };
 
 function CheckboxFilter<T extends string | string[] | null>({
@@ -25,6 +26,7 @@ function CheckboxFilter<T extends string | string[] | null>({
   onclick,
   setChecked,
   paramName,
+  onSelect,
 }: CheckboxFilterProps<T>) {
   const router = useRouter();
   const pathname = usePathname();
@@ -72,6 +74,8 @@ function CheckboxFilter<T extends string | string[] | null>({
     }
 
     setChecked(newValue);
+
+    onSelect?.();
 
     // URL'ni yangilash (agar paramName berilgan bo'lsa)
     if (paramName) {

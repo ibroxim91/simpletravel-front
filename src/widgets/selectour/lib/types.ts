@@ -11,6 +11,7 @@ export interface TickectAll {
     current_page: number;
     results: {
       tickets: TickectAllResults[];
+      recommended_tickets?: TickectAllResults[];
       min_price: number;
       max_price: number;
       hotel_amenities: string[];
@@ -40,6 +41,7 @@ export interface TickectAllResults {
   title: string;
   slug: string;
   price: number;
+  is_recommended?: boolean;
   departure_time: string;
   departure: {
     id: number;
@@ -95,6 +97,8 @@ export interface TickectAllFilter {
   meal_plan?: string;
   min_price?: number;
   most_expensive?: boolean;
+  cheapest?: boolean;
+  recommended?: boolean;
   max_departure_date?: string;
   min_departure_date?: string;
   adults?: number;
@@ -105,7 +109,6 @@ export interface TickectAllFilter {
   ticket_amenities?: string;
   title?: string;
   visa_required?: boolean | string;
-  cheapest?: boolean;
   shared_token?: string;
 }
 

@@ -234,9 +234,11 @@ const prevHotelsRef = useRef<any[] | null>(null);
   } = useFilterTickectsStore();
   const [hotelName, setHotelName] = useState<string>('');
   const [hotelID, setHotelID] = useState<string | null>(null);
+  const [hotelSearchQuery, setHotelSearchQuery] = useState('');
   const [draftOperator, setDraftOperator] = useState<string | null>(null);
   const [expensive, setExpensive] = useState<boolean>(false);
   const [cheaper, setCheaper] = useState<boolean>(false);
+  const [recommendedSort, setRecommendedSort] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [visa, setVisa] = useState<string | null>(null);
   const searchParams = useSearchParams();
@@ -308,6 +310,23 @@ const [error, setError] = useState<Error | null>(null);
     },
     [],
   );
+
+  const applyFiltersBtnRef = useRef<HTMLButtonElement>(null);
+
+  const notifyApplyFiltersIfNeeded = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    // Desktop sidebar only (lg+)
+    if (!window.matchMedia('(min-width: 1024px)').matches) return;
+    const el = applyFiltersBtnRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const inViewport =
+      rect.bottom > 0 &&
+      rect.top < (window.innerHeight || document.documentElement.clientHeight);
+    if (!inViewport) {
+      toast.info(t('apply_filters_toast'), { id: 'apply-filters-hint' });
+    }
+  }, [t]);
 
   const applyDraftPriceToApplied = useCallback(() => {
     if (priceRange.length !== 2) {
@@ -392,6 +411,20 @@ const [error, setError] = useState<Error | null>(null);
     });
   };
 
+  const scrollToLoadingArea = () => {
+    requestAnimationFrame(() => {
+      document
+        .getElementById('selectour-results')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+    // Loader may appear a tick later after fetch starts.
+    window.setTimeout(() => {
+      document
+        .getElementById('selectour-results')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 120);
+  };
+
   const applySideFilters = (options?: { closeMobileDrawer?: boolean }) => {
     if (!hasSearchDestination(filterLocal)) {
       toast.error(t('choice_country_and_region'));
@@ -436,6 +469,7 @@ const [error, setError] = useState<Error | null>(null);
     params.set('page', '1');
     setCurrentPage(1);
     router.replace(`/selectour?${params.toString()}`, { scroll: false });
+    scrollToLoadingArea();
   };
 
   const handleClearSideFilters = () => {
@@ -446,11 +480,13 @@ const [error, setError] = useState<Error | null>(null);
     setSelectedTown(null);
     setHotelID(null);
     setDraftOperator(null);
+    setHotelSearchQuery('');
     setPriceRange([]);
     setAppliedPriceRange([]);
     setAppliedSideFilters(EMPTY_SIDE_FILTERS);
     setCheaper(false);
     setExpensive(false);
+    setRecommendedSort(false);
     setHotelTypes(null);
     setHotelAmenitie(null);
     setHotelFeature([]);
@@ -487,6 +523,8 @@ type TicketCache = {
 
 function generateSearchKey(params: TickectAllFilter) {
   return JSON.stringify({
+    // bump when result ordering semantics change (e.g. R/N interleave)
+    sort_layout: 'rnnn_v2',
     page: params.page,
     adults: params.adults,
     children: params.children,
@@ -503,6 +541,7 @@ function generateSearchKey(params: TickectAllFilter) {
     duration_days: params.duration_days,
     cheapest: params.cheapest,
     most_expensive: params.most_expensive,
+    recommended: params.recommended,
     min_price: params.min_price,
     max_price: params.max_price,
   });
@@ -642,6 +681,7 @@ const loadTickets = async (priceForFetch: number[]) => {
     hotel_type: hotelType ?? '',
     cheapest: cheaper,
     most_expensive: expensive,
+    recommended: recommendedSort,
     hotel_rating: appliedSideFilters.hotelRating ?? '',
     duration_days: appliedSideFilters.durations ?? '',
     meal_plan: appliedSideFilters.mealPlan ?? '',
@@ -727,6 +767,7 @@ const filterBaseKey = useMemo(
       onlyFrom7,
       cheaper,
       expensive,
+      recommendedSort,
     }),
   [
     filterLocal?.from,
@@ -738,6 +779,7 @@ const filterBaseKey = useMemo(
     onlyFrom7,
     cheaper,
     expensive,
+    recommendedSort,
   ],
 );
 
@@ -1073,6 +1115,12 @@ const hotels = useMemo(() => {
   return sortHotelsByRating(prevHotelsRef.current ?? []);
 }, [ticket, isHotelLocked]);
 
+const filteredHotels = useMemo(() => {
+  const query = hotelSearchQuery.trim().toLowerCase();
+  if (!query) return hotels;
+  return hotels.filter((hotel) => hotel.name?.toLowerCase().includes(query));
+}, [hotels, hotelSearchQuery]);
+
 
 
 const prevCountry = useRef<string | null>(null);
@@ -1226,41 +1274,50 @@ const top_duration = [
               {t('Настройте свой отдых')}
             </p>
           </div>
-          <div className="flex h-[56px] w-full items-center justify-between rounded-[14px] bg-[#FAFBFC] px-4">
-            <div className="flex items-center gap-4">
-              <img src="/icons/sort.png" width="24px" alt="" />
+          <div className="flex h-[56px] w-full items-center gap-4 rounded-[14px] bg-[#FAFBFC] px-4">
+            <img src="/icons/sort.png" width="24px" className="shrink-0" alt="" />
                <Select
-                  value={cheaper ? 'cheaper' : expensive ? 'expensive' : 'all'}
+                  value={
+                    recommendedSort
+                      ? 'recommended'
+                      : cheaper
+                        ? 'cheaper'
+                        : expensive
+                          ? 'expensive'
+                          : 'all'
+                  }
                   onValueChange={(value) => {
                     if (value === 'cheaper') {
                       setCheaper(true);
                       setExpensive(false);
+                      setRecommendedSort(false);
                     } else if (value === 'expensive') {
                       setCheaper(false);
                       setExpensive(true);
+                      setRecommendedSort(false);
+                    } else if (value === 'recommended') {
+                      setCheaper(false);
+                      setExpensive(false);
+                      setRecommendedSort(true);
                     } else if (value === 'all') {
                       setCheaper(false);
                       setExpensive(false);
+                      setRecommendedSort(false);
                     }
                     setCurrentPage(1);
                   }}
                 >
-                  <SelectTrigger className="w-full !h-[40px] flex items-center justify-between rounded-lg gap-4 border-none bg-[#FAFBFC]">
+                  <SelectTrigger className="h-10 min-w-0 flex-1 border-none bg-transparent px-0 shadow-none focus:ring-0 [&>svg]:hidden">
                     <SelectValue placeholder={t('По возрастанию цены')} />
-                    <KeyboardArrowDownIcon />
+                    <KeyboardArrowDownIcon sx={{ color: '#6B7280', fontSize: 16 }} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">{t('Все')}</SelectItem>
                     <SelectItem value="cheaper">{t('Подешевле')}</SelectItem>
                     <SelectItem value="expensive">{t('Подороже')}</SelectItem>
+                    <SelectItem value="recommended">{t('recommended_sort')}</SelectItem>
                   </SelectContent>
                 </Select>
-              {/* <FilterListIcon sx={{ color: '#1A73E8', fontSize: 24 }} />
-              <p className="text-sm font-medium leading-[17px] text-[#6B7280]">
-                {t('По возрастанию цены')}
-              </p> */}
-            </div>
-            {/* <KeyboardArrowDownIcon sx={{ color: '#6B7280', fontSize: 16 }} /> */}
           </div>
 
           <div className="hidden w-full rounded-[14px] bg-[#FAFBFC] p-4">
@@ -1351,6 +1408,7 @@ const top_duration = [
                                 label={`${e.duration} ${t('ночей')}`}
                                 setChecked={handleDurationsChange}
                                 selectedValue={selectedDurations}
+                                onSelect={notifyApplyFiltersIfNeeded}
                               />
                             ))}
                       </FilterSection>
@@ -1385,6 +1443,7 @@ const top_duration = [
                         }}
                         selectedValue={selectedTown}
                         exclusive
+                        onSelect={notifyApplyFiltersIfNeeded}
                       />
                     ))}
                 </div>
@@ -1407,6 +1466,7 @@ const top_duration = [
                 }}
                 selectedValue={hotelRating}
                 exclusive
+                onSelect={notifyApplyFiltersIfNeeded}
               />
             ))}
           </FilterSection>
@@ -1428,8 +1488,15 @@ const top_duration = [
 
           <div className="w-full rounded-[14px] bg-[#FAFBFC] p-4">
      <FilterSection title={t('Отель')} defaultHidden icon="/icons/hotel.png">
-        {hotels.length > 0 ? (
-          hotels.map((hotel, hotelIndex) => (
+        <input
+          type="search"
+          value={hotelSearchQuery}
+          onChange={(e) => setHotelSearchQuery(e.target.value)}
+          placeholder={t('hotel_search_placeholder')}
+          className="mb-3 h-10 w-full rounded-xl border border-[#DFDFDF] bg-white px-3 text-sm text-[#121212] outline-none placeholder:text-[#909091] focus:border-[#1A73E8]"
+        />
+        {filteredHotels.length > 0 ? (
+          filteredHotels.map((hotel, hotelIndex) => (
             <CheckboxFilter
               key={`${hotel.id}-${hotelIndex}`}
               value={String(hotel.id)}
@@ -1454,6 +1521,7 @@ const top_duration = [
               }}
               selectedValue={hotelID}
               exclusive
+              onSelect={notifyApplyFiltersIfNeeded}
             />
           ))
         ) : (
@@ -1475,6 +1543,7 @@ const top_duration = [
                 setChecked={setMealPlan}
                 selectedValue={mealPlan}
                 exclusive
+                onSelect={notifyApplyFiltersIfNeeded}
               />
             ))}
           </FilterSection>
@@ -1489,9 +1558,10 @@ const top_duration = [
               value={sliderValue}
               className="placeholder:!text-[#909091] !text-[#909091]"
               onChange={(v) => setPriceRange(v as number[])}
-              onChangeComplete={(v) =>
-                setPriceRange(clampPriceRange(v as number[]))
-              }
+              onChangeComplete={(v) => {
+                setPriceRange(clampPriceRange(v as number[]));
+                notifyApplyFiltersIfNeeded();
+              }}
             />
             <div className="mt-3 flex items-center gap-2 rounded-xl border border-[#DFDFDF] p-3">
               <input
@@ -1499,7 +1569,10 @@ const top_duration = [
                 value={formatPrice(sliderValue[0])}
                 placeholder={formatPrice(priceLimits.min)}
                 onChange={(e) => handleInputChange(e.target.value, 0)}
-                onBlur={handlePriceInputBlur}
+                onBlur={() => {
+                  handlePriceInputBlur();
+                  notifyApplyFiltersIfNeeded();
+                }}
                 className={clsx(
                   'min-w-0 flex-1 border-none text-xs leading-3 outline-none',
                   sliderValue[0] ? 'text-[#848484]' : 'text-[#909091]',
@@ -1513,7 +1586,10 @@ const top_duration = [
                 value={formatPrice(sliderValue[1])}
                 placeholder={formatPrice(priceLimits.max)}
                 onChange={(e) => handleInputChange(e.target.value, 1)}
-                onBlur={handlePriceInputBlur}
+                onBlur={() => {
+                  handlePriceInputBlur();
+                  notifyApplyFiltersIfNeeded();
+                }}
                 className={clsx(
                   'min-w-0 flex-1 border-none text-right text-xs leading-3 outline-none',
                   sliderValue[1] ? 'text-[#848484]' : 'text-[#909091]',
@@ -1532,7 +1608,9 @@ const top_duration = [
               {t('Очистить')}
             </button>
             <button
+              ref={applyFiltersBtnRef}
               type="button"
+              id="selectour-apply-filters"
               className="h-12 w-full cursor-pointer rounded-[14px] bg-[#1A73E8] text-[14px] font-medium text-white transition-colors hover:bg-[#1557B0]"
               onClick={() => applySideFilters()}
             >
@@ -1654,34 +1732,48 @@ const top_duration = [
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="min-w-[10rem]">
                     <DropdownMenuItem
-                      className={clsx(!cheaper && !expensive && 'bg-accent')}
+                      className={clsx(!cheaper && !expensive && !recommendedSort && 'bg-accent')}
                       onSelect={() => {
                         setCheaper(false);
                         setExpensive(false);
+                        setRecommendedSort(false);
                         setCurrentPage(1);
                       }}
                     >
                       {t('Все')}
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      className={clsx(cheaper && !expensive && 'bg-accent')}
+                      className={clsx(cheaper && !expensive && !recommendedSort && 'bg-accent')}
                       onSelect={() => {
                         setCheaper(true);
                         setExpensive(false);
+                        setRecommendedSort(false);
                         setCurrentPage(1);
                       }}
                     >
                       {t('Подешевле')}
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      className={clsx(!cheaper && expensive && 'bg-accent')}
+                      className={clsx(!cheaper && expensive && !recommendedSort && 'bg-accent')}
                       onSelect={() => {
                         setCheaper(false);
                         setExpensive(true);
+                        setRecommendedSort(false);
                         setCurrentPage(1);
                       }}
                     >
                       {t('Подороже')}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className={clsx(recommendedSort && 'bg-accent')}
+                      onSelect={() => {
+                        setCheaper(false);
+                        setExpensive(false);
+                        setRecommendedSort(true);
+                        setCurrentPage(1);
+                      }}
+                    >
+                      {t('recommended_sort')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -1878,7 +1970,15 @@ const top_duration = [
             </FilterSection>
 
         <FilterSection title={t('Отели')} icon="/icons/hotel.png">
-  {hotels.map((hotel, hotelIndex) => (
+  <input
+    type="search"
+    value={hotelSearchQuery}
+    onChange={(e) => setHotelSearchQuery(e.target.value)}
+    placeholder={t('hotel_search_placeholder')}
+    className="mb-3 h-10 w-full rounded-xl border border-[#DFDFDF] bg-white px-3 text-sm text-[#121212] outline-none placeholder:text-[#909091] focus:border-[#1A73E8]"
+  />
+  {filteredHotels.length > 0 ? (
+    filteredHotels.map((hotel, hotelIndex) => (
     <CheckboxFilter
       key={`${hotel.id}-${hotelIndex}`}
       value={String(hotel.id)}
@@ -1902,7 +2002,10 @@ const top_duration = [
         }
       }}
     />
-  ))}
+  ))
+  ) : (
+    <p className="text-sm text-gray-500">{t('Отели не найдены')}</p>
+  )}
 </FilterSection>
 
 
@@ -1997,7 +2100,6 @@ const top_duration = [
                 </div>
               ) : (
                 <>
-               
                   {ticket && ticket?.data?.results.tickets.length > 0 ? (
                    
                     <div className="flex flex-col gap-6">
