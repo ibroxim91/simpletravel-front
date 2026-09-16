@@ -31,6 +31,7 @@ import {
 import FilterTours from '@/widgets/filter/ui/FilterTours';
 import SupportChatWidget from '@/widgets/support-chat/ui/SupportChatWidget';
 import FilterToursMobile from '@/widgets/filter/ui/FilterToursMobile';
+import ToursMiniMenu from '@/widgets/selectour/ui/ToursMiniMenu';
 import CloseIcon from '@mui/icons-material/Close';
 import EastIcon from '@mui/icons-material/East';
 import FilterListIcon from '@mui/icons-material/FilterList';
@@ -1022,6 +1023,107 @@ useEffect(() => {
     },
   });
 
+  const allInclusiveMealId = useMemo(() => {
+    const ai = meal?.find((item) => {
+      const name = (item.name || '').toLowerCase();
+      return (
+        name.includes('все включено') ||
+        name.includes('all inclusive') ||
+        /\bai\b/.test(name) ||
+        name.startsWith('ai')
+      );
+    });
+    return ai ? String(ai.id) : null;
+  }, [meal]);
+
+  const applyMiniMenuSide = (next: {
+    hotelRating: string | null;
+    mealPlan: string | null;
+    expensive: boolean;
+  }) => {
+    if (!hasSearchDestination(filterLocal)) {
+      toast.error(t('choice_country_and_region'));
+      scrollToSearchForm();
+      return;
+    }
+
+    setHotelRating(next.hotelRating);
+    setMealPlan(next.mealPlan);
+    setExpensive(next.expensive);
+    if (next.expensive) {
+      setCheaper(false);
+      setRecommendedSort(false);
+    }
+
+    const nextSide = sideFiltersFromParams({
+      duration: selectedDurations.length
+        ? selectedDurations.join(',')
+        : undefined,
+      meal: next.mealPlan || undefined,
+      rating: next.hotelRating || undefined,
+      town: selectedTown || undefined,
+      hotel_id: hotelID || undefined,
+      operator: draftOperator || undefined,
+    });
+    setAppliedSideFilters(nextSide);
+
+    const params = new URLSearchParams(searchParamsString);
+    writeSideParams(params, {
+      duration: nextSide.durations,
+      meal: nextSide.mealPlan,
+      rating: nextSide.hotelRating,
+      town: nextSide.town,
+      hotel_id: nextSide.hotel_id,
+      operator: nextSide.operator,
+    });
+    if (onlyFrom7) params.delete('from7');
+    else params.set('from7', '0');
+    params.set('page', '1');
+    setCurrentPage(1);
+    router.replace(`/selectour?${params.toString()}`, { scroll: false });
+    scrollToLoadingArea();
+  };
+
+  const handleMiniAll = () => {
+    applyMiniMenuSide({
+      hotelRating: null,
+      mealPlan: null,
+      expensive: false,
+    });
+  };
+
+  const handleMiniStars = () => {
+    const nextRating =
+      hotelRating === '4' || hotelRating === '5' ? null : '4';
+    applyMiniMenuSide({
+      hotelRating: nextRating,
+      mealPlan,
+      expensive,
+    });
+  };
+
+  const handleMiniAllInclusive = () => {
+    if (!allInclusiveMealId) {
+      toast.error(t('mini_filter_ai_unavailable'));
+      return;
+    }
+    const nextMeal =
+      mealPlan === allInclusiveMealId ? null : allInclusiveMealId;
+    applyMiniMenuSide({
+      hotelRating,
+      mealPlan: nextMeal,
+      expensive,
+    });
+  };
+
+  const handleMiniExpensive = () => {
+    applyMiniMenuSide({
+      hotelRating,
+      mealPlan,
+      expensive: !expensive,
+    });
+  };
+
 //   // let toastShown = false;
 //  const { data: ticket, isLoading, isFetching, isError, error, refetch } = useQuery<TickectAll>({
 //     queryKey: [
@@ -1709,17 +1811,18 @@ const top_duration = [
             </div>
 
             <div className="lg:hidden">
-              <div className="flex w-full items-center justify-between gap-3 max-lg:mt-[24px]">
-                <button
-                  type="button"
-                  className="flex h-9 min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-[14px] bg-[#FAFBFC] px-4 py-2 text-left"
-                  onClick={() => setFilter(true)}
-                >
-                  <FilterListIcon sx={{ color: '#1A73E8', fontSize: 18 }} className="shrink-0" />
-                  <span className="truncate text-[14px] font-bold leading-[17px] text-[#1A73E8]">
-                    {t('Настройте свой отдых')}
-                  </span>
-                </button>
+              <div className="mt-3 flex w-full items-center gap-3 max-lg:mt-[24px]">
+                <ToursMiniMenu
+                  hotelRating={hotelRating}
+                  mealPlan={mealPlan}
+                  expensive={expensive}
+                  allInclusiveMealId={allInclusiveMealId}
+                  onAll={handleMiniAll}
+                  onStars={handleMiniStars}
+                  onAllInclusive={handleMiniAllInclusive}
+                  onExpensive={handleMiniExpensive}
+                  onOpenFilters={() => setFilter(true)}
+                />
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button

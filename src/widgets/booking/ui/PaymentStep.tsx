@@ -8,7 +8,6 @@ import { formatPrice } from '@/shared/lib/formatPrice';
 import { cn } from '@/shared/lib/utils';
 import CreditCardOutlinedIcon from '@mui/icons-material/CreditCardOutlined';
 import EventRepeatOutlinedIcon from '@mui/icons-material/EventRepeatOutlined';
-import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
@@ -30,9 +29,23 @@ type Props = {
 
 type PaymentMode = 'full' | 'installment';
 
-const INSTALLMENT_URL =
-  process.env.NEXT_PUBLIC_INSTALLMENT_PAYMENT_URL ||
-  'https://www.apelsin.uz/open-service?serviceId=498649927';
+type VariantAppStatus = {
+  id?: number;
+  order_id?: number;
+  online_app_id?: string;
+  phone?: string;
+  selected_period?: number;
+  level?: number;
+  status?: number;
+  state?: string;
+  contract_number?: string;
+  reason_type?: string;
+  reason_message?: string;
+  order_status?: string;
+  sms_sent?: boolean;
+  detail?: string;
+  retry_after_seconds?: number;
+};
 
 const PAID_ORDER_STATUSES = new Set([
   'pending_confirmation',
@@ -40,10 +53,18 @@ const PAID_ORDER_STATUSES = new Set([
   'completed',
 ]);
 
+const VARIANT_PERIODS = [3, 6, 12] as const;
+
 const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL || 'https://simpletravel.uz'
 ).replace(/\/$/, '');
 
+function normalizePhoneInput(value: string) {
+  const digits = value.replace(/\D/g, '');
+  if (digits.startsWith('998')) return digits.slice(0, 12);
+  if (digits.startsWith('0')) return `998${digits.slice(1)}`.slice(0, 12);
+  return `998${digits}`.slice(0, 12);
+}
 interface User {
   date: string;
   firstName: string;
@@ -89,6 +110,9 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
   const route = useRouter();
   const [paymentMode, setPaymentMode] = useState<PaymentMode>('full');
   const [paymentTypes, setPaymentType] = useState<string | null>(null);
+  const [variantPhone, setVariantPhone] = useState('998');
+  const [variantPeriod, setVariantPeriod] = useState<number>(6);
+  const [variantApp, setVariantApp] = useState<VariantAppStatus | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
   const resolvedOrderId = resolveOrderId(orderId);
@@ -103,6 +127,26 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
     refetchOnWindowFocus: true,
   });
 
+  const shouldPollVariant =
+    paymentMode === 'installment' &&
+    Boolean(resolvedOrderId) &&
+    Boolean(variantApp?.online_app_id) &&
+    !['signed', 'failed', 'rejected', 'cancelled'].includes(
+      variantApp?.state || '',
+    );
+
+  const { data: variantStatusResponse } = useQuery({
+    queryKey: ['variant-status', resolvedOrderId, variantApp?.online_app_id],
+    queryFn: () =>
+      Ticketorder_Api.variantStatus({
+        order_id: resolvedOrderId!,
+        online_app_id: variantApp?.online_app_id,
+      }),
+    enabled: shouldPollVariant,
+    refetchInterval: shouldPollVariant ? 4000 : false,
+    retry: false,
+  });
+
   useEffect(() => {
     if (!resolvedOrderId || !orderResponse) return;
 
@@ -111,6 +155,22 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
       route.replace(`/view-voucher/${resolvedOrderId}`);
     }
   }, [orderResponse, resolvedOrderId, route]);
+
+  useEffect(() => {
+    const payload = (variantStatusResponse?.data ||
+      variantStatusResponse) as VariantAppStatus | undefined;
+    if (!payload) return;
+    setVariantApp((prev) => ({ ...prev, ...payload }));
+    if (
+      payload.state === 'signed' ||
+      (payload.order_status && PAID_ORDER_STATUSES.has(payload.order_status))
+    ) {
+      toast.success(t('Рассрочка успех'));
+      if (resolvedOrderId) {
+        route.replace(`/view-voucher/${resolvedOrderId}`);
+      }
+    }
+  }, [variantStatusResponse, resolvedOrderId, route, t]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: ({ return_url }: { return_url: string }) => {
@@ -126,6 +186,35 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
     onError: () => {
       setError('Произошла ошибка при отправке. Попробуйте ещё раз.');
       toast.error('Произошла ошибка при отправке. Попробуйте ещё раз.');
+    },
+  });
+
+  const variantStartMutation = useMutation({
+    mutationFn: () =>
+      Ticketorder_Api.variantStart({
+        order_id: Number(resolvedOrderId),
+        phone: normalizePhoneInput(variantPhone),
+        selected_period: variantPeriod,
+      }),
+    onSuccess: (res) => {
+      const payload = (res?.data || res) as VariantAppStatus;
+      setVariantApp(payload);
+      if (payload.sms_sent === false && payload.retry_after_seconds) {
+        toast.error(
+          t('Рассрочка SMS cooldown', {
+            seconds: payload.retry_after_seconds,
+          }),
+        );
+        return;
+      }
+      toast.success(t('Рассрочка SMS отправлена'));
+    },
+    onError: (err: any) => {
+      const detail =
+        err?.response?.data?.detail ||
+        err?.response?.data?.phone?.[0] ||
+        t('Рассрочка ошибка');
+      toast.error(typeof detail === 'string' ? detail : t('Рассрочка ошибка'));
     },
   });
 
@@ -151,7 +240,16 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
   }
 
   function onSubmitInstallment() {
-    window.open(INSTALLMENT_URL, '_blank', 'noopener,noreferrer');
+    if (!resolvedOrderId) {
+      toast.error(t('Рассрочка ошибка'));
+      return;
+    }
+    const phone = normalizePhoneInput(variantPhone);
+    if (phone.length !== 12) {
+      toast.error(t('Рассрочка телефон ошибка'));
+      return;
+    }
+    variantStartMutation.mutate();
   }
 
   const installmentSteps = [
@@ -161,7 +259,10 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
   ];
 
   const isFullPayDisabled = paymentMode === 'full' && paymentTypes === null;
-
+  const isVariantBusy = variantStartMutation.isPending;
+  const variantTerminal = ['signed', 'failed', 'rejected', 'cancelled'].includes(
+    variantApp?.state || '',
+  );
   return (
     <div className="w-full">
       <div className="w-full bg-[#FFFFFF] p-[20px] rounded-[20px] relative">
@@ -293,11 +394,11 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
           <div className="rounded-[20px] border-2 border-[#7000FF]/20 bg-gradient-to-br from-[#F7F0FF] to-[#EDEEF180] p-[24px]">
             <div className="flex items-center gap-4 mb-5">
               <div className="w-14 h-14 rounded-2xl bg-[#7000FF] flex items-center justify-center shrink-0">
-                <span className="text-white font-bold text-lg">U</span>
+                <span className="text-white font-bold text-lg">V</span>
               </div>
               <div>
-                <p className="text-xl font-bold text-[#212122]">{t('Uzum Bank')}</p>
-                <p className="text-sm text-[#646465]">{t('Рассрочка через Uzum Bank')}</p>
+                <p className="text-xl font-bold text-[#212122]">{t('Variant')}</p>
+                <p className="text-sm text-[#646465]">{t('Рассрочка через Variant')}</p>
               </div>
             </div>
 
@@ -314,8 +415,60 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
               ))}
             </ol>
 
+            <label className="block text-sm font-semibold text-[#212122] mb-2">
+              {t('Рассрочка телефон')}
+            </label>
+            <input
+              type="tel"
+              value={variantPhone}
+              onChange={(e) => setVariantPhone(normalizePhoneInput(e.target.value))}
+              placeholder="998901234567"
+              className="w-full mb-4 rounded-xl border border-[#D3D3D3] bg-white px-4 py-3 text-[#212122] outline-none focus:border-[#7000FF]"
+            />
+
+            <p className="text-sm font-semibold text-[#212122] mb-2">
+              {t('Рассрочка период')}
+            </p>
+            <div className="grid grid-cols-3 gap-2 mb-4">
+              {VARIANT_PERIODS.map((period) => (
+                <button
+                  key={period}
+                  type="button"
+                  onClick={() => setVariantPeriod(period)}
+                  className={cn(
+                    'rounded-xl border-2 py-3 font-semibold transition-colors',
+                    variantPeriod === period
+                      ? 'border-[#7000FF] bg-[#7000FF] text-white'
+                      : 'border-[#E0E0E0] bg-white text-[#212122]',
+                  )}
+                >
+                  {period} {t('мес')}
+                </button>
+              ))}
+            </div>
+
+            {variantApp && (
+              <div className="rounded-xl bg-white/80 p-3 text-sm text-[#646465] space-y-1 mb-3">
+                <p>
+                  {t('Рассрочка статус')}:{' '}
+                  <span className="font-semibold text-[#212122]">
+                    {variantApp.state || '—'}
+                  </span>
+                </p>
+                <p>
+                  Level: {variantApp.level ?? '—'} / Status:{' '}
+                  {variantApp.status ?? '—'}
+                </p>
+                {variantApp.reason_message && (
+                  <p className="text-red-600">{variantApp.reason_message}</p>
+                )}
+                {!variantTerminal && (
+                  <p className="text-[#7000FF]">{t('Рассрочка ожидание')}</p>
+                )}
+              </div>
+            )}
+
             <div className="flex items-start gap-2 bg-white/70 rounded-xl p-3 text-sm text-[#646465]">
-              <OpenInNewOutlinedIcon sx={{ fontSize: 18, color: '#7000FF', mt: '2px' }} />
               <p>{t('Рассрочка предупреждение')}</p>
             </div>
           </div>
@@ -360,15 +513,19 @@ export default function PaymentStep({ onPrev, data, orderId }: Props) {
         ) : (
           <button
             type="button"
+            disabled={isVariantBusy || variantTerminal}
             onClick={onSubmitInstallment}
-            className="py-4 font-medium px-10 rounded-full mt-[20px] bg-[#7000FF] text-white cursor-pointer hover:bg-[#5c00d4] flex items-center justify-center gap-2 max-lg:w-full"
+            className={cn(
+              'py-4 font-medium px-10 rounded-full mt-[20px] text-white flex items-center justify-center gap-2 max-lg:w-full',
+              isVariantBusy || variantTerminal
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-[#7000FF] cursor-pointer hover:bg-[#5c00d4]',
+            )}
           >
-            {t('Перейти к рассрочке')}
-            <OpenInNewOutlinedIcon sx={{ fontSize: 20 }} />
+            {isVariantBusy ? t('Загрузка') : t('Перейти к рассрочке')}
           </button>
         )}
       </div>
-
       <div className="w-full bg-[#FFFFFF] p-[20px] rounded-[20px] mt-5">
         <div className="flex items-center justify-between max-lg:flex-col max-lg:gap-4 max-lg:items-start">
           <h1 className="text-2xl font-bold text-[#212122]">

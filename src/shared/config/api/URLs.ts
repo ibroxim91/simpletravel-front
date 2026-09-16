@@ -50,6 +50,7 @@ const TICKETORDER_INFO = '/api/v1/get-ticket-info/';
 const TICKETORDER = '/api/v1/ticketorder/';
 const GET_AVIA_DATA = '/api/v1/get-avia-data/';
 const PAYMENTS = '/api/v1/payments_link/';
+const VARIANT = '/api/v1/variant/';
 const DONWLOAD_PDF = '/api/v1/get-order-pdf/';
 
 const SEND_COMMENT = '/api/v1/ticket-comment/';
@@ -98,6 +99,7 @@ export {
   PARTICIPANT,
   PARTICIPANT_IMAGE,
   PAYMENTS,
+  VARIANT,
   PHONE_CONFIRM_RESET_PASS,
   PHONE_CONFIRMOTP,
   PHONE_LOGIN,

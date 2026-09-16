@@ -4,6 +4,7 @@ import {
   PAYMENTS,
   TICKETORDER,
   TICKETORDER_INFO,
+  VARIANT,
 } from '@/shared/config/api/URLs';
 
 export interface Get_Info {
@@ -157,6 +158,29 @@ export const Ticketorder_Api = {
       order_id,
       return_url,
     });
+    return res;
+  },
+
+  async variantStart(body: {
+    order_id: number;
+    phone: string;
+    selected_period: number;
+  }) {
+    const res = await httpClient.post(`${VARIANT}start/`, body);
+    return res;
+  },
+
+  async variantStatus(params: { order_id?: number; online_app_id?: string }) {
+    const res = await httpClient.get(`${VARIANT}status/`, { params });
+    return res;
+  },
+
+  async variantCancel(body: {
+    order_id?: number;
+    online_app_id?: string;
+    reason?: string;
+  }) {
+    const res = await httpClient.post(`${VARIANT}cancel/`, body);
     return res;
   },
 
