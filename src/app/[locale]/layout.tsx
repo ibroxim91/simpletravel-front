@@ -8,6 +8,7 @@ import AnalyticsPageTracker from '@/shared/lib/analytics/AnalyticsPageTracker';
 import { Toaster } from '@/shared/ui/sonner';
 import ConditionalFooter from '@/widgets/footer/ui/ConditionalFooter';
 import Navbar from '@/widgets/navbar/ui';
+import IdleHelpSheet from '@/widgets/idle-help/ui/IdleHelpSheet';
 import ConditionalSupportChat from '@/widgets/support-chat/ui/ConditionalSupportChat';
 import type { Metadata } from 'next';
 import { hasLocale, Locale, NextIntlClientProvider } from 'next-intl';
@@ -175,6 +176,7 @@ export default async function RootLayout({ children, params }: Props) {
               <Navbar />
               <Welcome />
               <ConditionalSupportChat />
+              <IdleHelpSheet />
               <main className="flex-1">{children}</main>
               <ConditionalFooter />
               <Toaster richColors />

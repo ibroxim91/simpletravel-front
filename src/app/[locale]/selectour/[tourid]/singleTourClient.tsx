@@ -1,11 +1,7 @@
 import SingleTour from '@/widgets/singletour/ui';
 
 const SingleTourClient = () => {
-  return (
-    <div className="overflow-hidden">
-      <SingleTour />
-    </div>
-  );
+  return <SingleTour />;
 };
 
 export default SingleTourClient;

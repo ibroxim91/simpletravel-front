@@ -580,8 +580,9 @@ const includedServicesToRender = [
                   </Link>
                   <p className="text-[14px] text-[#112211]/70">{data.title}</p>
                 </Breadcrumbs>
+              </motion.div>
 
-                <div className="flex items-end justify-between gap-8 max-lg:flex-col max-lg:items-start max-lg:gap-6">
+                <div className="mt-6 flex items-end justify-between gap-8 max-lg:static max-lg:flex-col max-lg:items-start max-lg:gap-6 lg:sticky lg:top-[72px] lg:z-40 lg:-mx-4 lg:mt-8 lg:bg-[#FAFBFC] lg:px-4 lg:py-4 lg:shadow-[0_4px_16px_rgba(17,34,17,0.06)] xl:top-[102px]">
                   <div className="flex max-w-[684px] flex-col gap-6 max-lg:w-full max-lg:gap-4">
                     <div className="hidden w-full items-center justify-between max-lg:flex">
                      <div className="flex items-center gap-2">
@@ -717,7 +718,6 @@ const includedServicesToRender = [
                     </div>
                   </div>
                 </div>
-              </motion.div>
               
               <motion.div
                 initial="hidden"
@@ -985,30 +985,6 @@ const includedServicesToRender = [
                 {Number(data.price_full).toLocaleString('uz-UZ')} uzs  /{' '}
                   <span className="font-normal">{data.passenger_count || 1} {t('человек')}</span>
                 </p>
-                {user ? (
-                  <Link href={`/booking/${data.id}`} className="block w-full">
-                    <motion.button
-                      type="button"
-                      whileTap={{ scale: 0.95 }}
-                      className="flex h-12 w-full items-center justify-center rounded-2xl bg-[#FF6B00] px-4 text-[14px] font-semibold leading-[17px] text-white"
-                    >
-                      {t('Забронировать')}
-                    </motion.button>
-                  </Link>
-                ) : (
-                  <motion.button
-                    type="button"
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => {
-                      route.push(
-                        `/auth/register?callbackUrl=${encodeURIComponent(window.location.href)}`,
-                      );
-                    }}
-                    className="flex h-12 w-full items-center justify-center rounded-2xl bg-[#FF6B00] px-4 text-[14px] font-semibold leading-[17px] text-white"
-                  >
-                    {t('Забронировать')}
-                  </motion.button>
-                )}
               </div>
 
               {includedServicesToRender.length > 0 && (
@@ -1178,6 +1154,39 @@ const includedServicesToRender = [
               <CommentTour data={data} />
             </div>
           </div>
+
+          {/* Mobile: fixed book CTA — leaves room for chat FAB on the right */}
+          <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[75] lg:hidden">
+            <div className="pointer-events-auto border-t border-[#E5E7EB] bg-white/95 px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] pt-3 shadow-[0_-4px_20px_rgba(17,34,17,0.08)] backdrop-blur-sm">
+              <div className="mx-auto flex max-w-[1240px] items-center gap-3 pr-[4.75rem]">
+                {user ? (
+                  <Link href={`/booking/${data.id}`} className="block min-w-0 flex-1">
+                    <motion.button
+                      type="button"
+                      whileTap={{ scale: 0.95 }}
+                      className="flex h-12 w-full items-center justify-center rounded-2xl bg-[#FF6B00] px-4 text-[14px] font-semibold leading-[17px] text-white"
+                    >
+                      {t('Забронировать')}
+                    </motion.button>
+                  </Link>
+                ) : (
+                  <motion.button
+                    type="button"
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      route.push(
+                        `/auth/register?callbackUrl=${encodeURIComponent(window.location.href)}`,
+                      );
+                    }}
+                    className="flex h-12 min-w-0 flex-1 items-center justify-center rounded-2xl bg-[#FF6B00] px-4 text-[14px] font-semibold leading-[17px] text-white"
+                  >
+                    {t('Забронировать')}
+                  </motion.button>
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="h-[calc(4.5rem+env(safe-area-inset-bottom,0px))] lg:hidden" aria-hidden />
         </>
       )}
     </div>
