@@ -35,10 +35,10 @@ const MobileNavbar = ({ setOpen, open }: Props) => {
     { href: '/about', label: 'О нас', icon: ApartmentIcon, active: '/about' },
     { href: '/contacts', label: 'Контакты', icon: LocalPhoneIcon, active: '/contacts' },
     {
-      href: '/auth/register',
-      label: 'Зарегистрироваться',
+      href: '/auth/login',
+      label: 'Войти',
       icon: GroupAddIcon,
-      active: '/auth/register',
+      active: '/auth/login',
     },
   ];
 

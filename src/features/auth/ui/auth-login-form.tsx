@@ -1,6 +1,7 @@
 'use client';
 
-import { Link } from '@/shared/config/i18n/navigation';
+import { saveRefToken, saveToken } from '@/shared/config/api/saveToke';
+import { Link, useRouter } from '@/shared/config/i18n/navigation';
 import formatPhone from '@/shared/lib/formatPhone';
 import onlyNumber from '@/shared/lib/onlyNember';
 import { Button } from '@/shared/ui/button';
@@ -14,51 +15,43 @@ import {
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs';
-import { Checkbox } from '@/shared/ui/checkbox';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/shared/ui/dialog';
-import LegalOffertaUi from '@/features/legal-offerta/ui/LegalOffertaUi';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { LoaderCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
-import { Dispatch, SetStateAction, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import z from 'zod';
 import { Auth_Api } from '../lib/api';
-import { useLoginPhoneStore } from '../lib/store';
 import { resolveAuthErrorMessage } from '@/shared/lib/extractApiErrorMessage';
 
-interface Props {
-  setStep: Dispatch<SetStateAction<number>>;
-  embedded?: boolean;
-}
-
-const OneStep = ({ setStep, embedded = false }: Props) => {
+const AuthLoginForm = () => {
   const t = useTranslations();
+  const ref = useQueryClient();
+  const route = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl');
-  const { setEmail, setPhone } = useLoginPhoneStore();
-  const [agreeOffer, setAgreeOffer] = useState(false);
+
   const phoneFormSchema = z.object({
     phone: z.string().min(17, { message: 'Введите корректный номер телефона' }),
+    password: z
+      .string()
+      .min(8, { message: "Eng kamida 8ta belgi bo'lishi kerak" }),
   });
 
   const emailFormSchema = z.object({
     email: z.string().min(1, 'Majburiy maydon'),
+    password: z
+      .string()
+      .min(8, { message: "Eng kamida 8ta belgi bo'lishi kerak" }),
   });
 
   const phoneForm = useForm<z.infer<typeof phoneFormSchema>>({
     resolver: zodResolver(phoneFormSchema),
     defaultValues: {
       phone: '',
+      password: '',
     },
   });
 
@@ -66,15 +59,24 @@ const OneStep = ({ setStep, embedded = false }: Props) => {
     resolver: zodResolver(emailFormSchema),
     defaultValues: {
       email: '',
+      password: '',
     },
   });
 
   const { mutate: phoneMutate, isPending } = useMutation({
-    mutationFn: ({ phone }: { phone: string }) => {
-      return Auth_Api.registerPhone({ phone });
+    mutationFn: ({ phone, password }: { phone: string; password: string }) => {
+      return Auth_Api.loginPhone({ phone, password });
     },
-    onSuccess() {
-      setStep(2);
+    onSuccess(data) {
+      saveToken(data.data.access);
+      saveRefToken(data.data.refresh);
+      ref.clear();
+
+      if (callbackUrl && callbackUrl !== 'null') {
+        route.push(callbackUrl);
+      } else {
+        route.push('/profile');
+      }
     },
     onError(error) {
       toast.error(t('Xatolik yuz berdi'), {
@@ -86,11 +88,18 @@ const OneStep = ({ setStep, embedded = false }: Props) => {
   });
 
   const { mutate: emailMutate, isPending: emailPending } = useMutation({
-    mutationFn: ({ email }: { email: string }) => {
-      return Auth_Api.registerEmail({ email });
+    mutationFn: ({ email, password }: { email: string; password: string }) => {
+      return Auth_Api.loginEmail({ email, password });
     },
-    onSuccess() {
-      setStep(2);
+    onSuccess(data) {
+      saveToken(data.data.access);
+      saveRefToken(data.data.refresh);
+      ref.clear();
+      if (callbackUrl && callbackUrl !== 'null') {
+        route.push(callbackUrl);
+      } else {
+        route.push('/profile');
+      }
     },
     onError(error) {
       toast.error(t('Xatolik yuz berdi'), {
@@ -102,71 +111,23 @@ const OneStep = ({ setStep, embedded = false }: Props) => {
   });
 
   function onSubmitEmail(values: z.infer<typeof emailFormSchema>) {
-    setPhone(undefined);
-    setEmail(values.email);
     emailMutate({
       email: values.email,
+      password: values.password,
     });
   }
 
   function onSubmitPhone(values: z.infer<typeof phoneFormSchema>) {
-    setPhone(onlyNumber(values.phone));
-    setEmail(undefined);
     phoneMutate({
       phone: onlyNumber(values.phone),
+      password: values.password,
     });
   }
 
-  const publicOfferAgreement = (
-    <div className="space-y-4">
-     
-      <Dialog>
-        <DialogTrigger asChild>
-          <button
-            type="button"
-            className="text-sm font-medium text-[#084FE3] underline decoration-dashed underline-offset-2"
-          >
-            {t('offerta')}
-          </button>
-        </DialogTrigger>
-        <DialogContent className="w-screen h-screen !max-w-screen !max-h-screen  p-6">
-          <DialogHeader>
-            <DialogTitle>{t('offerta')}</DialogTitle>
-          </DialogHeader>
-          <div className="max-h-[70vh] overflow-y-auto pt-4">
-            <LegalOffertaUi type="individual" />
-          </div>
-        </DialogContent>
-      </Dialog>
-
-       <div className="flex items-start gap-3">
-        <Checkbox
-          checked={agreeOffer}
-          onCheckedChange={(value) => setAgreeOffer(Boolean(value))}
-          id="public-offer-checkbox"
-          className="mt-1"
-        />
-        <label
-          htmlFor="public-offer-checkbox"
-          className="text-sm leading-6 text-[#646465]"
-        >
-           {t('accept_offerta')} 
-        </label>
-      </div>
-    </div>
-  );
-
   return (
-    <Tabs
-      defaultValue="phone"
-      className={
-        embedded
-          ? 'w-full gap-2'
-          : 'absolute bottom-0 left-1/2 top-52 w-[50%] -translate-x-1/2 rounded-3xl bg-white px-10 py-5 max-md:px-2 max-sm:top-16 max-lg:w-[90%]'
-      }
-    >
+    <Tabs defaultValue="phone" className="w-full gap-2">
       <p className="text-xl font-semibold text-[#212122]">
-        {t("Ro'yxatdan o'tish")}
+        {t('Profilga kirish')}
       </p>
       <TabsList className="mt-2 h-[50px] w-full !bg-white !p-0.5 border-2 rounded-xl">
         <TabsTrigger
@@ -182,6 +143,7 @@ const OneStep = ({ setStep, embedded = false }: Props) => {
           {t('Вход по E-mail')}
         </TabsTrigger>
       </TabsList>
+
       <TabsContent value="phone" className="mt-5">
         <Form {...phoneForm}>
           <form
@@ -212,21 +174,46 @@ const OneStep = ({ setStep, embedded = false }: Props) => {
                 </FormItem>
               )}
             />
-            {publicOfferAgreement}
+            <FormField
+              control={phoneForm.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <Label className="text-lg font-semibold text-[#212122]">
+                    {t('Parol')}
+                  </Label>
+                  <FormControl>
+                    <Input
+                      placeholder={t('Введите пароль (минимум 8 символов)')}
+                      {...field}
+                      className="h-[60px] rounded-xl !text-md text-[#212122] placeholder:text-[#646465] focus:!ring-0"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                  <Link
+                    href={`/auth/forget-password?callbackUrl=${callbackUrl ?? ''}`}
+                    className="text-end font-medium text-red-500"
+                  >
+                    {t('Parol esdan chiqdimi')}
+                  </Link>
+                </FormItem>
+              )}
+            />
             <Button
               type="submit"
-              disabled={!agreeOffer || isPending}
+              disabled={isPending}
               className="w-full cursor-pointer rounded-full bg-[#1764FC] py-8 text-lg hover:bg-[#1764FC]"
             >
               {isPending ? (
                 <LoaderCircle className="animate-spin" />
               ) : (
-                t('Получить код')
+                t('Kirish')
               )}
             </Button>
           </form>
         </Form>
       </TabsContent>
+
       <TabsContent value="email" className="mt-5">
         <Form {...emailForm}>
           <form
@@ -252,34 +239,46 @@ const OneStep = ({ setStep, embedded = false }: Props) => {
                 </FormItem>
               )}
             />
-            {publicOfferAgreement}
+            <FormField
+              control={emailForm.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <Label className="text-lg font-semibold text-[#212122]">
+                    {t('Parol')}
+                  </Label>
+                  <FormControl>
+                    <Input
+                      placeholder={t('Введите пароль (минимум 8 символов)')}
+                      {...field}
+                      className="h-[60px] rounded-xl !text-md text-[#212122] placeholder:text-[#646465] focus:!ring-0"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                  <Link
+                    href={`/auth/forget-password?callbackUrl=${callbackUrl ?? ''}`}
+                    className="text-end font-medium text-red-500"
+                  >
+                    {t('Parol esdan chiqdimi')}
+                  </Link>
+                </FormItem>
+              )}
+            />
             <Button
               type="submit"
-              disabled={!agreeOffer || emailPending}
               className="w-full cursor-pointer rounded-full bg-[#1764FC] py-8 text-lg hover:bg-[#1764FC]"
             >
               {emailPending ? (
                 <LoaderCircle className="animate-spin" />
               ) : (
-                t('Получить код')
+                t('Kirish')
               )}
             </Button>
           </form>
         </Form>
       </TabsContent>
-      {!embedded ? (
-        <p className="mt-5 text-center text-md font-medium text-[#646465]">
-          {t('Hisobingiz bormi')}{' '}
-          <Link
-            href={`/auth/login?callbackUrl=${callbackUrl}`}
-            className="text-[#084FE3] "
-          >
-            {t('Kirish')}
-          </Link>
-        </p>
-      ) : null}
     </Tabs>
   );
 };
 
-export default OneStep;
+export default AuthLoginForm;

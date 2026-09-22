@@ -65,11 +65,13 @@ const GET_OFFERTA = '/api/v1/dashboard/dashboard-site-offerta/';
 const LOCATIONS = '/api/v1/locations/';
 const HOMETICKETS = '/api/v1/home-tours/';
 const HOME_OFFERS = '/async-samo/home-offers';
+const HOME_OFFERS_RECOMMENDED = '/async-samo/home-offers/recommended';
 export {
   BASE_URL,
   BASE_URL_TICKETS,
   HOMETICKETS,
   HOME_OFFERS,
+  HOME_OFFERS_RECOMMENDED,
   COUNTRIES,
   DONWLOAD_PDF,
   EMAIL_CONFIRM_RESET_PASS,

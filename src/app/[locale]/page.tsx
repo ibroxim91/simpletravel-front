@@ -3,8 +3,8 @@ import HotOffersPromoPopup from '@/features/home/ui/HotOffersPromoPopup';
 import HowItWorks from '@/features/home/ui/HowItWorks';
 import HotTours from '@/features/home/ui/HotTours';
 import Populardestinations from '@/features/home/ui/Populardestinations';
+import RecommendedHotels from '@/features/home/ui/RecommendedHotels';
 import SearchTours from '@/features/home/ui/SearchTours';
-import VisaTours from '@/features/home/ui/VisaTours';
 import HomeCommentTour from '@/features/home/ui/commentTour';
 
 export default async function Home() {
@@ -22,9 +22,9 @@ export default async function Home() {
           </div>
           <div className="mt-[104px] mb-[104px] flex flex-col gap-[104px] max-lg:mt-[64px] max-lg:mb-[64px] max-lg:gap-[64px]">
             <HowItWorks />
-            <Populardestinations />
+            <RecommendedHotels />
             <HomeCommentTour />
-            <VisaTours />
+            <Populardestinations />
             <HomeBenefits />
           </div>
         </div>

@@ -14,4 +14,5 @@ export { default as TabsHotelMobile } from './TabsHotelMobile';
 export { default as TabsTourMobile } from './TabsTourMobile';
 export { default as TabsTours } from './TabsTours';
 export { default as TourOffersSection } from './TourOffersSection';
+export { default as RecommendedHotels } from './RecommendedHotels';
 export { default as VisaTours } from './VisaTours';

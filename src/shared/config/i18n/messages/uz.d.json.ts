@@ -287,6 +287,7 @@ declare const messages: {
   "ta tur topildi": "ta tur topildi",
   "only_from_7_days_tours": "7 kundan boshlanadigan turlar",
   "recommended_hotels": "Tavsiya etilgan mehmonxonalar",
+  "recommended_hotels_subtitle": "Biz tanlagan ishonchli mehmonxonalar va eng yaxshi narxlar",
   "recommended_sort": "Tavsiya etiladi",
   "recommended_badge": "Tavsiya etiladi",
   "hotel_search_placeholder": "Mehmonxona qidirish",

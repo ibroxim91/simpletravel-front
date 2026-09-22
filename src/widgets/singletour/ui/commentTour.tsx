@@ -303,7 +303,7 @@ const averageRating =
               onClick={() => {
                 const isAuth = Boolean(userData && userData.data && userData.data.data);
                 if (!isAuth) {
-                  router.push('/auth/register');
+                  router.push('/auth/login?tab=register');
                   return;
                 }
                 setShowForm(!showForm);

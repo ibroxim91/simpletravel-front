@@ -8,6 +8,7 @@ import {
   SAVE_TICKETS,
   HOMETICKETS,
   HOME_OFFERS,
+  HOME_OFFERS_RECOMMENDED,
 } from '@/shared/config/api/URLs';
 import { AxiosResponse } from 'axios';
 import qs from 'qs';
@@ -34,6 +35,15 @@ const Ticket_Api = {
         ...(typeof params.visa_required === 'boolean'
           ? { visa_required: params.visa_required }
           : {}),
+        page: params.page ?? 1,
+      },
+    });
+    return res.data;
+  },
+
+  async GetRecommendedHomeOffers(params: { page?: number } = {}) {
+    const res = await httpClientTickets.get<TickectAll>(HOME_OFFERS_RECOMMENDED, {
+      params: {
         page: params.page ?? 1,
       },
     });

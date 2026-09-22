@@ -18,7 +18,7 @@ import { useEffect, useState } from 'react';
 import TourOfferCard from './cards/TourOfferCard';
 import { useRouter } from '@/shared/config/i18n/navigation';
 
-export type OfferMode = 'hot' | 'visa_free';
+export type OfferMode = 'hot' | 'visa_free' | 'recommended';
 
 type TourOffersSectionProps = {
   queryKey: string;
@@ -51,6 +51,9 @@ const TourOffersSection = ({
     queryKey: [queryKey, offerMode],
     queryFn: async () => {
       try {
+        if (offerMode === 'recommended') {
+          return await Ticket_Api.GetRecommendedHomeOffers({ page: 1 });
+        }
         if (offerMode === 'hot') {
           return await Ticket_Api.GetHomeOffers({ hot: true, page: 1 });
         }
@@ -67,7 +70,11 @@ const TourOffersSection = ({
   const carouselItems = isLoading ? Array.from({ length: 4 }) : tours;
 
   const seeAllHref =
-    offerMode === 'hot' ? '/selectour?hot=true' : '/selectour?visa_required=false';
+    offerMode === 'recommended'
+      ? '/selectour?recommended=true'
+      : offerMode === 'hot'
+        ? '/selectour?hot=true'
+        : '/selectour?visa_required=false';
 
   useEffect(() => {
     if (!carouselApi) return;

@@ -707,7 +707,7 @@ const includedServicesToRender = [
                           whileTap={{ scale: 0.95 }}
                           onClick={() => {
                             route.push(
-                              `/auth/register?callbackUrl=${encodeURIComponent(window.location.href)}`,
+                              `/auth/login?tab=register&callbackUrl=${encodeURIComponent(window.location.href)}`,
                             );
                           }}
                           className="h-12 w-[186px] rounded-[16px] bg-[#FF6B00] px-4 text-[14px] font-semibold text-white"
@@ -838,7 +838,7 @@ const includedServicesToRender = [
                     whileTap={{ scale: 0.95 }}
                     onClick={() => {
                       route.push(
-                        `/auth/register?callbackUrl=${encodeURIComponent(window.location.href)}`,
+                        `/auth/login?tab=register&callbackUrl=${encodeURIComponent(window.location.href)}`,
                       );
                     }}
                     className="bg-[#1764FC] rounded-[43px] px-[70px] py-[14px] text-white cursor-pointer text-sm max-lg:w-full"
@@ -1175,7 +1175,7 @@ const includedServicesToRender = [
                     whileTap={{ scale: 0.95 }}
                     onClick={() => {
                       route.push(
-                        `/auth/register?callbackUrl=${encodeURIComponent(window.location.href)}`,
+                        `/auth/login?tab=register&callbackUrl=${encodeURIComponent(window.location.href)}`,
                       );
                     }}
                     className="flex h-12 min-w-0 flex-1 items-center justify-center rounded-2xl bg-[#FF6B00] px-4 text-[14px] font-semibold leading-[17px] text-white"

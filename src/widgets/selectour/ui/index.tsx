@@ -263,7 +263,8 @@ const prevHotelsRef = useRef<any[] | null>(null);
   const isHotOffers = getSearchParam('hot') === 'true';
   const visaRequiredParam = getSearchParam('visa_required');
   const isVisaFreeOffers = visaRequiredParam === 'false';
-  const isHomeOffersMode = isHotOffers || isVisaFreeOffers;
+  const isRecommendedOffers = getSearchParam('recommended') === 'true';
+  const isHomeOffersMode = isHotOffers || isVisaFreeOffers || isRecommendedOffers;
 const [ticket, setTicket] = useState<TickectAll | null>(null);
 
 const [isLoading, setLoading] = useState(false);
@@ -930,8 +931,13 @@ useEffect(() => {
   if (!isHomeOffersMode) return;
 
   const signature = JSON.stringify({
-    mode: isHotOffers ? 'hot' : 'visa_free',
+    mode: isRecommendedOffers
+      ? 'recommended'
+      : isHotOffers
+        ? 'hot'
+        : 'visa_free',
     visa_required: visaRequiredParam,
+    recommended: isRecommendedOffers,
     page: currentPage,
   });
   if (ticketsFetchSignatureRef.current === `home-offers:${signature}`) {
@@ -946,15 +952,17 @@ useEffect(() => {
     setIsError(false);
     setError(null);
     try {
-      const response = await Ticket_Api.GetHomeOffers({
-        ...(isHotOffers ? { hot: true } : {}),
-        ...(visaRequiredParam !== ''
-          ? { visa_required: visaRequiredParam === 'true' }
-          : isVisaFreeOffers
-            ? { visa_required: false }
-            : {}),
-        page: currentPage,
-      });
+      const response = isRecommendedOffers
+        ? await Ticket_Api.GetRecommendedHomeOffers({ page: currentPage })
+        : await Ticket_Api.GetHomeOffers({
+            ...(isHotOffers ? { hot: true } : {}),
+            ...(visaRequiredParam !== ''
+              ? { visa_required: visaRequiredParam === 'true' }
+              : isVisaFreeOffers
+                ? { visa_required: false }
+                : {}),
+            page: currentPage,
+          });
       if (cancelled) return;
       setTicket(response);
     } catch (err) {
@@ -976,6 +984,7 @@ useEffect(() => {
   isHomeOffersMode,
   isHotOffers,
   isVisaFreeOffers,
+  isRecommendedOffers,
   visaRequiredParam,
   currentPage,
 ]);
@@ -1060,6 +1069,9 @@ useEffect(() => {
     const pageParam = getSearchParam('page');
     const nextPage = pageParam ? Number(pageParam) : 1;
     setCurrentPage((prev) => (prev === nextPage ? prev : nextPage));
+
+    const recommendedParam = getSearchParam('recommended') === 'true';
+    setRecommendedSort((prev) => (prev === recommendedParam ? prev : recommendedParam));
 
     const nextSide = sideFiltersFromParams({
       duration,

@@ -27,9 +27,10 @@ import { resolveAuthErrorMessage } from '@/shared/lib/extractApiErrorMessage';
 
 interface Props {
   setStep: Dispatch<SetStateAction<number>>;
+  embedded?: boolean;
 }
 
-const TwoStep = ({ setStep }: Props) => {
+const TwoStep = ({ setStep, embedded = false }: Props) => {
   const t = useTranslations();
   const { phone, email } = useLoginPhoneStore();
   const [time, setTime] = useState<number>(120);
@@ -167,7 +168,13 @@ const TwoStep = ({ setStep }: Props) => {
   };
 
   return (
-    <div className="w-[50%] bg-white rounded-3xl h-fit py-5 px-10 absolute bottom-0 top-52 max-md:px-2 max-sm:top-16 max-lg:w-[90%] left-1/2 -translate-x-1/2">
+    <div
+      className={
+        embedded
+          ? 'w-full'
+          : 'absolute bottom-0 left-1/2 top-52 h-fit w-[50%] -translate-x-1/2 rounded-3xl bg-white px-10 py-5 max-md:px-2 max-sm:top-16 max-lg:w-[90%]'
+      }
+    >
       <p className="text-xl font-semibold text-[#212122]">
         {t('Код аутентификации')}
       </p>
