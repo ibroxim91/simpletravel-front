@@ -3,9 +3,14 @@ import {
   ensureDestinationInParams,
 } from '@/widgets/selectour/lib/ensureDestinationParams';
 import { Checkbox } from '@/shared/ui/checkbox';
-import { Label } from '@/shared/ui/label';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { Dispatch, ReactNode, SetStateAction, useEffect } from 'react';
+import {
+  Dispatch,
+  ReactNode,
+  SetStateAction,
+  useEffect,
+  useId,
+} from 'react';
 
 type CheckboxFilterProps<T extends string | string[] | null> = {
   label: ReactNode;
@@ -14,7 +19,7 @@ type CheckboxFilterProps<T extends string | string[] | null> = {
   exclusive?: boolean;
   setChecked?: Dispatch<SetStateAction<T>>;
   onclick?: Dispatch<SetStateAction<number>>;
-  paramName?: string; // URL param nomi (optional)
+  paramName?: string;
   onSelect?: () => void;
 };
 
@@ -31,12 +36,13 @@ function CheckboxFilter<T extends string | string[] | null>({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const reactId = useId();
+  const inputId = `${reactId}-${value}`.replace(/:/g, '');
 
   const isChecked = Array.isArray(selectedValue)
     ? selectedValue.includes(value)
     : selectedValue === value;
 
-  // URL'dan qiymatni o'qib, state'ni yangilash
   useEffect(() => {
     if (!paramName || !setChecked) return;
 
@@ -47,37 +53,37 @@ function CheckboxFilter<T extends string | string[] | null>({
       if (JSON.stringify(urlValues) !== JSON.stringify(selectedValue)) {
         setChecked(urlValues as T);
       }
-    } else {
-      if (currentParam !== selectedValue) {
-        setChecked(currentParam as T);
-      }
+    } else if (currentParam !== selectedValue) {
+      setChecked(currentParam as T);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- hydrate once from URL
   }, []);
 
-  const handleChange = (checked: boolean) => {
+  const handleChange = (checked: boolean | 'indeterminate') => {
     if (!setChecked) return;
 
+    const nextChecked = checked === true;
     let newValue: T;
 
     if (Array.isArray(selectedValue)) {
-      // Ko'p tanlov uchun
-      if (checked) {
-        newValue = [...selectedValue, value] as T;
+      if (nextChecked) {
+        newValue = (
+          selectedValue.includes(value)
+            ? selectedValue
+            : [...selectedValue, value]
+        ) as T;
       } else {
         newValue = selectedValue.filter((v) => v !== value) as T;
       }
     } else if (exclusive) {
-      // Bitta tanlov uchun
-      newValue = (checked ? value : null) as T;
+      newValue = (nextChecked ? value : null) as T;
     } else {
-      newValue = (checked ? value : null) as T;
+      newValue = (nextChecked ? value : null) as T;
     }
 
     setChecked(newValue);
-
     onSelect?.();
 
-    // URL'ni yangilash (agar paramName berilgan bo'lsa)
     if (paramName) {
       const params = new URLSearchParams(searchParams.toString());
 
@@ -87,12 +93,10 @@ function CheckboxFilter<T extends string | string[] | null>({
         } else {
           params.delete(paramName);
         }
+      } else if (newValue) {
+        params.set(paramName, newValue);
       } else {
-        if (newValue) {
-          params.set(paramName, newValue);
-        } else {
-          params.delete(paramName);
-        }
+        params.delete(paramName);
       }
 
       if (DESTINATION_DEPENDENT_PARAMS.has(paramName)) {
@@ -110,15 +114,15 @@ function CheckboxFilter<T extends string | string[] | null>({
   return (
     <label className="mt-2 flex cursor-pointer items-center gap-3">
       <Checkbox
-        id={value}
+        id={inputId}
         checked={isChecked}
         value={value}
         className="h-6 w-6 cursor-pointer rounded-[2px] border-[#6B7280] data-[state=checked]:border-[#1A73E8] data-[state=checked]:bg-[#1A73E8]"
         onCheckedChange={handleChange}
       />
-      <Label className="cursor-pointer text-sm font-medium leading-[17px] text-[#6B7280]" htmlFor={value}>
+      <span className="cursor-pointer text-sm font-medium leading-[17px] text-[#6B7280]">
         {label}
-      </Label>
+      </span>
     </label>
   );
 }

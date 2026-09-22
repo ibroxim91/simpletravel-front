@@ -234,7 +234,7 @@ const prevHotelsRef = useRef<any[] | null>(null);
     hotel_type,
   } = useFilterTickectsStore();
   const [hotelName, setHotelName] = useState<string>('');
-  const [hotelID, setHotelID] = useState<string | null>(null);
+  const [hotelID, setHotelID] = useState<string[]>([]);
   const [hotelSearchQuery, setHotelSearchQuery] = useState('');
   const [draftOperator, setDraftOperator] = useState<string | null>(null);
   const [expensive, setExpensive] = useState<boolean>(false);
@@ -247,13 +247,13 @@ const prevHotelsRef = useRef<any[] | null>(null);
   const [filterLocal, setFilterLocal] = useState<FilterLocalState>();
   const [selectedDurations, setSelectedDurations] = useState<string[]>([]);
   const [onlyFrom7, setOnlyFrom7] = useState(true);
-  const [selectedTown, setSelectedTown] = useState<string | null>(null);
+  const [selectedTown, setSelectedTown] = useState<string[]>([]);
 
   const [selectedDestinations, setSelectedDestinations] = useState<string | null>(null);
   const [selectedDefaulDestination, setSelectedDefaulDestination] = useState<string | null>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [hotelRating, setHotelRating] = useState<string | null>(null);
-  const [mealPlan, setMealPlan] = useState<string | null>(null);
+  const [hotelRating, setHotelRating] = useState<string[]>([]);
+  const [mealPlan, setMealPlan] = useState<string[]>([]);
   const [hotelType, setHotelTypes] = useState<string | null>(null);
   const [hotelAmenities, setHotelAmenitie] = useState<string | null>(null);
   const [hotelFeature, setHotelFeature] = useState<string[]>([]);
@@ -285,10 +285,10 @@ const [error, setError] = useState<Error | null>(null);
       duration: selectedDurations.length
         ? selectedDurations.join(',')
         : undefined,
-      meal: mealPlan || undefined,
-      rating: hotelRating || undefined,
-      town: selectedTown || undefined,
-      hotel_id: hotelID || undefined,
+      meal: mealPlan.length ? mealPlan.join(',') : undefined,
+      rating: hotelRating.length ? hotelRating.join(',') : undefined,
+      town: selectedTown.length ? selectedTown.join(',') : undefined,
+      hotel_id: hotelID.length ? hotelID.join(',') : undefined,
       operator: draftOperator || undefined,
     }),
     [
@@ -303,31 +303,82 @@ const [error, setError] = useState<Error | null>(null);
 
   const handleDurationsChange = useCallback(
     (value: SetStateAction<string[]>) => {
-      setSelectedDurations((prev) => {
-        const next = typeof value === 'function' ? value(prev) : value;
-        setOnlyFrom7(next.length === 0);
-        return next;
-      });
+      setSelectedDurations((prev) =>
+        typeof value === 'function' ? value(prev) : value,
+      );
     },
     [],
   );
 
-  const applyFiltersBtnRef = useRef<HTMLButtonElement>(null);
+  const hasSelectedSideFilters = useMemo(() => {
+    const hasNonDefaultPrice =
+      priceRange.length === 2 &&
+      (priceRange[0] > STATIC_PRICE_LIMITS.min ||
+        priceRange[1] < STATIC_PRICE_LIMITS.max);
+    return (
+      selectedDurations.length > 0 ||
+      mealPlan.length > 0 ||
+      hotelRating.length > 0 ||
+      selectedTown.length > 0 ||
+      hotelID.length > 0 ||
+      Boolean(draftOperator) ||
+      hasNonDefaultPrice
+    );
+  }, [
+    selectedDurations,
+    mealPlan,
+    hotelRating,
+    selectedTown,
+    hotelID,
+    draftOperator,
+    priceRange,
+  ]);
 
-  const notifyApplyFiltersIfNeeded = useCallback(() => {
-    if (typeof window === 'undefined') return;
-    // Desktop sidebar only (lg+)
-    if (!window.matchMedia('(min-width: 1024px)').matches) return;
-    const el = applyFiltersBtnRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const inViewport =
-      rect.bottom > 0 &&
-      rect.top < (window.innerHeight || document.documentElement.clientHeight);
-    if (!inViewport) {
-      toast.info(t('apply_filters_toast'), { id: 'apply-filters-hint' });
+  const filterColumnRef = useRef<HTMLDivElement>(null);
+  const filterActionsSentinelRef = useRef<HTMLDivElement>(null);
+  const [isFilterActionsPinned, setIsFilterActionsPinned] = useState(false);
+  const [filterActionsPinBox, setFilterActionsPinBox] = useState({
+    left: 0,
+    width: 292,
+  });
+
+  useEffect(() => {
+    if (!hasSelectedSideFilters) {
+      setIsFilterActionsPinned(false);
+      return;
     }
-  }, [t]);
+
+    const updatePin = () => {
+      if (typeof window === 'undefined') return;
+      if (!window.matchMedia('(min-width: 1024px)').matches) {
+        setIsFilterActionsPinned(false);
+        return;
+      }
+      const column = filterColumnRef.current;
+      const sentinel = filterActionsSentinelRef.current;
+      if (!column || !sentinel) return;
+
+      const columnRect = column.getBoundingClientRect();
+      const sentinelRect = sentinel.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const columnInView = columnRect.top < vh && columnRect.bottom > 0;
+      const naturalBelowViewport = sentinelRect.top >= vh;
+
+      setFilterActionsPinBox({
+        left: columnRect.left,
+        width: columnRect.width,
+      });
+      setIsFilterActionsPinned(columnInView && naturalBelowViewport);
+    };
+
+    updatePin();
+    window.addEventListener('scroll', updatePin, { passive: true });
+    window.addEventListener('resize', updatePin);
+    return () => {
+      window.removeEventListener('scroll', updatePin);
+      window.removeEventListener('resize', updatePin);
+    };
+  }, [hasSelectedSideFilters]);
 
   const applyDraftPriceToApplied = useCallback(() => {
     if (priceRange.length !== 2) {
@@ -346,29 +397,49 @@ const [error, setError] = useState<Error | null>(null);
     }
   }, [priceRange]);
 
+  const resolveOnlyFrom7ForDurations = useCallback(
+    (durations: string[]) => {
+      if (durations.length > 0) return false;
+      if (appliedSideFilters.durations) return true;
+      return onlyFrom7;
+    },
+    [appliedSideFilters.durations, onlyFrom7],
+  );
+
   const commitSideFiltersFromDraft = useCallback(
     (options?: { resetDestinationFilters?: boolean }) => {
       const resetDestination = Boolean(options?.resetDestinationFilters);
       if (resetDestination) {
-        setSelectedTown(null);
-        setHotelID(null);
+        setSelectedTown([]);
+        setHotelID([]);
         setDraftOperator(null);
       }
+
+      const nextOnlyFrom7 = resolveOnlyFrom7ForDurations(selectedDurations);
+      setOnlyFrom7(nextOnlyFrom7);
 
       const nextSide = sideFiltersFromParams({
         duration: selectedDurations.length
           ? selectedDurations.join(',')
           : undefined,
-        meal: mealPlan || undefined,
-        rating: hotelRating || undefined,
-        town: resetDestination ? undefined : selectedTown || undefined,
-        hotel_id: resetDestination ? undefined : hotelID || undefined,
+        meal: mealPlan.length ? mealPlan.join(',') : undefined,
+        rating: hotelRating.length ? hotelRating.join(',') : undefined,
+        town: resetDestination
+          ? undefined
+          : selectedTown.length
+            ? selectedTown.join(',')
+            : undefined,
+        hotel_id: resetDestination
+          ? undefined
+          : hotelID.length
+            ? hotelID.join(',')
+            : undefined,
         operator: resetDestination ? undefined : draftOperator || undefined,
       });
       setAppliedSideFilters(nextSide);
       applyDraftPriceToApplied();
       setCurrentPage(1);
-      return nextSide;
+      return { nextSide, nextOnlyFrom7 };
     },
     [
       selectedDurations,
@@ -378,6 +449,7 @@ const [error, setError] = useState<Error | null>(null);
       hotelID,
       draftOperator,
       applyDraftPriceToApplied,
+      resolveOnlyFrom7ForDurations,
     ],
   );
 
@@ -433,7 +505,7 @@ const [error, setError] = useState<Error | null>(null);
       return;
     }
 
-    const nextSide = commitSideFiltersFromDraft();
+    const { nextSide, nextOnlyFrom7 } = commitSideFiltersFromDraft();
     const params = new URLSearchParams(searchParamsString);
     writeSideParams(params, {
       duration: nextSide.durations,
@@ -443,7 +515,7 @@ const [error, setError] = useState<Error | null>(null);
       hotel_id: nextSide.hotel_id,
       operator: nextSide.operator,
     });
-    if (onlyFrom7) params.delete('from7');
+    if (nextOnlyFrom7) params.delete('from7');
     else params.set('from7', '0');
     params.set('page', '1');
     router.replace(`/selectour?${params.toString()}`, { scroll: false });
@@ -476,10 +548,10 @@ const [error, setError] = useState<Error | null>(null);
   const handleClearSideFilters = () => {
     setSelectedDurations([]);
     setOnlyFrom7(true);
-    setMealPlan(null);
-    setHotelRating(null);
-    setSelectedTown(null);
-    setHotelID(null);
+    setMealPlan([]);
+    setHotelRating([]);
+    setSelectedTown([]);
+    setHotelID([]);
     setDraftOperator(null);
     setHotelSearchQuery('');
     setPriceRange([]);
@@ -1000,11 +1072,11 @@ useEffect(() => {
     const nextSideKey = sideUrlKey(nextSide);
     if (prevSideUrlKeyRef.current !== nextSideKey) {
       prevSideUrlKeyRef.current = nextSideKey;
-      setHotelRating(nextSide.hotelRating);
+      setHotelRating(parseDurationList(nextSide.hotelRating));
       setSelectedDurations(parseDurationList(nextSide.durations));
-      setMealPlan(nextSide.mealPlan);
-      setSelectedTown(nextSide.town);
-      setHotelID(nextSide.hotel_id);
+      setMealPlan(parseDurationList(nextSide.mealPlan));
+      setSelectedTown(parseDurationList(nextSide.town));
+      setHotelID(parseDurationList(nextSide.hotel_id));
       setDraftOperator(nextSide.operator);
       setAppliedSideFilters(nextSide);
     }
@@ -1037,8 +1109,8 @@ useEffect(() => {
   }, [meal]);
 
   const applyMiniMenuSide = (next: {
-    hotelRating: string | null;
-    mealPlan: string | null;
+    hotelRating: string[];
+    mealPlan: string[];
     expensive: boolean;
   }) => {
     if (!hasSearchDestination(filterLocal)) {
@@ -1059,10 +1131,10 @@ useEffect(() => {
       duration: selectedDurations.length
         ? selectedDurations.join(',')
         : undefined,
-      meal: next.mealPlan || undefined,
-      rating: next.hotelRating || undefined,
-      town: selectedTown || undefined,
-      hotel_id: hotelID || undefined,
+      meal: next.mealPlan.length ? next.mealPlan.join(',') : undefined,
+      rating: next.hotelRating.length ? next.hotelRating.join(',') : undefined,
+      town: selectedTown.length ? selectedTown.join(',') : undefined,
+      hotel_id: hotelID.length ? hotelID.join(',') : undefined,
       operator: draftOperator || undefined,
     });
     setAppliedSideFilters(nextSide);
@@ -1086,17 +1158,16 @@ useEffect(() => {
 
   const handleMiniAll = () => {
     applyMiniMenuSide({
-      hotelRating: null,
-      mealPlan: null,
+      hotelRating: [],
+      mealPlan: [],
       expensive: false,
     });
   };
 
   const handleMiniStars = () => {
-    const nextRating =
-      hotelRating === '4' || hotelRating === '5' ? null : '4';
+    const hasStars = hotelRating.includes('4') || hotelRating.includes('5');
     applyMiniMenuSide({
-      hotelRating: nextRating,
+      hotelRating: hasStars ? [] : ['4'],
       mealPlan,
       expensive,
     });
@@ -1107,11 +1178,10 @@ useEffect(() => {
       toast.error(t('mini_filter_ai_unavailable'));
       return;
     }
-    const nextMeal =
-      mealPlan === allInclusiveMealId ? null : allInclusiveMealId;
+    const hasAi = mealPlan.includes(allInclusiveMealId);
     applyMiniMenuSide({
       hotelRating,
-      mealPlan: nextMeal,
+      mealPlan: hasAi ? [] : [allInclusiveMealId],
       expensive,
     });
   };
@@ -1369,7 +1439,10 @@ const top_duration = [
       </section>
 
       <div className="custom-container mx-auto flex w-full max-w-[1240px] gap-6 max-lg:mt-8 max-lg:flex-col max-lg:px-5 lg:mt-[104px]">
-        <div className="hidden h-max w-[292px] shrink-0 flex-col gap-4 max-lg:hidden lg:flex">
+        <div
+          ref={filterColumnRef}
+          className="hidden h-max w-[292px] shrink-0 flex-col gap-4 max-lg:hidden lg:flex"
+        >
           <div className="flex h-[72px] w-full items-center gap-4 rounded-[14px] bg-[#FAFBFC] px-4 py-6">
             <FilterListIcon sx={{ color: '#1A73E8', fontSize: 24 }} />
             <p className="text-base font-bold leading-5 text-[#1A73E8]">
@@ -1510,7 +1583,6 @@ const top_duration = [
                                 label={`${e.duration} ${t('ночей')}`}
                                 setChecked={handleDurationsChange}
                                 selectedValue={selectedDurations}
-                                onSelect={notifyApplyFiltersIfNeeded}
                               />
                             ))}
                       </FilterSection>
@@ -1540,12 +1612,8 @@ const top_duration = [
                         key={`${town.id}-${townIndex}`}
                         value={String(town.id)}
                         label={<span className="pl-6">{town.name}</span>}
-                        setChecked={(val) => {
-                          setSelectedTown(typeof val === 'string' ? val : null);
-                        }}
+                        setChecked={setSelectedTown}
                         selectedValue={selectedTown}
-                        exclusive
-                        onSelect={notifyApplyFiltersIfNeeded}
                       />
                     ))}
                 </div>
@@ -1562,13 +1630,17 @@ const top_duration = [
                 value={rating}
                 label={t(`${rating} звезды`)}
                 setChecked={(val) => {
-                  setHotelRating(val ? rating : null);
-                  setHotelID(null);
+                  const next =
+                    typeof val === 'function'
+                      ? val(hotelRating)
+                      : Array.isArray(val)
+                        ? val
+                        : [];
+                  setHotelRating(next);
+                  setHotelID([]);
                   setDraftOperator(null);
                 }}
                 selectedValue={hotelRating}
-                exclusive
-                onSelect={notifyApplyFiltersIfNeeded}
               />
             ))}
           </FilterSection>
@@ -1613,17 +1685,26 @@ const top_duration = [
                 </span>
               }
               setChecked={(val) => {
-                if (val) {
-                  setHotelID(String(hotel.id));
-                  setDraftOperator(String((hotel as any).operator ?? ''));
-                } else {
-                  setHotelID(null);
-                  setDraftOperator(null);
-                }
+                const next =
+                  typeof val === 'function'
+                    ? val(hotelID)
+                    : Array.isArray(val)
+                      ? val
+                      : [];
+                setHotelID(next);
+                const selectedHotels = filteredHotels.filter((hotel) =>
+                  next.includes(String(hotel.id)),
+                );
+                const operators = [
+                  ...new Set(
+                    selectedHotels
+                      .map((hotel) => String((hotel as { operator?: string }).operator ?? ''))
+                      .filter(Boolean),
+                  ),
+                ];
+                setDraftOperator(operators.length === 1 ? operators[0] : null);
               }}
               selectedValue={hotelID}
-              exclusive
-              onSelect={notifyApplyFiltersIfNeeded}
             />
           ))
         ) : (
@@ -1644,8 +1725,6 @@ const top_duration = [
                 key={`${e.id}-${mealIndex}`}
                 setChecked={setMealPlan}
                 selectedValue={mealPlan}
-                exclusive
-                onSelect={notifyApplyFiltersIfNeeded}
               />
             ))}
           </FilterSection>
@@ -1660,10 +1739,9 @@ const top_duration = [
               value={sliderValue}
               className="placeholder:!text-[#909091] !text-[#909091]"
               onChange={(v) => setPriceRange(v as number[])}
-              onChangeComplete={(v) => {
-                setPriceRange(clampPriceRange(v as number[]));
-                notifyApplyFiltersIfNeeded();
-              }}
+              onChangeComplete={(v) =>
+                setPriceRange(clampPriceRange(v as number[]))
+              }
             />
             <div className="mt-3 flex items-center gap-2 rounded-xl border border-[#DFDFDF] p-3">
               <input
@@ -1671,10 +1749,7 @@ const top_duration = [
                 value={formatPrice(sliderValue[0])}
                 placeholder={formatPrice(priceLimits.min)}
                 onChange={(e) => handleInputChange(e.target.value, 0)}
-                onBlur={() => {
-                  handlePriceInputBlur();
-                  notifyApplyFiltersIfNeeded();
-                }}
+                onBlur={handlePriceInputBlur}
                 className={clsx(
                   'min-w-0 flex-1 border-none text-xs leading-3 outline-none',
                   sliderValue[0] ? 'text-[#848484]' : 'text-[#909091]',
@@ -1688,10 +1763,7 @@ const top_duration = [
                 value={formatPrice(sliderValue[1])}
                 placeholder={formatPrice(priceLimits.max)}
                 onChange={(e) => handleInputChange(e.target.value, 1)}
-                onBlur={() => {
-                  handlePriceInputBlur();
-                  notifyApplyFiltersIfNeeded();
-                }}
+                onBlur={handlePriceInputBlur}
                 className={clsx(
                   'min-w-0 flex-1 border-none text-right text-xs leading-3 outline-none',
                   sliderValue[1] ? 'text-[#848484]' : 'text-[#909091]',
@@ -1701,24 +1773,57 @@ const top_duration = [
           </FilterSection>
           </div>
 
-          <div className="grid w-full grid-cols-2 gap-3">
+          <div
+            ref={filterActionsSentinelRef}
+            className={clsx(
+              'grid w-full grid-cols-2 gap-3',
+              isFilterActionsPinned && 'invisible',
+            )}
+          >
             <button
               type="button"
               className="h-12 w-full cursor-pointer rounded-[14px] border border-[#1A73E8] bg-[#FAFBFC] text-[14px] font-medium text-[#1A73E8] transition-colors hover:bg-[#EEF4FF]"
               onClick={handleClearSideFilters}
+              tabIndex={isFilterActionsPinned ? -1 : undefined}
             >
               {t('Очистить')}
             </button>
             <button
-              ref={applyFiltersBtnRef}
               type="button"
-              id="selectour-apply-filters"
+              id={isFilterActionsPinned ? undefined : 'selectour-apply-filters'}
               className="h-12 w-full cursor-pointer rounded-[14px] bg-[#1A73E8] text-[14px] font-medium text-white transition-colors hover:bg-[#1557B0]"
               onClick={() => applySideFilters()}
+              tabIndex={isFilterActionsPinned ? -1 : undefined}
             >
               {t('Применять')}
             </button>
           </div>
+          {isFilterActionsPinned && (
+            <div
+              className="fixed z-30 grid grid-cols-2 gap-3 border-t border-[#E5E7EB] bg-[#FAFBFC] py-3 shadow-[0_-6px_16px_rgba(17,34,17,0.06)]"
+              style={{
+                left: filterActionsPinBox.left,
+                width: filterActionsPinBox.width,
+                bottom: 0,
+              }}
+            >
+              <button
+                type="button"
+                className="h-12 w-full cursor-pointer rounded-[14px] border border-[#1A73E8] bg-[#FAFBFC] text-[14px] font-medium text-[#1A73E8] transition-colors hover:bg-[#EEF4FF]"
+                onClick={handleClearSideFilters}
+              >
+                {t('Очистить')}
+              </button>
+              <button
+                type="button"
+                id="selectour-apply-filters"
+                className="h-12 w-full cursor-pointer rounded-[14px] bg-[#1A73E8] text-[14px] font-medium text-white transition-colors hover:bg-[#1557B0]"
+                onClick={() => applySideFilters()}
+              >
+                {t('Применять')}
+              </button>
+            </div>
+          )}
         </div>
 
 
@@ -2017,11 +2122,8 @@ const top_duration = [
                         key={`${town.id}-${townIndex}`}
                         value={String(town.id)}
                         label={<span className="pl-6">{town.name}</span>}
-                        setChecked={(val) => {
-                          setSelectedTown(typeof val === 'string' ? val : null);
-                        }}
+                        setChecked={setSelectedTown}
                         selectedValue={selectedTown}
-                        exclusive
                       />
                     ))}
                 </div>
@@ -2035,12 +2137,17 @@ const top_duration = [
       value={rating}
       label={t(`${rating} звезды`)}
       setChecked={(val) => {
-        setHotelRating(val ? rating : null);
-        setHotelID(null);
+        const next =
+          typeof val === 'function'
+            ? val(hotelRating)
+            : Array.isArray(val)
+              ? val
+              : [];
+        setHotelRating(next);
+        setHotelID([]);
         setDraftOperator(null);
       }}
       selectedValue={hotelRating}
-      exclusive
     />
   ))}
 </FilterSection>
@@ -2053,7 +2160,6 @@ const top_duration = [
                   key={`${e.id}-${mealIndex}`}
                   setChecked={setMealPlan}
                   selectedValue={mealPlan}
-                  exclusive
                 />
               ))}
             </FilterSection>
@@ -2094,15 +2200,25 @@ const top_duration = [
         </span>
       }
       selectedValue={hotelID}
-      exclusive
       setChecked={(val) => {
-        if (val) {
-          setHotelID(String(hotel.id));
-          setDraftOperator(String((hotel as any).operator ?? ''));
-        } else {
-          setHotelID(null);
-          setDraftOperator(null);
-        }
+        const next =
+          typeof val === 'function'
+            ? val(hotelID)
+            : Array.isArray(val)
+              ? val
+              : [];
+        setHotelID(next);
+        const selectedHotels = filteredHotels.filter((hotel) =>
+          next.includes(String(hotel.id)),
+        );
+        const operators = [
+          ...new Set(
+            selectedHotels
+              .map((hotel) => String((hotel as { operator?: string }).operator ?? ''))
+              .filter(Boolean),
+          ),
+        ];
+        setDraftOperator(operators.length === 1 ? operators[0] : null);
       }}
     />
   ))

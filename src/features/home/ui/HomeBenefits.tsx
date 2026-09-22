@@ -1,171 +1,119 @@
 'use client';
 
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
-import BoltIcon from '@mui/icons-material/Bolt';
-import HeadsetMicIcon from '@mui/icons-material/HeadsetMic';
-import SecurityOutlinedIcon from '@mui/icons-material/SecurityOutlined';
-import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
-import CompareArrowsOutlinedIcon from '@mui/icons-material/CompareArrowsOutlined';
-import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 
 const HomeBenefits = () => {
   const t = useTranslations();
-  const howItWorksSteps = [
-    {
-      icon: <SearchOutlinedIcon sx={{ color: '#FFFFFF', fontSize: 36 }} />,
-      title: t('Выберите направление'),
-      desc: t('Укажите место, даты и количество туристов в форме поиска'),
-      width: 'w-[397px]',
-    },
-    {
-      icon: <CompareArrowsOutlinedIcon sx={{ color: '#FFFFFF', fontSize: 36 }} />,
-      title: t('Сравните предложения'),
-      desc: t('Посмотрите варианты от разных туроператоров и выберите лучший'),
-      width: 'w-[398px]',
-    },
-    {
-      icon: <AccountBalanceWalletOutlinedIcon sx={{ color: '#FFFFFF', fontSize: 34 }} />,
-      title: t('Забронируйте онлайн'),
-      desc: t('Оформите бронирование за пару минут и получите подтверждение'),
-      width: 'w-[397px]',
-    },
-  ];
+
   const benefitItems = [
     {
-      icon: <AttachMoneyIcon sx={{ color: '#1A73E8', fontSize: 20 }} />,
       title: t('Лучшие цены'),
-      desc: t('Гарантируем самые выгодные предложения на рынке'),
-      bg: '#DBEAFE',
+      desc: t('why_choose_price_desc'),
+      bg: 'bg-[#E8F2FF]',
+      image: '/images/why-choose-us/best-prices.png',
     },
     {
-      icon: <HeadsetMicIcon sx={{ color: '#FF6B00', fontSize: 24 }} />,
       title: t('Поддержка 24/7'),
-      desc: t('Всегда на связи, чтобы помочь вам в любое время'),
-      bg: '#FFEDD4',
+      desc: t('why_choose_support_desc'),
+      bg: 'bg-[#FFF6E5]',
+      image: '/images/why-choose-us/support.png',
     },
     {
-      icon: <SecurityOutlinedIcon sx={{ color: '#22C55E', fontSize: 20 }} />,
       title: t('Проверенные туры'),
-      desc: t('Работаем только с надежными туроператорами'),
-      bg: '#DBFCE7',
+      desc: t('why_choose_verified_desc'),
+      bg: 'bg-[#E8F8EE]',
+      image: '/images/why-choose-us/verified.png',
     },
     {
-      icon: <BoltIcon sx={{ color: '#9810FA', fontSize: 22 }} />,
       title: t('Быстрое бронирование'),
-      desc: t('Оформите тур всего за несколько минут'),
-      bg: '#F3E8FF',
+      desc: t('why_choose_booking_desc'),
+      bg: 'bg-[#F3ECFF]',
+      image: '/images/why-choose-us/fast-booking.png',
     },
   ];
 
   return (
-    <section>
-      <div className="custom-container">
-        <div className="mx-auto w-full max-w-[1240px] rounded-[14px] bg-white px-4 py-6 shadow-[0_2px_4px_rgba(0,0,0,0.15)] md:px-6 md:pt-[25px] md:pb-8">
-          <div className="flex w-full flex-col gap-3 md:w-[445px] md:gap-4">
-            <h3 className="text-[24px] font-bold leading-[32px] text-[#1C1C1E] md:text-[32px] md:leading-[44px]">
-              {t('Почему выбирают нас')}
-            </h3>
-            <p className="text-sm font-medium leading-5 text-[#6B7280] md:text-base md:leading-[22px]">
-              {t('Мы делаем путешествия простыми и доступными')}
-            </p>
-          </div>
+    <section className="relative overflow-hidden py-4">
+      <div className="custom-container relative">
+        <svg
+          className="pointer-events-none absolute left-0 top-8 hidden h-16 w-28 text-[#BFD9FF] opacity-70 md:block lg:left-4"
+          viewBox="0 0 120 64"
+          fill="currentColor"
+          aria-hidden
+        >
+          <ellipse cx="38" cy="40" rx="28" ry="16" />
+          <ellipse cx="62" cy="32" rx="26" ry="18" />
+          <ellipse cx="88" cy="42" rx="22" ry="14" />
+        </svg>
 
-          <div className="mt-6 grid grid-cols-2 gap-4 md:mt-[61px] md:grid-cols-4 md:gap-3">
-            {benefitItems.map((item) => (
-              <div
-                key={item.title}
-                className="flex h-auto min-h-[150px] w-full flex-col items-center gap-4 md:h-[139px] md:gap-6"
-              >
-                <div
-                  className="grid h-[46px] w-[46px] place-items-center rounded-lg"
-                  style={{ backgroundColor: item.bg }}
-                >
-                  {item.icon}
-                </div>
-                <div className="flex w-full flex-col items-center gap-2 text-center">
-                  <p className="text-[22px] font-bold leading-7 text-[#1C1C1E] md:text-xl md:leading-[27px]">
-                    {item.title}
-                  </p>
-                  <p className="text-sm leading-[17px] text-[#6B7280]">
-                    {item.desc}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
+        <div
+          className="pointer-events-none absolute right-2 top-10 hidden items-center gap-0 md:flex lg:right-6"
+          aria-hidden
+        >
+          <svg
+            className="h-8 w-28 text-[#1A73E8]/45"
+            viewBox="0 0 120 32"
+            fill="none"
+          >
+            <path
+              d="M2 26 C28 26, 36 6, 58 8 C80 10, 88 24, 118 10"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeDasharray="5 6"
+              strokeLinecap="round"
+            />
+          </svg>
+          <svg
+            className="ml-[-6px] h-5 w-5 -rotate-12 text-[#1A73E8]"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
+          </svg>
         </div>
 
-        <div className="relative left-1/2 right-1/2 -mx-[50vw] mt-[104px] h-[581px] w-screen overflow-hidden border-y border-[#8AB3EE] bg-[#E8F1FF] max-lg:mt-8 max-lg:h-auto max-lg:border max-lg:border-[#DDE3EE] max-lg:px-5 max-lg:py-10">
-          <div className="flex h-full flex-col items-center gap-[56px] px-0 pb-[102px] pt-[58px] max-lg:items-start max-lg:gap-8 max-lg:px-0 max-lg:pb-0 max-lg:pt-0">
-            <div className="flex w-[445px] flex-col items-center gap-4 max-lg:w-full max-lg:items-start max-lg:gap-6">
-              <div className="flex w-full flex-col gap-2">
-                <h3 className="w-full text-center text-[32px] font-bold leading-[44px] text-[#1C1C1E] max-lg:text-left max-lg:text-[20px] max-lg:leading-6">
-                {t('Как это работает')}
-                </h3>
-                <p className="w-full text-center text-base font-medium leading-[22px] text-[#6B7280] max-lg:text-left max-lg:text-[16px] max-lg:font-medium max-lg:leading-[22px]">
-                {t('Три простых шага до путешествия мечты')}
-                </p>
-              </div>
-            </div>
+        <div className="mx-auto flex max-w-[820px] flex-col items-center text-center">
+          <h2 className="relative text-[32px] font-bold leading-[40px] text-[#0B3D91] md:text-[44px] md:leading-[52px]">
+            {t('Почему выбирают нас')}?
+            <span
+              className="absolute inset-x-[12%] -bottom-1 mx-auto h-[6px] max-w-[220px] rounded-full bg-[#1A73E8]/25 md:inset-x-[18%]"
+              aria-hidden
+            />
+          </h2>
 
-            <div className="flex w-full flex-col items-center gap-12 max-lg:gap-8">
-              <div className="relative h-20 w-full max-lg:hidden">
-                <div className="absolute left-0 right-0 top-1/2 h-px -translate-y-1/2 bg-gradient-to-r from-[#BFD0E9] via-[#6CA9EF] to-[#BFD0E9]" />
-                <div className="mx-auto flex h-20 w-[924px] items-center justify-between">
-                  {['01', '02', '03'].map((num) => (
-                    <div
-                      key={num}
-                      className="relative z-10 grid h-20 w-20 place-items-center rounded-full border-[3px] border-[#1A73E8] bg-white text-[32px] font-semibold leading-[39px] text-[#1A73E8]"
-                    >
-                      {num}
-                    </div>
-                  ))}
-                </div>
-              </div>
+          <p className="mt-4 max-w-[640px] text-base font-semibold leading-6 text-[#1A73E8] md:text-xl md:leading-7">
+            {t('why_choose_title_before')} {t('why_choose_title_highlight')}
+          </p>
 
-              <div className="grid w-[1240px] grid-cols-3 gap-6 max-lg:w-full max-lg:grid-cols-1 max-lg:gap-4">
-                {howItWorksSteps.map((step, index) => (
-                  <div
-                    key={step.title}
-                    className={`flex h-[153px] flex-col items-center gap-6 text-center max-lg:h-auto max-lg:w-full max-lg:items-start max-lg:gap-4 ${step.width}`}
-                  >
-                    <p className="hidden font-semibold leading-6 text-[#1A73E8] max-lg:block max-lg:text-[20px]">
-                      {`Шаг ${index + 1}:`}
-                    </p>
-                    <div className="max-lg:flex max-lg:w-full max-lg:items-start max-lg:gap-6">
-                      <div className="grid h-[60px] w-[60px] place-items-center rounded-[14px] bg-[#1A73E8] max-lg:h-10 max-lg:w-10 max-lg:rounded-[9.333px]">
-                        {index === 0 ? (
-                          <SearchOutlinedIcon sx={{ color: '#FFFFFF', fontSize: 24 }} />
-                        ) : index === 1 ? (
-                          <CompareArrowsOutlinedIcon sx={{ color: '#FFFFFF', fontSize: 24 }} />
-                        ) : (
-                          <AccountBalanceWalletOutlinedIcon sx={{ color: '#FFFFFF', fontSize: 22 }} />
-                        )}
-                      </div>
-                      <div className="hidden w-full max-lg:flex max-lg:max-w-[289px] max-lg:flex-col max-lg:gap-1">
-                        <p className="text-left font-bold text-[#1C1C1E] max-lg:text-[16px] max-lg:leading-5">
-                          {step.title}
-                        </p>
-                        <p className="text-left text-[12px] font-normal leading-[15px] text-[#6B7280]">
-                          {step.desc}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex w-full flex-col gap-2 max-lg:hidden">
-                      <p className="text-center text-xl font-bold leading-[27px] text-[#1C1C1E]">
-                        {step.title}
-                      </p>
-                      <p className="text-center text-sm leading-[17px] text-[#6B7280]">{step.desc}</p>
-                    </div>
-                    {index < howItWorksSteps.length - 1 ? (
-                      <div className="hidden h-px w-full bg-[rgba(17,34,17,0.25)] max-lg:block" />
-                    ) : null}
-                  </div>
-                ))}
+          <p className="mt-2 max-w-[560px] text-sm font-medium leading-5 text-[#6B7280] md:text-base md:leading-6">
+            {t('why_choose_subtitle')}
+          </p>
+        </div>
+
+        <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
+          {benefitItems.map((item) => (
+            <article
+              key={item.title}
+              className={`flex flex-col items-center rounded-[24px] px-5 pb-6 pt-5 text-center ${item.bg}`}
+            >
+              <div className="relative mb-4 h-[120px] w-full max-w-[160px]">
+                <Image
+                  src={item.image}
+                  alt={item.title}
+                  fill
+                  className="object-contain"
+                  sizes="160px"
+                />
               </div>
-            </div>
-          </div>
+              <h3 className="text-lg font-bold leading-6 text-[#0B3D91]">
+                {item.title}
+              </h3>
+              <p className="mt-2 text-sm leading-5 text-[#5B6B86]">
+                {item.desc}
+              </p>
+            </article>
+          ))}
         </div>
       </div>
     </section>

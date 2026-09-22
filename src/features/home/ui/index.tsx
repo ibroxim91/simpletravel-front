@@ -2,6 +2,8 @@ export { default as HomeCommentTour } from './commentTour';
 export { default as BannerCarousel } from './BannerCarousel';
 export { default as BannerCarouselMobile } from './BannerCarouselMobile';
 export { default as HomeBenefits } from './HomeBenefits';
+export { default as HotOffersPromoPopup } from './HotOffersPromoPopup';
+export { default as HowItWorks } from './HowItWorks';
 export { default as HotTours } from './HotTours';
 export { default as News } from './News';
 export { default as Populardestinations } from './Populardestinations';

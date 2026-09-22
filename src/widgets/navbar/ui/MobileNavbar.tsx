@@ -27,7 +27,7 @@ const MobileNavbar = ({ setOpen, open }: Props) => {
   const links = [
     { href: '/', label: 'Главная', icon: HomeIcon, active: '/' },
     {
-      href: '/selectour?page=1',
+      href: '/selectour?hot=true',
       label: 'Подобрать тур',
       icon: FlightIcon,
       active: '/selectour',

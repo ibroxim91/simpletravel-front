@@ -34,7 +34,7 @@ const Navbar = () => {
 
   const navLinks = [
     { href: '/', label: 'Главная' },
-    { href: '/selectour?page=1', label: 'Подобрать тур' },
+    { href: '/selectour?hot=true', label: 'Подобрать тур' },
     { href: '/about', label: 'О нас' },
     { href: '/contacts', label: 'Контакты' },
   ];
@@ -48,7 +48,7 @@ const Navbar = () => {
   const linksMobile = [
     { href: '/', label: 'Главная', icon: HomeIcon, active: '/' },
     {
-      href: '/selectour?page=1',
+      href: '/selectour?hot=true',
       label: 'Подобрать тур',
       icon: SearchIcon,
       active: '/selectour',
