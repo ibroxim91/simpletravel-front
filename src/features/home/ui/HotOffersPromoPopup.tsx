@@ -38,7 +38,6 @@ function RegionPricePages({
   locale: LanguageRoutes;
   onOfferClick: (offer: HotPromoOffer) => void;
 }) {
-  const t = useTranslations();
   const pages = useMemo(
     () => chunkOffers(region.offers, PRICES_PER_PAGE),
     [region.offers],
@@ -65,7 +64,6 @@ function RegionPricePages({
             offer={offer}
             locale={locale}
             onClick={() => onOfferClick(offer)}
-            otLabel={t('от')}
           />
         ))}
       </div>
@@ -89,7 +87,6 @@ function RegionPricePages({
                     offer={offer}
                     locale={locale}
                     onClick={() => onOfferClick(offer)}
-                    otLabel={t('от')}
                   />
                 ))}
               </div>
@@ -117,12 +114,10 @@ function RegionPricePages({
 function OfferRow({
   offer,
   locale,
-  otLabel,
   onClick,
 }: {
   offer: HotPromoOffer;
   locale: LanguageRoutes;
-  otLabel: string;
   onClick: () => void;
 }) {
   const displayPrice = Math.round(offer.priceUzs * 0.5);
@@ -132,16 +127,17 @@ function OfferRow({
       href={`/selectour/${offer.slug || ''}`}
       prefetch
       onClick={onClick}
-      className="flex items-baseline justify-between gap-3 rounded-xl bg-[#F5F9FF] px-3.5 py-3 transition hover:bg-[#E8F1FF]"
+      className="flex items-center justify-between gap-3 rounded-xl bg-[#F5F9FF] px-3.5 py-3.5 transition hover:bg-[#E8F1FF]"
     >
-      <span className="min-w-0 flex-1 text-[15px] font-medium leading-5 text-[#1A73E8]">
+      <span className="min-w-0 flex-1 text-[17px] font-semibold leading-6 text-[#1A73E8] md:text-[18px]">
         {offer.destinationName ? (
-          <span className="mr-1.5 text-[#0B3D91]">{offer.destinationName}</span>
+          <span className="mr-2 font-bold text-[#0B3D91]">
+            {offer.destinationName}
+          </span>
         ) : null}
-        {offer.dateLabel}{' '}
-        <span className="font-normal text-[#5B7BB2]">{otLabel}</span>
+        {offer.dateLabel}
       </span>
-      <span className="shrink-0 text-right text-[20px] font-bold leading-6 text-[#0B3D91]">
+      <span className="shrink-0 text-right text-[20px] font-bold leading-6 text-[#0B3D91] md:text-[22px]">
         {formatPrice(displayPrice, locale, true)}
       </span>
     </Link>
@@ -247,7 +243,7 @@ const HotOffersPromoPopup = () => {
         role="dialog"
         aria-modal="true"
         aria-label={t('hot_promo_title')}
-        className="relative w-full max-w-[380px] overflow-hidden rounded-[24px] bg-white shadow-[0_20px_60px_rgba(11,61,145,0.28)] animate-in zoom-in-95 slide-in-from-bottom-4 duration-300"
+        className="relative w-full max-w-[400px] overflow-hidden rounded-[24px] bg-white shadow-[0_20px_60px_rgba(11,61,145,0.28)] animate-in zoom-in-95 slide-in-from-bottom-4 duration-300 md:max-w-[460px]"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -268,20 +264,21 @@ const HotOffersPromoPopup = () => {
             {regions.map((region) => (
               <CarouselItem key={region.regionKey} className="basis-full pl-0">
                 <div className="relative">
-                  <div className="relative h-[220px] w-full overflow-hidden bg-[#1A73E8]">
+                  <div className="relative h-[220px] w-full overflow-hidden bg-[#1A73E8] md:h-[240px]">
                     {region.imageUrl ? (
                       <Image
                         src={region.imageUrl}
                         alt={region.regionName}
                         fill
-                        className="object-cover"
-                        sizes="380px"
+                        priority={false}
+                        className="object-cover object-center"
+                        sizes="(min-width: 768px) 460px, 400px"
                         unoptimized={region.imageUrl.startsWith('http')}
                       />
                     ) : null}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0B3D91]/95 via-[#1A73E8]/45 to-transparent" />
                     <div className="absolute inset-x-0 bottom-0 px-5 pb-6 pt-16 text-center">
-                      <h2 className="text-[28px] font-bold leading-8 text-white drop-shadow-sm">
+                      <h2 className="text-[28px] font-bold leading-8 text-white drop-shadow-sm md:text-[32px] md:leading-9">
                         {region.regionName}
                       </h2>
                       <span className="mt-2 inline-flex rounded-full border border-white/70 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-white">
@@ -290,8 +287,8 @@ const HotOffersPromoPopup = () => {
                     </div>
                   </div>
 
-                  <div className="px-4 pb-5 pt-4">
-                    <p className="mb-3 text-center text-sm font-medium text-[#6B7280]">
+                  <div className="px-4 pb-5 pt-5 md:px-5">
+                    <p className="mb-4 text-center text-[22px] font-bold leading-7 text-[#0B3D91] md:text-[24px] md:leading-8">
                       {t('hot_promo_title')}
                     </p>
                     <RegionPricePages

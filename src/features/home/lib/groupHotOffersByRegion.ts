@@ -63,9 +63,9 @@ function parseDepartureDate(ticket: Record<string, unknown>): {
 }
 
 function ticketImage(ticket: Record<string, unknown>): string {
-  const hotelPhoto = String(ticket.hotel_photo || '').trim();
-  if (hotelPhoto) return hotelPhoto;
-  return String(ticket.ticket_images || '').trim();
+  const ticketImages = String(ticket.ticket_images || '').trim();
+  if (ticketImages) return ticketImages;
+  return String(ticket.hotel_photo || '').trim();
 }
 
 /**
@@ -126,6 +126,12 @@ export function groupHotOffersByRegion(
 
     if (!group.imageUrl) {
       group.imageUrl = ticketImage(ticket);
+    } else {
+      // Prefer ticket_images when a later ticket has it
+      const fromTicketImages = String(ticket.ticket_images || '').trim();
+      if (fromTicketImages) {
+        group.imageUrl = fromTicketImages;
+      }
     }
     // Prefer country name if a fallback town title was set first
     if (countryName && group.regionName !== countryName) {
