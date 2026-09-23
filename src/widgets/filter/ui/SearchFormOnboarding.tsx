@@ -5,11 +5,8 @@ import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-/**
- * Test rejim: true bo'lsa guide har safar sahifa ochilganda chiqadi.
- * Sinovdan keyin false qiling — shunda faqat birinchi tashrifda chiqadi.
- */
-export const SEARCH_ONBOARDING_ALWAYS_SHOW = true;
+/** false: guide faqat birinchi tashrifda chiqadi. */
+export const SEARCH_ONBOARDING_ALWAYS_SHOW = false;
 
 const STORAGE_KEY = 'simple_travel_search_onboarding_completed';
 const STEP_MS = 1800;
