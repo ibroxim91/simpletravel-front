@@ -1,6 +1,6 @@
 /** SAMO NIGHTS_LIST presets for tour search. */
 export const NIGHTS_FROM_7 = '7,8,9,10,11,12,13,14';
-export const NIGHTS_ALL = '2,3,4,5,6,7,8,9,10,11,12,13,14';
+export const NIGHTS_ALL = '3,4,5,6,7,8,9,10,11,12,13,14';
 
 /**
  * Resolve nights list for search API.

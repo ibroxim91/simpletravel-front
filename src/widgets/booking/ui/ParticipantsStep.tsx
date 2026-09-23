@@ -59,7 +59,9 @@ export default function ParticipantsStep({
   const t = useTranslations();
   const [previewOpen, setPreviewOpen] = useState(false);
   const [openCalendar, setOpenCalendar] = useState<Record<number, boolean>>({});
-  const [openWhereMobile, setOpenWhereMobile] = useState(false);
+  const [openBirthMobile, setOpenBirthMobile] = useState<Record<number, boolean>>(
+    {},
+  );
   const [previewFile, setPreviewFile] = useState<PassportType | null>(null);
   const { addUser, user } = formStore();
   const [userIds, setUserIds] = useState<(number | undefined)[]>([]);
@@ -576,11 +578,17 @@ export default function ParticipantsStep({
                           </div>
                           <div className="lg:hidden">
                             <button
+                              type="button"
                               className={cn(
                                 'w-full justify-start text-left cursor-pointer relative font-normal border-2 h-[56px] border-[#EDEEF1] rounded-md p-[12px]',
                                 !field.value && 'text-muted-foreground',
                               )}
-                              onClick={() => setOpenWhereMobile(true)}
+                              onClick={() =>
+                                setOpenBirthMobile((prev) => ({
+                                  ...prev,
+                                  [index]: true,
+                                }))
+                              }
                             >
                               <CalendarMonthIcon
                                 sx={{
@@ -592,12 +600,17 @@ export default function ParticipantsStep({
                               />
                               {field.value
                                 ? format(field.value, 'dd.MM.yyyy')
-                                : t('Когда')}
+                                : t('Дата рождения')}
                             </button>
                             <Drawer
                               anchor="bottom"
-                              open={openWhereMobile}
-                              onClose={() => setOpenWhereMobile(false)}
+                              open={!!openBirthMobile[index]}
+                              onClose={() =>
+                                setOpenBirthMobile((prev) => ({
+                                  ...prev,
+                                  [index]: false,
+                                }))
+                              }
                               PaperProps={{
                                 sx: {
                                   borderTopLeftRadius: 16,
@@ -612,12 +625,18 @@ export default function ParticipantsStep({
                               <div className="flex flex-col gap-4 w-full font-medium">
                                 <div className="flex items-center justify-between">
                                   <p className="text-lg font-semibold">
-                                    {t('Дата отправления')}
+                                    {t('Дата рождения')}
                                   </p>
                                   <Button
+                                    type="button"
                                     variant={'outline'}
                                     className="rounded-full h-[40px] w-[40px] cursor-pointer"
-                                    onClick={() => setOpenWhereMobile(false)}
+                                    onClick={() =>
+                                      setOpenBirthMobile((prev) => ({
+                                        ...prev,
+                                        [index]: false,
+                                      }))
+                                    }
                                   >
                                     <CloseIcon sx={{ color: 'black' }} />
                                   </Button>
@@ -626,11 +645,15 @@ export default function ParticipantsStep({
                                   className="w-full max-w-2xl mx-auto"
                                   mode="single"
                                   selected={dateValue ? dateValue : undefined}
+                                  defaultMonth={dateValue ?? new Date()}
                                   onSelect={(d) => {
                                     field.onChange(d);
-                                    setOpenWhereMobile(false);
+                                    setOpenBirthMobile((prev) => ({
+                                      ...prev,
+                                      [index]: false,
+                                    }));
                                   }}
-                                  disabled={{ before: new Date() }}
+                                  disabled={{ after: new Date() }}
                                   captionLayout="dropdown"
                                 />
                               </div>

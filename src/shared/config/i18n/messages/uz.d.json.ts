@@ -286,7 +286,7 @@ declare const messages: {
   "Xatolik yuz berdi": "Xatolik yuz berdi",
   "ta tur topildi": "ta tur topildi",
   "only_from_7_days_tours": "7 kundan boshlanadigan turlar",
-  "recommended_hotels": "Tavsiya etilgan mehmonxonalar",
+  "recommended_hotels": "Tavsiya qilamiz",
   "recommended_hotels_subtitle": "Biz tanlagan ishonchli mehmonxonalar va eng yaxshi narxlar",
   "recommended_sort": "Tavsiya etiladi",
   "recommended_badge": "Tavsiya etiladi",
@@ -522,6 +522,20 @@ declare const messages: {
   "Tashkent International Airaport": "Toshkent xalqaro aeroporti",
   "Документы:": "Xujjatlar:",
   "Правила возврата": "Qaytarish qoidalari",
-  "Risk Control Measures": "Risk Control Measures"
+  "Risk Control Measures": "Risk Control Measures",
+  "search_onboarding_skip": "O‘tkazib yuborish",
+  "search_onboarding_step1_title": "Qayerga sayohat qilmoqchisiz?",
+  "search_onboarding_step1_desc": "Sayohat qilmoqchi bo‘lgan mamlakat yoki yo‘nalishni shu yerdan tanlang.",
+  "search_onboarding_step2_title": "Sayohat sanalarini tanlang",
+  "search_onboarding_step2_desc": "Safaringiz boshlanish va tugash sanalarini belgilang.",
+  "search_onboarding_step3_title": "Necha kishi sayohat qiladi?",
+  "search_onboarding_step3_desc": "Safarga chiqadigan sayohatchilar sonini tanlang.",
+  "search_onboarding_step4_title": "Qidiruvni boshlang",
+  "search_onboarding_step4_desc": "Tanlagan parametrlaringiz bo‘yicha mos turlarni topish uchun qidiruvni boshlang.",
+  "filter_guide_title": "Filtrlarni oching",
+  "filter_guide_desc": "Mehmonxona, ovqatlanish va boshqa filtrlarni shu tugma orqali sozlang.",
+  "installment_per_month": "uzs oyiga",
+  "installment_title": "Bo‘lib to‘lash",
+  "installment_open": "Bo‘lib to‘lash haqida"
 };
 export default messages;

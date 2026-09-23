@@ -34,6 +34,7 @@ import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { AxiosError } from 'axios';
 import { trackTourDetail } from '@/shared/lib/analytics';
+import InstallmentPrice from './InstallmentPrice';
 import 'swiper/css';
 import Hotel2 from '../../../../public/images/hotel2.png';
 import Hotel3 from '../../../../public/images/hotel3.png';
@@ -679,6 +680,7 @@ const includedServicesToRender = [
                        /{' '} {data?.passenger_count} {t('человек')}
                       </span>
                     </h1>
+                    <InstallmentPrice price={Number(data.price_full)} align="end" />
                     <div className="flex items-center gap-6">
                       <button
                         onClick={(e) => {
@@ -985,6 +987,7 @@ const includedServicesToRender = [
                 {Number(data.price_full).toLocaleString('uz-UZ')} uzs  /{' '}
                   <span className="font-normal">{data.passenger_count || 1} {t('человек')}</span>
                 </p>
+                <InstallmentPrice price={Number(data.price_full)} />
               </div>
 
               {includedServicesToRender.length > 0 && (

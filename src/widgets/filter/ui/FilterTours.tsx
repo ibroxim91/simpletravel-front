@@ -115,8 +115,6 @@ const FilterTours = ({
       return data.data.data;
     },
   });
-   
-const hideText = pathname.includes('/selectour') || pathname.includes('/selectour-test');
 
   const getBasePath = () =>
     pathname.includes('/selectour-test') ? '/selectour-test' : '/selectour';
@@ -929,12 +927,6 @@ const defaultitems = selectedCountry
         </Button>
       </div>
       </div>
-      
-      {!hideText && (
-        <p className="absolute right-1 top-[84px] text-right text-[14px] font-normal leading-[17px] text-white">
-          {t('Переходи в раздел “Подобрать тур”, чтобы ознакомиться со всеми турами')}
-        </p>
-      )}
 
     </div>
   );

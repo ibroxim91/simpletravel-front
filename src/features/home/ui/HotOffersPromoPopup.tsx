@@ -17,7 +17,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
   chunkOffers,
@@ -25,9 +25,29 @@ import {
   type HotPromoOffer,
   type HotPromoRegion,
 } from '../lib/groupHotOffersByRegion';
+import { setHomePopupPhase } from '../lib/homeOverlayQueue';
 
 const PRICES_PER_PAGE = 3;
 const REGION_AUTOPLAY_MS = 4000;
+const POPUP_INTERVAL_MS = 15 * 60 * 1000;
+const NEXT_SHOW_KEY = 'hot_offers_promo_next_show_at';
+
+function readNextShowAt(): number {
+  try {
+    const value = Number(localStorage.getItem(NEXT_SHOW_KEY));
+    return Number.isFinite(value) ? value : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function writeNextShowAt(timestamp: number) {
+  try {
+    localStorage.setItem(NEXT_SHOW_KEY, String(timestamp));
+  } catch {
+    // ignore
+  }
+}
 
 function RegionPricePages({
   region,
@@ -121,6 +141,7 @@ function OfferRow({
   onClick: () => void;
 }) {
   const displayPrice = Math.round(offer.priceUzs * 0.5);
+  const oldPrice = Math.round(displayPrice * 1.1);
 
   return (
     <Link
@@ -137,8 +158,13 @@ function OfferRow({
         ) : null}
         {offer.dateLabel}
       </span>
-      <span className="shrink-0 text-right text-[20px] font-bold leading-6 text-[#0B3D91] md:text-[22px]">
-        {formatPrice(displayPrice, locale, true)}
+      <span className="shrink-0 text-right">
+        <span className="block text-[13px] font-semibold leading-4 text-[#E11D48] line-through">
+          {formatPrice(oldPrice, locale, true)}
+        </span>
+        <span className="block text-[20px] font-bold leading-6 text-[#0B3D91] md:text-[22px]">
+          {formatPrice(displayPrice, locale, true)}
+        </span>
       </span>
     </Link>
   );
@@ -153,8 +179,34 @@ const HotOffersPromoPopup = () => {
   const [regionIndex, setRegionIndex] = useState(0);
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
+  const reopenTimer = useRef<number | null>(null);
 
-  const { data: tickets, isSuccess } = useQuery({
+  const clearReopenTimer = useCallback(() => {
+    if (reopenTimer.current != null) {
+      window.clearTimeout(reopenTimer.current);
+      reopenTimer.current = null;
+    }
+  }, []);
+
+  const scheduleOpen = useCallback(
+    (delayMs: number) => {
+      clearReopenTimer();
+      reopenTimer.current = window.setTimeout(() => {
+        setOpen(true);
+        writeNextShowAt(Date.now() + POPUP_INTERVAL_MS);
+      }, delayMs);
+    },
+    [clearReopenTimer],
+  );
+
+  const dismissPopup = useCallback(() => {
+    setOpen(false);
+    writeNextShowAt(Date.now() + POPUP_INTERVAL_MS);
+    scheduleOpen(POPUP_INTERVAL_MS);
+    setHomePopupPhase('clear');
+  }, [scheduleOpen]);
+
+  const { data: tickets, isSuccess, isFetched, isError } = useQuery({
     queryKey: ['home_offers_hot', 'hot'],
     queryFn: async () => {
       try {
@@ -176,10 +228,22 @@ const HotOffersPromoPopup = () => {
   }, []);
 
   useEffect(() => {
+    if (!isFetched) return;
+    if (isError || !isSuccess || regions.length === 0) {
+      setHomePopupPhase('clear');
+    }
+  }, [isFetched, isError, isSuccess, regions.length]);
+
+  useEffect(() => {
     if (!isSuccess || regions.length === 0) return;
-    const timer = window.setTimeout(() => setOpen(true), 400);
-    return () => window.clearTimeout(timer);
-  }, [isSuccess, regions.length]);
+    const nextAt = readNextShowAt();
+    const now = Date.now();
+    const delay = nextAt > now ? nextAt - now : 400;
+    // Hozir ochiladigan popup guide'dan oldin chiqsin. Keyinroq rejalangan popup guide'ni kutib turmasin.
+    setHomePopupPhase(delay <= 1500 ? 'popup' : 'clear');
+    scheduleOpen(delay);
+    return () => clearReopenTimer();
+  }, [isSuccess, regions.length, scheduleOpen, clearReopenTimer]);
 
   useEffect(() => {
     if (!open) return;
@@ -228,7 +292,7 @@ const HotOffersPromoPopup = () => {
     } catch {
       // ignore
     }
-    setOpen(false);
+    dismissPopup();
   };
 
   if (!mounted || !open || regions.length === 0) return null;
@@ -237,7 +301,7 @@ const HotOffersPromoPopup = () => {
     <div
       className="fixed inset-0 z-[90] flex items-center justify-center bg-black/45 p-4 animate-in fade-in duration-200"
       role="presentation"
-      onClick={() => setOpen(false)}
+      onClick={dismissPopup}
     >
       <div
         role="dialog"
@@ -249,7 +313,7 @@ const HotOffersPromoPopup = () => {
         <button
           type="button"
           aria-label="Close"
-          onClick={() => setOpen(false)}
+          onClick={dismissPopup}
           className="absolute right-3 top-3 z-20 grid h-9 w-9 place-items-center rounded-full bg-black/35 text-white backdrop-blur-sm transition hover:bg-black/50"
         >
           <CloseIcon sx={{ fontSize: 18 }} />

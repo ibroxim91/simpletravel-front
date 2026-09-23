@@ -634,5 +634,19 @@
   "support_chat_bar_label": "Поддержка — есть вопрос?",
   "Документы:": "Документы:",
   "Правила возврата": "Правила возврата",
-  "Risk Control Measures": "Меры по рискам"
+  "Risk Control Measures": "Меры по рискам",
+  "search_onboarding_skip": "Пропустить",
+  "search_onboarding_step1_title": "Куда хотите поехать?",
+  "search_onboarding_step1_desc": "Выберите страну или направление вашего отдыха.",
+  "search_onboarding_step2_title": "Выберите даты",
+  "search_onboarding_step2_desc": "Укажите даты начала и окончания поездки.",
+  "search_onboarding_step3_title": "Сколько вас едет?",
+  "search_onboarding_step3_desc": "Выберите количество путешественников.",
+  "search_onboarding_step4_title": "Начните поиск",
+  "search_onboarding_step4_desc": "Нажмите, чтобы найти лучшие туры по вашим параметрам.",
+  "filter_guide_title": "Откройте фильтры",
+  "filter_guide_desc": "Настройте отель, питание и другие параметры этой кнопкой.",
+  "installment_per_month": "сум/мес",
+  "installment_title": "Рассрочка",
+  "installment_open": "О рассрочке"
 }

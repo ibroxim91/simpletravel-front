@@ -8,6 +8,7 @@ import StarRoundedIcon from '@mui/icons-material/StarRounded';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/shared/lib/utils';
+import FilterButtonGuide from './FilterButtonGuide';
 
 type Props = {
   hotelRating: string[];
@@ -45,7 +46,21 @@ export default function ToursMiniMenu({
   const allActive = !starsActive && !aiActive && !expensiveActive;
 
   return (
-    <div className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto scrollbar-none">
+    <div className="scrollbar-hide flex min-w-0 flex-1 items-center gap-2 overflow-x-auto">
+      <button
+        type="button"
+        data-filter-guide="open"
+        onClick={onOpenFilters}
+        className={cn(
+          chipBase,
+          'border border-[rgba(17,34,17,0.25)] bg-white text-[#6B7280]',
+        )}
+        aria-label={t('Настройте свой отдых')}
+      >
+        <FilterListIcon sx={{ fontSize: 18, color: '#1A73E8' }} />
+        <ExpandMoreIcon sx={{ fontSize: 18 }} />
+      </button>
+
       <button
         type="button"
         onClick={onAll}
@@ -103,19 +118,7 @@ export default function ToursMiniMenu({
         <TrendingUpIcon sx={{ fontSize: 18 }} />
         {t('mini_filter_expensive')}
       </button>
-
-      <button
-        type="button"
-        onClick={onOpenFilters}
-        className={cn(
-          chipBase,
-          'border border-[rgba(17,34,17,0.25)] bg-white text-[#6B7280]',
-        )}
-        aria-label={t('Настройте свой отдых')}
-      >
-        <FilterListIcon sx={{ fontSize: 18, color: '#1A73E8' }} />
-        <ExpandMoreIcon sx={{ fontSize: 18 }} />
-      </button>
+      <FilterButtonGuide />
     </div>
   );
 }

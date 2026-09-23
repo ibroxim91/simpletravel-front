@@ -29,6 +29,7 @@ import { useTranslations } from 'next-intl';
 import { useSearchParams, usePathname } from 'next/navigation';
 import { toast } from 'sonner';
 import { adultsForSearch, DEFAULT_ADULTS, getPassengerDisplayCount, resolveAdultsCount } from '../lib/passengers';
+import SearchFormOnboarding from './SearchFormOnboarding';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { DateRange } from 'react-day-picker';
 
@@ -493,6 +494,7 @@ useEffect(() => {
 
       <div className="relative col-span-2 flex flex-col gap-0">
         <div
+          data-search-guide="destination"
           onClick={() => {
             setOpenDrawerDes(true);
             setSearchCountryDes('');
@@ -713,7 +715,7 @@ useEffect(() => {
         </Drawer>
       </div>
 
-      <div className="relative h-full border-r border-[#E5E7EB]">
+      <div data-search-guide="dates" className="relative h-full border-r border-[#E5E7EB]">
         <div
           onClick={() => {
             if (!dataOpenMobile) applyDatesFromSearchParams();
@@ -855,7 +857,7 @@ useEffect(() => {
         </Sheet>
       </div>
 
-      <div className="relative h-full">
+      <div data-search-guide="passengers" className="relative h-full">
         <div
           onClick={() => setAgeOpen(!ageOpen)}
           className="cursor-pointer w-full"
@@ -981,6 +983,7 @@ useEffect(() => {
 
       <div className="mt-6 flex flex-col gap-2">
         <Button
+          data-search-guide="search"
           className="flex h-12 items-center justify-center rounded-[14px] bg-[#FF6B00] text-center text-[14px] font-medium text-white hover:bg-[#ff7a1f]"
          onClick={() => {
             if (!saveFilter()) return;
@@ -992,15 +995,8 @@ useEffect(() => {
         >
           <p>{t('Искать тур')}</p>
         </Button>
-        
-     {!hideText && (
-        <p className="absolute right-1 top-[84px] text-right text-[14px] font-normal leading-[17px] text-white">
-          {t('Переходи в раздел “Подобрать тур”, чтобы ознакомиться со всеми турами')}
-        </p>
-      )}
-
-
       </div>
+      {!hideText ? <SearchFormOnboarding /> : null}
     </div>
   );
 };
