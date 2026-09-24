@@ -162,7 +162,7 @@ function OfferRow({
         <span className="block text-[13px] font-semibold leading-4 text-[#E11D48] line-through">
           {formatPrice(oldPrice, locale, true)}
         </span>
-        <span className="block text-[20px] font-bold leading-6 text-[#0B3D91] md:text-[22px]">
+        <span className="block text-[22px] font-bold leading-7 text-[#0B3D91] md:text-[24px]">
           {formatPrice(displayPrice, locale, true)}
         </span>
       </span>
@@ -340,8 +340,11 @@ const HotOffersPromoPopup = () => {
                         unoptimized={region.imageUrl.startsWith('http')}
                       />
                     ) : null}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0B3D91]/95 via-[#1A73E8]/45 to-transparent" />
-                    <div className="absolute inset-x-0 bottom-0 px-5 pb-6 pt-16 text-center">
+                    <div className="absolute inset-0 bg-gradient-to-b from-[#0B3D91]/80 via-[#1A73E8]/25 to-[#0B3D91]/95" />
+                    <p className="absolute inset-x-0 top-0 px-14 pt-5 text-center text-[40px] font-bold leading-[44px] text-white drop-shadow-md md:pt-6 md:text-[48px] md:leading-[52px]">
+                      {t('hot_promo_title')}
+                    </p>
+                    <div className="absolute inset-x-0 bottom-0 px-5 pb-6 text-center">
                       <h2 className="text-[28px] font-bold leading-8 text-white drop-shadow-sm md:text-[32px] md:leading-9">
                         {region.regionName}
                       </h2>
@@ -352,9 +355,6 @@ const HotOffersPromoPopup = () => {
                   </div>
 
                   <div className="px-4 pb-5 pt-5 md:px-5">
-                    <p className="mb-4 text-center text-[22px] font-bold leading-7 text-[#0B3D91] md:text-[24px] md:leading-8">
-                      {t('hot_promo_title')}
-                    </p>
                     <RegionPricePages
                       region={region}
                       locale={locale}

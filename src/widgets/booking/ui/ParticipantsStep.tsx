@@ -29,7 +29,8 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import CloseIcon from '@mui/icons-material/Close';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import Drawer from '@mui/material/Drawer';
-import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { format } from 'date-fns';
 import { Plus, TrashIcon, UserIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -50,6 +51,67 @@ type Props = {
   maxPerson: number;
 };
 
+const TELEGRAM_DOCS_NOTE =
+  "Qolgan ishtirokchilar xujjatlari telegram orqali jo'natiladi";
+const TELEGRAM_DOCS_FLAG = 'bookingSendDocsViaTelegram';
+
+function hasPassportFile(value: unknown) {
+  if (!value) return false;
+  const files = Array.isArray(value) ? value : [value];
+  return files.some((file) => {
+    if (file instanceof File) return true;
+    if (typeof file === 'string' && file.trim()) return true;
+    return Boolean(
+      file &&
+        typeof file === 'object' &&
+        'image' in file &&
+        (file as { image?: string }).image,
+    );
+  });
+}
+
+function readBookingComment() {
+  if (typeof window === 'undefined') return '';
+  return localStorage.getItem('bookingComment') || '';
+}
+
+function writeBookingComment(value: string) {
+  const trimmed = value.trim();
+  localStorage.setItem('bookingComment', trimmed);
+  try {
+    const tourRaw = localStorage.getItem('tour');
+    if (!tourRaw) return;
+    const tourData = JSON.parse(tourRaw);
+    if (trimmed) tourData.comment = trimmed;
+    else delete tourData.comment;
+    localStorage.setItem('tour', JSON.stringify(tourData));
+  } catch {
+    // ignore invalid tour payload
+  }
+}
+
+function setTelegramDocsNote(enabled: boolean) {
+  let text = readBookingComment();
+  const hasNote = text.includes(TELEGRAM_DOCS_NOTE);
+  if (enabled && !hasNote) {
+    text = text.trim() ? `${text.trim()}\n${TELEGRAM_DOCS_NOTE}` : TELEGRAM_DOCS_NOTE;
+  } else if (!enabled && hasNote) {
+    text = text
+      .replace(`\n${TELEGRAM_DOCS_NOTE}`, '')
+      .replace(TELEGRAM_DOCS_NOTE, '')
+      .trim();
+  }
+  writeBookingComment(text);
+  localStorage.setItem(TELEGRAM_DOCS_FLAG, enabled ? '1' : '0');
+}
+
+function isPassportRequiredError(error: unknown) {
+  const data = (error as AxiosError<{ data?: { pasport_images?: unknown } }>)
+    ?.response?.data;
+  const images = data?.data?.pasport_images;
+  return Array.isArray(images) && images.length > 0;
+}
+
 export default function ParticipantsStep({
   onNext,
   onPrev,
@@ -68,6 +130,14 @@ export default function ParticipantsStep({
   const [selectedUserIds, setSelectedUserIds] = useState<Set<number>>(
     new Set(),
   );
+  const [passportErrors, setPassportErrors] = useState<Set<number>>(new Set());
+  const [sendDocsViaTelegram, setSendDocsViaTelegram] = useState(false);
+
+  useEffect(() => {
+    const enabled = localStorage.getItem(TELEGRAM_DOCS_FLAG) === '1';
+    setSendDocsViaTelegram(enabled);
+    if (enabled) setTelegramDocsNote(true);
+  }, []);
 
   const {
     data: allParticipant,
@@ -121,6 +191,10 @@ export default function ParticipantsStep({
     name: 'participants',
   });
   const queryClient = useQueryClient();
+  const { data: me } = useQuery({
+    queryKey: ['get_me'],
+    queryFn: () => User_Api.getMe(),
+  });
 
   useEffect(() => {
     const saved = localStorage.getItem('participantsForm');
@@ -157,9 +231,42 @@ export default function ParticipantsStep({
     }
   }, []);
 
+  useEffect(() => {
+    if (localStorage.getItem('participantsForm')) return;
+    if (user.length) return;
+    const profile = me?.data?.data;
+    if (!profile) return;
+
+    const current = form.getValues('participants.0');
+    if (!current) return;
+    if (!current.firstName && profile.first_name) {
+      form.setValue('participants.0.firstName', profile.first_name);
+    }
+    if (!current.lastName && profile.last_name) {
+      form.setValue('participants.0.lastName', profile.last_name);
+    }
+    if (!current.phone && profile.phone) {
+      form.setValue('participants.0.phone', formatPhone(profile.phone));
+    }
+  }, [me, user.length, form]);
+
   async function onSubmit(values: z.infer<typeof ParticipantsForm>) {
     if (fields.length < minPerson) {
       toast.error(t(`Kamida ${minPerson} ta ishtirokchi kerak`));
+      return;
+    }
+
+    const missingPassport = values.participants.flatMap((participant, index) =>
+      hasPassportFile(participant.passport) ? [] : [index],
+    );
+    if (missingPassport.length > 0) {
+      setPassportErrors(new Set(missingPassport));
+      missingPassport.forEach((index) => {
+        form.setError(`participants.${index}.passport`, {
+          message: t('passport_required'),
+        });
+      });
+      toast.error(t('passport_required'));
       return;
     }
 
@@ -203,7 +310,21 @@ export default function ParticipantsStep({
         });
       }
 
-      const response = await User_Api.createParticipant(formData);
+      let response;
+      try {
+        response = await User_Api.createParticipant(formData);
+      } catch (error) {
+        if (isPassportRequiredError(error)) {
+          setPassportErrors((prev) => new Set(prev).add(index));
+          form.setError(`participants.${index}.passport`, {
+            message: t('passport_required'),
+          });
+          toast.error(t('passport_required'));
+          return;
+        }
+        toast.error(t('Xatolik yuz berdi'));
+        return;
+      }
       const newUser = response.data.data;
 
       addUser({
@@ -375,6 +496,14 @@ export default function ParticipantsStep({
                           `participants.${index}.passport`,
                           p.data.participant_pasport_image,
                         );
+                        if (hasPassportFile(p.data.participant_pasport_image)) {
+                          setPassportErrors((prev) => {
+                            const next = new Set(prev);
+                            next.delete(index);
+                            return next;
+                          });
+                          form.clearErrors(`participants.${index}.passport`);
+                        }
                       },
                     );
                   }}
@@ -711,6 +840,12 @@ export default function ParticipantsStep({
                               ? [...current, file]
                               : [file];
                             field.onChange(updated);
+                            setPassportErrors((prev) => {
+                              const next = new Set(prev);
+                              next.delete(index);
+                              return next;
+                            });
+                            form.clearErrors(`participants.${index}.passport`);
                           }
                         }}
                         type="file"
@@ -722,7 +857,12 @@ export default function ParticipantsStep({
                     </FormControl>
                     <label
                       htmlFor={`passport-file-${index}`}
-                      className="w-full bg-[#EDEEF180] border-2 border-dashed border-[#D3D3D3] flex flex-col items-center gap-2 justify-center py-4 rounded-2xl cursor-pointer hover:bg-[#EDEEF1]"
+                      className={cn(
+                        'w-full bg-[#EDEEF180] border-2 border-dashed flex flex-col items-center gap-2 justify-center py-4 rounded-2xl cursor-pointer hover:bg-[#EDEEF1]',
+                        passportErrors.has(index)
+                          ? 'border-red-500'
+                          : 'border-[#D3D3D3]',
+                      )}
                     >
                       <p className="font-semibold text-xl text-[#212122]">
                         {t('Drag or select file')}
@@ -817,6 +957,26 @@ export default function ParticipantsStep({
             </div>
           );
         })}
+        <label className="flex items-start gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={sendDocsViaTelegram}
+            onChange={(event) => {
+              const enabled = event.target.checked;
+              setSendDocsViaTelegram(enabled);
+              setTelegramDocsNote(enabled);
+            }}
+            className="mt-1 h-4 w-4 shrink-0 accent-[#1764FC]"
+          />
+          <span>
+            <span className="block text-[15px] font-medium text-[#212122]">
+              {t('telegram_docs_checkbox')}
+            </span>
+            <span className="mt-1 block text-sm text-[#646465]">
+              {t('telegram_docs_subtitle')}
+            </span>
+          </span>
+        </label>
         <div className="flex gap-4 justify-between max-lg:flex-col-reverse">
           <button
             type="button"

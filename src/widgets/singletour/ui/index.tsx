@@ -10,15 +10,10 @@ import Ticket_Api from '@/widgets/selectour/lib/api';
 import EmojiObjectsOutlinedIcon from '@mui/icons-material/EmojiObjectsOutlined';
 import ErrorIcon from '@mui/icons-material/Error';
 import FavoriteRoundedIcon from '@mui/icons-material/FavoriteRounded';
-import Groups2OutlinedIcon from '@mui/icons-material/Groups2Outlined';
 import HotelOutlinedIcon from '@mui/icons-material/HotelOutlined';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import LocalCafeOutlinedIcon from '@mui/icons-material/LocalCafeOutlined';
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
-import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
-import StarBorderRoundedIcon from '@mui/icons-material/StarBorderRounded';
-import TimelapseOutlinedIcon from '@mui/icons-material/TimelapseOutlined';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Rating from '@mui/material/Rating';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -36,16 +31,11 @@ import { AxiosError } from 'axios';
 import { trackTourDetail } from '@/shared/lib/analytics';
 import InstallmentPrice from './InstallmentPrice';
 import 'swiper/css';
-import Hotel2 from '../../../../public/images/hotel2.png';
-import Hotel3 from '../../../../public/images/hotel3.png';
-import Hotel4 from '../../../../public/images/hotel4.png';
-import Hotel_MEAL from '../../../../public/images/hotel_meal.png';
 import Hotel1 from '../../../../public/icons/hotel.svg';
 import Support from '../../../../public/icons/support.svg';
 import Food from '../../../../public/icons/meal.svg';
 import Insurance from '../../../../public/icons/insurance.svg';
 import Bus from '../../../../public/icons/transfer.svg';
-import Hotel_Star from '../../../../public/images/hotel_star.png';
 import Flight from '../../../../public/icons/flight.svg';
 import { TicketsDetailAPi } from '../lib/api';
 import {
@@ -57,7 +47,7 @@ import {
 } from '../lib/shareTour';
 import ShareTourNotFound from './ShareTourNotFound';
 import ShareTourSearching from './ShareTourSearching';
-import HotelInfoItem from './HotelInfoItem';
+import TourBrief from './TourBrief';
 import TourDayItem from './TourDayItem';
 import TourDetailLoading from './TourDetailLoading';
 import TourFoodItem from './TourFoodItem';
@@ -222,31 +212,6 @@ export default function SingleTour() {
     setTourOperatorId(String(ticket.tour_operator_id ?? ''));
   }, [sharedResult]);
 
-  const formatShortDate = (value?: string) => {
-  if (!value) return '--.--.--';
-
-  let date: Date | null = null;
-
-  // Agar format YYYYMMDD bo'lsa (masalan: 20260517)
-  if (/^\d{8}$/.test(value)) {
-    const year = value.slice(0, 4);
-    const month = value.slice(4, 6);
-    const day = value.slice(6, 8);
-    date = new Date(`${year}-${month}-${day}`);
-  } else {
-    // Oddiy ISO yoki boshqa format
-    date = new Date(value);
-  }
-
-  if (!date || Number.isNaN(date.getTime())) return '--.--.--';
-
-  const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const year = String(date.getFullYear()).slice(-2);
-
-  return `${day}.${month}.${year}`;
-};
-    
   // const formatShortDate = (value?: string) => {
   //   if (!value) return '--.--.--';
   //   const date = new Date(value);
@@ -673,14 +638,7 @@ const includedServicesToRender = [
                     </div>
                   </div>
 
-                  <div className="flex w-full max-w-[301px] flex-col items-end gap-4 max-lg:hidden max-lg:items-start">
-                    <h1 className="text-right text-[24px] leading-[29px] max-lg:text-left font-bold text-[#1C1C1E]">
-                      {Number(data.price_full).toLocaleString('uz-UZ')}  uzs 
-                      <span className="text-[24px] font-normal">
-                       /{' '} {data?.passenger_count} {t('человек')}
-                      </span>
-                    </h1>
-                    <InstallmentPrice price={Number(data.price_full)} align="end" />
+                  <div className="flex w-full max-w-[360px] flex-col items-end gap-4 max-lg:hidden">
                     <div className="flex items-center gap-6">
                       <button
                         onClick={(e) => {
@@ -785,6 +743,12 @@ const includedServicesToRender = [
                 )}
               </motion.div>
 
+              <div className="mt-5 lg:mt-6">
+                <InstallmentPrice
+                  price={Number(data.price_full)}
+                  passengerCount={Number(data.passenger_count) || 1}
+                />
+              </div>
 
               {aviaData?.results?.length ? (
                 <motion.div
@@ -867,130 +831,17 @@ const includedServicesToRender = [
                 </button>
               </motion.div>
 
-              <motion.div
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: false, amount: 0.2 }}
-                // variants={slideIn}
-                className="mb-[72px] mt-[72px] flex w-full max-w-[1240px] flex-col gap-6 max-lg:mt-0 max-xl:h-auto"
-              >
-                <div className="flex w-full flex-col items-start gap-4 max-lg:max-w-full">
-                  <h1 className="w-full text-[20px] font-semibold leading-6 text-[#1C1C1E]">
-                    {t('Описание отеля')} 
-                  </h1>
-                 <p className="w-full text-[14px] font-medium leading-[17px] text-[#1C1C1E] opacity-75 max-lg:h-auto max-lg:overflow-visible lg:h-[120px] lg:overflow-hidden">
-                    {hotelData?.data?.description 
-                      ? hotelData.data.description 
-                      : t('default_hotel_description')}
-                  </p>
+              <TourBrief
+                hotelRating={data.ticket_hotel?.[0]?.rating}
+                mealPlan={data.ticket_hotel?.[0]?.meal_plan}
+                durationDays={data.duration_days}
+                passengerCount={data.passenger_count}
+                departureDate={data.departure_date}
+                returnDate={data.travel_time}
+              />
 
-                </div>
-                <div className="flex w-full flex-col items-stretch gap-2 overflow-visible max-lg:gap-2 max-xl:flex-wrap lg:h-[145px] lg:flex-row lg:items-start lg:gap-6">
-                  <motion.div
-                    whileHover={{ scale: 1.03 }}
-                    className="flex w-full shrink-0 rounded-[12px] bg-[#1A73E8] px-4 py-2 max-lg:min-h-[56px] max-lg:flex-row max-lg:items-center max-lg:justify-between lg:h-[145px] lg:w-[187px] lg:flex-col lg:justify-between lg:p-4"
-                  >
-                    <p className="text-[32px] font-bold leading-10 text-white tabular-nums">
-                      {Number(data.rating || 0).toFixed(1)}
-                    </p>
-                    <div className="flex flex-col items-end gap-1 max-lg:shrink-0">
-                      <p className="text-right text-[16px] font-bold leading-5 text-white">
-                        {t('Очень хорошо')}
-                      </p>
-                      <p className="text-right text-[12px] font-normal leading-[15px] text-white">
-                        {data.ticket_comments?.length || 0} {t('отзывов')}
-                      </p>
-                    </div>
-                  </motion.div>
-
-                  {[
-                    {
-                        id: 'hotel-type',
-                        img: Hotel_Star,
-                        name: t('Тип отеля'),
-                        title:
-                          typeof data.ticket_hotel?.[0]?.rating === "number"
-                            ? `${data.ticket_hotel?.[0]?.rating || '-'} ${t('звездочный')}`
-                            : `${data.ticket_hotel?.[0]?.rating || '-'}`,
-                        iconNode: <StarBorderRoundedIcon sx={{ color: '#1A73E8', fontSize: 24 }} />,
-                      },
-                    {
-                      id: 'meal',
-                      img: Hotel_MEAL,
-                      name: t('Питание'),
-                      title: (() => {
-                        const meal = data.ticket_hotel?.[0]?.meal_plan;
-                        const mealMap: Record<string, string> = {
-                          FB: t('Полный пансион'),
-                          BB: t('Завтрак'),
-                          HB: t('Полупансион'),
-                          AI: t('Все включено'),
-                          UAI: t('Все включено'),
-                          RO: t('Без питания'),
-                        };
-                        return mealMap[meal] || t('Все включено');
-                      })(),
-                      iconNode: <LocalCafeOutlinedIcon sx={{ color: '#1A73E8', fontSize: 24 }} />,
-                    },
-                    {
-                      id: 'duration',
-                      img: Hotel2,
-                      name: t('Длительность'),
-                      title: `${data.duration_days} ${t('дней')}`,
-                      iconNode: <TimelapseOutlinedIcon sx={{ color: '#1A73E8', fontSize: 24 }} />,
-                    },
-                    {
-                      id: 'group_size',
-                      img: Hotel3,
-                      name: t('Количество'),
-                      title: `${data.passenger_count} ${t('человек')}`,
-                      iconNode: <Groups2OutlinedIcon sx={{ color: '#1A73E8', fontSize: 24 }} />,
-                    },
-                    {
-                      id: 'tour-date',
-                      img: Hotel4,
-                      name: t('Дата тура'),
-                      title: (() => {
-                        const start = formatShortDate(data.departure_date);
-                        const endDate = formatShortDate(data.travel_time);
-                        // const endDate = new Date(start);
-                        // if (!Number.isNaN(endDate.getTime())) {
-                        //   endDate.setDate(endDate.getDate() + Math.max((data.duration_days || 1) - 1, 0));
-                        // }
-                        // const end = Number.isNaN(endDate.getTime())
-                        //   ? '--.--.--'
-                        //   : formatShortDate(endDate.toISOString());
-                        return `${start} - ${endDate}`;
-                      })(),
-                      iconNode: <CalendarMonthOutlinedIcon sx={{ color: '#1A73E8', fontSize: 24 }} />,
-                    },
-                  ].map((item) => (
-                    <motion.div
-                      key={item.id}
-                      whileHover={{ scale: 1.03 }}
-                      className="flex min-h-[59px] w-full shrink-0 flex-col items-stretch justify-center rounded-[12px] border border-[#1A73E8] px-4 
-                      py-2 max-lg:min-h-[59px] max-lg:w-full lg:h-[145px] lg:w-[186px] lg:gap-0 lg:p-4"
-                    >
-                      <HotelInfoItem
-                        img={item.img}
-                        title={item.title}
-                        name={item.name}
-                        iconNode={item.iconNode}
-                      />
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-
-              <div className="mt-12 mb-12 flex w-full flex-col gap-4 lg:hidden">
-                <p className="w-full text-left text-[20px] font-bold leading-6 text-[#1C1C1E]">
-                {Number(data.price_full).toLocaleString('uz-UZ')} uzs  /{' '}
-                  <span className="font-normal">{data.passenger_count || 1} {t('человек')}</span>
-                </p>
-                <InstallmentPrice price={Number(data.price_full)} />
-              </div>
-
-              {includedServicesToRender.length > 0 && (
+              {/* Tur narxiga nimalar kiritilgan — vaqtincha yashirilgan */}
+              {false && includedServicesToRender.length > 0 && (
                 <motion.div
                   initial="hidden"
                   whileInView="visible"

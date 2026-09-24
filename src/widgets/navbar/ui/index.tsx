@@ -81,7 +81,7 @@ const Navbar = () => {
     <>
       <section className="sticky top-0 z-50 w-full bg-[#FAFBFC]">
         <div className="custom-container h-[72px] xl:h-[102px]">
-          <div className="mx-auto flex h-full w-full max-w-[1240px] items-center">
+          <div className="flex h-full w-full items-center">
             <div className="hidden h-full w-full items-center justify-between xl:flex">
               <Link href="/" className="shrink-0">
                 <Image
