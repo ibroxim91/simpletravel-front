@@ -55,6 +55,7 @@ const DONWLOAD_PDF = '/api/v1/get-order-pdf/';
 
 const SEND_COMMENT = '/api/v1/ticket-comment/';
 const GET_TICKET_COMMENTS = '/api/v1/ticket-comment/';
+const GET_VIDEO_COMMENTS = '/api/v1/video-comment/';
 
 const GET_BANNER = '/api/v1/banner/';
 
@@ -119,6 +120,7 @@ export {
   TICKETORDER_INFO,
   UPDATE_USER,
   GET_TICKET_COMMENTS,
+  GET_VIDEO_COMMENTS,
   GET_TICKETS_FROM_GO,
   POPULAR_DESTINATIONS,
 };

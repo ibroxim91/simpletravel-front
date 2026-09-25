@@ -6,6 +6,7 @@ import Populardestinations from '@/features/home/ui/Populardestinations';
 import RecommendedHotels from '@/features/home/ui/RecommendedHotels';
 import SearchTours from '@/features/home/ui/SearchTours';
 import HomeCommentTour from '@/features/home/ui/commentTour';
+import VideoReviews from '@/features/home/ui/videoReviews';
 
 export default async function Home() {
   return (
@@ -23,6 +24,7 @@ export default async function Home() {
           <div className="mt-[104px] mb-[104px] flex flex-col gap-[104px] max-lg:mt-[64px] max-lg:mb-[64px] max-lg:gap-[64px]">
             <HowItWorks />
             <RecommendedHotels />
+            <VideoReviews />
             <HomeCommentTour />
             <Populardestinations />
             <HomeBenefits />
