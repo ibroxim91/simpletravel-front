@@ -23,6 +23,7 @@ interface TourOfferCardProps {
   fallbackDurationText: string;
   starsText: string;
   isPopularDestination: boolean;
+  preferHotelPhoto?: boolean;
 }
 
 const 
@@ -35,6 +36,7 @@ TourOfferCard = ({
   fallbackDurationText,
   starsText,
   isPopularDestination = false,
+  preferHotelPhoto = false,
 }: TourOfferCardProps) => {
   const t = useTranslations();
   // const oldPrice = Math.round(Number(item.price || 0) * 1.23);
@@ -44,6 +46,11 @@ TourOfferCard = ({
   };
   const currentPrice = isPopularDestination ? formatHalfPrice(item.price) : Number(item.price || 0);
 const oldPrice = Math.round(currentPrice / 0.7);
+  const hotelPhoto = String(item?.hotel_photo || item?.hotel_photos?.[0]?.image || '').trim();
+  const imageSrc =
+    (preferHotelPhoto || isPopularDestination) && hotelPhoto
+      ? hotelPhoto
+      : item.ticket_images;
 
   
   return (
@@ -64,11 +71,7 @@ const oldPrice = Math.round(currentPrice / 0.7);
       >
                 <div className="relative h-[153px] w-full overflow-hidden rounded-[14px] sm:h-[210px] xl:h-[233px]">
                 <Image
-                  src={
-                    isPopularDestination && item.hotel_photo && item.hotel_photo.trim() !== ""
-                      ? item.hotel_photo
-                      : item.ticket_images
-                  }
+                  src={imageSrc}
                   alt={item.title}
                   fill
                   className="object-cover transition-transform duration-300 group-hover:scale-105"

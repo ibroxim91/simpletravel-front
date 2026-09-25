@@ -157,6 +157,7 @@ const TourOffersSection = ({
                         fallbackHotelText={t('Отель')}
                         starsText={t('звёзды')}
                         isPopularDestination={isPopularDestination}
+                        preferHotelPhoto={offerMode === 'recommended'}
                         onClick={() => {
                           localStorage.setItem('tourOperator', item?.operator ?? '');
                           localStorage.setItem('from_cache', item?.from_cache ?? '');
