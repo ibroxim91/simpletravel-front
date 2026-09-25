@@ -1,53 +1,58 @@
 'use client';
 
+import httpClient from '@/shared/config/api/httpClient';
+import { GET_TICKET_COMMENTS } from '@/shared/config/api/URLs';
+import {
+  Carousel,
+  CarouselApi,
+  CarouselContent,
+  CarouselItem,
+} from '@/shared/ui/carousel';
+import { TicketComment, TicketCommentListResponse } from '@/widgets/singletour/lib/data';
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
+import FmdGoodOutlinedIcon from '@mui/icons-material/FmdGoodOutlined';
 import Rating from '@mui/material/Rating';
 import { useQuery } from '@tanstack/react-query';
 import type { AxiosResponse } from 'axios';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselPrevious,
-  CarouselNext,
-} from '@/shared/ui/carousel';
-import httpClient from '@/shared/config/api/httpClient';
-import { GET_TICKET_COMMENTS } from '@/shared/config/api/URLs';
-import { TicketComment, TicketCommentListResponse } from '@/widgets/singletour/lib/data';
 
-const DEMO_TICKET_ID = 1; // Demo ticket ID for home page comments
+const DEMO_TICKET_ID = 1;
+const NO_USER_AVATAR = '/images/no-user.svg';
+const MONTH_KEYS = [
+  'Yanvar',
+  'Fevral',
+  'Mart',
+  'Aprel',
+  'May',
+  'Iyun',
+  'Iyul',
+  'Avgust',
+  'Sentabr',
+  'Oktabr',
+  'Noyabr',
+  'Dekabr',
+] as const;
 
-export interface HomeCommentResponse {
-  status: boolean;
-  data: {
-    links: {
-      previous: string | null;
-      next: string | null;
-    };
-    total_items: number;
-    total_pages: number;
-    page_size: number;
-    current_page: number;
-    results: TicketComment[];
-  };
+function formatTravelDate(
+  value: string | null | undefined,
+  t: (key: (typeof MONTH_KEYS)[number]) => string,
+) {
+  if (!value) return '';
+  const match = /^(\d{4})-(\d{2})/.exec(value);
+  if (!match) return '';
+  const monthKey = MONTH_KEYS[Number(match[2]) - 1];
+  if (!monthKey) return '';
+  return `${t(monthKey)} ${match[1]}`;
 }
 
 const HomeCommentTour = () => {
   const t = useTranslations();
   const [page, setPage] = useState(1);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(false);
 
   const { data: commentsData, isLoading: isCommentsLoading } = useQuery<
     AxiosResponse<TicketCommentListResponse>
@@ -59,160 +64,168 @@ const HomeCommentTour = () => {
   });
 
   const comments: TicketComment[] = commentsData?.data?.data?.results ?? [];
-  const totalComments = commentsData?.data?.data?.total_items ?? comments.length;
   const totalPages = commentsData?.data?.data?.total_pages ?? 1;
   const currentPage = commentsData?.data?.data?.current_page ?? page;
 
-  // Calculate average rating
-  const averageRating =
-    totalComments > 0
-      ? comments.reduce((sum, c) => sum + Number(c.rating || 0), 0) / totalComments
-      : 0;
-
- const slidesCount = Math.max(
-  1,
-  Math.ceil(comments.length / (isMobile ? 1 : 2))
-);
+  useEffect(() => {
+    if (!carouselApi) return;
+    const updateScrollState = () => {
+      setCanScrollPrev(carouselApi.canScrollPrev());
+      setCanScrollNext(carouselApi.canScrollNext());
+    };
+    updateScrollState();
+    carouselApi.on('select', updateScrollState);
+    carouselApi.on('reInit', updateScrollState);
+    return () => {
+      carouselApi.off('select', updateScrollState);
+    };
+  }, [carouselApi]);
 
   return (
-    <section className="custom-container">
-      <div className="mx-auto w-full max-w-[353px] rounded-[14px] bg-white p-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)] md:max-w-[1240px] md:p-6">
-        <div className="flex flex-col gap-2">
-          <p className="text-[24px] font-bold leading-[32px] text-[#1C1C1E] md:text-[32px] md:leading-[44px]">
-            {t('Отзывы нашых клиентов')}
-          </p>
-        </div>
-
-        <div className="mt-6">
-          {/* <div className="flex items-center gap-4 max-md:flex-wrap">
-            <p className="text-[48px] leading-[59px] font-bold text-[#112211]">
-              {Number(averageRating || 0).toFixed(1)}
-            </p>
-            <div className="flex flex-col items-start gap-2">
-              <p className="text-[14px] leading-[17px] font-normal text-[#112211]">
-                {totalComments} {t('отзывов')}
+    <section>
+      <div className="custom-container">
+        <div className="mx-auto w-full max-w-[353px] rounded-[14px] bg-white px-4 pb-4 pt-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)] md:max-w-[1240px] md:px-6 md:pb-6 md:pt-6 md:shadow-[0_2px_20px_rgba(0,0,0,0.15)]">
+          <div className="flex w-full items-start justify-between gap-2 md:items-center">
+            <div className="flex flex-col gap-2">
+              <h2 className="text-[20px] font-bold leading-6 text-[#1C1C1E] md:text-[32px] md:leading-[44px]">
+                {t('Отзывы наших клиентов')}
+              </h2>
+              <p className="text-[14px] font-normal leading-[17px] text-[#6B7280] md:text-base md:leading-[22px]">
+                {t('reviews_subtitle')}
               </p>
             </div>
-          </div> */}
-
-          <div className="h-px w-full bg-[#11221140] mt-6" />
-
-          <div className="flex w-full flex-col items-start gap-6 mt-6">
-        <div className="w-full">
-          {isCommentsLoading ? (
-            <div className="flex h-60 w-full items-center justify-center text-[#6B7280]">
-              {t('Загрузка отзывов...')}
-            </div>
-          ) : comments.length > 0 ? (
-            <div className="relative">
-              <Carousel
-                opts={{ align: 'start', containScroll: 'trimSnaps', loop: true }}
+            <div className="hidden items-center gap-2 md:flex">
+              <button
+                type="button"
+                aria-label="prev"
+                disabled={!canScrollPrev}
+                className="grid h-9 w-9 place-items-center rounded-[20px] bg-[#E5E7EB]/70 text-[#6B7280] disabled:cursor-not-allowed disabled:opacity-50"
+                onClick={() => carouselApi?.scrollPrev()}
               >
-                <CarouselContent className="px-0">
-                  {Array.from({ length: slidesCount }).map((_, slideIdx) => (
-                    <CarouselItem key={slideIdx}>
-                      <div className="flex gap-6">
-                       {comments
-                        .slice(
-                        slideIdx * (isMobile ? 1 : 3),
-                        slideIdx * (isMobile ? 1 : 3) + (isMobile ? 1 : 3)
-                        ).map((item, idx) => {
-                                            const it: any = item;
-                            const username =
-                              it.username || it.user?.username || 'UF';
-                            const initials = (username as string)
-                              .split(' ')
-                              .slice(0, 2)
-                              .map((v: string) => v[0] || '')
-                              .join('')
-                              .toUpperCase();
+                <KeyboardBackspaceIcon sx={{ fontSize: 18 }} />
+              </button>
+              <button
+                type="button"
+                aria-label="next"
+                disabled={!canScrollNext}
+                className="grid h-9 w-9 place-items-center rounded-[20px] bg-[#E5E7EB] text-black disabled:cursor-not-allowed disabled:opacity-50"
+                onClick={() => carouselApi?.scrollNext()}
+              >
+                <KeyboardBackspaceIcon sx={{ fontSize: 18, transform: 'rotate(180deg)' }} />
+              </button>
+            </div>
+          </div>
 
-                            return (
-                              <div
-                                key={`${username}-${idx}`}
-                                className="md:w-1/2 w-full rounded-xl border p-4 bg-white max-md:w-full min-h-[200px]"
-                              >
-                                <div className="flex items-start gap-4">
-                                  <div className="flex h-[45px] w-[45px] shrink-0 items-center justify-center rounded-full bg-[#D9D9D9] text-[14px] font-semibold text-[#112211] overflow-hidden">
-                                    {it.image ? (
-                                      <img
-                                        src={it.image}
-                                        alt={username}
-                                        className="h-full w-full object-cover"
-                                      />
-                                    ) : (
-                                      initials
-                                    )}
-                                  </div>
-                                  <div className="flex flex-1 flex-col items-start gap-1">
-                                    <div className="flex items-center gap-2">
-                                      <p className="text-[16px] leading-5 font-semibold text-[#112211]">
-                                        {Number(item.rating || 0).toFixed(1)}{' '}
-                                        {/* {t('Превосходно')} */}
-                                      </p>
-                                      <span className="text-[16px] leading-5 font-normal text-[#112211]">
-                                        |
-                                      </span>
-                                      <p className="text-[16px] leading-5 font-semibold text-[#112211]">
-                                        {username}
-                                      </p>
-                                    </div>
-                                    <p className="mt-2 break-words text-[14px] leading-[17px] font-normal text-[#112211]">
-                                      {item.text}
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          })}
-                      </div>
-                    </CarouselItem>
-                  ))}
+          <div className="mt-6">
+            {isCommentsLoading ? (
+              <div className="flex h-60 w-full items-center justify-center text-[#6B7280]">
+                {t('Загрузка отзывов...')}
+              </div>
+            ) : comments.length > 0 ? (
+              <Carousel
+                setApi={setCarouselApi}
+                opts={{ align: 'start', containScroll: 'trimSnaps', loop: false }}
+                className="w-full"
+              >
+                <CarouselContent className="-ml-3">
+                  {comments.map((item, index) => {
+                    const username = item.username || 'User';
+                    const avatar = item.image?.trim() ? item.image : NO_USER_AVATAR;
+                    const travelDate = formatTravelDate(item.travel_date, t);
+                    const place = [item.location, item.destination].filter(Boolean).join(', ');
+
+                    return (
+                      <CarouselItem
+                        key={`${username}-${index}`}
+                        className="basis-full pl-3 md:basis-1/2 xl:basis-1/4"
+                      >
+                        <article className="flex h-full min-h-[220px] flex-col rounded-[16px] border border-[#E5E7EB] bg-white p-4">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex min-w-0 items-center gap-3">
+                              <img
+                                src={avatar}
+                                alt={username}
+                                className="h-11 w-11 shrink-0 rounded-full object-cover"
+                              />
+                              <p className="truncate text-[15px] font-bold leading-5 text-[#1C1C1E]">
+                                {username}
+                              </p>
+                            </div>
+                            <span className="text-[28px] leading-none text-[#1A73E8]/30">”</span>
+                          </div>
+
+                          <div className="mt-3 flex items-center gap-2">
+                            <Rating
+                              value={Number(item.rating || 0)}
+                              precision={0.1}
+                              readOnly
+                              size="small"
+                              sx={{ color: '#F5B400' }}
+                            />
+                            <span className="text-[14px] font-bold text-[#1C1C1E]">
+                              {Number(item.rating || 0).toFixed(1)}
+                            </span>
+                          </div>
+
+                          <p className="mt-3 flex-1 text-[14px] leading-5 text-[#1C1C1E]">
+                            {item.text}
+                          </p>
+
+                          {(place || travelDate) && (
+                            <div className="mt-4 flex items-center justify-between gap-2 border-t border-[#F3F4F6] pt-3 text-[12px] text-[#6B7280]">
+                              {place ? (
+                                <span className="flex min-w-0 items-center gap-1">
+                                  <FmdGoodOutlinedIcon sx={{ fontSize: 16, color: '#1A73E8' }} />
+                                  <span className="truncate">{place}</span>
+                                </span>
+                              ) : (
+                                <span />
+                              )}
+                              {travelDate ? (
+                                <span className="flex shrink-0 items-center gap-1">
+                                  <CalendarMonthOutlinedIcon sx={{ fontSize: 16, color: '#1A73E8' }} />
+                                  {travelDate}
+                                </span>
+                              ) : null}
+                            </div>
+                          )}
+                        </article>
+                      </CarouselItem>
+                    );
+                  })}
                 </CarouselContent>
-                <CarouselPrevious />
-                <CarouselNext />
               </Carousel>
-
-              {/* <div className="flex items-center justify-center gap-4 pt-5">
-                <p className="text-sm font-medium text-[#1C1C1E]">
-                  {t('Страница')} {currentPage} / {totalPages}
-                </p>
-              </div> */}
-            </div>
-          ) : (
-            <div className="flex h-60 w-full items-center justify-center text-[#6B7280]">
-              {t('Отзывов пока нет')}
-            </div>
-          )}
-        </div>
+            ) : (
+              <div className="flex h-60 w-full items-center justify-center text-[#6B7280]">
+                {t('Отзывов пока нет')}
+              </div>
+            )}
+          </div>
 
           {totalPages > 1 && (
-            <div className="flex flex-col items-center gap-3 pt-6">
-              <div className="flex items-center gap-4">
-                <button
-                  type="button"
-                  onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-                  disabled={page <= 1}
-                  className="rounded-full border border-[#D1D5DB] px-4 py-2 text-sm font-semibold text-[#1A73E8] disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {t('Предыдущая')}
-                </button>
-                <p className="text-sm font-medium text-[#1C1C1E]">
-                  {t('Страница')} {currentPage} / {totalPages}
-                </p>
-                <button
-                  type="button"
-                  onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-                  disabled={page >= totalPages}
-                  className="rounded-full border border-[#D1D5DB] px-4 py-2 text-sm font-semibold text-[#1A73E8] disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {t('Следующая')}
-                </button>
-              </div>
+            <div className="flex items-center justify-center gap-4 pt-6">
+              <button
+                type="button"
+                onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                disabled={page <= 1}
+                className="rounded-full border border-[#D1D5DB] px-4 py-2 text-sm font-semibold text-[#1A73E8] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {t('Предыдущая')}
+              </button>
+              <p className="text-sm font-medium text-[#1C1C1E]">
+                {t('Страница')} {currentPage} / {totalPages}
+              </p>
+              <button
+                type="button"
+                onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+                disabled={page >= totalPages}
+                className="rounded-full border border-[#D1D5DB] px-4 py-2 text-sm font-semibold text-[#1A73E8] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {t('Следующая')}
+              </button>
             </div>
           )}
         </div>
-      </div>
       </div>
     </section>
   );

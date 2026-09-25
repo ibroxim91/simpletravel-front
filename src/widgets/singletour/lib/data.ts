@@ -135,6 +135,9 @@ export interface TicketComment {
   text: string;
   rating: number;
   image?: string;
+  location?: string;
+  destination?: string;
+  travel_date?: string | null;
   created_at: string;
 
 }
