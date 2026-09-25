@@ -19,7 +19,7 @@ const PLANS = [
   { months: 12, rate: 0.25 },
 ] as const;
 
-const DEFAULT_MONTHS = 3;
+const DEFAULT_MONTHS = 12;
 
 function formatMoney(value: number) {
   return Math.round(value).toLocaleString('uz-UZ', {
@@ -123,7 +123,7 @@ export default function InstallmentPrice({
         <div className="order-2 flex items-center justify-between gap-3 rounded-[16px] bg-[#FFF4EC] px-4 py-3 lg:order-1 lg:min-w-[280px] lg:max-w-[340px]">
           <AccountBalanceWalletOutlinedIcon sx={{ fontSize: 28, color: '#F97316' }} />
           <div className="min-w-0 flex-1">
-            <p className="text-[12px] font-medium leading-4 text-[#F97316] lg:text-[13px]">
+            <p className="text-[14px] font-medium leading-4 text-[#F97316] lg:text-[13px]">
               {t('price_start_payment')}
             </p>
             <p className="text-[18px] font-bold leading-6 text-[#F97316] lg:text-[20px]">
