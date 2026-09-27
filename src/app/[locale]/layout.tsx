@@ -78,6 +78,22 @@ export default async function RootLayout({ children, params }: Props) {
 
   return (
     <html lang={locale} suppressHydrationWarning>
+      <head>
+        <script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=AW-18475906860"
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'AW-18475906860');
+            `,
+          }}
+        />
+      </head>
       <body
         className={`${monserrat.className} antialiased min-h-screen flex flex-col relative`}
       >
