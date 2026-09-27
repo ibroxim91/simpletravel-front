@@ -47,7 +47,7 @@ const Footer = () => {
     { key: 'linkedin', href: data?.[0]?.linkedin || '#', icon: <LinkedInIcon sx={{ color: '#1A73E8', width: 16, height: 16 }} /> },
     { key: 'instagram', href: data?.[0]?.instagram || '#', icon: <InstagramIcon sx={{ color: '#1A73E8', width: 16, height: 16 }} /> },
     { key: 'twitter', href: data?.[0]?.twitter || '#', icon: <XIcon sx={{ color: '#1A73E8', width: 14, height: 14 }} /> },
-  ];
+  ].filter((item) => item.key === 'telegram' || item.key === 'instagram');
   const paymentLogos = [
     { src: '/humo.png', alt: 'Humo', width: 54 },
     { src: '/uzcard.png', alt: 'Uzcard', width: 52 },

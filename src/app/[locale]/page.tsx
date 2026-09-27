@@ -1,5 +1,4 @@
 import HomeBenefits from '@/features/home/ui/HomeBenefits';
-import HotOffersPromoPopup from '@/features/home/ui/HotOffersPromoPopup';
 import HowItWorks from '@/features/home/ui/HowItWorks';
 import HotTours from '@/features/home/ui/HotTours';
 import Populardestinations from '@/features/home/ui/Populardestinations';
@@ -31,7 +30,6 @@ export default async function Home() {
           </div>
         </div>
       </main>
-      <HotOffersPromoPopup />
     </>
   );
 }

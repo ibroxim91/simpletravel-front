@@ -53,7 +53,7 @@ export default function IdleHelpSheet() {
     enabled: open,
   });
 
-  const telegramHref = contact?.telegram_chat || contact?.telegram || '';
+  const telegramHref = 'https://t.me/Simpletraveluzb';
   const phoneRaw = contact?.main_phone || contact?.other_phone || '';
   const phoneHref = phoneRaw ? `tel:${onlyNumber(phoneRaw)}` : '';
 

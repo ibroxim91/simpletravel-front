@@ -996,7 +996,7 @@ useEffect(() => {
           <p>{t('Искать тур')}</p>
         </Button>
       </div>
-      {!hideText ? <SearchFormOnboarding /> : null}
+      {false && !hideText ? <SearchFormOnboarding /> : null}
     </div>
   );
 };
