@@ -1005,12 +1005,15 @@ const includedServicesToRender = [
             </div>
           </div>
 
-          <div className="custom-container max-lg:px-5">
-            <div className="mt-[72px] h-px w-full bg-[#11221140]" />
-            <div className="mt-[72px]">
-              <CommentTour data={data} />
+          {/* Tekstli otzivlar — vaqtincha yashirilgan */}
+          {false && (
+            <div className="custom-container max-lg:px-5">
+              <div className="mt-[72px] h-px w-full bg-[#11221140]" />
+              <div className="mt-[72px]">
+                <CommentTour data={data} />
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Mobile: fixed book CTA — leaves room for chat FAB on the right */}
           <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[75] lg:hidden">
