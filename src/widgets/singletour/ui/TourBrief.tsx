@@ -90,6 +90,17 @@ export default function TourBrief({
     circle: string;
   }[] = [
     {
+      id: 'dates',
+      label: t('Дата тура'),
+      value: `${formatShortDate(departureDate)} – ${formatShortDate(returnDate)}`,
+      hint: days
+        ? `${days} ${t('дней')} / ${nights} ${t('ночей')}`
+        : undefined,
+      image: tourDates,
+      surface: 'lg:bg-[#FDECEF]',
+      circle: 'bg-[#F8D7E0]',
+    },
+    {
       id: 'hotel-type',
       label: t('Тип отеля'),
       value: starsLabel,
@@ -107,15 +118,6 @@ export default function TourBrief({
       circle: 'bg-[#FFE6CC]',
     },
     {
-      id: 'duration',
-      label: t('Длительность'),
-      value: `${days || '—'} ${t('дней')}`,
-      hint: `${nights} ${t('ночей')}`,
-      image: tourDuration,
-      surface: 'lg:bg-[#E8F8F0]',
-      circle: 'bg-[#D4F3E4]',
-    },
-    {
       id: 'group',
       label: t('Количество'),
       value: `${people || '—'} ${t('человек')}`,
@@ -125,15 +127,13 @@ export default function TourBrief({
       circle: 'bg-[#E6DCFF]',
     },
     {
-      id: 'dates',
-      label: t('Дата тура'),
-      value: `${formatShortDate(departureDate)} – ${formatShortDate(returnDate)}`,
-      hint: days
-        ? `${days} ${t('дней')} / ${nights} ${t('ночей')}`
-        : undefined,
-      image: tourDates,
-      surface: 'lg:bg-[#FDECEF]',
-      circle: 'bg-[#F8D7E0]',
+      id: 'duration',
+      label: t('Длительность'),
+      value: `${days || '—'} ${t('дней')}`,
+      hint: `${nights} ${t('ночей')}`,
+      image: tourDuration,
+      surface: 'lg:bg-[#E8F8F0]',
+      circle: 'bg-[#D4F3E4]',
     },
   ];
 
