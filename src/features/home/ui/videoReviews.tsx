@@ -126,7 +126,7 @@ function streamSrc(item: VideoItem) {
   return `${base}${GET_VIDEO_COMMENTS}${item.id}/stream/`;
 }
 
-const VideoReviews = () => {
+const VideoReviews = ({ embedded = false }: { embedded?: boolean }) => {
   const t = useTranslations();
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [selected, setSelected] = useState(0);
@@ -168,8 +168,8 @@ const VideoReviews = () => {
   };
 
   return (
-    <section>
-      <div className="custom-container">
+    <section className={embedded ? 'mt-10 max-lg:mt-6' : undefined}>
+      <div className={embedded ? undefined : 'custom-container'}>
         <div className="mx-auto w-full max-w-[353px] rounded-[14px] bg-white px-4 pb-4 pt-4 shadow-[0_2px_4px_rgba(0,0,0,0.15)] md:max-w-[1240px] md:px-6 md:pb-6 md:pt-6 md:shadow-[0_2px_20px_rgba(0,0,0,0.15)]">
           <div className="flex w-full items-start justify-between gap-3 md:items-center">
             <div className="flex min-w-0 flex-col gap-2">

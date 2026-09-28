@@ -47,6 +47,7 @@ import {
 } from '../lib/shareTour';
 import ShareTourNotFound from './ShareTourNotFound';
 import ShareTourSearching from './ShareTourSearching';
+import VideoReviews from '@/features/home/ui/videoReviews';
 import TourBrief from './TourBrief';
 import TourDayItem from './TourDayItem';
 import TourDetailLoading from './TourDetailLoading';
@@ -830,6 +831,8 @@ const includedServicesToRender = [
                   <p>{t('Нужна помощь?')}</p>
                 </button>
               </motion.div>
+
+              <VideoReviews embedded />
 
               <TourBrief
                 hotelRating={data.ticket_hotel?.[0]?.rating}
