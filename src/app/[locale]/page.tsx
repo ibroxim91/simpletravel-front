@@ -1,4 +1,5 @@
 import HomeBenefits from '@/features/home/ui/HomeBenefits';
+import HotOffersPromoPopup from '@/features/home/ui/HotOffersPromoPopup';
 import HowItWorks from '@/features/home/ui/HowItWorks';
 import HotTours from '@/features/home/ui/HotTours';
 import Populardestinations from '@/features/home/ui/Populardestinations';
@@ -10,6 +11,7 @@ import VideoReviews from '@/features/home/ui/videoReviews';
 export default async function Home() {
   return (
     <>
+      <HotOffersPromoPopup />
       <main>
         <div className="flex flex-col">
           <div className="bg-[#1E73E8] pb-[180px] max-lg:h-[759px] max-lg:pb-0">

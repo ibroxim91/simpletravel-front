@@ -118,7 +118,7 @@ export default function ToursMiniMenu({
         <TrendingUpIcon sx={{ fontSize: 18 }} />
         {t('mini_filter_expensive')}
       </button>
-      {false && <FilterButtonGuide />}
+      <FilterButtonGuide />
     </div>
   );
 }
